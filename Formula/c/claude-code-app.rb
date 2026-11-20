@@ -6,11 +6,11 @@ class ClaudeCodeApp < Formula
   version "5.11492.5"
   sha256 "fe6cd8a70f96b96eb4e6b647300cfaee6aaff4ce133a0fbbe11c2cdb775f5a6a"
   license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
-  revision 4
+  revision 5
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-app-v5.11492.5-r7"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ded49f045012a8d4869b645fc591caa5ac48ddc5be573ddbb4fd99ec11f42a18"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-app-v5.11492.5-r8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bead11fce7539337434f7a038945ec87103b342db4358a1420dc09250583efca"
   end
 
   depends_on "binutils" => :build

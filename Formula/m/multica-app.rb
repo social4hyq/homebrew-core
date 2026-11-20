@@ -4,7 +4,7 @@ class MulticaApp < Formula
   url "https://github.com/multica-ai/multica/archive/refs/tags/v0.11.1.tar.gz"
   sha256 "8a8f2149447dfd0c178fca332f88b539560fa57a5075d67c6e440958de8d49fc"
   license :cannot_represent # Multica License (Apache-2.0 plus additional conditions)
-  revision 2
+  revision 3
 
   livecheck do
     url :stable
@@ -76,6 +76,10 @@ class MulticaApp < Formula
              "./cmd/multica-desktop-bridge"
     end
 
+    # The Multica License is Apache-2.0 plus conditions and requires the full
+    # license (and NOTICE, if present) to travel with redistributed binaries.
+    pkgshare.install "LICENSE" => "MULTICA-LICENSE"
+    cp "NOTICE", pkgshare/"MULTICA-NOTICE" if File.exist?("NOTICE")
     pkgshare.install "scripts/install-desktop-ohos.sh" => "install-desktop.sh"
     pkgshare.install "scripts/multica-desktop-ohos.sh" => "desktop.sh"
     chmod 0755, pkgshare/"install-desktop.sh"

@@ -42,6 +42,15 @@ codex_cache_dir() {
   printf '%s' "${XDG_CACHE_HOME:-$HOME/.cache}/codex-app"
 }
 
+record_vendor_failure() { # stage reason detail
+  [ -n "${HAP_INSTALLER_RESULT_FILE:-}" ] || return 0
+  node -e '
+const fs = require("node:fs");
+const [file, stage, reason, detail] = process.argv.slice(1);
+fs.writeFileSync(file, JSON.stringify({ v: 1, stage, reason, detail: String(detail).slice(0, 300) }) + "\n", { mode: 0o600 });
+' "$HAP_INSTALLER_RESULT_FILE" "$1" "$2" "$3" 2>/dev/null || true
+}
+
 sha256_matches() {
   node -e '
 const fs = require("node:fs"), crypto = require("node:crypto");
@@ -80,10 +89,11 @@ process.stdout.write([value.url, value.sha256, value.version, value.file || "cha
       rm -f "$deb" "$deb.part"
       log "downloading ChatGPT $version from OpenAI (~519 MB)..."
       curl -fL --retry 3 --retry-delay 2 -C - -o "$deb.part" "$url" ||
-        { echo "download failed: $url" >&2; exit 1; }
+        { record_vendor_failure download network "download failed: $url"; echo "download failed: $url" >&2; exit 1; }
       mv "$deb.part" "$deb"
       if ! sha256_matches "$deb" "$sha"; then
         rm -f "$deb"
+        record_vendor_failure download install-failed "downloaded package failed the sha256 check"
         echo "the downloaded package failed the sha256 check" >&2
         exit 1
       fi
@@ -104,7 +114,7 @@ fs.createReadStream(process.argv[1])
     rm -f "$assembled" "$assembled.part"
     log "assembling the HAP (this can take a minute)..."
     python3 "$assemble_dir/assemble-local-hap.py" "$DEFAULT_HAP" "$deb" "$assembled.part" >&2 ||
-      { rm -f "$assembled.part"; echo "assembling the HAP failed" >&2; exit 1; }
+      { rm -f "$assembled.part"; record_vendor_failure assemble install-failed "assembling the HAP failed"; echo "assembling the HAP failed" >&2; exit 1; }
     mv "$assembled.part" "$assembled"
   fi
   printf '%s' "$assembled"

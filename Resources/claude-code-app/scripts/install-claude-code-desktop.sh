@@ -32,7 +32,12 @@ while (($#)); do
 done
 
 vendor_cache_dir() {
-  printf '%s' "${XDG_CACHE_HOME:-$HOME}/.cache/claude-code-app"
+  printf '%s' "${XDG_CACHE_HOME:-$HOME/.cache}/claude-code-app"
+}
+
+record_vendor_failure() { # stage reason detail
+  [ -n "${HAP_INSTALLER_RESULT_FILE:-}" ] || return 0
+  python3 -c 'import json,os,sys; open(os.environ["HAP_INSTALLER_RESULT_FILE"],"w").write(json.dumps({"v":1,"stage":sys.argv[1],"reason":sys.argv[2],"detail":sys.argv[3][:300]})+"\n")' "$1" "$2" "$3" 2>/dev/null || true
 }
 
 deb_sha256() {
@@ -61,10 +66,11 @@ prepare_vendor_hap() {
       rm -f "$deb" "$deb.part"
       echo "downloading Claude Desktop $version from Anthropic..." >&2
       curl -fL --retry 3 --retry-delay 2 -C - -o "$deb.part" "$url" ||
-        { echo "download failed: $url" >&2; exit 1; }
+        { record_vendor_failure download network "download failed: $url"; echo "download failed: $url" >&2; exit 1; }
       mv "$deb.part" "$deb"
       if [ "$(deb_sha256 "$deb")" != "$sha" ]; then
         rm -f "$deb"
+        record_vendor_failure download install-failed "downloaded package failed the sha256 check"
         echo "the downloaded package failed the sha256 check" >&2
         exit 1
       fi
@@ -72,7 +78,8 @@ prepare_vendor_hap() {
   fi
   out="$stage/claude-desktop-assembled-unsigned.hap"
   echo "assembling the HAP (this can take a minute)..." >&2
-  python3 "$assembler" "$INPUT_HAP" "$deb" "$out" >&2
+  python3 "$assembler" "$INPUT_HAP" "$deb" "$out" >&2 ||
+    { record_vendor_failure assemble install-failed "assembling the HAP failed"; echo "assembling the HAP failed" >&2; exit 1; }
   printf '%s' "$out"
 }
 [[ -f "$INPUT_HAP" ]] || { echo "Input HAP not found: $INPUT_HAP" >&2; exit 1; }
