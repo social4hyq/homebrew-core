@@ -291,3 +291,69 @@ test('the HAP given to hdc installation is the one without directory entries', t
   const signerCall=f.calls().find(c=>c[0]==='signer'); const input=signerCall[signerCall.indexOf('--hap')+1];
   assert.match(input,/\.nodirs\.hap$/); assert.ok(!fs.existsSync(input));
 });
+
+// A real zip64 archive, written by hand because AdmZip cannot produce one: the
+// classic end-of-central-directory record carries 0xFFFF / 0xFFFFFFFF
+// placeholders and the real values live in the zip64 end record and locator,
+// which is how `zip` marks archives it cannot describe in 32 bits. The entries
+// include directory entries, so a rewrite that ignored zip64 would drop them.
+function crc32(data) {
+  let crc = 0xffffffff;
+  for (const byte of data) {
+    crc ^= byte;
+    for (let bit = 0; bit < 8; bit += 1) crc = (crc >>> 1) ^ (0xedb88320 & -(crc & 1));
+  }
+  return (crc ^ 0xffffffff) >>> 0;
+}
+function writeZip64Hap(file) {
+  const entries = [
+    ['module.json', Buffer.from(JSON.stringify({app:{bundleName:bundle}, module:{name:'electron', requestPermissions:basic}}))],
+    ['libs/', Buffer.alloc(0)],
+    ['libs/arm64-v8a/', Buffer.alloc(0)],
+    ['libs/arm64-v8a/libdemo.so', Buffer.from('\x7fELF-demo-'.repeat(100))],
+  ];
+  const locals = [], centrals = [];
+  let offset = 0;
+  for (const [name, data] of entries) {
+    const nameBytes = Buffer.from(name);
+    const local = Buffer.alloc(30);
+    local.writeUInt32LE(0x04034b50, 0); local.writeUInt16LE(45, 4); local.writeUInt16LE(0, 6); local.writeUInt16LE(0, 8);
+    local.writeUInt16LE(0, 10); local.writeUInt16LE(33, 12); local.writeUInt32LE(crc32(data), 14);
+    local.writeUInt32LE(data.length, 18); local.writeUInt32LE(data.length, 22); local.writeUInt16LE(nameBytes.length, 26);
+    const central = Buffer.alloc(46);
+    central.writeUInt32LE(0x02014b50, 0); central.writeUInt16LE(45, 4); central.writeUInt16LE(45, 6);
+    central.writeUInt16LE(0, 8); central.writeUInt16LE(0, 10); central.writeUInt16LE(0, 12); central.writeUInt16LE(33, 14);
+    central.writeUInt32LE(crc32(data), 16); central.writeUInt32LE(data.length, 20); central.writeUInt32LE(data.length, 24);
+    central.writeUInt16LE(nameBytes.length, 28); central.writeUInt32LE(offset, 42);
+    locals.push(local, nameBytes, data); centrals.push(central, nameBytes);
+    offset += local.length + nameBytes.length + data.length;
+  }
+  const centralDirectory = Buffer.concat(centrals);
+  const zip64End = Buffer.alloc(56);
+  zip64End.writeUInt32LE(0x06064b50, 0); zip64End.writeBigUInt64LE(44n, 4); zip64End.writeUInt16LE(45, 12); zip64End.writeUInt16LE(45, 14);
+  zip64End.writeBigUInt64LE(BigInt(entries.length), 24); zip64End.writeBigUInt64LE(BigInt(entries.length), 32);
+  zip64End.writeBigUInt64LE(BigInt(centralDirectory.length), 40); zip64End.writeBigUInt64LE(BigInt(offset), 48);
+  const locator = Buffer.alloc(20);
+  locator.writeUInt32LE(0x07064b50, 0); locator.writeBigUInt64LE(BigInt(offset + centralDirectory.length), 8); locator.writeUInt32LE(1, 16);
+  const end = Buffer.alloc(22);
+  end.writeUInt32LE(0x06054b50, 0); end.writeUInt16LE(0xffff, 8); end.writeUInt16LE(0xffff, 10);
+  end.writeUInt32LE(0xffffffff, 12); end.writeUInt32LE(0xffffffff, 16);
+  fs.writeFileSync(file, Buffer.concat([...locals, centralDirectory, zip64End, locator, end]));
+}
+test('--strip-dirs refuses a zip64 HAP and writes nothing', t => {
+  const f=fixture(t); writeZip64Hap(f.hap); const out=path.join(f.root,'copy.hap');
+  const r=spawnSync(process.execPath,[path.join(__dirname,'prepare-profile.cjs'),'--strip-dirs',f.hap,out],{env:f.env,encoding:'utf8'});
+  assert.equal(r.status,1); assert.match(r.stderr,/zip64 is not supported/); assert.equal(r.stdout,'');
+  assert.ok(!fs.existsSync(out));
+});
+test('a zip64 HAP is signed as it is, with a warning, and never rewritten', t => {
+  const f=fixture(t); writeZip64Hap(f.hap); const original=fs.readFileSync(f.hap); const out=path.join(f.root,'out','signed.hap');
+  assert.equal(spawnSync('unzip',['-tq',f.hap]).status,0);
+  assert.equal(names(f.hap).filter(n=>n.endsWith('/')).length,2);
+  const r=f.run(['--sign-only','--output',out]); assert.equal(r.status,0,r.stdout+r.stderr);
+  assert.match(r.stderr,/could not check the HAP for directory entries; signing it as it is/);
+  assert.doesNotMatch(r.stdout,/Removed/);
+  assert.ok(fs.readFileSync(out).equals(original)); assert.ok(fs.readFileSync(f.hap).equals(original));
+  assert.equal(names(out).filter(n=>n.endsWith('/')).length,2);
+  assert.deepEqual(fs.readdirSync(path.dirname(out)),['signed.hap']);
+});
