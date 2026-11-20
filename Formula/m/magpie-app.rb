@@ -202,19 +202,15 @@ class MagpieApp < Formula
 
   def caveats
     <<~EOS
-      `brew install` runs `magpie-app install` automatically once the device is
-      connected and the Huawei Developer login is done; otherwise it is queued:
-      `hap-app install-pending` finishes it. To install by hand, run
-      `magpie-app install` to sign and install the desktop HAP locally.
-      By default it starts the installed Magpie CLI and shares that CLI's
-      settings. The web interface listens on loopback and requires a fresh key
-      for each launch. Installing this variant needs a developer debug profile.
-      The profile grants READ_PASTEBOARD, without which pasting into the window
-      does not work.
+      `brew install`/`brew upgrade` installs the HAP automatically once the
+      device and the Huawei Developer login are ready; otherwise it is queued:
+      `hap-app status` shows why, `hap-app install-pending` finishes it.
+      Manual: `magpie-app install`. Details: docs/hap-app-formulae.md.
 
-      If the ACL profile is unavailable, run `magpie-app install --no-acl`
-      and start `magpie web --addr 127.0.0.1:3430 --no-open` separately.
-      Enter the key printed by Magpie in the desktop window.
+      Starts the installed Magpie CLI and shares its settings; the web UI listens on
+      loopback with a per-launch key. Needs a debug profile for READ_PASTEBOARD
+      (paste). Without ACLs: `magpie-app install --no-acl`, then run
+      `magpie web --addr 127.0.0.1:3430 --no-open` yourself.
     EOS
   end
 
