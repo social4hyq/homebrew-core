@@ -266,21 +266,15 @@ class GenofficeApp < Formula
 
   def caveats
     <<~EOS
-      The desktop HAP is unsigned in the bottle. `brew install` runs
-      `genoffice-app install` automatically once the device is connected and the
-      Huawei Developer login is done; otherwise it is queued: `hap-app
-      install-pending` finishes it. To install by hand, run `genoffice-app install`.
-      app-installer handles Huawei Developer
-      login, local debug profile generation, signing, installation, and launch;
-      `genoffice-app start` opens it again.
+      `brew install`/`brew upgrade` installs the HAP automatically once the
+      device and the Huawei Developer login are ready; otherwise it is queued:
+      `hap-app status` shows why, `hap-app install-pending` finishes it.
+      Manual: `genoffice-app install`. Details: docs/hap-app-formulae.md.
 
-      The app runs entirely inside its own sandbox. The weak-sandbox permissions
-      CUSTOM_SANDBOX and READ_WRITE_USER_FILE (host user files) and
-      READ_PASTEBOARD (paste) are granted through a debug profile generated on
-      the spot, and the two kernel ACLs enable WebAssembly for the renderer.
-      The `genoffice` command line of the `genoffice` formula is a separate
-      tool: it cannot reach the app's sandbox, so `genoffice open` does not
-      control this app.
+      The app runs entirely in its own sandbox: CUSTOM_SANDBOX, READ_WRITE_USER_FILE
+      and READ_PASTEBOARD come from the local debug profile, and the kernel ACLs keep
+      WebAssembly working. The `genoffice` CLI is a separate tool that cannot reach
+      the app.
     EOS
   end
 
