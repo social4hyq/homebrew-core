@@ -19,10 +19,23 @@ const hostConfig = {
 
 function boot(packageVersion = '26.1111.71704') {
   const runtimeProcess = { env: {} };
-  const state = { appPath: null, loaded: null, name: null, childProcess: null, process: runtimeProcess };
+  const state = {
+    appPath: null,
+    loaded: null,
+    name: null,
+    paths: {},
+    madeDirs: [],
+    childProcess: null,
+    process: runtimeProcess,
+  };
   const app = {
+    getPath(name) {
+      assert.equal(name, 'userData');
+      return '/data/storage/el2/base/files/ChatGPT';
+    },
     setAppPath(value) { state.appPath = value; },
     setName(value) { state.name = value; },
+    setPath(name, value) { state.paths[name] = value; },
   };
   const childProcess = {};
   for (const name of ['spawn', 'spawnSync', 'execFile', 'execFileSync']) {
@@ -31,7 +44,12 @@ function boot(packageVersion = '26.1111.71704') {
   state.childProcess = childProcess;
   const fakeRequire = id => {
     if (id === 'node:path') return path;
-    if (id === 'node:fs') return { readFileSync: () => JSON.stringify(hostConfig) };
+    if (id === 'node:fs') {
+      return {
+        readFileSync: () => JSON.stringify(hostConfig),
+        mkdirSync: (...args) => state.madeDirs.push(args),
+      };
+    }
     if (id === 'node:child_process') return childProcess;
     if (id === 'electron') return { app };
     if (id === vendor) return {};
@@ -52,6 +70,11 @@ test('loads the official app and configures the supported host Codex CLI overrid
   const state = boot();
   assert.equal(state.name, 'ChatGPT');
   assert.equal(state.appPath, vendor);
+  assert.equal(state.paths.appData, '/data/storage/el2/base/files/ChatGPT');
+  assert.equal(state.madeDirs.length, 1);
+  assert.equal(state.madeDirs[0][0], '/data/storage/el2/base/files/ChatGPT');
+  assert.equal(state.madeDirs[0][1].recursive, true);
+  assert.equal(state.madeDirs[0][1].mode, 0o700);
   assert.equal(state.loaded, path.join(vendor, '.vite/build/early-bootstrap.js'));
   assert.equal(state.process.env.CODEX_CLI_PATH, hostConfig.codexCli);
 });

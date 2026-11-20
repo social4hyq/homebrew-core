@@ -6,6 +6,16 @@ const fs = require('node:fs');
 const { app } = require('electron');
 const hostConfigPath = path.join(__dirname, 'chatgpt-host-config.json');
 
+// The OHOS Electron shell exposes appData as an unsupported path. The
+// official main process reads it during startup, so map it to the app's
+// private userData directory before loading the vendor entry point.
+const privateDataBase = app.getPath('userData');
+if (typeof privateDataBase !== 'string' || !path.isAbsolute(privateDataBase)) {
+  throw new Error('Electron did not provide a private userData path');
+}
+fs.mkdirSync(privateDataBase, { recursive: true, mode: 0o700 });
+app.setPath('appData', privateDataBase);
+
 function absolute(value, label) {
   if (typeof value !== 'string' || !path.isAbsolute(value)) {
     throw new Error(`invalid ChatGPT host config: ${label} must be an absolute path`);
