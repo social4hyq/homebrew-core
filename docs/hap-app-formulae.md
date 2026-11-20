@@ -114,6 +114,18 @@ Homebrew 的 `post_install` 不在用户的 shell 环境里跑：它把 `HOME` �
 `no-device` / `no-login` / `no-hdc` / `multiple-devices`）、`login`、
 `permissions`。
 
+### 厂商二进制在安装时下载
+
+闭源上游的官方包不进 bottle（避免二次分发）：`codex-app` 的 ChatGPT `.deb`、
+`claude-code-app` 的 Claude Desktop `.deb` 都由 `<app> install` 在安装时下载并校验
+sha256，缓存到 `~/.cache/<app>/vendor/`，再合成 HAP、签名安装。`obsidian-app` 一直
+是同样的模式（安装时下载官方 asar）。
+
+- 离线安装：`<app> install --deb PATH`（仍会校验 sha256）。
+- 清理缓存：`<app> install --clean-cache`。
+- 首次 `brew install` 会多一次大文件下载（codex-app 约 519 MB）；下载/网络失败按
+  `network` 入队，`hap-app install-pending` 重试时命中缓存不重复下载。
+
 ### TLS / 代理与日志（新 PC 排障）
 
 Homebrew 跑 `post_install` 时清空环境变量，所以**在 shell 里 export 的

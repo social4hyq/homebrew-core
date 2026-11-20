@@ -10,6 +10,106 @@ NEED_CONFIG=0
 MODULE=electron
 ABILITY=EntryAbility
 
+# The bottle ships the shell only; the official package comes from OpenAI at
+# install time (or from --deb) and stays in the user's cache.
+EXTRA_TOOLS=(curl)
+VENDOR_DEB="${CHATGPT_APP_VENDOR_DEB:-}"
+CLEAN_CACHE=0
+DEFAULT_HAP="${CHATGPT_APP_UNSIGNED_HAP:-}"
+
+app_usage_extra() {
+  cat <<'EOF'
+  --deb PATH     Official ChatGPT .deb to use instead of downloading it.
+  --clean-cache  Remove the cached .deb and assembled HAP before installing.
+EOF
+}
+
+app_parse_option() {
+  case "${1:-}" in
+    --deb)
+      VENDOR_DEB="${2:?--deb needs a path}"
+      OPT_SHIFT=2
+      ;;
+    --clean-cache)
+      CLEAN_CACHE=1
+      OPT_SHIFT=1
+      ;;
+    *) OPT_SHIFT=0 ;;
+  esac
+}
+
+codex_cache_dir() {
+  printf '%s' "${XDG_CACHE_HOME:-$HOME/.cache}/codex-app"
+}
+
+sha256_matches() {
+  node -e '
+const fs = require("node:fs"), crypto = require("node:crypto");
+const [file, want] = process.argv.slice(1);
+const hash = crypto.createHash("sha256");
+fs.createReadStream(file)
+  .on("data", chunk => hash.update(chunk))
+  .on("error", () => process.exit(1))
+  .on("end", () => process.exit(hash.digest("hex") === want ? 0 : 1));
+' "$1" "$2"
+}
+
+prepare_chatgpt_hap() {
+  local vendor_json assemble_dir cache_dir deb assembled shell_key url sha version file
+  vendor_json="${CHATGPT_APP_VENDOR_JSON:?missing ChatGPT vendor.json}"
+  assemble_dir="${CHATGPT_APP_ASSEMBLE_DIR:?missing the HAP assembler}"
+  cache_dir="$(codex_cache_dir)"
+  if [ "$CLEAN_CACHE" = "1" ]; then rm -rf "$cache_dir"; fi
+  mkdir -p "$cache_dir/vendor" "$cache_dir/assembled"
+
+  read -r url sha version file < <(node -e '
+const value = JSON.parse(require("node:fs").readFileSync(process.argv[1], "utf8"));
+process.stdout.write([value.url, value.sha256, value.version, value.file || "chatgpt_arm64.deb"].join(" "));
+' "$vendor_json")
+  [ -n "$url" ] && [ -n "$sha" ] || { echo "invalid vendor.json: $vendor_json" >&2; exit 1; }
+
+  if [ -n "$VENDOR_DEB" ]; then
+    [ -f "$VENDOR_DEB" ] || { echo "--deb not found: $VENDOR_DEB" >&2; exit 1; }
+    sha256_matches "$VENDOR_DEB" "$sha" || { echo "--deb failed the sha256 check: $VENDOR_DEB" >&2; exit 1; }
+    deb="$VENDOR_DEB"
+  else
+    deb="$cache_dir/vendor/$sha.deb"
+    if [ -f "$deb" ] && sha256_matches "$deb" "$sha"; then
+      log "using the cached ChatGPT $version package"
+    else
+      rm -f "$deb" "$deb.part"
+      log "downloading ChatGPT $version from OpenAI (~519 MB)..."
+      curl -fL --retry 3 --retry-delay 2 -C - -o "$deb.part" "$url" ||
+        { echo "download failed: $url" >&2; exit 1; }
+      mv "$deb.part" "$deb"
+      if ! sha256_matches "$deb" "$sha"; then
+        rm -f "$deb"
+        echo "the downloaded package failed the sha256 check" >&2
+        exit 1
+      fi
+    fi
+  fi
+
+  shell_key="$(node -e '
+const crypto = require("node:crypto"), fs = require("node:fs");
+const hash = crypto.createHash("sha256");
+fs.createReadStream(process.argv[1])
+  .on("data", chunk => hash.update(chunk))
+  .on("end", () => process.stdout.write(hash.digest("hex").slice(0, 16)));
+' "$DEFAULT_HAP")"
+  assembled="$cache_dir/assembled/chatgpt-$shell_key-${sha:0:16}.hap"
+  if [ -f "$assembled" ]; then
+    log "using the cached assembled HAP"
+  else
+    rm -f "$assembled" "$assembled.part"
+    log "assembling the HAP (this can take a minute)..."
+    python3 "$assemble_dir/assemble-local-hap.py" "$DEFAULT_HAP" "$deb" "$assembled.part" >&2 ||
+      { rm -f "$assembled.part"; echo "assembling the HAP failed" >&2; exit 1; }
+    mv "$assembled.part" "$assembled"
+  fi
+  printf '%s' "$assembled"
+}
+
 app_prepare() {
   local home prefix cli
   home="${CHATGPT_APP_HOST_HOME:-$HOME}"
@@ -22,6 +122,11 @@ app_prepare() {
   # Host Node and its OHOS node-pty back the in-app terminal (owl-pty-shim.cjs).
   export CHATGPT_APP_NODE="${CHATGPT_APP_NODE:-$prefix/opt/node/bin/node}"
   prepare_host_settings "$home" "$CHATGPT_APP_CODEX_HOME"
+
+  case "$(basename "${shell_hap:-}")" in
+    codex-app-shell-unsigned.hap) shell_hap="$(prepare_chatgpt_hap)" ;;
+    *) log "using the caller's HAP as-is; skipping the ChatGPT package download" ;;
+  esac
 }
 
 # HAP processes do not inherit the user's shell, and cannot create folders under
