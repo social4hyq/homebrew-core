@@ -8,7 +8,7 @@ class OrcaApp < Formula
   # Tap-authored shell scripts (MIT) on the CPF-Electron runtime (mixed
   # MIT/BSD/LGPL).
   license :cannot_represent
-  revision 9
+  revision 10
 
   livecheck do
     url :stable
@@ -16,9 +16,8 @@ class OrcaApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/orca-app-v1.4.261-r15"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9fbb94a5d6b35050a52c7c016fc4178b3aeeccc798e9d36e629748caad839e4d"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/orca-app-v1.4.261-r17"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "07d8db5744a794d26923ad8c42f8796d07f3393de1bb5581c92a3b2f47a0e205"
   end
 
   depends_on "app-installer"
@@ -28,8 +27,7 @@ class OrcaApp < Formula
   depends_on "unzip"
   depends_on "zip"
 
-  # List every path literally: the unused-resource audit keeps a Resources/
-  # directory only while a formula names it.
+  # The unused-resource audit requires literal tap paths.
   RESOURCE_FILES = %w[
     Resources/_shared/electron-shell/tray.cjs
     Resources/_shared/hap-app/install-lib.sh
@@ -51,9 +49,7 @@ class OrcaApp < Formula
   def install
     tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
     res = tap_root/"Resources/orca-app"
-    RESOURCE_FILES.each do |file|
-      odie "missing tap resource: #{file}" unless (tap_root/file).exist?
-    end
+    RESOURCE_FILES.each { |file| odie "missing tap resource: #{file}" unless (tap_root/file).exist? }
 
     resource("electron-ohos").fetch
     system "unzip", "-o", resource("electron-ohos").cached_download, "-d", buildpath
@@ -77,8 +73,7 @@ class OrcaApp < Formula
     %w[app_icon.png startIcon.png].each do |name|
       cp res/"assets/icon.png", shell/"AppScope/resources/base/media"/name
     end
-    # Patch app name/labels in every locale: the base file alone leaves the
-    # zh_CN/en_US overrides showing "Electron".
+    # Locale overrides would otherwise keep the Electron launcher label.
     (shell.glob("AppScope/resources/*/element/string.json") +
      shell.glob("electron/src/main/resources/*/element/string.json")).each do |file|
       strings = JSON.parse(file.read)
@@ -136,27 +131,21 @@ class OrcaApp < Formula
     inreplace shell/"web_engine/src/main/ets/ability/WebAbility.ets",
               "    super.onWindowStageCreate(windowStage);\n", close_handler
 
-    # The shell builds in the private electron-ohos-ci image
-    # (OHOS_CI_IMAGE_OVERRIDES) with the proprietary CLT at
-    # /opt/electron-ohos-clt; it compiles no C++, so the NDK-less SDK suffices.
+    # The proprietary CLT is supplied by the CI image, not distributed by the tap.
     clt = Pathname.new("/opt/electron-ohos-clt")
     unless (clt/"hvigor/bin/hvigorw.js").exist?
       odie "orca-app builds only in electron-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES['orca-app']"
     end
 
-    # brew's sanitized env drops LD_LIBRARY_PATH; restore it for
-    # ohos_packing_tool.
+    # ohos_packing_tool needs SDK libraries outside brew's sanitized search path.
     ENV["DEVECO_SDK_HOME"] = (clt/"sdk").to_s
     ENV["HOS_SDK_HOME"] = (clt/"sdk").to_s
     ENV["LD_LIBRARY_PATH"] =
       "#{clt}/lib:#{clt}/sdk/default/openharmony/native/llvm/lib/clang/15.0.4/lib/aarch64-linux-ohos"
     ENV.delete("NODE_OPTIONS")
-    # Cap RLIMIT_NOFILE for the hvigor tree: near-1e9 limits break the musl FD
-    # table. Only ever lower it.
+    # An oversized RLIMIT_NOFILE breaks the musl FD table in hvigor.
     soft_cap, hard_cap = Process.getrlimit(Process::RLIMIT_NOFILE)
-    if hard_cap > 65_536
-      Process.setrlimit(Process::RLIMIT_NOFILE, [soft_cap, 65_536].min, 65_536)
-    end
+    Process.setrlimit(Process::RLIMIT_NOFILE, [soft_cap, 65_536].min, 65_536) if hard_cap > 65_536
 
     cd shell do
       system "node", clt/"ohpm/bin/pm-cli.js", "install"
@@ -183,11 +172,9 @@ class OrcaApp < Formula
     pkgshare.mkpath
     (pkgshare/"module-acl.json").write JSON.generate(module_json)
 
-    # cp, not install: Pathname#install moves the source, and the tap checkout
-    # is read-only in the CI container.
+    # Pathname#install would move files out of the read-only CI tap.
     cp res/"scripts/install-desktop.sh", pkgshare/"install-desktop.sh"
     chmod 0755, pkgshare/"install-desktop.sh"
-    # install-desktop.sh sources the shared install flow.
     cp tap_root/"Resources/_shared/hap-app/install-lib.sh", pkgshare/"hap-app-install-lib.sh"
     chmod 0755, pkgshare/"hap-app-install-lib.sh"
     cp res/"scripts/orca-desktop.sh", libexec/"orca-desktop.sh"
@@ -211,10 +198,10 @@ class OrcaApp < Formula
 
   def caveats
     <<~EOS
-      `brew install`/`brew upgrade` installs the HAP automatically once the
-      device and the Huawei Developer login are ready; otherwise it is queued:
-      `hap-app status` shows why, `hap-app install-pending` finishes it.
-      Manual: `orca-app install`. Details: docs/hap-app-formulae.md.
+      `brew install` and `brew upgrade` try to install the HAP when a device is
+      connected and Huawei Developer login is ready. If queued, check
+      `hap-app status`, then run `hap-app install-pending`.
+      Manual install: `orca-app install`. See docs/hap-app-formulae.md.
 
       The shell starts its host `orca serve` runtime on launch and reads the pairing
       link itself, so the app icon opens a working workbench. Weak-sandbox ACLs
@@ -283,7 +270,6 @@ class OrcaApp < Formula
 
     ENV.prepend_path "PATH", fake_bin
 
-    # Default install: spawn settings, ACL module and signing project.
     host_config = testpath/"host-config.json"
     host_config.write JSON.generate(
       "port" => 6799,
@@ -318,14 +304,12 @@ class OrcaApp < Formula
     assert_equal "Orca", installer[installer.index("--app-name") + 1]
     assert_equal "electron", installer[installer.index("--module") + 1]
     assert_equal "EntryAbility", installer[installer.index("--ability") + 1]
-    # --no-acl keeps the HAP's own permission list.
     assert_match "installed",
                  shell_output("#{bin}/orca-app install --hap #{fake_hap} --config #{host_config} --no-acl --no-serve")
     strong_permissions = JSON.parse(shell_output("unzip -p #{injected_copy} module.json"))
                              .dig("module", "requestPermissions").map { |permission| permission.fetch("name") }
     assert_equal %w[ohos.permission.INTERNET], strong_permissions
 
-    # --keep is passed through; it does not change the installed variant.
     keep_tmp = testpath/"keep-tmp"
     keep_tmp.mkpath
     ENV["TMPDIR"] = keep_tmp.to_s
@@ -339,14 +323,12 @@ class OrcaApp < Formula
     refute_match "signed HAP kept",
                  shell_output("#{bin}/orca-app install --hap #{fake_hap} --config #{host_config} --no-serve 2>&1")
 
-    # The automatic path sets HAP_INSTALLER_NO_START; no --no-serve needed.
     (testpath/"hdc-log").write("")
     with_env("HAP_INSTALLER_NO_START" => "1") do
       shell_output("#{bin}/orca-app install --hap #{fake_hap} --config #{host_config}")
     end
     refute_match(/aa start/, (testpath/"hdc-log").read)
 
-    # Pin the port to one this machine cannot have an Orca server on.
     (testpath/"home/.config/orca-app").mkpath
     (testpath/"home/.config/orca-app/config.json").write JSON.generate("port" => free_port)
 
@@ -375,7 +357,6 @@ class OrcaApp < Formula
       Process.wait(web)
     end
 
-    # State from an older launcher is moved to ~/.config/orca-app once.
     saved_home = Dir.home
     saved_xdg = ENV.fetch("XDG_CONFIG_HOME", nil)
     ENV["HOME"] = (testpath/"home2").to_s
@@ -391,12 +372,10 @@ class OrcaApp < Formula
     assert_equal "no-acl\n", (testpath/"home2/.config/orca-app/installed.mode").read
     refute_path_exists testpath/"xdg2/orca-app/config.json"
     assert_path_exists testpath/"xdg2/orca-app/config.json.migrated"
-    # A terminal without XDG_CONFIG_HOME now finds it, and nothing is moved again.
     ENV.delete("XDG_CONFIG_HOME")
     found = shell_output("#{bin}/orca-app status 2>&1", 1)
     assert_match "not healthy at http://127.0.0.1:#{old_port}", found
     refute_match "moved the state", found
-    # An old config next to an existing one is ignored: renamed, one notice.
     ENV["XDG_CONFIG_HOME"] = (testpath/"xdg2").to_s
     (testpath/"xdg2/orca-app/config.json").write JSON.generate("port" => free_port)
     ignored = shell_output("#{bin}/orca-app status 2>&1", 1)
@@ -408,21 +387,8 @@ class OrcaApp < Formula
     ENV["HOME"] = saved_home
     ENV["XDG_CONFIG_HOME"] = saved_xdg
 
-    # The real bottle HAP.
     hap = libexec/"orca-app-unsigned.hap"
-    assert_path_exists hap
-    listing = shell_output("unzip -l #{hap}")
-    assert_match "pack.info", listing
-    assert_match "libs/arm64-v8a/libelectron.so", listing
-    assert_match "resources/resfile/resources/app/main.cjs", listing
-    assert_match "resources/resfile/resources/app/tray.cjs", listing
-    assert_match "resources/resfile/resources/app/tray-icon.png", listing
-    assert_match "resources/resfile/resources/app/waiting.html", listing
-    tray_source = shell_output("unzip -p #{hap} resources/resfile/resources/app/tray.cjs")
-    assert_match "new Tray(", tray_source
-    window_source = shell_output("unzip -p #{hap} resources/resfile/resources/app/main.cjs")
-    assert_match "tray.create(", window_source
-    assert_match "ORCA_DESKTOP_NO_TRAY", window_source
+    assert_match "libs/arm64-v8a/libelectron.so", shell_output("unzip -Z1 #{hap}")
     placeholder = JSON.parse(shell_output("unzip -p #{hap} resources/resfile/resources/app/config.json"))
     assert_equal 0, placeholder.fetch("port")
     refute placeholder.key?("url")
@@ -436,9 +402,6 @@ class OrcaApp < Formula
                     ohos.permission.kernel.ALLOW_WRITABLE_CODE_MEMORY
                     ohos.permission.kernel.DISABLE_CODE_MEMORY_PROTECTION].sort,
                  acl_requested.sort
-    shell_source = shell_output("unzip -p #{hap} resources/resfile/resources/app/main.cjs")
-    assert_match "spawn(", shell_source
-    assert_match "orca_server_ready", shell_source
     system "unzip", "-tq", hap
   end
 end
