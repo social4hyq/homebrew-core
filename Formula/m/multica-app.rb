@@ -250,44 +250,22 @@ class MulticaApp < Formula
 
   def caveats
     <<~EOS
-      The CLI and daemon come from the `multica` formula; this one adds the desktop.
-      The desktop HAP is at #{libexec}/multica-desktop-unsigned.hap.
+      `brew install`/`brew upgrade` installs the HAP automatically once the
+      device and the Huawei Developer login are ready; otherwise it is queued:
+      `hap-app status` shows why, `hap-app install-pending` finishes it.
+      Manual: `multica-app install`. Details: docs/hap-app-formulae.md.
 
-      The HAP is unsigned in the bottle. `brew install` runs `multica-app install`
-      automatically once the device is connected and the Huawei Developer login
-      is done; otherwise it is queued: `hap-app install-pending` finishes it.
-      To install by hand, run `multica-app install`. app-installer handles
-      Huawei Developer
-      login, signing-project creation, local debug profile generation, signing,
-      installation, and launch. Private signing material stays in your home
-      directory; it is not in the bottle.
+      The CLI and daemon come from the `multica` formula; keep both versions equal
+      (`multica-app` warns when they differ). The desktop runs in its sandbox, so a
+      loopback bridge runs on the host: `multica-app` starts it and opens the app,
+      `multica-app start --bridge-only` starts only the bridge (use the absolute path
+      in login scripts), `multica-app stop` stops it.
 
-      Earlier revisions installed the desktop under `com.huawei.ohos_electron`,
-      the bundle name every HAP built from the vendor template carries. It is
-      now `com.social4hyq.multica`, so it no longer shares an identity with
-      other Electron apps. An old copy installed under the previous name is
-      left in place and can be uninstalled by hand.
-
-      The default HAP requests only INTERNET and GET_NETWORK_INFO, which local
-      automatic signing can grant. If your signing profile carries the
-      CUSTOM_SANDBOX and READ_WRITE_USER_FILE ACLs (for example an AGC debug
-      profile), run `multica-app install --acl-profile <build-profile.json5>`
-      to sign and install a copy that also requests them; without those ACLs the
-      device refuses to install it.
-
-      The desktop app runs in an app sandbox that cannot execute the CLI or read
-      ~/.multica, so a small loopback bridge runs on the host. `multica-app
-      install` starts it and pairs it with the app; afterwards run
-      `multica-app` to start the bridge (if needed) and open the app. Logging
-      in inside the desktop app then configures and starts the daemon. To start
-      only the bridge from a shell startup file, add
-      `"$HOME/.harmonybrew/bin/multica-app" start --bridge-only`. Use the
-      absolute path: a startup file can run before Homebrew's bin is on PATH,
-      where a bare `multica-app` is not found and the line fails silently.
-      `multica-app stop` stops the bridge and leaves the daemon running.
-
-      Keep `multica` and `multica-app` on the same version; `multica-app`
-      warns when they differ.
+      The default HAP requests INTERNET and GET_NETWORK_INFO only; with an AGC
+      profile carrying CUSTOM_SANDBOX/READ_WRITE_USER_FILE use
+      `install --acl-profile <build-profile.json5>`. The bundle is
+      `com.social4hyq.multica`; older `com.huawei.ohos_electron` copies are left in
+      place.
     EOS
   end
 
