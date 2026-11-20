@@ -93,8 +93,9 @@ test('auto-install signs, installs and verifies permissions without starting the
   assert.match(r.stdout, /已装机 com\.example\.desktop（设备 local）/);
   const install = f.calls().find(c => c[0] === "orca-app");
   assert.ok(install, "the app install must run");
-  assert.equal(install[2].noStart, "1", "the auto path must not start the app");
-  assert.equal(install[2].noLogin, "1", "the auto path must not block on a login");
+  const installEnv = install.find(value => value && typeof value === "object");
+  assert.equal(installEnv.noStart, "1", "the auto path must not start the app");
+  assert.equal(installEnv.noLogin, "1", "the auto path must not block on a login");
   const permissions = f.calls().find(c => c[0] === "app-installer" && c[1] === "permissions");
   assert.ok(permissions, "permissions must be checked after installing");
   assert.equal(permissions[2], "--bundle-id");
@@ -170,7 +171,7 @@ test('--start passes the request through to the app install', t => {
   const r = f.run(["auto-install", "orca-app", "com.example.desktop", "--start"]);
   assert.equal(r.status, 0, r.stdout + r.stderr);
   const install = f.calls().find(c => c[0] === "orca-app" && c[1] === "install");
-  assert.equal(install[2].noStart, "");
+  assert.equal(install.find(value => value && typeof value === "object").noStart, "");
   assert.ok(f.calls().some(c => c[0] === "orca-app" && c[1] === "start"));
 });
 
@@ -218,4 +219,12 @@ test('the config file can switch automatic installs off', t => {
   assert.match(r.stderr, /自动装机已关闭/);
   assert.deepEqual(f.calls(), []);
   assert.deepEqual(f.queued(), []);
+});
+
+test('the auto path asks an installer that opens the app not to', t => {
+  const f = fixture(t);
+  const r = f.run(["auto-install", "orca-app", "com.example.desktop"]);
+  assert.equal(r.status, 0, r.stdout + r.stderr);
+  const install = f.calls().find(c => c[0] === "orca-app" && c[1] === "install");
+  assert.ok(install.includes("--no-serve"), "orca-app install must not open the window");
 });

@@ -189,10 +189,15 @@ install_one() {
   local -a timeout_args=()
   command -v timeout >/dev/null 2>&1 &&
     timeout_args=(timeout "${HAP_APP_INSTALL_TIMEOUT:-900}")
+  # A few installers open the app themselves; the automatic path must not.
+  local -a app_args=()
+  case "$command" in
+    orca-app) app_args+=(--no-serve) ;;
+  esac
 
   log "installing $bundle"
   local rc=0
-  env "${env_args[@]}" "${timeout_args[@]}" "$command" install || rc=$?
+  env "${env_args[@]}" "${timeout_args[@]}" "$command" install "${app_args[@]+"${app_args[@]}"}" || rc=$?
   if ((rc != 0)); then
     local reason=install-failed
     [ "$(probe_ready)" = "no-login" ] && reason=login
