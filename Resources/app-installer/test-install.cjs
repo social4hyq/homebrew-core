@@ -42,6 +42,8 @@ function fixture(t) {
       fs.writeFileSync(root + '/entry/src/main/module.json5', '{// comment\\n module: {name:"entry", type:"entry", requestPermissions:[{name:"old"}],},}');
     }
     if (args[0] === 'signature') {
+      if (process.env.CAPTURE_NET_ENV) fs.writeFileSync(process.env.CAPTURE_NET_ENV, JSON.stringify({ca: process.env.NODE_EXTRA_CA_CERTS || '', proxy: process.env.HTTPS_PROXY || ''}));
+      if (process.env.FAIL_TLS) { console.error('Network connection failed (SELF_SIGNED_CERT_IN_CHAIN)'); process.exit(1); }
       const p = JSON.parse(fs.readFileSync('entry/src/main/module.json5', 'utf8'));
       fs.writeFileSync(process.env.TEST_PERMISSIONS, JSON.stringify(p.module.requestPermissions));
     }
@@ -52,6 +54,7 @@ function fixture(t) {
     if (args.includes('shell')) {
       const cmd = args.slice(args.indexOf('shell') + 1).join(' ');
       if (cmd.includes('bm install')) { console.log(process.env.INSTALL_FAIL ? 'error: failed' : 'install bundle successfully'); }
+      if (cmd.includes('aa force-stop') && process.env.STOP_MISSING) { console.log('error: failed to force stop process.'); console.log('Error Code:10104002  Error Message:Failed to retrieve specified package information.'); }
       if (cmd.includes('aa start')) { console.log(process.env.START_FAIL ? 'screen locked' : 'start ability successfully'); }
       if (cmd.includes('bm uninstall')) { console.log(process.env.UNINSTALL_FAIL ? 'error: bundle not found' : 'uninstall bundle successfully.'); }
       if (cmd.includes('bm dump') && process.env.TEST_BM_DUMP) { console.log(fs.readFileSync(process.env.TEST_BM_DUMP, 'utf8')); }
@@ -426,4 +429,55 @@ test('HAP_INSTALLER_NO_LOGIN stops before the DevEco login when not signed in', 
   assert.match(r.stderr,/HAP_INSTALLER_NO_LOGIN/);
   assert.ok(!f.calls().some(c=>c.join(' ').includes('auth login')));
   assert.ok(!f.calls().some(c=>c[0]==='signer'));
+});
+
+test('tls_ca and https_proxy come from ~/.app-installer/config', t => {
+  const f = fixture(t);
+  const ca = path.join(f.root, 'ca.pem');
+  fs.writeFileSync(ca, '-----BEGIN CERTIFICATE-----\n');
+  fs.mkdirSync(path.join(f.root, '.app-installer'));
+  fs.writeFileSync(path.join(f.root, '.app-installer', 'config'),
+    `tls_ca=${ca}\nhttps_proxy=http://127.0.0.1:7890\n`);
+  const capture = path.join(f.root, 'net-env.json');
+  const r = f.run([], { CAPTURE_NET_ENV: capture });
+  assert.equal(r.status, 0, r.stdout + r.stderr);
+  assert.deepEqual(JSON.parse(fs.readFileSync(capture, 'utf8')),
+    { ca, proxy: 'http://127.0.0.1:7890' });
+});
+
+test('a TLS trust failure records tls and prints the CA hint', t => {
+  const f = fixture(t);
+  const result = path.join(f.root, 'result.json');
+  const r = f.run([], { FAIL_TLS: '1', HAP_INSTALLER_RESULT_FILE: result });
+  assert.notEqual(r.status, 0);
+  assert.match(r.stderr, /tls_ca=\/path\/to\/ca\.pem/);
+  assert.equal(JSON.parse(fs.readFileSync(result, 'utf8')).reason, 'tls');
+});
+
+test('a tls_ca that does not exist fails before any DevEco call', t => {
+  const f = fixture(t);
+  fs.mkdirSync(path.join(f.root, '.app-installer'));
+  fs.writeFileSync(path.join(f.root, '.app-installer', 'config'),
+    `tls_ca=${path.join(f.root, 'missing.pem')}\n`);
+  const r = f.run();
+  assert.notEqual(r.status, 0);
+  assert.match(r.stderr, /tls_ca is not a file/);
+  assert.ok(!f.calls().some(c => c[0] === 'devecocli'));
+});
+
+test('a force-stop of a package that is not installed stays quiet', t => {
+  const f = fixture(t);
+  const r = f.run([], { STOP_MISSING: '1' });
+  assert.equal(r.status, 0, r.stdout + r.stderr);
+  assert.doesNotMatch(r.stdout + r.stderr, /10104002|not installed/);
+});
+
+test('doctor reports the configured TLS CA', t => {
+  const f = fixture(t);
+  const ca = path.join(f.root, 'ca.pem');
+  fs.writeFileSync(ca, 'x');
+  fs.mkdirSync(path.join(f.root, '.app-installer'));
+  fs.writeFileSync(path.join(f.root, '.app-installer', 'config'), `tls_ca=${ca}\n`);
+  const r = spawnSync('bash', [script, 'doctor'], { env: f.env, encoding: 'utf8' });
+  assert.match(r.stdout + r.stderr, /TLS config \(tls_ca=/);
 });
