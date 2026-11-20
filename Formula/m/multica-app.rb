@@ -4,6 +4,7 @@ class MulticaApp < Formula
   url "https://github.com/multica-ai/multica/archive/refs/tags/v0.11.1.tar.gz"
   sha256 "8a8f2149447dfd0c178fca332f88b539560fa57a5075d67c6e440958de8d49fc"
   license :cannot_represent # Multica License (Apache-2.0 plus additional conditions)
+  revision 1
 
   livecheck do
     url :stable
@@ -241,13 +242,22 @@ class MulticaApp < Formula
     bin.install_symlink bin/"multica-app" => "multica-desktop"
   end
 
+  post_install_steps do
+    run "{HOMEBREW_PREFIX}/bin/hap-app",
+        args: ["auto-install", "multica-app", "com.social4hyq.multica"],
+        must_succeed: false, print_stdout: true, network_access: true
+  end
+
   def caveats
     <<~EOS
       The CLI and daemon come from the `multica` formula; this one adds the desktop.
       The desktop HAP is at #{libexec}/multica-desktop-unsigned.hap.
 
-      The HAP is unsigned in the bottle. Connect and unlock the target device,
-      then run `multica-app install`. app-installer handles Huawei Developer
+      The HAP is unsigned in the bottle. `brew install` runs `multica-app install`
+      automatically once the device is connected and the Huawei Developer login
+      is done; otherwise it is queued: `hap-app install-pending` finishes it.
+      To install by hand, run `multica-app install`. app-installer handles
+      Huawei Developer
       login, signing-project creation, local debug profile generation, signing,
       installation, and launch. Private signing material stays in your home
       directory; it is not in the bottle.
