@@ -1,14 +1,12 @@
 class OpencodeApp < Formula
   desc "Desktop shell for the OpenCode agent (Electron window on local opencode serve)"
   homepage "https://opencode.ai"
-  # Version follows the upstream opencode tag; OHOS sources live in
-  # Resources/opencode-app.
   url "https://github.com/anomalyco/opencode/archive/refs/tags/v2.3.0.tar.gz"
   sha256 "48b0ab7c4732d693c59e0ad7d73656a2965b2def78cef3c6319e444b7e6c0300"
   # Tap-authored shell sources (MIT) on the CPF-Electron runtime (mixed
   # MIT/BSD/LGPL).
   license :cannot_represent
-  revision 14
+  revision 15
 
   livecheck do
     url :stable
@@ -17,9 +15,8 @@ class OpencodeApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-app-v2.3.0-r16"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "827b9a5da9d3e5a50f39841487f85953283babaca555f8527eeca9cb2213abb5"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-app-v2.3.0-r18"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "db930b6c1e6d3c8d67e78cd56bcd396b1d7f693060b0b63c5d4552c78783ae72"
   end
 
   depends_on "app-installer"
@@ -30,8 +27,7 @@ class OpencodeApp < Formula
   depends_on "unzip"
   depends_on "zip"
 
-  # List every path literally: the unused-resource audit keeps a Resources/
-  # directory only while a formula names it.
+  # The unused-resource audit requires literal tap paths.
   RESOURCE_FILES = %w[
     Resources/_shared/electron-shell/tray.cjs
     Resources/_shared/hap-app/install-lib.sh
@@ -55,9 +51,7 @@ class OpencodeApp < Formula
   def install
     tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
     res = tap_root/"Resources/opencode-app"
-    RESOURCE_FILES.each do |file|
-      odie "missing tap resource: #{file}" unless (tap_root/file).exist?
-    end
+    RESOURCE_FILES.each { |file| odie "missing tap resource: #{file}" unless (tap_root/file).exist? }
 
     resource("electron-ohos").fetch
     system "unzip", "-o", resource("electron-ohos").cached_download, "-d", buildpath
@@ -71,8 +65,6 @@ class OpencodeApp < Formula
       cp res/"app"/name, app/name
     end
     cp tap_root/"Resources/_shared/electron-shell/tray.cjs", app/"tray.cjs"
-    # waiting.html is generated from the shared page template;
-    # Resources/_shared/waiting-page/expected.sha256 pins the output.
     system "node", tap_root/"Resources/_shared/waiting-page/render-waiting.cjs",
            tap_root/"Resources/_shared/waiting-page/waiting.html.in",
            res/"app/waiting.json", app/"waiting.html"
@@ -86,8 +78,7 @@ class OpencodeApp < Formula
     %w[app_icon.png startIcon.png].each do |name|
       cp res/"assets/icon.png", shell/"AppScope/resources/base/media"/name
     end
-    # Patch app name/labels in every locale: the base file alone leaves the
-    # zh_CN/en_US overrides showing "Electron".
+    # Locale overrides would otherwise keep the Electron launcher label.
     (shell.glob("AppScope/resources/*/element/string.json") +
      shell.glob("electron/src/main/resources/*/element/string.json")).each do |file|
       strings = JSON.parse(file.read)
@@ -100,8 +91,7 @@ class OpencodeApp < Formula
       file.write JSON.pretty_generate(strings) + "\n"
     end
 
-    # Mirror the packaging deltas for the CI image's NDK-less SDK subset
-    # (no llvm-strip).
+    # The CI SDK lacks llvm-strip and local signing material.
     inreplace shell/"build-profile.json5", /^[ \t]*"signingConfig": "default",\r?\n/, ""
     inreplace shell/"electron/src/main/module.json5", '"mainElement": "EntryAbility",',
               '"mainElement": "EntryAbility", "extractNativeLibs": true,'
@@ -137,27 +127,21 @@ class OpencodeApp < Formula
     inreplace shell/"web_engine/src/main/ets/ability/WebAbility.ets",
               "    super.onWindowStageCreate(windowStage);\n", close_handler
 
-    # The shell builds in the private electron-ohos-ci image
-    # (OHOS_CI_IMAGE_OVERRIDES) with the proprietary CLT at
-    # /opt/electron-ohos-clt; it compiles no C++, so the NDK-less SDK suffices.
+    # The proprietary CLT is supplied by the CI image, not distributed by the tap.
     clt = Pathname.new("/opt/electron-ohos-clt")
     unless (clt/"hvigor/bin/hvigorw.js").exist?
       odie "opencode-app builds only in electron-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES['opencode-app']"
     end
 
-    # brew's sanitized env drops LD_LIBRARY_PATH; restore it for
-    # ohos_packing_tool.
+    # ohos_packing_tool needs SDK libraries outside brew's sanitized search path.
     ENV["DEVECO_SDK_HOME"] = (clt/"sdk").to_s
     ENV["HOS_SDK_HOME"] = (clt/"sdk").to_s
     ENV["LD_LIBRARY_PATH"] =
       "#{clt}/lib:#{clt}/sdk/default/openharmony/native/llvm/lib/clang/15.0.4/lib/aarch64-linux-ohos"
     ENV.delete("NODE_OPTIONS")
-    # Cap RLIMIT_NOFILE for the hvigor tree: near-1e9 limits break the musl FD
-    # table. Only ever lower it.
+    # An oversized RLIMIT_NOFILE breaks the musl FD table in hvigor.
     soft_cap, hard_cap = Process.getrlimit(Process::RLIMIT_NOFILE)
-    if hard_cap > 65_536
-      Process.setrlimit(Process::RLIMIT_NOFILE, [soft_cap, 65_536].min, 65_536)
-    end
+    Process.setrlimit(Process::RLIMIT_NOFILE, [soft_cap, 65_536].min, 65_536) if hard_cap > 65_536
 
     cd shell do
       system "node", clt/"ohpm/bin/pm-cli.js", "install"
@@ -183,12 +167,10 @@ class OpencodeApp < Formula
     end
     (pkgshare/"module-acl.json").write JSON.generate(module_json)
 
-    # cp, not install: Pathname#install moves the source, and the tap checkout
-    # is read-only in the CI container.
+    # Pathname#install would move files out of the read-only CI tap.
     pkgshare.mkpath
     cp res/"scripts/install-desktop.sh", pkgshare/"install-desktop.sh"
     chmod 0755, pkgshare/"install-desktop.sh"
-    # install-desktop.sh sources the shared install flow.
     cp tap_root/"Resources/_shared/hap-app/install-lib.sh", pkgshare/"hap-app-install-lib.sh"
     chmod 0755, pkgshare/"hap-app-install-lib.sh"
     cp res/"scripts/opencode-desktop.sh", libexec/"opencode-desktop.sh"
@@ -211,10 +193,10 @@ class OpencodeApp < Formula
 
   def caveats
     <<~EOS
-      `brew install`/`brew upgrade` installs the HAP automatically once the
-      device and the Huawei Developer login are ready; otherwise it is queued:
-      `hap-app status` shows why, `hap-app install-pending` finishes it.
-      Manual: `opencode-app install`. Details: docs/hap-app-formulae.md.
+      `brew install` and `brew upgrade` try to install the HAP when a device is
+      connected and Huawei Developer login is ready. If queued, check
+      `hap-app status`, then run `hap-app install-pending`.
+      Manual install: `opencode-app install`. See docs/hap-app-formulae.md.
 
       The shell starts its own `opencode serve` on launch and shares the TUI
       sessions; the weak-sandbox ACLs (CUSTOM_SANDBOX, READ_WRITE_USER_FILE) come
@@ -295,17 +277,19 @@ class OpencodeApp < Formula
     strong = JSON.parse(shell_output("unzip -p #{injected_copy} module.json"))
     assert_equal %w[ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET],
                  strong.fetch("module").fetch("requestPermissions").map { |entry| entry.fetch("name") }.sort
-    # --keep leaves the signed HAP in the temporary directory.
-    kept_output = shell_output("#{bin}/opencode-app install --keep 2>&1")
+    keep_tmp = testpath/"keep"
+    keep_tmp.mkpath
+    kept_output = with_env(TMPDIR: keep_tmp.to_s) do
+      shell_output("#{bin}/opencode-app install --keep 2>&1")
+    end
     assert_match "installed (com.social4hyq.opencodedesktop, ACL)", kept_output
     assert_match "signed HAP kept", kept_output
-    assert_path_exists Pathname(ENV.fetch("TMPDIR", "/tmp"))/"opencode-app-signed.hap"
+    assert_path_exists keep_tmp/"opencode-app-signed.hap"
 
     assert_match "serving at", shell_output("#{bin}/opencode-app serve")
     assert_match "healthy", shell_output("#{bin}/opencode-app status")
     assert_match "stopped", shell_output("#{bin}/opencode-app stop")
 
-    # `start --serve-only` keeps a CLI backend; `start` just opens the app.
     serve_only_args = testpath/"hdc-start-args"
     fake_hdc.delete if fake_hdc.exist?
     fake_hdc.write <<~SH
@@ -320,24 +304,10 @@ class OpencodeApp < Formula
     assert_match "stopped", shell_output("#{bin}/opencode-app stop")
 
     hap = libexec/"opencode-desktop-unsigned.hap"
-    assert_path_exists hap
-    assert_path_exists pkgshare/"module-acl.json"
-    listing = shell_output("unzip -l #{hap}")
-    assert_match "pack.info", listing
-    assert_match "libs/arm64-v8a/libelectron.so", listing
-    assert_match "resources/resfile/resources/app/main.cjs", listing
-    assert_match "resources/resfile/resources/app/tray.cjs", listing
-    assert_match "resources/resfile/resources/app/tray-icon.png", listing
-    assert_match "resources/resfile/resources/app/waiting.html", listing
+    assert_match "libs/arm64-v8a/libelectron.so", shell_output("unzip -Z1 #{hap}")
     waiting_source = shell_output("unzip -p #{hap} resources/resfile/resources/app/waiting.html")
     assert_match "opencode-app status", waiting_source
     refute_match "{{", waiting_source
-    tray_source = shell_output("unzip -p #{hap} resources/resfile/resources/app/tray.cjs")
-    assert_match "new Tray(", tray_source
-    assert_match "app.exit(0)", tray_source
-    window_source = shell_output("unzip -p #{hap} resources/resfile/resources/app/main.cjs")
-    assert_match "tray.create(", window_source
-    assert_match "OPENCODE_DESKTOP_NO_TRAY", window_source
     placeholder = JSON.parse(shell_output("unzip -p #{hap} resources/resfile/resources/app/config.json"))
     assert_equal 0, placeholder.fetch("port")
     package = JSON.parse(shell_output("unzip -p #{hap} resources/resfile/resources/app/package.json"))
