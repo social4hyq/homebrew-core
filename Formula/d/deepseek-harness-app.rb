@@ -4,6 +4,7 @@ class DeepseekHarnessApp < Formula
   url "https://github.com/deepseek-ai/deepseek-harness/archive/refs/tags/dsh-v0.2.2-rc.5.tar.gz"
   sha256 "4e24e132a9fc267d5cdc5724525873db2575680e073fd2db4519b92553614215"
   license :cannot_represent
+  revision 1
 
   livecheck do
     url "https://github.com/deepseek-ai/deepseek-harness.git"
@@ -11,8 +12,8 @@ class DeepseekHarnessApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/deepseek-harness-app-v0.2.2-rc.5-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "61b05291afffd90b5294e8e8d442c051a70bba974e3296c70f035cd79c144da6"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/deepseek-harness-app-v0.2.2-rc.5-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5677576f5e90e3f9a0cb451a474372f90da1805f1e5b0866569d0d1d6cf00a20"
   end
 
   depends_on "app-installer"
@@ -206,10 +207,18 @@ class DeepseekHarnessApp < Formula
     bin.install_symlink bin/"dsh-app" => "deepseek-harness-desktop"
   end
 
+  post_install_steps do
+    run "{{HOMEBREW_PREFIX}}/bin/hap-app",
+        args: ["auto-install", "dsh-app", "com.social4hyq.deepseekharness"],
+        must_succeed: false, print_stdout: true, network_access: true
+  end
+
   def caveats
     <<~EOS
-      The desktop HAP is unsigned in the bottle. Connect and unlock the device,
-      then run `dsh-app install`.
+      The desktop HAP is unsigned in the bottle. `brew install` runs
+      `dsh-app install` automatically once the device is connected and the
+      Huawei Developer login is done; otherwise it is queued:
+      `hap-app install-pending` finishes it (or run `dsh-app install`).
 
       Closing the window hides it to the DeepSeek Harness system tray icon.
       `dsh-app install` and `dsh-app start` start a detached CLI-managed

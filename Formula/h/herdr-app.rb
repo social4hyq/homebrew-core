@@ -4,7 +4,7 @@ class HerdrApp < Formula
   url "https://github.com/herdrdev/herdr-app/archive/refs/tags/v0.1.16.tar.gz"
   sha256 "fea3d920607f2199ed330eb3cdcb1fa3626dcea5080c92a97a296d983d6bc681"
   license "Apache-2.0"
-  revision 3
+  revision 4
 
   livecheck do
     url "https://github.com/herdrdev/herdr-app.git"
@@ -13,8 +13,8 @@ class HerdrApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/herdr-app-v0.1.16-r6"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "df217c84711cba168cf595b5bd65fb74c6572a6a16c91b79ae26fd1e20bc23d7"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/herdr-app-v0.1.16-r7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e87019824c53837c4803c8fe8c489d2a590c0d6018efd621c2ef6efde6be9e18"
   end
 
   depends_on "node" => :build
@@ -193,12 +193,20 @@ class HerdrApp < Formula
       HERDR_APP_PYTHON:      formula_opt_bin("python@3.15")/"python3"
   end
 
+  post_install_steps do
+    run "{{HOMEBREW_PREFIX}}/bin/hap-app",
+        args: ["auto-install", "herdr-app", "com.social4hyq.herdrapp"],
+        must_succeed: false, print_stdout: true, network_access: true
+  end
+
   def caveats
     <<~EOS
-      The HAP is unsigned in the bottle. Connect and unlock the device, then run
-      `herdr-app install`. app-installer handles Huawei Developer login, local
-      debug profile generation, signing, installation, and launch. Later, open
-      the app with `herdr-app start`.
+      The HAP is unsigned in the bottle. `brew install` runs `herdr-app install`
+      automatically once the device is connected and the Huawei Developer login
+      is done; otherwise it is queued: `hap-app install-pending` finishes it (or
+      run `herdr-app install` yourself). app-installer handles the login, local
+      debug profile generation, signing and installation. Later, open the app
+      with `herdr-app start`.
 
       The app cannot start the host's `hc`, so it reaches herdr-core through a
       bridge that `herdr-app install` and `herdr-app start` run for you
