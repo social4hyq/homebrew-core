@@ -297,42 +297,20 @@ class ObsidianApp < Formula
 
   def caveats
     <<~EOS
-      The desktop HAP is unsigned in the bottle and contains no Obsidian code.
-      `brew install` runs `obsidian-app install` automatically once the device
-      is connected and the Huawei Developer login is done; otherwise it is
-      queued: `hap-app install-pending` finishes it. To install by hand, run:
+      `brew install`/`brew upgrade` installs the HAP automatically once the
+      device and the Huawei Developer login are ready; otherwise it is queued:
+      `hap-app status` shows why, `hap-app install-pending` finishes it.
+      Manual: `obsidian-app install`. Details: docs/hap-app-formulae.md.
 
-        obsidian-app install
+      It downloads Obsidian #{version} from the official release, verifies the
+      sha256, injects it into the HAP and signs with a local debug profile;
+      `--asar PATH` uses a local copy (offline). Vaults default to
+      `~/Obsidian/Obsidian Vault`; paste and WebAssembly work. `--no-acl` gives the
+      strong-sandbox variant (vaults in the app sandbox, no paste/JIT).
 
-      It downloads Obsidian #{version} from Obsidian's official release,
-      checks the pinned sha256, injects the app package into the HAP, signs with
-      a locally generated debug profile, installs and starts it. Use
-      `obsidian-app install --asar PATH` to install from a local copy
-      instead (offline devices).
-
-      The HAP requests the weak-sandbox ACLs (CUSTOM_SANDBOX,
-      READ_WRITE_USER_FILE, READ_PASTEBOARD) and the two kernel JIT ACLs, and
-      `install` points the signing project at the same list. app-installer
-      generates the matching local debug profile, so vaults live in your home
-      directory (default ~/Obsidian/Obsidian Vault), image paste works, and the
-      renderer keeps WebAssembly. The first install asks for a Huawei Developer
-      login to create the profile. ACL profiles need a app-installer whose
-      toolchain ships the SDK permission definitions (tap app-installer r3+);
-      an older one silently generates a profile without ACLs and the device
-      rejects the install with 9568289. `--no-acl` installs the strong-sandbox
-      variant instead (vaults in the app sandbox, no paste, no JIT).
-
-      Command line interface: enable Settings -> General -> Command line
-      interface once, then use `obsidian-app cli <command>` (same commands
-      as Obsidian's own `obsidian` CLI: try `obsidian-app cli help`). The
-      app listens on a UNIX socket inside its sandbox; the host process bridges
-      it to loopback TCP with a token stored in
-      ~/.cache/obsidian-app/cli.json.
-
-      Desktop self-update is disabled; upgrading is `brew upgrade` plus
-      `obsidian-app install`. The formula version follows Obsidian's
-      releases, so `brew bump-formula-pr` / autobump handles a new version
-      without touching the host payload.
+      CLI: enable Settings -> General -> Command line interface, then
+      `obsidian-app cli <command>` (try `cli help`). Desktop self-update is disabled;
+      upgrade with `brew upgrade`.
     EOS
   end
 
