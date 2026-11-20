@@ -17,7 +17,7 @@ const hostConfig = {
   path: '/storage/Users/currentUser/.harmonybrew/bin:/system/bin',
 };
 
-function boot(packageVersion = '26.1111.71704') {
+function boot(packageVersion = '26.1117.31558') {
   const runtimeProcess = { env: {} };
   const state = {
     appPath: null,

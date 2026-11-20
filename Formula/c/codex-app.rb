@@ -3,14 +3,13 @@ class CodexApp < Formula
   homepage "https://learn.chatgpt.com/docs/linux/linux-app"
   url "https://persistent.oaistatic.com/codex-app-prod/linux/deb/latest/chatgpt_arm64.deb",
       using: :nounzip
-  version "26.1111.71704"
-  sha256 "f0550dee1f99127d357ad760aef739c557d49bd67728d2f105d00a7a4780f740"
+  version "26.1117.31558"
+  sha256 "81670501c6b7d784ef2b9a62b32da031e81a0eac0f50ebd933d0a9956d7bec77"
   license :cannot_represent # OpenAI service and software terms
-  revision 2
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codex-app-v26.1111.71704-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "231cf0e75e0e109ca99f9ccf4eb5fc4729c6fd52fa43afd2811475a430ed0731"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codex-app-v26.1117.31558-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "db14c79aeab62108fd4a39aa1e27bae77ac563dec4a6efe753a2fdfea4b4f95f"
   end
 
   depends_on "binutils" => :build
