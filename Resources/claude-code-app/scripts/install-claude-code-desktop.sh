@@ -8,6 +8,7 @@ APP_NAME='Claude_Code'
 
 usage() {
   echo "Usage: $0 INPUT_UNSIGNED_HAP OUTPUT_DIR [--no-acl] [--build-only] [--device HDC_TARGET]" >&2
+  echo "          [--deb PATH] [--clean-cache]" >&2
 }
 
 if (($# < 2)); then usage; exit 2; fi
@@ -17,14 +18,63 @@ shift 2
 NO_ACL=0
 BUILD_ONLY=0
 DEVICE=""
+VENDOR_DEB=""
+CLEAN_CACHE=0
 while (($#)); do
   case "$1" in
     --no-acl) NO_ACL=1; shift ;;
     --build-only) BUILD_ONLY=1; shift ;;
     --device) [[ $# -ge 2 ]] || { usage; exit 2; }; DEVICE="$2"; shift 2 ;;
+    --deb) [[ $# -ge 2 ]] || { usage; exit 2; }; VENDOR_DEB="$2"; shift 2 ;;
+    --clean-cache) CLEAN_CACHE=1; shift ;;
     *) usage; exit 2 ;;
   esac
 done
+
+vendor_cache_dir() {
+  printf '%s' "${XDG_CACHE_HOME:-$HOME}/.cache/claude-code-app"
+}
+
+deb_sha256() {
+  python3 -c 'import hashlib,sys; print(hashlib.file_digest(open(sys.argv[1],"rb"),"sha256").hexdigest())' "$1"
+}
+
+prepare_vendor_hap() {
+  local stage="$1" vendor_json assembler cache deb out url sha version file
+  vendor_json="${CLAUDE_CODE_APP_VENDOR_JSON:?missing Claude vendor.json}"
+  assembler="${CLAUDE_CODE_APP_ASSEMBLER:?missing the HAP assembler}"
+  cache="$(vendor_cache_dir)/vendor"
+  if [ "$CLEAN_CACHE" = "1" ]; then rm -rf "$(vendor_cache_dir)"; fi
+  mkdir -p "$cache"
+  [ -n "$VENDOR_DEB" ] || command -v curl >/dev/null || { echo "curl not found" >&2; exit 1; }
+  read -r url sha version file < <(python3 -c 'import json,sys; v=json.load(open(sys.argv[1])); print(v["url"], v["sha256"], v["version"], v.get("file","claude-desktop.deb"))' "$vendor_json")
+  [ -n "$url" ] && [ -n "$sha" ] || { echo "invalid vendor.json: $vendor_json" >&2; exit 1; }
+  if [ -n "$VENDOR_DEB" ]; then
+    [ -f "$VENDOR_DEB" ] || { echo "--deb not found: $VENDOR_DEB" >&2; exit 1; }
+    [ "$(deb_sha256 "$VENDOR_DEB")" = "$sha" ] || { echo "--deb failed the sha256 check: $VENDOR_DEB" >&2; exit 1; }
+    deb="$VENDOR_DEB"
+  else
+    deb="$cache/$sha.deb"
+    if [ -f "$deb" ] && [ "$(deb_sha256 "$deb")" = "$sha" ]; then
+      echo "using the cached Claude Desktop $version package" >&2
+    else
+      rm -f "$deb" "$deb.part"
+      echo "downloading Claude Desktop $version from Anthropic..." >&2
+      curl -fL --retry 3 --retry-delay 2 -C - -o "$deb.part" "$url" ||
+        { echo "download failed: $url" >&2; exit 1; }
+      mv "$deb.part" "$deb"
+      if [ "$(deb_sha256 "$deb")" != "$sha" ]; then
+        rm -f "$deb"
+        echo "the downloaded package failed the sha256 check" >&2
+        exit 1
+      fi
+    fi
+  fi
+  out="$stage/claude-desktop-assembled-unsigned.hap"
+  echo "assembling the HAP (this can take a minute)..." >&2
+  python3 "$assembler" "$INPUT_HAP" "$deb" "$out" >&2
+  printf '%s' "$out"
+}
 [[ -f "$INPUT_HAP" ]] || { echo "Input HAP not found: $INPUT_HAP" >&2; exit 1; }
 command -v python3 >/dev/null
 command -v unzip >/dev/null
@@ -40,6 +90,9 @@ TMP_PARENT="${TMPDIR:-/data/storage/el2/base/cache}"
 mkdir -p -- "$TMP_PARENT"
 STAGE="$(mktemp -d "$TMP_PARENT/claude-selfstart.XXXXXX")"
 trap 'rm -rf -- "$STAGE"' EXIT
+if [ "$(basename -- "$INPUT_HAP")" = "claude-code-shell-unsigned.hap" ]; then
+  INPUT_HAP="$(prepare_vendor_hap "$STAGE")"
+fi
 UNSIGNED="$OUT_DIR/claude-code-desktop-selfstart-unsigned.hap"
 SIGNED="$OUT_DIR/claude-code-desktop-selfstart-signed.hap"
 rm -f -- "$UNSIGNED"
