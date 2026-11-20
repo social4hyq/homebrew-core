@@ -227,34 +227,23 @@ class OrcaApp < Formula
 
   def caveats
     <<~EOS
-      The desktop HAP is unsigned in the bottle. `brew install` runs
-      `orca-app install` automatically once the device is connected and the
-      Huawei Developer login is done; otherwise it is queued: `hap-app
-      install-pending` finishes it. To install by hand, run:
+      `brew install`/`brew upgrade` installs the HAP automatically once the
+      device and the Huawei Developer login are ready; otherwise it is queued:
+      `hap-app status` shows why, `hap-app install-pending` finishes it.
+      Manual: `orca-app install`. Details: docs/hap-app-formulae.md.
 
-        orca-app install
+      The shell starts its host `orca serve` runtime on launch and reads the pairing
+      link itself, so the app icon opens a working workbench. Weak-sandbox ACLs
+      (CUSTOM_SANDBOX, READ_WRITE_USER_FILE) let it spawn `orca`; the local debug
+      profile grants them. `orca-app serve` runs a separate host-side runtime in
+      ~/.orca for browser/CLI use:
 
-      app-installer generates a local debug profile (the first run asks for a
-      Huawei Developer login), signs the HAP and installs it, and the app opens
-      directly. The shell starts the host `orca serve` runtime itself on every
-      launch and reads the single-use pairing link that runtime prints, so the
-      app icon always opens a working workbench:
-
-        orca-app start      # open the app (it starts the runtime itself)
-        orca-app status     # host-side runtime started by `orca-app serve`
+        orca-app start      # open the app
+        orca-app status     # host-side runtime
         orca-app stop
 
-      Opening the app needs the weak-sandbox permissions CUSTOM_SANDBOX and
-      READ_WRITE_USER_FILE so the shell may spawn the host `orca` binary; a local
-      debug profile grants them without an approval wait. The shell keeps its
-      runtime state in the app sandbox (so a force-stop can always reclaim its
-      instance lock); `orca-app serve` runs a separate host-side runtime in
-      ~/.orca for browser or CLI use.
-
-      The default install also carries the two kernel ACLs (JIT/WebAssembly for
-      the renderer) and READ_PASTEBOARD; `orca-app install --no-acl` installs the
-      strong-sandbox variant, which cannot spawn the runtime and waits for
-      `orca-app serve` instead (no JIT, no paste).
+      `install --no-acl` installs the strong-sandbox variant (no JIT/paste; it waits
+      for `orca-app serve` instead of spawning the runtime).
     EOS
   end
 
