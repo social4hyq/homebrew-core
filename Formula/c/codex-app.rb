@@ -1,12 +1,17 @@
 class CodexApp < Formula
   desc "ChatGPT desktop shell for OpenHarmony/HarmonyOS PC"
   homepage "https://learn.chatgpt.com/docs/linux/linux-app"
-  url "https://persistent.oaistatic.com/codex-app-prod/linux/deb/latest/chatgpt_arm64.deb",
+  url "https://persistent.oaistatic.com/codex-app-prod/linux/deb/pool/main/c/chatgpt/chatgpt_26.1117.31558_arm64.deb",
       using: :nounzip
   version "26.1117.31558"
   sha256 "81670501c6b7d784ef2b9a62b32da031e81a0eac0f50ebd933d0a9956d7bec77"
   license :cannot_represent # OpenAI service and software terms
-  revision 6
+  revision 7
+
+  livecheck do
+    url "https://persistent.oaistatic.com/codex-app-prod/linux/deb/dists/stable/main/binary-arm64/Packages"
+    regex(%r{^Filename: pool/main/c/chatgpt/chatgpt_(\d+(?:\.\d+)+)_arm64\.deb$}i)
+  end
 
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codex-app-v26.1117.31558-r9"
