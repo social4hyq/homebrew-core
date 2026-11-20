@@ -6,7 +6,7 @@ class CodexApp < Formula
   version "26.1111.71704"
   sha256 "f0550dee1f99127d357ad760aef739c557d49bd67728d2f105d00a7a4780f740"
   license :cannot_represent # OpenAI service and software terms
-  revision 1
+  revision 2
 
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codex-app-v26.1111.71704-r2"
@@ -139,11 +139,20 @@ class CodexApp < Formula
       PATH:                       runtime_path
   end
 
+  post_install_steps do
+    run "{HOMEBREW_PREFIX}/bin/hap-app",
+        args: ["auto-install", "codex-app", "com.social4hyq.chatgpt"],
+        must_succeed: false, print_stdout: true, network_access: true
+  end
+
   def caveats
     <<~EOS
-      Run `codex-app install` to create a local debug signing profile,
-      sign the HAP, and install ChatGPT. A connected, unlocked OpenHarmony PC
-      device is required. The app starts the stable Homebrew `codex` CLI when
+      `brew install` runs `codex-app install` automatically once the device is
+      connected and the Huawei Developer login is done; otherwise it is queued:
+      `hap-app install-pending` finishes it. To install by hand, run
+      `codex-app install` to create a local debug signing profile, sign the HAP,
+      and install ChatGPT. A connected, unlocked OpenHarmony PC device is
+      required. The app starts the stable Homebrew `codex` CLI when
       opened. Installation injects host paths into a private signed HAP copy
       and requests ACL permissions for host project access. A Huawei Developer
       login is required for the first ACL-capable signing. Use
