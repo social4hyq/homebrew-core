@@ -1,8 +1,8 @@
 class MulticaApp < Formula
   desc "Desktop shell for the Multica AI agent workspace (Electron HAP for OpenHarmony)"
   homepage "https://multica.ai"
-  url "https://github.com/multica-ai/multica/archive/refs/tags/v0.10.0.tar.gz"
-  sha256 "4f0092e840fc07014b80b5a7fa9bf11e96425a4dd1879e86485df8511b7be999"
+  url "https://github.com/multica-ai/multica/archive/refs/tags/v0.11.1.tar.gz"
+  sha256 "8a8f2149447dfd0c178fca332f88b539560fa57a5075d67c6e440958de8d49fc"
   license :cannot_represent # Multica License (Apache-2.0 plus additional conditions)
 
   livecheck do

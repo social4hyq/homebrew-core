@@ -3,10 +3,10 @@ tailwindcss oxide and lightningcss native packages to the @ohos-npm-ports
 builds, which carry OpenHarmony bindings.
 
 diff --git a/package.json b/package.json
-index 7845527..9613f04 100644
+index 42074db..5e074ea 100644
 --- a/package.json
 +++ b/package.json
-@@ -34,7 +34,8 @@
+@@ -35,7 +35,8 @@
      "ui:add": "cd packages/ui && npx shadcn@latest add",
      "generate:brand": "node scripts/brand/generate.mjs",
      "generate:attachment-text-preview": "node scripts/generate-attachment-text-preview.mjs",
@@ -16,7 +16,7 @@ index 7845527..9613f04 100644
    },
    "engines": {
      "node": ">=22"
-@@ -56,7 +57,9 @@
+@@ -57,7 +58,9 @@
        "minimatch@5>brace-expansion": "2.1.4",
        "minimatch@9>brace-expansion": "2.1.4",
        "minimatch@10>brace-expansion": "5.0.9",
@@ -27,12 +27,11 @@ index 7845527..9613f04 100644
      },
      "patchedDependencies": {
        "expo-modules-core@57.0.21": "apps/mobile/patches/expo-modules-core@57.0.21.patch"
-@@ -71,6 +74,7 @@
+@@ -69,6 +72,7 @@
+     "@types/node": "catalog:",
+     "@types/pg": "^8.20.0",
+     "knip": "^6.32.2",
++    "ohos-signpost": "^1.1.2",
      "pg": "^8.20.0",
      "postcss": "catalog:",
      "turbo": "^2.5.4",
--    "typescript": "catalog:"
-+    "typescript": "catalog:",
-+    "ohos-signpost": "^1.1.2"
-   }
- }
