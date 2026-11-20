@@ -7,6 +7,11 @@ class CodexApp < Formula
   sha256 "f0550dee1f99127d357ad760aef739c557d49bd67728d2f105d00a7a4780f740"
   license :cannot_represent # OpenAI service and software terms
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codex-app-v26.1111.71704-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "daeeb306d103a6259584a0ac5fb789e22255427bcf71c0a1d7247b856b008e75"
+  end
+
   depends_on "binutils" => :build
   depends_on "app-installer"
   depends_on "codex"
