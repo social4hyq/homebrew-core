@@ -13,9 +13,34 @@ set -uo pipefail
 
 app_installer="${HAP_APP_APP_INSTALLER:-app-installer}"
 node_bin="${HAP_APP_NODE:-node}"
-config_dir="${XDG_CONFIG_HOME:-$HOME/.config}/hap-app"
-queue_dir="$config_dir/pending"
-cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/hap-app"
+
+# Homebrew runs post_install with a throwaway HOME, a cleared environment and no
+# readable /proc/PID/environ, so hdc (keys under ~/.harmony), devecocli (login
+# state under ~) and app-installer (signing projects under ~/.hap-installer)
+# cannot see the user's session. This tap installs into ~/.harmonybrew, so the
+# prefix's parent is the real home; HAP_APP_USER_HOME overrides it and it is
+# only trusted when it really looks like a home directory.
+recover_user_home() {
+  local candidate=""
+  if [ -n "${HAP_APP_USER_HOME:-}" ]; then
+    candidate="$HAP_APP_USER_HOME"
+  elif [ -n "${HOMEBREW_PREFIX:-}" ]; then
+    candidate="$(dirname "$HOMEBREW_PREFIX")"
+  fi
+  if [ -n "$candidate" ] && [ -d "$candidate" ] && {
+    [ -e "$candidate/.HDCServer.pid" ] || [ -d "$candidate/.harmony" ] ||
+      [ -d "$candidate/.hap-installer" ] || [ -d "$candidate/.app-installer" ]
+  }; then
+    export HOME="$candidate"
+  fi
+}
+recover_user_home
+
+# State lives under the (recovered) home so the post_install run and the user's
+# own shells agree, even when XDG_CONFIG_HOME/XDG_CACHE_HOME point elsewhere.
+config_dir="${HAP_APP_CONFIG_DIR:-$HOME/.config/hap-app}"
+cache_dir="${HAP_APP_CACHE_DIR:-$HOME/.cache/hap-app}"
+queue_dir="$cache_dir/pending"
 
 log() { printf 'hap-app: %s\n' "$*" >&2; }
 say() { printf 'hap-app: %s\n' "$*"; }
@@ -38,11 +63,13 @@ Usage: hap-app <command> [options]
 
 Environment:
   HAP_APP_AUTO_INSTALL=0   Do not install or queue automatically (config file:
-                           auto_install=0)
+                           ~/.config/hap-app/config, auto_install=0)
   HAP_APP_AUTO_LOGIN=1     Let auto-install open the Huawei Developer login
                            and wait up to HAP_APP_LOGIN_TIMEOUT seconds (120)
                            (config file: auto_login=1)
   HAP_APP_INSTALL_TIMEOUT  Overall install timeout in seconds (900)
+  HAP_APP_USER_HOME        Override the home directory recovered from
+                           HOMEBREW_PREFIX (for tests or unusual layouts)
 EOF
 }
 
