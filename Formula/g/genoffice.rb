@@ -4,6 +4,12 @@ class Genoffice < Formula
   url "https://github.com/genspark-ai/genoffice/archive/refs/tags/v0.13.18.tar.gz"
   sha256 "156528d8fa1e6878d6c61d3576d6d6b093eda4abbef223e7fbc4bd4855c9cb08"
   license "Apache-2.0"
+  revision 1
+
+  livecheck do
+    url :stable
+    strategy :github_latest
+  end
 
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/genoffice-v0.13.18-r1"
