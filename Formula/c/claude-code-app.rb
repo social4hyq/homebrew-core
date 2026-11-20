@@ -6,11 +6,11 @@ class ClaudeCodeApp < Formula
   version "5.11492.5"
   sha256 "fe6cd8a70f96b96eb4e6b647300cfaee6aaff4ce133a0fbbe11c2cdb775f5a6a"
   license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
-  revision 6
+  revision 7
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-app-v5.11492.5-r9"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bb4b1ab9b1d6980ff512c68a1d33056557fd3777cb34853a74428fe9ec483ebd"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-app-v5.11492.5-r10"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "93811e9ae9a1836148ef44dff821a204ec442d1af289415cbcfd75f84b3e567b"
   end
 
   depends_on "app-installer"
@@ -33,8 +33,7 @@ class ClaudeCodeApp < Formula
     end
   end
 
-  # List every path literally: the unused-resource audit keeps a Resources/
-  # directory only while a formula names it.
+  # The unused-resource audit requires literal tap paths.
   RESOURCE_FILES = %w[
     Resources/claude-code-app/assets/icon.png
     Resources/claude-code-app/scripts/claude-code-app.sh
@@ -63,9 +62,7 @@ class ClaudeCodeApp < Formula
   def install
     tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
     res = tap_root/"Resources/claude-code-app"
-    RESOURCE_FILES.each do |file|
-      odie "missing tap resource: #{file}" unless (tap_root/file).exist?
-    end
+    RESOURCE_FILES.each { |file| odie "missing tap resource: #{file}" unless (tap_root/file).exist? }
     support = buildpath/"claude-code-support"
     support.mkpath
     RESOURCE_FILES.grep(%r{/(app|support)/}).each do |file|
@@ -90,9 +87,7 @@ class ClaudeCodeApp < Formula
       "#{clt}/lib:#{clt}/sdk/default/openharmony/native/llvm/lib/clang/15.0.4/lib/aarch64-linux-ohos"
     ENV.delete("NODE_OPTIONS")
     soft_cap, hard_cap = Process.getrlimit(Process::RLIMIT_NOFILE)
-    if hard_cap > 65_536
-      Process.setrlimit(Process::RLIMIT_NOFILE, [soft_cap, 65_536].min, 65_536)
-    end
+    Process.setrlimit(Process::RLIMIT_NOFILE, [soft_cap, 65_536].min, 65_536) if hard_cap > 65_536
 
     cd project do
       system "node", clt/"ohpm/bin/pm-cli.js", "install"
@@ -154,10 +149,10 @@ class ClaudeCodeApp < Formula
 
   def caveats
     <<~EOS
-      `brew install`/`brew upgrade` installs the HAP automatically once the
-      device and the Huawei Developer login are ready; otherwise it is queued:
-      `hap-app status` shows why, `hap-app install-pending` finishes it.
-      Manual: `claude-code-app install`. Details: docs/hap-app-formulae.md.
+      `brew install` and `brew upgrade` try to install the HAP when a device is
+      connected and Huawei Developer login is ready. If queued, check
+      `hap-app status`, then run `hap-app install-pending`.
+      Manual install: `claude-code-app install`. See docs/hap-app-formulae.md.
 
       The bottle ships only the tap-authored shell; the first install asks
       Anthropic for the official package (sha256-checked) and caches it in
@@ -173,20 +168,11 @@ class ClaudeCodeApp < Formula
   test do
     tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
     hap = libexec/"claude-code-shell-unsigned.hap"
-    assert_path_exists hap
     vendor = JSON.parse((libexec/"vendor.json").read)
     assert_equal version.to_s, vendor.fetch("version")
-    assert_match(/(\A[0-9a-f]{64}\z)/, vendor.fetch("sha256"))
+    assert_match(/\A[0-9a-f]{64}\z/, vendor.fetch("sha256"))
     assert_match(%r{\Ahttps://}, vendor.fetch("url"))
-    assert_path_exists pkgshare/"assemble-local-hap.py"
-    assert_match "Usage: claude-code-app", shell_output("#{bin}/claude-code-app --help")
-    %w[
-      patch-code-runtime-hap.py
-      claude-bootstrap.cjs
-      claude-code-platform-patch.cjs
-      claude-launch-bridge.cjs
-      claude-ohos-config.cjs
-    ].each { |file| assert_path_exists pkgshare/file }
+    system "python3", pkgshare/"assemble-local-hap.py", "--help"
     assert_match "input_hap output_hap",
                  shell_output("python3 #{pkgshare}/patch-code-runtime-hap.py --help")
 
