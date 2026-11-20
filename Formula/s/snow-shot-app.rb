@@ -4,7 +4,7 @@ class SnowShotApp < Formula
   url "https://github.com/mg-chao/snow-shot/archive/refs/tags/v1.5.7_snow-shot.tar.gz"
   sha256 "6d9de662710ccf406dea312c0322e77a3f473bc6121096ec82df713d30f4273c"
   license "GPL-3.0-or-later"
-  revision 20
+  revision 21
 
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-app-v1.5.7-r8"
@@ -603,10 +603,19 @@ class SnowShotApp < Formula
            "--system-lib-dir", sdk_lib_dir, "--system-lib-dir", clt_lib_dir
   end
 
+  post_install_steps do
+    run "{HOMEBREW_PREFIX}/bin/hap-app",
+        args: ["auto-install", "snow-shot-app", "com.social4hyq.snowshot"],
+        must_succeed: false, print_stdout: true, network_access: true
+  end
+
   def caveats
     <<~EOS
-      The HAP is unsigned in the bottle. Connect and unlock the device, then run
-      `snow-shot-app install`: app-installer handles Huawei Developer login, local
+      The HAP is unsigned in the bottle. `brew install` runs `snow-shot-app install`
+      automatically once the device is connected and the Huawei Developer login
+      is done; otherwise it is queued: `hap-app install-pending` finishes it.
+      To install by hand, run `snow-shot-app install`: app-installer handles
+      Huawei Developer login, local
       debug profile generation, signing, installation, and launch.
     EOS
   end
@@ -621,12 +630,12 @@ class SnowShotApp < Formula
     assert_match "unknown command: bogus", shell_output("#{bin}/snow-shot-app bogus 2>&1", 2)
     fake_bin = testpath/"bin"
     fake_bin.mkpath
-    installer_args = testpath/"hap-installer-args"
-    (fake_bin/"hap-installer").write <<~SH
+    installer_args = testpath/"app-installer-args"
+    (fake_bin/"app-installer").write <<~SH
       #!/bin/sh
       printf '%s\\n' "$@" > #{installer_args}
     SH
-    chmod 0755, fake_bin/"hap-installer"
+    chmod 0755, fake_bin/"app-installer"
     (fake_bin/"hdc").write "#!/bin/sh\necho 127.0.0.1:1\n"
     chmod 0755, fake_bin/"hdc"
     with_env(PATH: "#{fake_bin}:#{ENV["PATH"]}", SNOW_SHOT_HDC: (fake_bin/"hdc").to_s) do
