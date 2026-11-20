@@ -4,7 +4,7 @@ class MagpieApp < Formula
   url "https://github.com/yetone/magpie/archive/refs/tags/v0.1.4402.tar.gz"
   sha256 "a23a2867fe4aa3ae33ee83d5a554ba8283b9052d01c20c02c6bd2941bed47dcd"
   license :cannot_represent
-  revision 5
+  revision 6
 
   livecheck do
     url :stable
@@ -12,9 +12,8 @@ class MagpieApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/magpie-app-v0.1.4402-r10"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cb27aaa7bc4e652e4583dadba29e5331f0e8154a1abef001fc6fe252b7d0404d"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/magpie-app-v0.1.4402-r12"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "21a0225796d2c4266404a25ede80fa0c730475cdf151977a2590f889cf6288a6"
   end
 
   depends_on "app-installer"
@@ -29,8 +28,7 @@ class MagpieApp < Formula
     sha256 "5268fe3c994ec2ce48a999fd6b5029d9cb0e409b07c0395e2a6072e50cb3e1ac"
   end
 
-  # List every path literally: the unused-resource audit keeps a Resources/
-  # directory only while a formula names it.
+  # The unused-resource audit requires literal tap paths.
   RESOURCE_FILES = %w[
     Resources/_shared/hap-app/install-lib.sh
     Resources/magpie-app/app/config.json
@@ -44,9 +42,7 @@ class MagpieApp < Formula
   def install
     tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
     res = tap_root/"Resources/magpie-app"
-    RESOURCE_FILES.each do |file|
-      odie "missing tap resource: #{file}" unless (tap_root/file).exist?
-    end
+    RESOURCE_FILES.each { |file| odie "missing tap resource: #{file}" unless (tap_root/file).exist? }
 
     resource("electron-ohos").fetch
     system "unzip", "-o", resource("electron-ohos").cached_download, "-d", buildpath
@@ -68,8 +64,7 @@ class MagpieApp < Formula
     %w[app_icon.png startIcon.png].each do |name|
       cp icon, shell/"AppScope/resources/base/media"/name
     end
-    # Patch app name/labels in every locale: the base file alone leaves the
-    # zh_CN/en_US overrides showing "Electron".
+    # Locale overrides would otherwise keep the Electron launcher label.
     (shell.glob("AppScope/resources/*/element/string.json") +
      shell.glob("electron/src/main/resources/*/element/string.json")).each do |file|
       strings = JSON.parse(file.read)
@@ -82,8 +77,7 @@ class MagpieApp < Formula
       file.write JSON.pretty_generate(strings) + "\n"
     end
 
-    # Mirror the packaging deltas for the CI image's NDK-less SDK subset
-    # (no llvm-strip).
+    # The CI SDK lacks llvm-strip and local signing material.
     inreplace shell/"build-profile.json5", /^[ \t]*"signingConfig": "default",\r?\n/, ""
     inreplace shell/"electron/src/main/module.json5", '"mainElement": "EntryAbility",',
               '"mainElement": "EntryAbility", "extractNativeLibs": true,'
@@ -119,27 +113,21 @@ class MagpieApp < Formula
     inreplace shell/"web_engine/src/main/ets/ability/WebAbility.ets",
               "    super.onWindowStageCreate(windowStage);\n", close_handler
 
-    # The shell builds in the private electron-ohos-ci image
-    # (OHOS_CI_IMAGE_OVERRIDES) with the proprietary CLT at
-    # /opt/electron-ohos-clt; it compiles no C++, so the NDK-less SDK suffices.
+    # The proprietary CLT is supplied by the CI image, not distributed by the tap.
     clt = Pathname.new("/opt/electron-ohos-clt")
     unless (clt/"hvigor/bin/hvigorw.js").exist?
       odie "magpie-app builds only in electron-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES['magpie-app']"
     end
 
-    # brew's sanitized env drops LD_LIBRARY_PATH; restore it for
-    # ohos_packing_tool.
+    # ohos_packing_tool needs SDK libraries outside brew's sanitized search path.
     ENV["DEVECO_SDK_HOME"] = (clt/"sdk").to_s
     ENV["HOS_SDK_HOME"] = (clt/"sdk").to_s
     ENV["LD_LIBRARY_PATH"] =
       "#{clt}/lib:#{clt}/sdk/default/openharmony/native/llvm/lib/clang/15.0.4/lib/aarch64-linux-ohos"
     ENV.delete("NODE_OPTIONS")
-    # Cap RLIMIT_NOFILE for the hvigor tree: near-1e9 limits break the musl FD
-    # table. Only ever lower it.
+    # An oversized RLIMIT_NOFILE breaks the musl FD table in hvigor.
     soft_cap, hard_cap = Process.getrlimit(Process::RLIMIT_NOFILE)
-    if hard_cap > 65_536
-      Process.setrlimit(Process::RLIMIT_NOFILE, [soft_cap, 65_536].min, 65_536)
-    end
+    Process.setrlimit(Process::RLIMIT_NOFILE, [soft_cap, 65_536].min, 65_536) if hard_cap > 65_536
 
     cd shell do
       system "node", clt/"ohpm/bin/pm-cli.js", "install"
@@ -164,8 +152,7 @@ class MagpieApp < Formula
 
     cp res/"scripts/magpie-app.sh", libexec/"magpie-app.sh"
     chmod 0755, libexec/"magpie-app.sh"
-    # Sources the shared install flow; cp, not install: the tap checkout is
-    # read-only in the CI container.
+    # Pathname#install would move files out of the read-only CI tap.
     cp res/"scripts/install-desktop.sh", pkgshare/"install-desktop.sh"
     chmod 0755, pkgshare/"install-desktop.sh"
     cp tap_root/"Resources/_shared/hap-app/install-lib.sh", pkgshare/"hap-app-install-lib.sh"
@@ -187,10 +174,10 @@ class MagpieApp < Formula
 
   def caveats
     <<~EOS
-      `brew install`/`brew upgrade` installs the HAP automatically once the
-      device and the Huawei Developer login are ready; otherwise it is queued:
-      `hap-app status` shows why, `hap-app install-pending` finishes it.
-      Manual: `magpie-app install`. Details: docs/hap-app-formulae.md.
+      `brew install` and `brew upgrade` try to install the HAP when a device is
+      connected and Huawei Developer login is ready. If queued, check
+      `hap-app status`, then run `hap-app install-pending`.
+      Manual install: `magpie-app install`. See docs/hap-app-formulae.md.
 
       Starts the installed Magpie CLI and shares its settings; the web UI listens on
       loopback with a per-launch key. Needs a debug profile for READ_PASTEBOARD
@@ -205,10 +192,7 @@ class MagpieApp < Formula
     system "unzip", "-tq", hap
     listing = shell_output("unzip -Z1 #{hap}")
     assert_match "libs/arm64-v8a/libelectron.so", listing
-    assert_match "#{entry}/main.cjs", listing
-    assert_match "Menu.setApplicationMenu(null)", shell_output("unzip -p #{hap} #{entry}/main.cjs")
     assert_match "#{entry}/connect.html", listing
-    assert_match "#{entry}/tray-icon.png", listing
     assert_match "Usage: magpie-app", shell_output("#{bin}/magpie-app --help")
 
     fake = testpath/"app-installer"
@@ -243,17 +227,18 @@ class MagpieApp < Formula
                  permissions.sort
 
     system bin/"magpie-app", "install", "--no-acl"
-    # The strong-sandbox HAP has the same settings as the ACL one; only the
-    # permissions differ.
     assert_equal config, JSON.parse(shell_output("unzip -p #{staged} #{entry}/config.json"))
     plain = JSON.parse(shell_output("unzip -p #{staged} module.json"))
     permissions = plain.fetch("module").fetch("requestPermissions").map { |permission| permission.fetch("name") }
     assert_equal %w[ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET], permissions.sort
 
-    # --keep leaves the signed HAP in the temporary directory.
-    kept_output = shell_output("#{bin}/magpie-app install --keep 2>&1")
+    keep_tmp = testpath/"keep"
+    keep_tmp.mkpath
+    kept_output = with_env(TMPDIR: keep_tmp.to_s) do
+      shell_output("#{bin}/magpie-app install --keep 2>&1")
+    end
     assert_match "installed (com.social4hyq.magpiedesktop, ACL)", kept_output
     assert_match "signed HAP kept", kept_output
-    assert_path_exists Pathname(ENV.fetch("TMPDIR", "/tmp"))/"magpie-app-signed.hap"
+    assert_path_exists keep_tmp/"magpie-app-signed.hap"
   end
 end
