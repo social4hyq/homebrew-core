@@ -6,7 +6,7 @@ class ClaudeCodeApp < Formula
   version "5.11492.5"
   sha256 "fe6cd8a70f96b96eb4e6b647300cfaee6aaff4ce133a0fbbe11c2cdb775f5a6a"
   license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
-  revision 3
+  revision 4
 
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-app-v5.11492.5-r6"
@@ -104,17 +104,21 @@ class ClaudeCodeApp < Formula
 
     shell_hap = project/"electron/build/default/outputs/default/electron-default-unsigned.hap"
     encrypted_hap = buildpath/"electron-default-cookie-unsigned.hap"
-    assembled_hap = buildpath/"claude-desktop-assembled-unsigned.hap"
-    final_hap = buildpath/"claude-code-desktop-unsigned.hap"
     system "python3", support/"enable-cookie-encryption.py", shell_hap, encrypted_hap
-    system "python3", support/"assemble-local-hap.py", encrypted_hap,
-           stable.cached_download, assembled_hap
-    system "python3", support/"patch-code-runtime-hap.py", assembled_hap,
-           final_hap, "--no-host-config"
 
-    libexec.install final_hap => "claude-code-desktop-unsigned.hap"
+    # The bottle ships only this tap-authored shell; `claude-code-app install`
+    # downloads Anthropic's official package and assembles the HAP locally, so
+    # the tap does not redistribute Anthropic binaries.
+    libexec.install encrypted_hap => "claude-code-shell-unsigned.hap"
+    (libexec/"vendor.json").write JSON.generate(
+      "url"     => stable.url.to_s,
+      "sha256"  => stable.checksum.hexdigest,
+      "version" => version.to_s,
+      "file"    => File.basename(stable.url.to_s),
+    )
     pkgshare.mkpath
     cp res/"scripts/install-claude-code-desktop.sh", pkgshare/"install-desktop.sh"
+    cp support/"assemble-local-hap.py", pkgshare/"assemble-local-hap.py"
     %w[
       patch-code-runtime-hap.py
       claude-bootstrap.cjs
@@ -138,7 +142,9 @@ class ClaudeCodeApp < Formula
     (bin/"claude-code-app").write_env_script libexec/"claude-code-app.sh",
       CLAUDE_CODE_APP_HDC:            formula_opt_prefix("ohos-sdk-toolchains")/"hdc",
       CLAUDE_CODE_APP_INSTALL_SCRIPT: pkgshare/"install-desktop.sh",
-      CLAUDE_CODE_APP_UNSIGNED_HAP:   libexec/"claude-code-desktop-unsigned.hap",
+      CLAUDE_CODE_APP_UNSIGNED_HAP:   libexec/"claude-code-shell-unsigned.hap",
+      CLAUDE_CODE_APP_VENDOR_JSON:    libexec/"vendor.json",
+      CLAUDE_CODE_APP_ASSEMBLER:      pkgshare/"assemble-local-hap.py",
       PATH:                           runtime_path
   end
 
@@ -155,6 +161,11 @@ class ClaudeCodeApp < Formula
       `hap-app status` shows why, `hap-app install-pending` finishes it.
       Manual: `claude-code-app install`. Details: docs/hap-app-formulae.md.
 
+      The bottle ships only the tap-authored shell; the first install asks
+      Anthropic for the official package (sha256-checked) and caches it in
+      ~/.cache/claude-code-app/vendor/. Use `claude-code-app install --deb PATH`
+      for an offline copy, and `--clean-cache` to remove the cached package.
+
       The app needs the host `claude-code.latest` CLI installed and logged in;
       install injects the host paths into a private signed HAP, and ACL permissions
       let it spawn the CLI. `claude-code-app start` opens the app.
@@ -163,8 +174,13 @@ class ClaudeCodeApp < Formula
 
   test do
     tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
-    hap = libexec/"claude-code-desktop-unsigned.hap"
+    hap = libexec/"claude-code-shell-unsigned.hap"
     assert_path_exists hap
+    vendor = JSON.parse((libexec/"vendor.json").read)
+    assert_equal version.to_s, vendor.fetch("version")
+    assert_match(/(\A[0-9a-f]{64}\z)/, vendor.fetch("sha256"))
+    assert_match(%r{\Ahttps://}, vendor.fetch("url"))
+    assert_path_exists pkgshare/"assemble-local-hap.py"
     assert_match "Usage: claude-code-app", shell_output("#{bin}/claude-code-app --help")
     %w[
       patch-code-runtime-hap.py
@@ -189,9 +205,8 @@ class ClaudeCodeApp < Formula
     major, minor, patch = version.to_s.split(".").map(&:to_i)
     assert_equal (major << 22) | (minor << 8) | patch, module_json.dig("app", "versionCode")
     permissions = module_json.dig("module", "requestPermissions").map { |entry| entry.fetch("name") }
-    assert_equal 7, permissions.length
-    assert_includes permissions, "ohos.permission.CUSTOM_SANDBOX"
-    assert_includes permissions, "ohos.permission.READ_WRITE_USER_FILE"
+    assert_includes permissions, "ohos.permission.INTERNET"
+    refute_includes permissions, "ohos.permission.CUSTOM_SANDBOX"
     assert_empty module_json.dig("module", "executableBinaryPaths") || []
 
     resource_strings = shell_output("unzip -p #{hap} resources.index | strings")
@@ -203,7 +218,8 @@ class ClaudeCodeApp < Formula
                  Digest::SHA256.file(icon).hexdigest
 
     listing = shell_output("unzip -l #{hap}")
-    assert_match "resources/resfile/resources/app/vendor.asar", listing
+    refute_match "vendor.asar", listing
+    refute_match "ion-dist.asar", listing
     refute_match "claude-host-config.json", listing
     refute_match "claude-code-probe.bin", listing
     system "unzip", "-tq", hap
