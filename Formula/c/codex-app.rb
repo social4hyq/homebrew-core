@@ -6,12 +6,11 @@ class CodexApp < Formula
   version "26.1117.31558"
   sha256 "81670501c6b7d784ef2b9a62b32da031e81a0eac0f50ebd933d0a9956d7bec77"
   license :cannot_represent # OpenAI service and software terms
-  revision 2
+  revision 3
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codex-app-v26.1117.31558-r4"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f2dc1b30b222222a4a4f3c86783afd9151d6b20aa47ad7728167e0aeeb4fee8b"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codex-app-v26.1117.31558-r5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "892a2cd9866db06dba28ebdd14b3ab0100574b05148d33df4844dd02d91796a7"
   end
 
   depends_on "binutils" => :build
@@ -104,12 +103,18 @@ class CodexApp < Formula
 
     shell_hap = project/"electron/build/default/outputs/default/electron-default-unsigned.hap"
     encrypted_hap = buildpath/"electron-default-cookie-unsigned.hap"
-    assembled_hap = buildpath/"chatgpt-desktop-assembled-unsigned.hap"
     system "python3", support/"enable-cookie-encryption.py", shell_hap, encrypted_hap
-    system "python3", support/"assemble-local-hap.py", encrypted_hap,
-           stable.cached_download, assembled_hap
 
-    libexec.install assembled_hap => "codex-app-unsigned.hap"
+    # The bottle ships only this tap-authored shell. The official ChatGPT
+    # package is downloaded by `codex-app install` (see install-desktop.sh) so
+    # the tap does not redistribute OpenAI binaries.
+    libexec.install encrypted_hap => "codex-app-shell-unsigned.hap"
+    (libexec/"vendor.json").write JSON.generate(
+      "url"     => stable.url.to_s,
+      "sha256"  => stable.checksum.hexdigest,
+      "version" => version.to_s,
+      "file"    => "chatgpt_arm64.deb",
+    )
     resource("node-pty").stage(libexec/"node_modules/node-pty")
     rm_r Dir[libexec/"node_modules/node-pty/prebuilds/{darwin,win32}-*"]
     pkgshare.mkpath
@@ -118,14 +123,17 @@ class CodexApp < Formula
     cp res/"scripts/install-chatgpt-desktop.sh", pkgshare/"install-desktop.sh"
     cp tap_root/"Resources/_shared/hap-app/install-lib.sh", pkgshare/"hap-app-install-lib.sh"
     cp res/"scripts/stage-ohos-shell.sh", pkgshare/"stage-ohos-shell.sh"
-    cp support/"assemble-local-hap.py", pkgshare/"assemble-local-hap.py"
+    assemble_dir = pkgshare/"assemble"
+    assemble_dir.mkpath
+    cp support/"assemble-local-hap.py", assemble_dir
+    RESOURCE_FILES.grep(%r{/app/}).each { |file| cp tap_root/file, assemble_dir }
     cp support/"enable-cookie-encryption.py", pkgshare/"enable-cookie-encryption.py"
     chmod 0755, [libexec/"codex-app.sh", pkgshare/"codex-app.sh",
                  pkgshare/"install-desktop.sh", pkgshare/"hap-app-install-lib.sh",
                  pkgshare/"stage-ohos-shell.sh"]
 
     module_json = JSON.parse(
-      Utils.safe_popen_read("unzip", "-p", libexec/"codex-app-unsigned.hap", "module.json"),
+      Utils.safe_popen_read("unzip", "-p", libexec/"codex-app-shell-unsigned.hap", "module.json"),
     )
     requested = module_json.fetch("module").fetch("requestPermissions")
     %w[ohos.permission.CUSTOM_SANDBOX ohos.permission.READ_WRITE_USER_FILE
@@ -145,7 +153,9 @@ class CodexApp < Formula
     ].join(":")
     (bin/"codex-app").write_env_script libexec/"codex-app.sh",
       CHATGPT_APP_HDC:            formula_opt_prefix("ohos-sdk-toolchains")/"hdc",
-      CHATGPT_APP_UNSIGNED_HAP:   libexec/"codex-app-unsigned.hap",
+      CHATGPT_APP_UNSIGNED_HAP:   libexec/"codex-app-shell-unsigned.hap",
+      CHATGPT_APP_VENDOR_JSON:    libexec/"vendor.json",
+      CHATGPT_APP_ASSEMBLE_DIR:   pkgshare/"assemble",
       CHATGPT_APP_CODEX_CLI:      formula_opt_bin("codex")/"codex",
       CHATGPT_APP_NODE:           formula_opt_bin("node")/"node",
       CHATGPT_APP_NODE_PTY:       opt_libexec/"node_modules/node-pty",
@@ -169,6 +179,12 @@ class CodexApp < Formula
       `hap-app status` shows why, `hap-app install-pending` finishes it.
       Manual: `codex-app install`. Details: docs/hap-app-formulae.md.
 
+      The bottle ships only the tap-authored shell; the first install asks
+      OpenAI for the official ChatGPT package (~519 MB, sha256-checked) and
+      caches it in ~/.cache/codex-app/vendor/ for reinstalls. Use
+      `codex-app install --deb PATH` for an offline copy, and `--clean-cache`
+      to remove the cached package and assembled HAP.
+
       The app starts the Homebrew `codex` CLI; install injects host paths into a
       private signed HAP (ACLs are needed to reach host projects). `--no-acl` gives a
       strong-sandbox variant without host Codex features. Install keeps
@@ -180,15 +196,18 @@ class CodexApp < Formula
 
   test do
     tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
-    hap = libexec/"codex-app-unsigned.hap"
+    hap = libexec/"codex-app-shell-unsigned.hap"
     assert_path_exists hap
+    vendor = JSON.parse((libexec/"vendor.json").read)
+    assert_equal version.to_s, vendor.fetch("version")
+    assert_match(/(\A[0-9a-f]{64}\z)/, vendor.fetch("sha256"))
+    assert_match(%r{\Ahttps://}, vendor.fetch("url"))
+    assert_path_exists pkgshare/"assemble/chatgpt-bootstrap.cjs"
+    assert_path_exists pkgshare/"assemble/assemble-local-hap.py"
     assert_match "Usage: codex-app", shell_output("#{bin}/codex-app --help")
 
-    %w[
-      assemble-local-hap.py
-      enable-cookie-encryption.py
-    ].each { |file| assert_path_exists pkgshare/file }
-    assert_match "shell deb output", shell_output("python3 #{pkgshare}/assemble-local-hap.py --help")
+    assert_path_exists pkgshare/"enable-cookie-encryption.py"
+    assert_match "shell deb output", shell_output("python3 #{pkgshare}/assemble/assemble-local-hap.py --help")
     assert_match "source output", shell_output("python3 #{pkgshare}/enable-cookie-encryption.py --help")
     system "node", "--check", tap_root/"Resources/codex-app/app/chatgpt-bootstrap.cjs"
     owl_shims = %w[owl-compat owl-host-shim owl-pty-host owl-pty-shim owl-sqlite-shim owl-utility-entry]
@@ -222,18 +241,16 @@ class CodexApp < Formula
     assert_match "CODEX_CLI_PATH", bootstrap
     assert_match "chatgpt-host-config.json", installer
     listing = shell_output("unzip -Z1 #{hap}")
-    assert_match "resources/resfile/resources/app/vendor.asar", listing
+    refute_match "vendor.asar", listing
+    refute_match "resources/resfile/resources/codex", listing
+    refute_match "vendor.asar.unpacked", listing
     owl_shims.each do |name|
-      assert_match "resources/resfile/resources/app/#{name}.cjs", listing
+      refute_match "resources/resfile/resources/app/#{name}.cjs", listing
     end
-    assert_match "resources/resfile/resources/app/vendor.asar.unpacked/", listing
-    assert_match "resources/resfile/resources/codex", listing
-    assert_match "resources/resfile/resources/codex-code-mode-host", listing
     assert_match "resources.index", listing
-    assert_match "ChatGPT", shell_output("unzip -p #{hap} resources.index | strings")
-    icon = testpath/"chatgpt-icon.png"
+    icon = testpath/"shell-icon.png"
     icon.write Utils.safe_popen_read("unzip", "-p", hap, "resources/base/media/app_icon.png")
-    assert_equal "cfe031774dd6aabdceca35338f329bc4844592767d043b7b4a56d8fb097dffd0",
+    assert_equal Digest::SHA256.file(tap_root/"Resources/codex-app/assets/icon.png").hexdigest,
                  Digest::SHA256.file(icon).hexdigest
     system "unzip", "-tq", hap
 
@@ -294,7 +311,7 @@ class CodexApp < Formula
         end
       end
     end
-    install_variant.call("--keep")
+    install_variant.call("--hap", fixture_hap.to_s, "--keep")
     injected = testpath/"codex-app-signed.hap"
     injected_manifest = JSON.parse(shell_output("unzip -p #{injected} module.json"))
     assert_includes injected_manifest.dig("module", "requestPermissions").map { |item| item.fetch("name") },
@@ -311,7 +328,19 @@ class CodexApp < Formula
     assert_path_exists Pathname(workspace_root)
     assert_match "projectlessWorkspaceRoot = \"#{workspace_root}\"", (host_home/".codex/config.toml").read
 
-    install_variant.call("--no-acl", "--keep")
+    install_variant.call("--hap", fixture_hap.to_s, "--no-acl", "--keep")
+
+    assert_match "--deb PATH", shell_output("bash #{pkgshare}/install-desktop.sh --help 2>&1")
+    bad_deb = testpath/"bad.deb"
+    bad_deb.write "not a deb"
+    rejected = shell_output(
+      "CHATGPT_APP_UNSIGNED_HAP=#{hap} " \
+      "CHATGPT_APP_VENDOR_JSON=#{libexec}/vendor.json " \
+      "CHATGPT_APP_ASSEMBLE_DIR=#{pkgshare}/assemble " \
+      "bash #{pkgshare}/install-desktop.sh --deb #{bad_deb} 2>&1",
+      1,
+    )
+    assert_match(/sha256/, rejected)
     strong_sandbox = JSON.parse(shell_output("unzip -p #{injected} module.json"))
     strong_permissions = strong_sandbox.dig("module", "requestPermissions").map { |item| item.fetch("name") }
     assert_empty strong_permissions.grep(/CUSTOM_SANDBOX|READ_WRITE_USER_FILE/)
