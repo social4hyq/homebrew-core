@@ -6,7 +6,7 @@ class ClaudeCodeApp < Formula
   version "5.11492.5"
   sha256 "fe6cd8a70f96b96eb4e6b647300cfaee6aaff4ce133a0fbbe11c2cdb775f5a6a"
   license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
-  revision 2
+  revision 3
 
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-app-v5.11492.5-r3"
@@ -144,7 +144,7 @@ class ClaudeCodeApp < Formula
   end
 
   post_install_steps do
-    run "{HOMEBREW_PREFIX}/bin/hap-app",
+    run "{{HOMEBREW_PREFIX}}/bin/hap-app",
         args: ["auto-install", "claude-code-app", "com.social4hyq.claudecode"],
         must_succeed: false, print_stdout: true, network_access: true
   end
