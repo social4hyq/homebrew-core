@@ -1,10 +1,11 @@
 OHOS: paint minimize, maximize/restore and close at the right end of the tab
 strip, where Windows and Linux show the platform's own caption buttons. The
 buttons only mount when the preload reports 'openharmony', so every other
-platform keeps its native controls.
+platform keeps its native controls. The glyphs are 14px so they read at the
+strip's 40px height.
 
 diff --git a/apps/shell/src/renderer/src/TabBar.tsx b/apps/shell/src/renderer/src/TabBar.tsx
-index 76b98e7..7059331 100644
+index 76b98e7..91174c2 100644
 --- a/apps/shell/src/renderer/src/TabBar.tsx
 +++ b/apps/shell/src/renderer/src/TabBar.tsx
 @@ -1,6 +1,7 @@
@@ -15,7 +16,7 @@ index 76b98e7..7059331 100644
  import { TEAR_OFF_SLACK, insertionIndexForX, isBeyondBand } from '../../shared/tab-drag-geometry'
  import { notifyFilesChanged } from './file-events'
  import { useI18n } from './locale'
-@@ -8,6 +9,7 @@ import { useI18n } from './locale'
+@@ -8,6 +9,7 @@
  declare global {
    interface Window {
      aiOfficeTabs: TabsApi
@@ -23,7 +24,7 @@ index 76b98e7..7059331 100644
    }
  }
  
-@@ -174,6 +176,77 @@ export function renamedFileName(currentPath: string, typedName: string): string
+@@ -174,6 +176,77 @@
    return ext ? `${typedName}.${ext}` : typedName
  }
  
@@ -61,7 +62,7 @@ index 76b98e7..7059331 100644
 +        aria-label={t('windowMinimize')}
 +        onClick={() => api.minimize()}
 +      >
-+        <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
++        <svg width="14" height="14" viewBox="0 0 10 10" aria-hidden="true">
 +          <path d="M2 5.5h6" stroke="currentColor" strokeWidth="1" />
 +        </svg>
 +      </button>
@@ -73,12 +74,12 @@ index 76b98e7..7059331 100644
 +        onClick={() => void api.toggleMaximize()}
 +      >
 +        {maximized ? (
-+          <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
++          <svg width="14" height="14" viewBox="0 0 10 10" aria-hidden="true">
 +            <path d="M3.5 2.5h4v4" fill="none" stroke="currentColor" strokeWidth="1" />
 +            <rect x="2.5" y="3.5" width="4" height="4" fill="none" stroke="currentColor" strokeWidth="1" />
 +          </svg>
 +        ) : (
-+          <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
++          <svg width="14" height="14" viewBox="0 0 10 10" aria-hidden="true">
 +            <rect x="2.5" y="2.5" width="5" height="5" fill="none" stroke="currentColor" strokeWidth="1" />
 +          </svg>
 +        )}
@@ -90,7 +91,7 @@ index 76b98e7..7059331 100644
 +        aria-label={t('windowClose')}
 +        onClick={() => api.close()}
 +      >
-+        <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
++        <svg width="14" height="14" viewBox="0 0 10 10" aria-hidden="true">
 +          <path d="M2.5 2.5l5 5M7.5 2.5l-5 5" stroke="currentColor" strokeWidth="1" />
 +        </svg>
 +      </button>
@@ -101,7 +102,7 @@ index 76b98e7..7059331 100644
  export function TabBar() {
    const { t } = useI18n()
    const [tabs, setTabs] = useState<TabSummary[]>([])
-@@ -665,6 +738,7 @@ export function TabBar() {
+@@ -665,6 +738,7 @@
            />
          </svg>
        </button>
