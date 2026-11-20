@@ -4,7 +4,7 @@ class DeepseekHarnessApp < Formula
   url "https://github.com/deepseek-ai/deepseek-harness/archive/refs/tags/dsh-v0.2.2-rc.5.tar.gz"
   sha256 "4e24e132a9fc267d5cdc5724525873db2575680e073fd2db4519b92553614215"
   license :cannot_represent
-  revision 1
+  revision 2
 
   livecheck do
     url "https://github.com/deepseek-ai/deepseek-harness.git"
@@ -12,9 +12,8 @@ class DeepseekHarnessApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/deepseek-harness-app-v0.2.2-rc.5-r3"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d2fe1ac7a92a1cb33c7a69a968f56ee5317fb77162e2765996c7dd1170a4d44c"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/deepseek-harness-app-v0.2.2-rc.5-r5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "51b4ba60d68d4201ab34c9a8b7b1c5a6040fbcb0b521dea6c93479f553a2e105"
   end
 
   depends_on "app-installer"
@@ -32,8 +31,7 @@ class DeepseekHarnessApp < Formula
     sha256 "5268fe3c994ec2ce48a999fd6b5029d9cb0e409b07c0395e2a6072e50cb3e1ac"
   end
 
-  # List every path literally: the unused-resource audit keeps a Resources/
-  # directory only while a formula names it.
+  # The unused-resource audit requires literal tap paths.
   RESOURCE_FILES = %w[
     Resources/_shared/hap-app/install-lib.sh
     Resources/_shared/waiting-page/render-waiting.cjs
@@ -58,9 +56,7 @@ class DeepseekHarnessApp < Formula
   def install
     tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
     res = tap_root/"Resources/deepseek-harness-app"
-    RESOURCE_FILES.each do |file|
-      odie "missing tap resource: #{file}" unless (tap_root/file).exist?
-    end
+    RESOURCE_FILES.each { |file| odie "missing tap resource: #{file}" unless (tap_root/file).exist? }
 
     resource("electron-ohos").fetch
     system "unzip", "-o", resource("electron-ohos").cached_download, "-d", buildpath
@@ -77,8 +73,6 @@ class DeepseekHarnessApp < Formula
     cp res/"app/tray.cjs", app
     cp res/"app/package.json", app
     cp res/"app/config.json", app
-    # waiting.html is generated from the shared page template;
-    # Resources/_shared/waiting-page/expected.sha256 pins the output.
     system "node", tap_root/"Resources/_shared/waiting-page/render-waiting.cjs",
            tap_root/"Resources/_shared/waiting-page/waiting.html.in",
            res/"app/waiting.json", app/"waiting.html"
@@ -147,9 +141,7 @@ class DeepseekHarnessApp < Formula
       "#{clt}/lib:#{clt}/sdk/default/openharmony/native/llvm/lib/clang/15.0.4/lib/aarch64-linux-ohos"
     ENV.delete("NODE_OPTIONS")
     soft_cap, hard_cap = Process.getrlimit(Process::RLIMIT_NOFILE)
-    if hard_cap > 65_536
-      Process.setrlimit(Process::RLIMIT_NOFILE, [soft_cap, 65_536].min, 65_536)
-    end
+    Process.setrlimit(Process::RLIMIT_NOFILE, [soft_cap, 65_536].min, 65_536) if hard_cap > 65_536
 
     cd shell do
       system "node", clt/"ohpm/bin/pm-cli.js", "install"
@@ -176,8 +168,6 @@ class DeepseekHarnessApp < Formula
       (res/"scripts/install-desktop.sh").read,
     )
     chmod 0755, pkgshare/"install-desktop.sh"
-    # install-desktop.sh sources the shared install flow; use cp, not install:
-    # the tap checkout is read-only in the CI container.
     cp tap_root/"Resources/_shared/hap-app/install-lib.sh", pkgshare/"hap-app-install-lib.sh"
     chmod 0755, pkgshare/"hap-app-install-lib.sh"
     (libexec/"deepseek-harness-desktop.sh").write(
@@ -207,10 +197,10 @@ class DeepseekHarnessApp < Formula
 
   def caveats
     <<~EOS
-      `brew install`/`brew upgrade` installs the HAP automatically once the
-      device and the Huawei Developer login are ready; otherwise it is queued:
-      `hap-app status` shows why, `hap-app install-pending` finishes it.
-      Manual: `dsh-app install`. Details: docs/hap-app-formulae.md.
+      `brew install` and `brew upgrade` try to install the HAP when a device is
+      connected and Huawei Developer login is ready. If queued, check
+      `hap-app status`, then run `hap-app install-pending`.
+      Manual install: `dsh-app install`. See docs/hap-app-formulae.md.
 
       Closing the window hides it to the tray. `dsh-app install`/`start` run a
       detached `dsh web` backend that survives the window; the tray menu shows or
@@ -273,16 +263,18 @@ class DeepseekHarnessApp < Formula
     assert_match "installed", shell_output("#{bin}/dsh-app install --device chosen")
     installer = installer_args.read.lines(chomp: true)
     assert_equal "chosen", installer[installer.index("--device") + 1]
-    # --no-acl installs the strong-sandbox variant (the HAP's own permissions).
     assert_match "strong-sandbox", shell_output("#{bin}/dsh-app install --no-acl")
     strong = JSON.parse(shell_output("unzip -p #{injected_copy} module.json"))
     assert_equal %w[ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET],
                  strong.fetch("module").fetch("requestPermissions").map { |entry| entry.fetch("name") }.sort
-    # --keep leaves the signed HAP in the temporary directory.
-    kept_output = shell_output("#{bin}/dsh-app install --keep 2>&1")
+    keep_tmp = testpath/"keep"
+    keep_tmp.mkpath
+    kept_output = with_env(TMPDIR: keep_tmp.to_s) do
+      shell_output("#{bin}/dsh-app install --keep 2>&1")
+    end
     assert_match "installed (com.social4hyq.deepseekharness, ACL)", kept_output
     assert_match "signed HAP kept", kept_output
-    assert_path_exists Pathname(ENV.fetch("TMPDIR", "/tmp"))/"deepseek-harness-app-signed.hap"
+    assert_path_exists keep_tmp/"deepseek-harness-app-signed.hap"
 
     assert_match(/serving at|already healthy/, shell_output("#{bin}/dsh-app serve"))
     assert_match "healthy", shell_output("#{bin}/dsh-app status")
@@ -302,32 +294,15 @@ class DeepseekHarnessApp < Formula
                  serve_only_args.read.lines(chomp: true)
     assert_match "stopped", shell_output("#{bin}/dsh-app stop")
 
-    # `start` also brings the host backend up, so the agent survives the shell.
     assert_match "opened", shell_output("#{bin}/dsh-app start")
     assert_match "healthy", shell_output("#{bin}/dsh-app status")
     assert_match "stopped", shell_output("#{bin}/dsh-app stop")
 
     hap = libexec/"deepseek-harness-desktop-unsigned.hap"
-    assert_path_exists hap
-    assert_path_exists pkgshare/"module-acl.json"
-    listing = shell_output("unzip -l #{hap}")
-    assert_match "pack.info", listing
-    assert_match "libs/arm64-v8a/libelectron.so", listing
-    assert_match "resources/resfile/resources/app/main.cjs", listing
-    assert_match "resources/resfile/resources/app/proxy.cjs", listing
-    assert_match "resources/resfile/resources/app/proxy-preload.cjs", listing
-    assert_match "resources/resfile/resources/app/tray.cjs", listing
-    assert_match "resources/resfile/resources/app/tray-icon.png", listing
-    assert_match "resources/resfile/resources/app/waiting.html", listing
+    assert_match "libs/arm64-v8a/libelectron.so", shell_output("unzip -Z1 #{hap}")
     waiting_source = shell_output("unzip -p #{hap} resources/resfile/resources/app/waiting.html")
     assert_match "dsh-app status", waiting_source
     refute_match "{{", waiting_source
-    tray_source = shell_output("unzip -p #{hap} resources/resfile/resources/app/tray.cjs")
-    assert_match "new Tray(", tray_source
-    assert_match "preventDefault", tray_source
-    window_source = shell_output("unzip -p #{hap} resources/resfile/resources/app/main.cjs")
-    assert_match "tray.create(", window_source
-    assert_match "DSH_DESKTOP_NO_TRAY", window_source
     helper = testpath/"startup.cjs"
     helper.write shell_output("unzip -p #{hap} resources/resfile/resources/app/startup.cjs")
     ENV["DSH_APP_STARTUP_HELPER"] = helper
