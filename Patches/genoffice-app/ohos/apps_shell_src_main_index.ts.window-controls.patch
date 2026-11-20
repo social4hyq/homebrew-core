@@ -5,11 +5,16 @@ decor is all-or-nothing, so a window created that way has no button to close,
 maximize or minimize it. The renderer drives the window it lives in through a
 small IPC channel instead.
 
+The maximize state is tracked from the window's maximize/unmaximize events
+rather than read back through win.isMaximized(): electron-ohos reports a freshly
+created window as maximized until its state first changes, which painted the
+restore icon on a floating window.
+
 diff --git a/apps/shell/src/main/index.ts b/apps/shell/src/main/index.ts
-index f79d441..c61f8c4 100644
+index 719aba8..c9d5c36 100644
 --- a/apps/shell/src/main/index.ts
 +++ b/apps/shell/src/main/index.ts
-@@ -320,6 +320,7 @@ import {
+@@ -319,6 +319,7 @@
  } from '@genoffice/ui/ai-panel-prefs'
  import type { TabKind } from '../shared/tabs-api'
  import { TABS_CHANNELS } from '../shared/tabs-api'
@@ -17,7 +22,7 @@ index f79d441..c61f8c4 100644
  import { showErrorDialog } from './error-dialog'
  import { startRendererWatchdog } from './renderer-watchdog'
  import {
-@@ -5928,6 +5929,37 @@ function tabMenuActions(): TabMenuActions {
+@@ -5927,6 +5928,50 @@
    }
  }
  
@@ -25,37 +30,50 @@ index f79d441..c61f8c4 100644
 + * (OpenHarmony): the renderer drives the window it lives in, so the main
 + * window and a detached one share the handlers. */
 +function registerWindowControlsIpc(): void {
++  // Tracked from the events instead of read back through win.isMaximized():
++  // electron-ohos reports a freshly created window as maximized until its
++  // state first changes, which would paint the restore icon on a floating
++  // window. The shell always creates its windows with explicit bounds, so a
++  // window starts unmaximized.
++  const maximized = new WeakMap<BrowserWindow, boolean>()
 +  app.on('browser-window-created', (_event, win) => {
-+    const send = (): void => {
++    maximized.set(win, false)
++    const send = (state: boolean): void => {
++      maximized.set(win, state)
 +      if (win.isDestroyed()) return
-+      win.webContents.send(WINDOW_CHANNELS.maximizedChanged, win.isMaximized())
++      win.webContents.send(WINDOW_CHANNELS.maximizedChanged, state)
 +    }
-+    win.on('maximize', send)
-+    win.on('unmaximize', send)
++    win.on('maximize', () => send(true))
++    win.on('unmaximize', () => send(false))
 +  })
-+  ipcMain.handle(
-+    WINDOW_CHANNELS.isMaximized,
-+    (event) => BrowserWindow.fromWebContents(event.sender)?.isMaximized() ?? false,
-+  )
++  ipcMain.handle(WINDOW_CHANNELS.isMaximized, (event) => {
++    const win = BrowserWindow.fromWebContents(event.sender)
++    return win ? (maximized.get(win) ?? false) : false
++  })
 +  ipcMain.handle(WINDOW_CHANNELS.control, (event, action: unknown) => {
 +    const win = BrowserWindow.fromWebContents(event.sender)
 +    if (!win || win.isDestroyed()) return false
-+    if (action === 'minimize') win.minimize()
-+    else if (action === 'close') win.close()
-+    else if (action === 'toggle-maximize') {
-+      if (win.isMaximized()) win.unmaximize()
-+      else win.maximize()
-+    } else {
-+      return false
++    const state = maximized.get(win) ?? false
++    if (action === 'minimize') {
++      win.minimize()
++      return state
 +    }
-+    return win.isMaximized()
++    if (action === 'close') {
++      win.close()
++      return state
++    }
++    if (action !== 'toggle-maximize') return false
++    const next = !state
++    if (next) win.maximize()
++    else win.unmaximize()
++    return next
 +  })
 +}
 +
  function registerTabsIpc(): void {
    ipcMain.on(TABS_CHANNELS.chromePressed, (event) => broadcastChromePressed(event.sender))
    ipcMain.handle(TABS_CHANNELS.list, () => tabManager?.list() ?? [])
-@@ -7071,6 +7103,7 @@ registerIntegrationsIpc({
+@@ -7070,6 +7115,7 @@
      : join(APPS_ROOT, '..', 'skills', 'recommended'),
  })
  registerTabsIpc()

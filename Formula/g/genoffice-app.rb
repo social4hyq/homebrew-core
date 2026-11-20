@@ -9,11 +9,11 @@ class GenofficeApp < Formula
   # Apache-2.0 upstream with tap-authored packaging scripts, on the CPF-Electron
   # runtime (Chromium/Electron, mixed MIT/BSD/LGPL).
   license :cannot_represent
-  revision 8
+  revision 9
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/genoffice-app-v0.13.18-r9"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f1472f9971725d634a1a4060b18a5dc3da3110e610efe2fa840265d588997ae4"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/genoffice-app-v0.13.18-r10"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b7f0a070cfbce21faaf6eabecc18a079ad4be496b9234b46f2589d140e89ff34"
   end
 
   depends_on "genoffice" => :build
