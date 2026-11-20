@@ -151,18 +151,14 @@ class ClaudeCodeApp < Formula
 
   def caveats
     <<~EOS
-      `brew install` runs `claude-code-app install` automatically once the
-      device is connected and the Huawei Developer login is done; otherwise it
-      is queued: `hap-app install-pending` finishes it. To install by hand, run
-      `claude-code-app install` to create a local debug signing profile, sign
-      the HAP, and install Claude Code. This requires a connected, unlocked
-      device and a Huawei Developer login for the ACL-capable profile.
+      `brew install`/`brew upgrade` installs the HAP automatically once the
+      device and the Huawei Developer login are ready; otherwise it is queued:
+      `hap-app status` shows why, `hap-app install-pending` finishes it.
+      Manual: `claude-code-app install`. Details: docs/hap-app-formulae.md.
 
-      The app uses the host `claude-code.latest` CLI and its login/config store;
-      the CLI must be installed and authenticated. No CLI credentials or host
-      paths are stored in the bottle. The signed HAP receives the host paths at
-      install time and is not shared. ACL permissions are required for the app
-      to spawn the host CLI. `claude-code-app start` opens the installed app.
+      The app needs the host `claude-code.latest` CLI installed and logged in;
+      install injects the host paths into a private signed HAP, and ACL permissions
+      let it spawn the CLI. `claude-code-app start` opens the app.
     EOS
   end
 
