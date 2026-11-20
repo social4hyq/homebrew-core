@@ -254,66 +254,23 @@ class ZcodeApp < Formula
 
   def caveats
     <<~EOS
-      The desktop HAP is unsigned in the bottle. `brew install` runs
-      `zcode-app install` automatically once the device is connected and the
-      Huawei Developer login is done; otherwise it is queued: `hap-app
-      install-pending` finishes it. To install by hand, run:
+      `brew install`/`brew upgrade` installs the HAP automatically once the
+      device and the Huawei Developer login are ready; otherwise it is queued:
+      `hap-app status` shows why, `hap-app install-pending` finishes it.
+      Manual: `zcode-app install`. Details: docs/hap-app-formulae.md.
 
-        zcode-app install
+      Install does not start `zcode --web`; the shell starts its own copy on launch
+      (weak-sandbox ACLs from the local debug profile). A service you start yourself
+      outlives the app:
 
-      app-installer generates a local debug profile (the first run asks for a
-      Huawei Developer login), signs the HAP and installs it.
+        zcode-app serve | status | stop
 
-      `zcode-app install` does not start the backing `zcode --web` instance.
-      When the app icon is opened and the service is not running, the shell
-      starts it itself by running `zcode-app serve`, and `zcode-app start`
-      does the same before it opens the app. This needs the weak-sandbox permissions CUSTOM_SANDBOX and
-      READ_WRITE_USER_FILE, which are granted through a debug profile generated
-      on the spot (no approval wait; the release path still goes through AGC
-      review). The service the shell starts belongs to the app: it runs as the
-      app's user and goes away when the app exits (tray menu: Quit), so the next
-      launch starts it again. A service you start yourself with
-      `zcode-app serve` belongs to your terminal user and keeps running after the
-      app exits; only that one can be stopped with `zcode-app stop`. To stop a
-      service the shell started, quit the app. To manage it by hand:
-
-        zcode-app serve
-        zcode-app status
-        zcode-app stop
-
-      The service state (config.json, web.pid, web.log and the patched server
-      copy) lives in ~/.config/zcode-desktop, so the shell and the terminal see
-      the same files, port and process. Older versions kept it under
-      $XDG_CONFIG_HOME, which is a different directory inside the shell's app
-      sandbox; the first `zcode-app` command moves it over.
-
-      `serve` also creates ~/.zcode/v2/credential-secret and exports
-      ZCODE_CREDENTIAL_SECRET_FILE. ZCode 3.18.2 refuses to start without a
-      credential secret and HarmonyOS has no Secret Service, so the file is
-      required even when no Z.ai account is used.
-
-      Project routing: 3.18.2's `zcode --web` advertises itself as a remote
-      source server, so the browser workbench's "this computer" projects are
-      routed to a remote host and creating one fails with project.host-offline.
-      `serve` therefore runs the bundled server from a per-version copy with
-      projectStorageHostId pinned to "local". If that copy cannot be prepared it
-      falls back to `zcode --web` and logs the warning.
-
-      Account login: the workbench served on loopback signs in through the
-      server-side OAuth flow (patched zcode): the login dialog's "browser
-      authorization" button opens the authorize URL in the system browser and
-      the server polls for the token. `zcode-app login [zai|bigmodel]` runs
-      the same flow from the terminal and restarts the managed server. The HAP
-      registers the zcode:// scheme so a browser handoff launches the shell
-      instead of OHOS's "no application can open this" dialog.
-
-      The default install carries the two kernel ACLs (JIT/WebAssembly for the
-      renderer) and READ_PASTEBOARD; `zcode-app install --no-acl` installs
-      the strong-sandbox variant instead (no JIT, no paste, and the shell cannot
-      start the service: run `zcode-app serve` yourself). 坚盾守护模式
-      disables JIT regardless of the ACLs. The workbench's embedded terminal is
-      unavailable because node-pty cannot spawn child processes under bun on
-      HarmonyOS.
+      State is shared in `~/.config/zcode-desktop`. `zcode-app login
+      [zai|bigmodel]` runs the browser OAuth flow. `--no-acl` gives the
+      strong-sandbox variant (no JIT/paste, cannot start the service). 坚盾守护模式
+      disables JIT. The embedded terminal is unavailable (node-pty cannot spawn under
+      bun on HarmonyOS). `serve` pins projectStorageHostId to "local" so 3.18.2's
+      remote routing does not break "this computer" projects.
     EOS
   end
 
