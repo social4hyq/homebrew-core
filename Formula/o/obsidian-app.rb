@@ -10,7 +10,7 @@ class ObsidianApp < Formula
   # Obsidian's own release at install time (never copied into the bottle); see
   # obsidian.md terms and multica.rb.
   license :cannot_represent
-  revision 7
+  revision 8
 
   # Upstream is the vendor app, not the tap-authored host payload: the formula
   # version tracks Obsidian so `brew upgrade` follows new releases, while the
@@ -290,7 +290,7 @@ class ObsidianApp < Formula
   end
 
   post_install_steps do
-    run "{HOMEBREW_PREFIX}/bin/hap-app",
+    run "{{HOMEBREW_PREFIX}}/bin/hap-app",
         args: ["auto-install", "obsidian-app", "com.social4hyq.obsidiandesktop"],
         must_succeed: false, print_stdout: true, network_access: true
   end
