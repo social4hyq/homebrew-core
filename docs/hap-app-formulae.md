@@ -76,8 +76,9 @@ end
 
 行为：
 
-- 设备已连接、华为开发者已登录：立刻签名安装，装完用 `bm dump` 校验权限；
-  stdout 一行结果，stderr 是进度。
+- 设备已连接、华为开发者已登录：立刻签名安装，装完用 `bm dump` 校验权限。
+  默认每个 app 只打印两行（开始、结果），安装输出写 `~/.cache/hap-app/logs/`；
+  失败时打印原因、下一步和日志路径（`verbose=1` 或 `HAP_APP_VERBOSE=1` 可流式）。
 - 设备没连、多个设备、没登录、装机失败、权限未授予：不报错、不阻塞 brew，
   把 `<command>` 登记到 `~/.cache/hap-app/pending/<command>.json`，
   提示运行 `hap-app install-pending`；登录只做一次。
@@ -90,6 +91,9 @@ end
   的 `*_MODULE_ACL` 取 ACL 清单传给 `app-installer permissions --expect-acl`，
   既确认装的是 ACL 变体，也只要求 `system_grant`（安装时授予）的权限为 granted；
   `user_grant` 权限（粘贴、截屏等）装机后是 -1，只报告不判失败。
+- 失败会带原因（`tls` / `network` / `login` / `device` / `permissions` /
+  `install-failed`）入队，`hap-app status` 按原因给出下一步；`hap-app status --tsv`
+  保留机器可读的四列输出。
 - CI、root、`HAP_APP_AUTO_INSTALL=0`（或配置文件 `~/.config/hap-app/config`
   里 `auto_install=0`）下静默 no-op。
 - 逃生口：`brew install --skip-post-install`；补跑用 `brew postinstall <app>`。
@@ -98,16 +102,37 @@ Homebrew 的 `post_install` 不在用户的 shell 环境里跑：它把 `HOME` �
 `$TMPDIR/<formula>-postinstall-*`、清掉大多数环境变量，`/proc/<pid>/environ`
 也读不到，所以 `hdc`（`~/.harmony` 的鉴权密钥、`~/.HDCServer.pid`）、
 `devecocli`（登录态）和 `app-installer`（`~/.hap-installer/projects`）都找不到
-用户会话。`hap-app` 因此先按「prefix 的父目录 + 家目录标记（`.HDCServer.pid`、
-`.harmony`、`.hap-installer`、`.app-installer`）」恢复真实 `HOME`
-（本 tap 约定装在 `~/.harmonybrew`，可用 `HAP_APP_USER_HOME` 覆盖），再调用
-`app-installer`；恢复失败就只登记待装。状态目录跟真实 `HOME` 走
+用户会话。`hap-app` 因此从 prefix 的父目录恢复真实 `HOME`：有家目录标记
+（`.HDCServer.pid`、`.harmony`、`.hap-installer`、`.app-installer`）即采信；
+全新机器一个标记都没有时，只要父目录里确实有 `.harmonybrew`（本 tap 的约定）
+且可写也采信。可用 `HAP_APP_USER_HOME` 覆盖。状态目录跟真实 `HOME` 走
 （`~/.cache/hap-app`、`~/.config/hap-app`），保证 post_install 与用户 shell 看到同一份。
 
-`hap-app` 子命令：`auto-install`（formula 用）、`install-pending`、`status`、
-`forget`。`app-installer` 另有 `ready`（无副作用预检，输出 `ok <device>` /
+`hap-app` 子命令：`auto-install`（formula 用）、`install-pending`、`status [--tsv]`、
+`login`、`forget`。`app-installer` 另有 `ready`（无侧作用预检，输出 `ok <device>` /
 `no-device` / `no-login` / `no-hdc` / `multiple-devices`）、`login`、
 `permissions`。
+
+### TLS / 代理与日志（新 PC 排障）
+
+Homebrew 跑 `post_install` 时清空环境变量，所以**在 shell 里 export 的
+`NODE_EXTRA_CA_CERTS` / `NODE_TLS_REJECT_UNAUTHORIZED` / `HTTPS_PROXY` 不会传给
+DevEco CLI**——公司电脑上最常见的失败就是 `devecocli signature generate` 报
+`self-signed certificate in certificate chain`，而手动 `hap-app install-pending`
+又正常。把网络设置写进文件（不会被清掉）：
+
+```ini
+# ~/.app-installer/config
+tls_ca=/absolute/path/to/proxy-ca.pem     # 首选：信任代理/VPN 的 CA
+# https_proxy=http://127.0.0.1:7890       # 可选
+```
+
+- 文件只影响 app-installer 调 DevEco 签名的环境；shell 里已有的同名变量优先。
+- `tls_ca` 指向不存在的文件会直接报错，不会悄悄跳过。
+- `app-installer doctor` 会显示当前 TLS 配置；`hap-app install-pending` 失败后按
+  提示改好配置再重试即可，不用重装 brew 包。
+- `~/.config/hap-app/config` 管行为：`auto_install=0`、`auto_login=1`、`verbose=1`。
+- 日志在 `~/.cache/hap-app/logs/`（0600，保留最近 20 个），失败时结果里会打印路径。
 
 ## 共享安装库
 

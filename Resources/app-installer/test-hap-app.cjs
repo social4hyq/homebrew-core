@@ -43,7 +43,14 @@ function fixture(t) {
   `);
 
   tool("orca-app", `
-    if (args[0] === 'install') process.exit(process.env.APP_INSTALL_FAIL ? 1 : 0);
+    if (args[0] === 'install') {
+      if (process.env.APP_FAIL_REASON && process.env.HAP_INSTALLER_RESULT_FILE) {
+        fs.writeFileSync(process.env.HAP_INSTALLER_RESULT_FILE,
+          JSON.stringify({ v: 1, reason: process.env.APP_FAIL_REASON }) + String.fromCharCode(10));
+      }
+      if (process.env.APP_LOG_LINE) console.log(process.env.APP_LOG_LINE);
+      process.exit(process.env.APP_INSTALL_FAIL ? 1 : 0);
+    }
     process.exit(0);
   `);
 
@@ -135,8 +142,54 @@ test('an install failure queues the app and keeps brew install successful', t =>
   const f = fixture(t);
   const r = f.run(["auto-install", "orca-app", "com.example.desktop"], { APP_INSTALL_FAIL: "1" });
   assert.equal(r.status, 0, r.stdout + r.stderr);
-  assert.match(r.stdout, /装机失败（install-failed）/);
+  assert.match(r.stdout, /装机失败：安装失败（已登记，共 1 个待装）/);
+  assert.match(r.stdout, /→ 查看日志或运行 hap-app status/);
+  assert.match(r.stdout, /日志：.*logs\/.*-orca-app\.log/);
   assert.equal(f.queuedEntry("orca-app").reason, "install-failed");
+});
+
+test('a structured failure reason drives the queue entry and the hint', t => {
+  const f = fixture(t);
+  const r = f.run(["auto-install", "orca-app", "com.example.desktop"],
+    { APP_INSTALL_FAIL: "1", APP_FAIL_REASON: "tls" });
+  assert.equal(r.status, 0, r.stdout + r.stderr);
+  assert.match(r.stdout, /TLS 证书链不受信/);
+  assert.match(r.stdout, /tls_ca=\/path\/to\/ca\.pem/);
+  assert.equal(f.queuedEntry("orca-app").reason, "tls");
+});
+
+test('the default automatic path prints one start line and one result line', t => {
+  const f = fixture(t);
+  const r = f.run(["auto-install", "orca-app", "com.example.desktop"]);
+  assert.equal(r.status, 0, r.stdout + r.stderr);
+  const lines = (r.stdout + r.stderr).split("\n").filter(Boolean);
+  assert.equal(lines.length, 2, r.stdout + r.stderr);
+  assert.ok(lines.some(line => /installing orca-app/.test(line)), r.stdout + r.stderr);
+  assert.ok(lines.some(line => /已装机 com\.example\.desktop（设备 local）/.test(line)), r.stdout + r.stderr);
+  const logs = fs.readdirSync(path.join(f.root, ".cache", "hap-app", "logs"));
+  assert.equal(logs.filter(name => name.endsWith("-orca-app.log")).length, 1);
+});
+
+test('verbose streams the app output and keeps it in the log', t => {
+  const f = fixture(t);
+  fs.mkdirSync(f.configDir, { recursive: true });
+  fs.writeFileSync(path.join(f.configDir, "config"), "verbose=1\n");
+  const r = f.run(["auto-install", "orca-app", "com.example.desktop"],
+    { APP_LOG_LINE: "chatty install detail" });
+  assert.equal(r.status, 0, r.stdout + r.stderr);
+  assert.match(r.stderr, /chatty install detail/);
+  const logDir = path.join(f.root, ".cache", "hap-app", "logs");
+  const log = fs.readdirSync(logDir).find(name => name.endsWith("-orca-app.log"));
+  assert.match(fs.readFileSync(path.join(logDir, log), "utf8"), /chatty install detail/);
+});
+
+test('hap-app login delegates to app-installer login', t => {
+  const f = fixture(t);
+  const r = f.run(["login", "--timeout", "5"]);
+  assert.equal(r.status, 0, r.stdout + r.stderr);
+  const login = f.calls().find(c => c[0] === "app-installer" && c[1] === "login");
+  assert.ok(login, "login must be delegated");
+  assert.deepEqual(login.slice(2, 4), ["--timeout", "5"]);
 });
 
 test('a permission failure queues the app after it was installed', t => {
@@ -180,6 +233,7 @@ test('install-pending installs the queued apps and empties the queue', t => {
   assert.deepEqual(f.queued(), ["orca-app.json"]);
   const r = f.run(["install-pending"]);
   assert.equal(r.status, 0, r.stdout + r.stderr);
+  assert.match(r.stdout, /已装机 com\.example\.desktop（设备 local）/);
   assert.match(r.stdout, /补装完成：1 个成功/);
   assert.deepEqual(f.queued(), []);
 });
@@ -188,6 +242,12 @@ test('status lists the queue and forget removes one entry', t => {
   const f = fixture(t);
   assert.equal(f.run(["auto-install", "orca-app", "com.example.desktop"], { READY: "no-device" }).status, 0);
   let r = f.run(["status"]);
+  assert.equal(r.status, 0, r.stdout + r.stderr);
+  assert.match(r.stdout, /待装 1 个/);
+  assert.match(r.stdout, /orca-app\s+com\.example\.desktop\s+device/);
+  assert.match(r.stdout, /连接并解锁设备后运行 hap-app install-pending/);
+  assert.match(r.stdout, /日志：.*\.cache\/hap-app\/logs/);
+  r = f.run(["status", "--tsv"]);
   assert.equal(r.status, 0, r.stdout + r.stderr);
   assert.match(r.stdout, /^orca-app\tcom\.example\.desktop\tdevice\t/m);
   r = f.run(["forget", "orca-app"]);
@@ -218,4 +278,18 @@ test('the config file can switch automatic installs off', t => {
   assert.match(r.stderr, /自动装机已关闭/);
   assert.deepEqual(f.calls(), []);
   assert.deepEqual(f.queued(), []);
+});
+
+test('a clean PC without marker files still gets the queue in the real home', t => {
+  const f = fixture(t);
+  const isolated = path.join(f.root, "fresh-postinstall");
+  fs.mkdirSync(isolated);
+  fs.mkdirSync(path.join(f.root, ".harmonybrew"));
+  const r = f.run(["auto-install", "orca-app", "com.example.desktop"], {
+    HOME: isolated,
+    HOMEBREW_PREFIX: path.join(f.root, ".harmonybrew"),
+    READY: "no-device",
+  });
+  assert.equal(r.status, 0, r.stdout + r.stderr);
+  assert.deepEqual(f.queued(), ["orca-app.json"], "the queue must use the recovered home");
 });

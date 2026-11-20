@@ -4,7 +4,7 @@ class AppInstaller < Formula
   url "https://registry.npmjs.org/@deveco/deveco-cli-openharmony-arm64/-/deveco-cli-openharmony-arm64-1.3.10.tgz"
   sha256 "7fdee1bfb7393c151fa09b3714ecc4796e53d9876557e9933c5890319ffb4daa"
   license "MIT"
-  revision 12
+  revision 14
 
   livecheck do
     url :stable
@@ -12,8 +12,8 @@ class AppInstaller < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/app-installer-v1.3.10-r9"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "13c3b7e03951d80cb4573a1ff15da6d8455380e9ebdc44946dd9c6603a659fc1"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/app-installer-v1.3.10-r11"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "827a3eec949968ccd10c70b45e27fdcea21e0fbdba0f0820b412ccc10f1b5eb9"
   end
 
   depends_on "bash"
@@ -184,6 +184,13 @@ class AppInstaller < Formula
       The tap's desktop apps install themselves after `brew install` through
       `hap-app`. When the device or the login is not ready they are queued:
       `hap-app status` lists them and `hap-app install-pending` finishes them.
+
+      Behind a proxy or VPN that intercepts HTTPS, signing needs the proxy CA:
+      put `tls_ca=/path/to/ca.pem` (or `https_proxy=...`) in
+      ~/.app-installer/config. Homebrew clears the environment for post-install
+      steps, so a variable exported in your shell does not reach the DevEco CLI.
+      Each automatic install prints one start line and one result line and keeps
+      the full output in ~/.cache/hap-app/logs/.
     EOS
   end
 

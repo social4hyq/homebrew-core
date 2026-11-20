@@ -27,9 +27,13 @@ recover_user_home() {
   elif [ -n "${HOMEBREW_PREFIX:-}" ]; then
     candidate="$(dirname "$HOMEBREW_PREFIX")"
   fi
+  # A marker proves this is the user's home. The second signal covers a clean
+  # PC where none of the markers exists yet: this tap always installs into
+  # <home>/.harmonybrew, so the prefix's parent is the home by construction.
   if [ -n "$candidate" ] && [ -d "$candidate" ] && {
     [ -e "$candidate/.HDCServer.pid" ] || [ -d "$candidate/.harmony" ] ||
-      [ -d "$candidate/.hap-installer" ] || [ -d "$candidate/.app-installer" ]
+      [ -d "$candidate/.hap-installer" ] || [ -d "$candidate/.app-installer" ] ||
+      { [ -d "$candidate/.harmonybrew" ] && [ "$(basename "$HOMEBREW_PREFIX")" = ".harmonybrew" ] && [ -w "$candidate" ]; }
   }; then
     export HOME="$candidate"
   fi
@@ -41,6 +45,56 @@ recover_user_home
 config_dir="${HAP_APP_CONFIG_DIR:-$HOME/.config/hap-app}"
 cache_dir="${HAP_APP_CACHE_DIR:-$HOME/.cache/hap-app}"
 queue_dir="$cache_dir/pending"
+log_dir="$cache_dir/logs"
+
+verbose_setting() {
+  local value="${HAP_APP_VERBOSE:-$(conf_get verbose)}"
+  printf '%s' "${value:-0}"
+}
+
+pending_count() {
+  local count=0 file
+  for file in "$queue_dir"/*.json; do
+    [ -e "$file" ] && count=$((count + 1))
+  done
+  printf '%s' "$count"
+}
+
+prune_logs() {
+  [ -d "$log_dir" ] || return 0
+  local old
+  for old in $(ls -1t "$log_dir"/*.log 2>/dev/null | tail -n +21); do
+    rm -f "$old"
+  done
+}
+
+reason_label() {
+  case "$1" in
+    tls) printf '%s' 'TLS 证书链不受信' ;;
+    network) printf '%s' '网络不可达' ;;
+    login) printf '%s' '未登录华为开发者' ;;
+    device) printf '%s' '设备不可用' ;;
+    permissions) printf '%s' '权限校验未通过' ;;
+    *) printf '%s' '安装失败' ;;
+  esac
+}
+
+reason_hint() {
+  case "$1" in
+    tls) printf '%s' '在 ~/.app-installer/config 设置 tls_ca=/path/to/ca.pem 后运行 hap-app install-pending' ;;
+    network) printf '%s' '检查网络/代理后运行 hap-app install-pending' ;;
+    login) printf '%s' '运行 hap-app install-pending 完成华为开发者登录' ;;
+    device) printf '%s' '连接并解锁设备后运行 hap-app install-pending' ;;
+    permissions) printf '%s' '运行 hap-app status 查看缺失权限' ;;
+    *) printf '%s' '查看日志或运行 hap-app status' ;;
+  esac
+}
+
+result_reason() {
+  local file="$1"
+  [ -f "$file" ] || return 0
+  "$node_bin" -e 'const fs=require("node:fs");try{const v=JSON.parse(fs.readFileSync(process.argv[1],"utf8"));process.stdout.write(String(v.reason||""))}catch{}' "$file" 2>/dev/null
+}
 
 log() { printf 'hap-app: %s\n' "$*" >&2; }
 say() { printf 'hap-app: %s\n' "$*"; }
@@ -56,7 +110,9 @@ Usage: hap-app <command> [options]
                 post_install_steps; exits 0 even when it only queued the app.
   install-pending [--start] [--device <id>]
                 Install every queued app, logging in once if needed.
-  status        Show the queued apps.
+  status [--tsv]  Show the queued apps with the reason and the next step.
+  login [--timeout <s>]
+                Huawei Developer login (what install-pending does when needed).
   forget <app-command>
                 Remove one app from the queue.
   help          Show this help.
@@ -67,6 +123,8 @@ Environment:
   HAP_APP_AUTO_LOGIN=1     Let auto-install open the Huawei Developer login
                            and wait up to HAP_APP_LOGIN_TIMEOUT seconds (120)
                            (config file: auto_login=1)
+  HAP_APP_VERBOSE=1        Stream the app install output instead of one line
+                           per app (config file: verbose=1)
   HAP_APP_INSTALL_TIMEOUT  Overall install timeout in seconds (900)
   HAP_APP_USER_HOME        Override the home directory recovered from
                            HOMEBREW_PREFIX (for tests or unusual layouts)
@@ -179,7 +237,7 @@ mark_login_attempt() {
 # Run "<command> install" for one app, verify the permissions it asked for, and
 # queue it when anything failed. Expects the environment to be ready.
 install_one() {
-  local command="$1" bundle="$2" start="$3" device="${4:-}"
+  local command="$1" bundle="$2" start="$3" device="${4:-}" stream="${5:-0}"
   local acl_file
   acl_file="$(acl_file_for "$command")"
 
@@ -190,16 +248,37 @@ install_one() {
   command -v timeout >/dev/null 2>&1 &&
     timeout_args=(timeout "${HAP_APP_INSTALL_TIMEOUT:-900}")
 
-  log "installing $bundle"
+  mkdir -p "$log_dir" 2>/dev/null || true
+  chmod 700 "$log_dir" 2>/dev/null || true
+  local log_file result_file
+  log_file="$log_dir/$(date -u +%Y%m%dT%H%M%SZ)-$command.log"
+  result_file="$log_dir/result-$command.json"
+  rm -f "$result_file" 2>/dev/null || true
+  env_args+=(HAP_INSTALLER_RESULT_FILE="$result_file")
+
+  install_status=queued
+  log "installing $command${device:+（设备 $device）}…"
   local rc=0
-  env "${env_args[@]}" "${timeout_args[@]}" "$command" install || rc=$?
+  if ((stream)); then
+    env "${env_args[@]}" "${timeout_args[@]}" "$command" install 2>&1 | tee "$log_file" >&2
+    rc="${PIPESTATUS[0]}"
+  else
+    env "${env_args[@]}" "${timeout_args[@]}" "$command" install >"$log_file" 2>&1 || rc=$?
+  fi
   if ((rc != 0)); then
-    local reason=install-failed
+    local reason
+    reason="$(result_reason "$result_file")"
+    [ -z "$reason" ] && reason=install-failed
     [ "$(probe_ready)" = "no-login" ] && reason=login
     queue_add "$command" "$bundle" "$reason"
-    say "$command: 装机失败（$reason），已登记待装；运行 hap-app install-pending 重试"
+    printf 'hap-app: ✖ %s 装机失败：%s（已登记，共 %s 个待装）\n' \
+      "$command" "$(reason_label "$reason")" "$(pending_count)"
+    printf 'hap-app:   → %s\n' "$(reason_hint "$reason")"
+    printf 'hap-app:   日志：%s\n' "$log_file"
+    prune_logs
     return 0
   fi
+  rm -f "$result_file" 2>/dev/null || true
 
   local -a perms_args=(permissions --bundle-id "$bundle")
   [ -n "$acl_file" ] && perms_args+=(--expect-acl "$acl_file")
@@ -208,12 +287,17 @@ install_one() {
   if ((perms_rc != 0)); then
     printf '%s\n' "$perms_out" >&2
     queue_add "$command" "$bundle" permissions
-    say "$command: 已装但权限校验未通过，已登记待装；运行 hap-app status 查看"
+    printf 'hap-app: ✖ %s 权限校验未通过（已登记，共 %s 个待装）\n' "$command" "$(pending_count)"
+    printf 'hap-app:   → %s\n' "$(reason_hint permissions)"
+    printf 'hap-app:   日志：%s\n' "$log_file"
+    prune_logs
     return 0
   fi
 
   queue_remove "$command"
+  install_status=installed
   say "$command: 已装机 $bundle${device:+（设备 $device）}"
+  prune_logs
   if ((start)); then
     "$command" start >/dev/null 2>&1 || log "$command: 启动失败；稍后手动运行 $command start"
   fi
@@ -264,31 +348,34 @@ cmd_auto_install() {
 
   auto_install_guarded "$command" || exit 0
 
+  local login_attempted=0
   local ready
   ready="$(probe_ready)"
   if [ "$ready" = "no-login" ] && enabled "$(auto_login_setting)" && ! login_recently_attempted; then
     mark_login_attempt
+    login_attempted=1
     log "需要登录华为开发者，正在打开浏览器（最多 ${HAP_APP_LOGIN_TIMEOUT:-120}s）"
     "$app_installer" login --timeout "${HAP_APP_LOGIN_TIMEOUT:-120}" >&2 || true
     ready="$(probe_ready)"
   fi
 
-  local device=""
+  local device="" stream=0
+  if ((login_attempted)) || enabled "$(verbose_setting)"; then stream=1; fi
   case "$ready" in
     ok\ *) device="${ready#ok }" ;;
     no-login)
       queue_add "$command" "$bundle" login
-      say "$command: 未登录华为开发者，已登记待装；运行 hap-app install-pending"
+      say "$command: 未登录华为开发者，已登记待装（共 $(pending_count) 个）；运行 hap-app install-pending 一次性完成"
       exit 0
       ;;
     *)
       queue_add "$command" "$bundle" device
-      say "$command: 设备未就绪（${ready:-unknown}），已登记待装；运行 hap-app install-pending"
+      say "$command: 设备未就绪（${ready:-unknown}），已登记待装（共 $(pending_count) 个）；运行 hap-app install-pending 修复"
       exit 0
       ;;
   esac
 
-  install_one "$command" "$bundle" "$start" "$device"
+  install_one "$command" "$bundle" "$start" "$device" "$stream"
 }
 
 cmd_install_pending() {
@@ -313,20 +400,24 @@ cmd_install_pending() {
     return 0
   fi
 
-  local ready
+  local ready selected=""
   ready="$(probe_ready)"
   case "$ready" in
     no-login)
       log "需要登录华为开发者，正在打开浏览器…"
       "$app_installer" login >&2 || { log "登录未完成，未装机"; return 1; }
+      ready="$(probe_ready)"
       ;;
-    ok\ *) ;;
+  esac
+  case "$ready" in
+    ok\ *) selected="${ready#ok }" ;;
     *) log "设备未就绪（${ready:-unknown}）"; return 1 ;;
   esac
+  [ -n "${device_arg:-}" ] && selected="$device_arg"
 
-  local failed=0 installed=0 before after
+  local failed=0 installed=0
   for name in "${names[@]}"; do
-    local bundle device=""
+    local bundle=""
     bundle="$(queue_field "$(queue_file "$name")" bundle)"
     if ! valid_command "$name" || ! valid_bundle "$bundle"; then
       log "丢弃损坏的队列条目：$name"
@@ -334,17 +425,17 @@ cmd_install_pending() {
       failed=$((failed + 1))
       continue
     fi
-    [ -n "${device_arg:-}" ] && device="$device_arg"
-    before="$(queue_names | wc -l | tr -d ' ')"
-    install_one "$name" "$bundle" "$start" "$device"
-    after="$(queue_names | wc -l | tr -d ' ')"
-    if ((after < before)); then installed=$((installed + 1)); else failed=$((failed + 1)); fi
+    install_one "$name" "$bundle" "$start" "$selected" 1
+    if [ "$install_status" = installed ]; then installed=$((installed + 1)); else failed=$((failed + 1)); fi
   done
   say "补装完成：$installed 个成功，$failed 个仍待装"
+  if ((failed > 0)); then say "运行 hap-app status 查看剩余原因"; fi
   ((failed == 0))
 }
 
 cmd_status() {
+  local tsv=0
+  [ "${1:-}" = "--tsv" ] && tsv=1
   local -a names=()
   local name
   while IFS= read -r name; do
@@ -354,15 +445,35 @@ cmd_status() {
     say "没有待装的应用"
     return 0
   fi
+  if ((tsv)); then
+    for name in "${names[@]}"; do
+      local file
+      file="$(queue_file "$name")"
+      printf '%s\t%s\t%s\t%s\n' \
+        "$name" \
+        "$(queue_field "$file" bundle)" \
+        "$(queue_field "$file" reason)" \
+        "$(queue_field "$file" updated)"
+    done
+    return 0
+  fi
+  say "待装 ${#names[@]} 个"
   for name in "${names[@]}"; do
-    local file
+    local file reason
     file="$(queue_file "$name")"
-    printf '%s\t%s\t%s\t%s\n' \
-      "$name" \
-      "$(queue_field "$file" bundle)" \
-      "$(queue_field "$file" reason)" \
-      "$(queue_field "$file" updated)"
+    reason="$(queue_field "$file" reason)"
+    printf '  %s  %s  %s  %s\n' \
+      "$name" "$(queue_field "$file" bundle)" "${reason:-unknown}" "$(queue_field "$file" updated)"
+    printf '    → %s\n' "$(reason_hint "$reason")"
   done
+  printf 'hap-app: 配置：%s（verbose）、%s/.app-installer/config（tls_ca/https_proxy）\n' \
+    "$config_dir/config" "$HOME"
+  printf 'hap-app: 日志：%s\n' "$log_dir"
+}
+
+cmd_login() {
+  command -v "$app_installer" >/dev/null 2>&1 || die "找不到 $app_installer"
+  exec "$app_installer" login "$@"
 }
 
 cmd_forget() {
@@ -378,7 +489,8 @@ shift || true
 case "$command_name" in
   auto-install) cmd_auto_install "$@" ;;
   install-pending) cmd_install_pending "$@" ;;
-  status) cmd_status ;;
+  status) cmd_status "$@" ;;
+  login) cmd_login "$@" ;;
   forget) cmd_forget "$@" ;;
   -h|--help|help|"") usage; exit 0 ;;
   *) usage >&2; exit 2 ;;

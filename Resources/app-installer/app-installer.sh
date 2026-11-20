@@ -59,6 +59,21 @@ EOF
 
 die() { printf 'app-installer: %s\n' "$1" >&2; exit "${2:-1}"; }
 
+result_file="${HAP_INSTALLER_RESULT_FILE:-}"
+record_result() { # stage reason detail
+  [[ -n "$result_file" ]] || return 0
+  mkdir -p "$(dirname "$result_file")" 2>/dev/null || return 0
+  node -e '
+const fs = require("node:fs");
+const [file, stage, reason, detail, bundle] = process.argv.slice(1);
+const value = { v: 1, stage, reason, detail: String(detail).split("\n").pop().slice(0, 300), bundle, at: new Date().toISOString() };
+const temporary = `${file}.${process.pid}.tmp`;
+fs.writeFileSync(temporary, JSON.stringify(value) + "\n", { mode: 0o600 });
+fs.chmodSync(temporary, 0o600);
+fs.renameSync(temporary, file);
+' "$result_file" "$1" "${2:-unknown}" "${3:-}" "$bundle_id" 2>/dev/null || true
+}
+
 cmd=install
 case "${1:-}" in
   install|uninstall|info|doctor|ready|login|permissions) cmd="$1"; shift ;;
@@ -200,6 +215,46 @@ if [[ ! -d "$projects_root" && -d "$home/.hap-installer/projects" ]]; then
   projects_root="$home/.hap-installer/projects"
 fi
 
+# Homebrew runs post_install with a cleared environment, so NODE_EXTRA_CA_CERTS
+# and the proxy variables a user exports in their shell do not reach the DevEco
+# CLI. Keep those network settings in a file instead (a shell user still wins):
+#   ~/.app-installer/config
+#     tls_ca=/absolute/path/proxy-ca.pem
+#     https_proxy=http://127.0.0.1:7890
+config_file="$home/.app-installer/config"
+network_config_error=""
+config_value() {
+  [[ -f "$config_file" ]] || return 0
+  sed -n "s/^[[:space:]]*$1[[:space:]]*=[[:space:]]*//p" "$config_file" 2>/dev/null | tail -n 1
+}
+load_network_config() {
+  [[ -f "$config_file" ]] || return 0
+  local ca proxy
+  ca="$(config_value tls_ca)"
+  if [[ -n "$ca" ]]; then
+    if [[ ! -f "$ca" ]]; then
+      network_config_error="tls_ca is not a file: $ca"
+    elif [[ -z "${NODE_EXTRA_CA_CERTS:-}" ]]; then
+      export NODE_EXTRA_CA_CERTS="$ca"
+    fi
+  fi
+  proxy="$(config_value https_proxy)"
+  if [[ -n "$proxy" && -z "${HTTPS_PROXY:-}" && -z "${https_proxy:-}" ]]; then
+    export HTTPS_PROXY="$proxy" https_proxy="$proxy"
+  fi
+}
+load_network_config
+
+# The caller (hap-app) passes a per-attempt result file so a failure can be
+# classified without guessing from a global marker file.
+classify_network_error() {
+  case "$1" in
+    *SELF_SIGNED_CERT_IN_CHAIN*|*"self-signed certificate"*|*UNABLE_TO_GET_ISSUER_CERT_LOCALLY*|*CERT_HAS_EXPIRED*|*"certificate has expired"*|*"unable to verify the first certificate"*|*"certificate chain"*) printf '%s' tls ;;
+    *EAI_AGAIN*|*ENOTFOUND*|*ECONNREFUSED*|*ECONNRESET*|*ETIMEDOUT*|*"Network connection failed"*|*"socket hang up"*) printf '%s' network ;;
+    *) printf '%s' sign ;;
+  esac
+}
+
 # Whole days left on the local debug profile of a signing project; prints
 # nothing when unknown.
 profile_days_left() {
@@ -300,13 +355,19 @@ install_via_hdc() {
   # Concatenate the parts we just sent by explicit name. A glob that matches
   # nothing makes the device's cat read stdin and fail with "cat: -: Broken pipe".
   hdc_cmd shell "cat ${remote_parts[*]} > /data/local/tmp/$remote.hap"
-  hdc_cmd shell "aa force-stop $bundle_id" || true
+  stop_output="$(hdc_cmd shell "aa force-stop $bundle_id" 2>&1)" || true
+  if [[ -n "$stop_output" ]] &&
+     ! printf '%s' "$stop_output" | grep -qiE 'force stop process successfully|not installed|10104002'; then
+    printf '%s\n' "$stop_output" >&2
+  fi
   printf '%s\n' 'Installing the signed HAP on the device.'
   if ! install_output=$(hdc_cmd shell "bm install -p /data/local/tmp/$remote.hap" 2>&1); then
+    record_result install device "$install_output"
     printf '%s\n' "$install_output" >&2; exit 1
   fi
   printf '%s\n' "$install_output"
   if ! printf '%s\n' "$install_output" | grep -qiE 'install bundle successfully|^success'; then
+    record_result install device "$install_output"
     die 'device did not report successful installation.'
   fi
   if ((start_app)); then
@@ -423,6 +484,16 @@ case "$cmd" in
       rc=0; ((n >= 1)) || rc=1
       check "hdc target connected ($n)" "$rc" 'turn on developer mode and wireless debugging, unlock the device, or pass --device'
     fi
+    if [[ -n "$network_config_error" ]]; then
+      check 'TLS config' 1 "$network_config_error"
+    elif [[ -n "${NODE_EXTRA_CA_CERTS:-}" ]]; then
+      echo "  ok       TLS config (tls_ca=$NODE_EXTRA_CA_CERTS)"
+    else
+      echo '  info     TLS config: none; a proxy that intercepts HTTPS needs tls_ca=... in ~/.app-installer/config'
+    fi
+    if [[ -n "${HTTPS_PROXY:-}${https_proxy:-}" ]]; then
+      echo "  info     HTTPS proxy: ${HTTPS_PROXY:-$https_proxy}"
+    fi
     rc=0; login_state || rc=1
     check 'Huawei Developer login' "$rc" 'run: devecocli auth login (not needed with --profile or --keystore)'
     if [[ -d "$projects_root" ]]; then
@@ -444,6 +515,7 @@ esac
 # --- install ------------------------------------------------------------------------
 if [[ -z "$hap" || -z "$bundle_id" ]]; then usage >&2; exit 2; fi
 if [[ ! -f "$hap" ]]; then printf 'app-installer: HAP not found: %s\n' "$hap" >&2; exit 1; fi
+if [[ -n "$network_config_error" ]]; then die "$network_config_error"; fi
 
 use_hdc=1
 if ((sign_only)); then
@@ -495,6 +567,7 @@ else
     1)
       if [[ "${HAP_INSTALLER_NO_LOGIN:-0}" != "0" ]]; then
         printf '%s\n' 'app-installer: Huawei Developer login is required; not starting it (HAP_INSTALLER_NO_LOGIN).' >&2
+        record_result login login 'Huawei Developer login is required'
         exit 3
       fi
       printf '%s\n' 'A Huawei Developer account login is required; opening DevEco CLI login.'
@@ -513,7 +586,23 @@ else
   node "$prepare" "$hap" "$bundle_id" "$project_dir"
 
   printf '%s\n' 'Generating or refreshing the local debug profile for connected devices.'
-  (cd "$project_dir" && devecocli signature generate --product default)
+  profile_rc=0
+  profile_output="$(cd "$project_dir" && devecocli signature generate --product default 2>&1)" || profile_rc=$?
+  printf '%s\n' "$profile_output"
+  if ((profile_rc != 0)); then
+    profile_reason="$(classify_network_error "$profile_output")"
+    case "$profile_reason" in
+      tls)
+        printf '%s\n' 'app-installer: TLS trust failed: the DevEco CLI could not verify the certificate chain (a proxy or VPN may be intercepting HTTPS).' >&2
+        printf 'app-installer: set tls_ca=/path/to/ca.pem in %s and retry (hap-app install-pending).\n' "$config_file" >&2
+        ;;
+      network)
+        printf '%s\n' 'app-installer: the DevEco CLI could not reach the signing service; check the network or proxy and retry.' >&2
+        ;;
+    esac
+    record_result profile-generate "$profile_reason" "$profile_output"
+    exit 1
+  fi
   warn_profile_expiry "$project_dir"
   sign_args+=(--profile "$profile")
 fi
@@ -543,7 +632,7 @@ fi
 sign_rc=0
 (umask 077; "$HAP_INSTALLER_SIGNER" --hap "$sign_input" "${sign_args[@]}") || sign_rc=$?
 rm -f "$stripped"
-if ((sign_rc)); then exit "$sign_rc"; fi
+if ((sign_rc)); then record_result sign sign 'signer failed'; exit "$sign_rc"; fi
 
 if ((sign_only)); then
   printf 'Signed HAP: %s\n' "$signed_hap"
