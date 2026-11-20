@@ -233,7 +233,7 @@ config_value() {
 }
 load_network_config() {
   [[ -f "$config_file" ]] || return 0
-  local ca proxy
+  local ca proxy insecure
   ca="$(config_value tls_ca)"
   if [[ -n "$ca" ]]; then
     if [[ ! -f "$ca" ]]; then
@@ -245,6 +245,18 @@ load_network_config() {
   proxy="$(config_value https_proxy)"
   if [[ -n "$proxy" && -z "${HTTPS_PROXY:-}" && -z "${https_proxy:-}" ]]; then
     export HTTPS_PROXY="$proxy" https_proxy="$proxy"
+  fi
+  # Last resort for a machine whose proxy/interceptor CA cannot be installed:
+  # verify nothing at all. Kept in this file (not the shell) because Homebrew
+  # runs post_install with a cleared environment, so an exported
+  # NODE_TLS_REJECT_UNAUTHORIZED never reaches the DevEco CLI from
+  # `brew install` — only the config file does. Scoped to this installer's
+  # process tree: the DevEco CLI and anything it spawns.
+  insecure="$(config_value tls_insecure)"
+  if [[ "$insecure" == "1" ]]; then
+    export NODE_TLS_REJECT_UNAUTHORIZED=0
+    tls_insecure=1
+    printf '%s\n' 'app-installer: WARNING: tls_insecure=1 — TLS certificate verification is disabled for the DevEco CLI; the Huawei developer login token and the signing response can be read or forged by anything on the network path. Use tls_ca=<proxy-ca.pem> and remove tls_insecure once the chain is trusted.' >&2
   fi
 }
 load_network_config
@@ -490,6 +502,8 @@ case "$cmd" in
     fi
     if [[ -n "$network_config_error" ]]; then
       check 'TLS config' 1 "$network_config_error"
+    elif [[ "${tls_insecure:-0}" == "1" ]]; then
+      echo '  warn     TLS config (tls_insecure=1: certificate verification disabled — set tls_ca= and remove tls_insecure to restore it)'
     elif [[ -n "${NODE_EXTRA_CA_CERTS:-}" ]]; then
       echo "  ok       TLS config (tls_ca=$NODE_EXTRA_CA_CERTS)"
     else
