@@ -89,17 +89,49 @@ UPLOAD_DIR=$(mktemp -d)
 PIDS=()
 LAUNCHED=0
 
+# Endpoint pool. The presigned URL comes back pointing at file.gitcode.com,
+# which is Beijing for every GitHub runner (China, the US and every public
+# DoH probed answer 116.205.2.91 — file.atomgit.com answers the same address
+# by name, and no public resolver hands out the overseas node). AtomGit's
+# Hong Kong node (159.138.147.37, Huawei Cloud HK, AS136907) accepts the very
+# same presigned PUT when pinned with --resolve: measured 7.24 MB/s for a
+# 32 MiB object while the Beijing path was doing ~13 KB/s in the same minute,
+# with the attachment registered in the same bucket and downloading back
+# byte-identical. So put half the hedge on each endpoint and let the race
+# decide. A dead endpoint only loses its own connections, which the
+# replacement logic re-fills (round-robin, so the default path takes over),
+# hence no separate fallback path. `BOTTLE_UPLOAD_OVERSEAS=""` turns it off.
+OVERSEAS=${BOTTLE_UPLOAD_OVERSEAS-file.atomgit.com@159.138.147.37}
+ENDPOINT_LABELS=("default")
+ENDPOINT_URLS=("$UPLOAD_URL")
+ENDPOINT_RESOLVE=("")
+for spec in $OVERSEAS; do
+  ehost=${spec%%@*}
+  eip=${spec#*@}
+  [ -n "$ehost" ] && [ -n "$eip" ] && [ "$ehost" != "$eip" ] || continue
+  ENDPOINT_LABELS+=("$ehost@$eip")
+  ENDPOINT_URLS+=("$(echo "$UPLOAD_URL" | sed -E "s#^(https://)[^/]+#\\1$ehost#")")
+  ENDPOINT_RESOLVE+=("--resolve $ehost:443:$eip")
+done
+ENDPOINTS=${#ENDPOINT_URLS[@]}
+NEXT_EP=0
+echo "== upload endpoints: $(printf '%s ' "${ENDPOINT_LABELS[@]}")=="
+
 # One whole-object PUT. `exec` makes the subshell become curl, so $! is
 # curl's own pid and killing it really closes the upload (a killed subshell
 # would leave curl orphaned and still writing). `-w` output lands in
 # $UPLOAD_DIR/<n>.code as "<http code> <seconds> <bytes> <bytes/s>".
 start_wave() { # $1 = how many connections to add
-  local n=$1 i
+  local n=$1 i ep
   [ "$n" -gt 0 ] || return 0
   for i in $(seq 1 "$n"); do
     LAUNCHED=$((LAUNCHED + 1))
+    ep=$NEXT_EP
+    NEXT_EP=$(( (NEXT_EP + 1) % ENDPOINTS ))
+    echo "${ENDPOINT_LABELS[$ep]}" >"$UPLOAD_DIR/$LAUNCHED.ep"
     ( exec curl -sS --fail-with-body --tcp-nodelay -H "Expect:" \
-        -m "$UPLOAD_TIMEOUT" -X PUT "$UPLOAD_URL" \
+        --connect-timeout 20 -m "$UPLOAD_TIMEOUT" -X PUT "${ENDPOINT_URLS[$ep]}" \
+        ${ENDPOINT_RESOLVE[$ep]} \
         -H "x-obs-meta-project-id: $HDR_META" \
         -H "x-obs-acl: $HDR_ACL" \
         -H "x-obs-callback: $HDR_CB" \
@@ -109,7 +141,7 @@ start_wave() { # $1 = how many connections to add
         >"$UPLOAD_DIR/$LAUNCHED.code" 2>"$UPLOAD_DIR/$LAUNCHED.err" ) &
     PIDS+=("$!")
   done
-  echo "== hedged PUT $FILENAME ($SIZE B): connections $((LAUNCHED - n + 1))-$LAUNCHED =="
+  echo "== hedged PUT $FILENAME ($SIZE B): connections $((LAUNCHED - n + 1))-$LAUNCHED across $ENDPOINTS endpoint(s) =="
 }
 
 # `jobs` is unusable here: inside the $(...) command substitution that reads
@@ -130,7 +162,7 @@ report_conns() {
   local f
   for f in "$UPLOAD_DIR"/*.code; do
     [ -e "$f" ] || continue
-    echo "  conn $(basename "$f" .code): [$(cat "$f" 2>/dev/null)] err=[$(tr '\r' '\n' <"${f%.code}.err" 2>/dev/null | grep -vE '^[[:space:]]*$' | tail -1)]"
+    echo "  conn $(basename "$f" .code) [$(cat "${f%.code}.ep" 2>/dev/null)]: [$(cat "$f" 2>/dev/null)] err=[$(tr '\r' '\n' <"${f%.code}.err" 2>/dev/null | grep -vE '^[[:space:]]*$' | tail -1)]"
   done
 }
 
@@ -183,7 +215,7 @@ done
 kill "${PIDS[@]}" 2>/dev/null || true
 wait 2>/dev/null || true
 [ -n "$WINNER" ] || { rm -rf "$UPLOAD_DIR"; exit 1; }
-echo "::notice::hedged upload won by connection $(basename "$WINNER" .code): $(cat "$WINNER")"
+echo "::notice::hedged upload won by connection $(basename "$WINNER" .code) [$(cat "${WINNER%.code}.ep" 2>/dev/null)]: $(cat "$WINNER")"
 report_conns
 
 # The asset only becomes downloadable once the OBS callback registers it, and
