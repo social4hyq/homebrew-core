@@ -201,20 +201,15 @@ class HerdrApp < Formula
 
   def caveats
     <<~EOS
-      The HAP is unsigned in the bottle. `brew install` runs `herdr-app install`
-      automatically once the device is connected and the Huawei Developer login
-      is done; otherwise it is queued: `hap-app install-pending` finishes it (or
-      run `herdr-app install` yourself). app-installer handles the login, local
-      debug profile generation, signing and installation. Later, open the app
-      with `herdr-app start`.
+      `brew install`/`brew upgrade` installs the HAP automatically once the
+      device and the Huawei Developer login are ready; otherwise it is queued:
+      `hap-app status` shows why, `hap-app install-pending` finishes it.
+      Manual: `herdr-app install`. Details: docs/hap-app-formulae.md.
 
-      The app cannot start the host's `hc`, so it reaches herdr-core through a
-      bridge that `herdr-app install` and `herdr-app start` run for you
-      (`herdr-app bridge status|stop|restart`). The bridge listens on 127.0.0.1
-      only and answers only a connection that starts with a token. The token is
-      made at install time, kept in $XDG_CONFIG_HOME/herdr-app/bridge.conf (mode
-      600) and baked into the installed app. `herdr-app install --new-token`
-      replaces it.
+      The app cannot start the host `hc`, so a loopback bridge is used
+      (`herdr-app bridge status|stop|restart`). Install and start run it; the token
+      lives in $XDG_CONFIG_HOME/herdr-app/bridge.conf (0600) and is baked into the
+      app (`install --new-token` rotates it). Open with `herdr-app start`.
     EOS
   end
 
