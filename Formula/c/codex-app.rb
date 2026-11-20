@@ -6,7 +6,7 @@ class CodexApp < Formula
   version "26.1117.31558"
   sha256 "81670501c6b7d784ef2b9a62b32da031e81a0eac0f50ebd933d0a9956d7bec77"
   license :cannot_represent # OpenAI service and software terms
-  revision 1
+  revision 2
 
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codex-app-v26.1117.31558-r2"
@@ -27,11 +27,24 @@ class CodexApp < Formula
     sha256 "5268fe3c994ec2ce48a999fd6b5029d9cb0e409b07c0395e2a6072e50cb3e1ac"
   end
 
+  # OHOS build of node-pty for the in-app terminal; the Electron-side shim runs it
+  # in a host Node helper because the official linux/glibc addon cannot load here.
+  resource "node-pty" do
+    url "https://registry.npmjs.org/@ohos-ports/node-pty/-/node-pty-1.1.0-beta.4.tgz"
+    sha256 "c032f4d4e3a95b99eef4c586928ccff62f35da6d1d716ea5ede00357563c9883"
+  end
+
   # The shell staging files and official ChatGPT icon are listed literally so
   # the tap's resource audit retains every file used by the formula.
   RESOURCE_FILES = %w[
     Resources/codex-app/assets/icon.png
     Resources/codex-app/app/chatgpt-bootstrap.cjs
+    Resources/codex-app/app/owl-compat.cjs
+    Resources/codex-app/app/owl-host-shim.cjs
+    Resources/codex-app/app/owl-pty-host.cjs
+    Resources/codex-app/app/owl-pty-shim.cjs
+    Resources/codex-app/app/owl-sqlite-shim.cjs
+    Resources/codex-app/app/owl-utility-entry.cjs
     Resources/codex-app/scripts/codex-app.sh
     Resources/codex-app/scripts/install-chatgpt-desktop.sh
     Resources/codex-app/scripts/stage-ohos-shell.sh
@@ -97,6 +110,8 @@ class CodexApp < Formula
            stable.cached_download, assembled_hap
 
     libexec.install assembled_hap => "codex-app-unsigned.hap"
+    resource("node-pty").stage(libexec/"node_modules/node-pty")
+    rm_r Dir[libexec/"node_modules/node-pty/prebuilds/{darwin,win32}-*"]
     pkgshare.mkpath
     cp res/"scripts/codex-app.sh", libexec/"codex-app.sh"
     cp res/"scripts/codex-app.sh", pkgshare/"codex-app.sh"
@@ -132,6 +147,8 @@ class CodexApp < Formula
       CHATGPT_APP_HDC:            formula_opt_prefix("ohos-sdk-toolchains")/"hdc",
       CHATGPT_APP_UNSIGNED_HAP:   libexec/"codex-app-unsigned.hap",
       CHATGPT_APP_CODEX_CLI:      formula_opt_bin("codex")/"codex",
+      CHATGPT_APP_NODE:           formula_opt_bin("node")/"node",
+      CHATGPT_APP_NODE_PTY:       opt_libexec/"node_modules/node-pty",
       CHATGPT_APP_BREW_PREFIX:    formula_opt_prefix("codex").parent.parent,
       CHATGPT_APP_MODULE_ACL:     pkgshare/"module-acl.json",
       CHATGPT_APP_INSTALL_SCRIPT: pkgshare/"install-desktop.sh",
@@ -158,6 +175,14 @@ class CodexApp < Formula
       login is required for the first ACL-capable signing. Use
       `codex-app install --no-acl` to install a strong-sandbox variant; host
       Codex features will not work in that variant.
+
+      The installer also prepares two host settings for the app: it sets
+      `[desktop] projectlessWorkspaceRoot` in `$CODEX_HOME/config.toml` (the
+      app cannot create folders under ~/Documents; the original file is kept
+      as `config.toml.pre-owl`), and, when the file does not exist yet, writes
+      the proxy variables of the current shell to `~/.config/codex-app/env.json`
+      for the Codex CLI, the cloud connection and the in-app terminal. An
+      existing `env.json` is never overwritten; edit it when the proxy changes.
     EOS
   end
 
@@ -174,6 +199,13 @@ class CodexApp < Formula
     assert_match "shell deb output", shell_output("python3 #{pkgshare}/assemble-local-hap.py --help")
     assert_match "source output", shell_output("python3 #{pkgshare}/enable-cookie-encryption.py --help")
     system "node", "--check", tap_root/"Resources/codex-app/app/chatgpt-bootstrap.cjs"
+    owl_shims = %w[owl-compat owl-host-shim owl-pty-host owl-pty-shim owl-sqlite-shim owl-utility-entry]
+    owl_shims.each do |name|
+      system "node", "--check", tap_root/"Resources/codex-app/app/#{name}.cjs"
+    end
+    assert_path_exists libexec/"node_modules/node-pty/lib/index.js"
+    assert_path_exists libexec/"node_modules/node-pty/prebuilds/openharmony-arm64/pty.node"
+    refute_path_exists libexec/"node_modules/node-pty/prebuilds/darwin-arm64"
     system "node", "--test", tap_root/"Resources/codex-app/tests/chatgpt-bootstrap.test.cjs"
     system "python3", tap_root/"Resources/codex-app/tests/assemble-local-hap.test.py"
 
@@ -199,6 +231,9 @@ class CodexApp < Formula
     assert_match "chatgpt-host-config.json", installer
     listing = shell_output("unzip -Z1 #{hap}")
     assert_match "resources/resfile/resources/app/vendor.asar", listing
+    owl_shims.each do |name|
+      assert_match "resources/resfile/resources/app/#{name}.cjs", listing
+    end
     assert_match "resources/resfile/resources/app/vendor.asar.unpacked/", listing
     assert_match "resources/resfile/resources/codex", listing
     assert_match "resources/resfile/resources/codex-code-mode-host", listing
@@ -251,6 +286,8 @@ class CodexApp < Formula
       "CHATGPT_APP_BREW_PREFIX"  => formula_opt_prefix("codex").parent.parent.to_s,
       "CHATGPT_APP_HOST_HOME"    => host_home.to_s,
       "CHATGPT_APP_HDC"          => "fake-hdc",
+      "CHATGPT_APP_NODE"         => (formula_opt_bin("node")/"node").to_s,
+      "CHATGPT_APP_NODE_PTY"     => (opt_libexec/"node_modules/node-pty").to_s,
       "TMPDIR"                   => testpath.to_s,
       "CODEX_HOME"               => "#{host_home}/.codex",
       "PATH"                     => "#{fake_bin}:#{ENV.fetch("PATH")}",
@@ -277,6 +314,11 @@ class CodexApp < Formula
     assert_equal host_home.to_s, host_config.fetch("home")
     assert_equal "#{host_home}/.codex", host_config.fetch("codexHome")
     assert_equal "#{formula_opt_bin("codex")}/codex", host_config.fetch("codexCli")
+    assert_equal "#{formula_opt_bin("node")}/node", host_config.fetch("nodeCli")
+    assert_equal "#{opt_libexec}/node_modules/node-pty", host_config.fetch("nodePtyDir")
+    workspace_root = "#{host_home}/.cache/codex-app/Documents/Codex"
+    assert_path_exists Pathname(workspace_root)
+    assert_match "projectlessWorkspaceRoot = \"#{workspace_root}\"", (host_home/".codex/config.toml").read
 
     install_variant.call("--no-acl", "--keep")
     strong_sandbox = JSON.parse(shell_output("unzip -p #{injected} module.json"))
