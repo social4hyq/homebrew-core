@@ -6,11 +6,11 @@ class ClaudeCodeApp < Formula
   version "5.11492.5"
   sha256 "fe6cd8a70f96b96eb4e6b647300cfaee6aaff4ce133a0fbbe11c2cdb775f5a6a"
   license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
-  revision 1
+  revision 2
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-app-v5.11492.5-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "332f525c93cd2ac2ebeee0cee61f81b04508f9093f9bdacd65dbcaeb7660c062"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-app-v5.11492.5-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "32443e4969168971993a6c05b4664782aba3025295ef5f3557c083dddbeeffaa"
   end
 
   depends_on "binutils" => :build
@@ -143,11 +143,20 @@ class ClaudeCodeApp < Formula
       PATH:                           runtime_path
   end
 
+  post_install_steps do
+    run "{HOMEBREW_PREFIX}/bin/hap-app",
+        args: ["auto-install", "claude-code-app", "com.social4hyq.claudecode"],
+        must_succeed: false, print_stdout: true, network_access: true
+  end
+
   def caveats
     <<~EOS
-      Run `claude-code-app install` to create a local debug signing profile,
-      sign the HAP, and install Claude Code. This requires a connected,
-      unlocked device and a Huawei Developer login for the ACL-capable profile.
+      `brew install` runs `claude-code-app install` automatically once the
+      device is connected and the Huawei Developer login is done; otherwise it
+      is queued: `hap-app install-pending` finishes it. To install by hand, run
+      `claude-code-app install` to create a local debug signing profile, sign
+      the HAP, and install Claude Code. This requires a connected, unlocked
+      device and a Huawei Developer login for the ACL-capable profile.
 
       The app uses the host `claude-code.latest` CLI and its login/config store;
       the CLI must be installed and authenticated. No CLI credentials or host
