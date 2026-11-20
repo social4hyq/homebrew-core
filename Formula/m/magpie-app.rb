@@ -4,7 +4,7 @@ class MagpieApp < Formula
   url "https://github.com/yetone/magpie/archive/refs/tags/v0.1.4402.tar.gz"
   sha256 "a23a2867fe4aa3ae33ee83d5a554ba8283b9052d01c20c02c6bd2941bed47dcd"
   license :cannot_represent
-  revision 3
+  revision 4
 
   livecheck do
     url :stable
@@ -195,9 +195,18 @@ class MagpieApp < Formula
       PATH:                      "#{formula_opt_bin("node")}:$PATH"
   end
 
+  post_install_steps do
+    run "{HOMEBREW_PREFIX}/bin/hap-app",
+        args: ["auto-install", "magpie-app", "com.social4hyq.magpiedesktop"],
+        must_succeed: false, print_stdout: true, network_access: true
+  end
+
   def caveats
     <<~EOS
-      Run `magpie-app install` to sign and install the desktop HAP locally.
+      `brew install` runs `magpie-app install` automatically once the device is
+      connected and the Huawei Developer login is done; otherwise it is queued:
+      `hap-app install-pending` finishes it. To install by hand, run
+      `magpie-app install` to sign and install the desktop HAP locally.
       By default it starts the installed Magpie CLI and shares that CLI's
       settings. The web interface listens on loopback and requires a fresh key
       for each launch. Installing this variant needs a developer debug profile.
