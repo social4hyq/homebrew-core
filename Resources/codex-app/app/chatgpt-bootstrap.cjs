@@ -83,7 +83,7 @@ app.setName('ChatGPT');
 app.setAppPath(vendor);
 
 const vendorPackage = require(path.join(vendor, 'package.json'));
-if (vendorPackage.version !== '26.1111.71704' ||
+if (vendorPackage.version !== '26.1117.31558' ||
     vendorPackage.main !== '.vite/build/early-bootstrap.js') {
   throw new Error('unexpected official ChatGPT application entry point');
 }

@@ -11,9 +11,9 @@ import tempfile
 import zipfile
 from pathlib import Path, PurePosixPath
 
-VERSION = "26.1111.71704"
+VERSION = "26.1117.31558"
 BUNDLE_ID = "com.social4hyq.chatgpt"
-DEB_SHA256 = "f0550dee1f99127d357ad760aef739c557d49bd67728d2f105d00a7a4780f740"
+DEB_SHA256 = "81670501c6b7d784ef2b9a62b32da031e81a0eac0f50ebd933d0a9956d7bec77"
 DEB_ROOT = "usr/lib/chatgpt/resources/"
 OWL_RUNTIME = "usr/lib/chatgpt/owl-shell-runtime.json"
 HAP_ROOT = "resources/resfile/resources/"
