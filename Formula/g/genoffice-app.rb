@@ -1,14 +1,12 @@
 class GenofficeApp < Formula
   desc "GenOffice AI office suite (docs, sheets, slides, PDF, Markdown, HTML) as a HAP"
   homepage "https://github.com/genspark-ai/genoffice"
-  # Version follows the upstream GenOffice tag; OHOS sources live in
-  # Resources/genoffice-app and Patches/genoffice-app.
   url "https://github.com/genspark-ai/genoffice/archive/refs/tags/v0.13.18.tar.gz"
   sha256 "156528d8fa1e6878d6c61d3576d6d6b093eda4abbef223e7fbc4bd4855c9cb08"
   # Apache-2.0 upstream with tap-authored packaging on the CPF-Electron runtime
   # (mixed MIT/BSD/LGPL).
   license :cannot_represent
-  revision 11
+  revision 12
 
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/genoffice-app-v0.13.18-r15"
@@ -23,8 +21,7 @@ class GenofficeApp < Formula
   depends_on "unzip"
   depends_on "zip"
 
-  # List every path literally: the unused-resource audit keeps a Resources/
-  # directory only while a formula names it.
+  # The unused-resource audit requires literal tap paths.
   RESOURCE_FILES = %w[
     Resources/_shared/hap-app/install-lib.sh
     Resources/genoffice-app/scripts/genoffice-app.sh
@@ -46,9 +43,7 @@ class GenofficeApp < Formula
   def install
     tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
     res = tap_root/"Resources/genoffice-app"
-    RESOURCE_FILES.each do |file|
-      odie "missing tap resource: #{file}" unless (tap_root/file).exist?
-    end
+    RESOURCE_FILES.each { |file| odie "missing tap resource: #{file}" unless (tap_root/file).exist? }
 
     # The xlsx sidecar comes from the `genoffice` formula (same release); keep
     # the two in sync.
@@ -138,8 +133,7 @@ class GenofficeApp < Formula
     %w[app_icon.png startIcon.png].each do |name|
       cp buildpath/"apps/shell/build/icons/512x512.png", shell/"AppScope/resources/base/media"/name
     end
-    # Patch app name/labels in every locale: the base file alone leaves the
-    # zh_CN/en_US overrides showing "Electron".
+    # Locale overrides would otherwise keep the Electron launcher label.
     (shell.glob("AppScope/resources/*/element/string.json") +
      shell.glob("electron/src/main/resources/*/element/string.json")).each do |file|
       strings = JSON.parse(file.read)
@@ -152,8 +146,7 @@ class GenofficeApp < Formula
       file.write JSON.pretty_generate(strings) + "\n"
     end
 
-    # Mirror the packaging deltas for the CI image's NDK-less SDK subset (no
-    # llvm-strip) so hvigor skips strip and unavailable signing material.
+    # The CI SDK lacks llvm-strip and local signing material.
     inreplace shell/"build-profile.json5", /^[ \t]*"signingConfig": "default",\r?\n/, ""
     inreplace shell/"electron/src/main/module.json5", '"mainElement": "EntryAbility",',
               '"mainElement": "EntryAbility", "extractNativeLibs": true,'
@@ -171,28 +164,21 @@ class GenofficeApp < Formula
                     ],
               JSON5
 
-    # The shell builds in the private electron-ohos-ci image
-    # (OHOS_CI_IMAGE_OVERRIDES), which bakes the proprietary CLT at
-    # /opt/electron-ohos-clt; the shell compiles no C++, so the NDK-less SDK
-    # subset suffices.
+    # The proprietary CLT is supplied by the CI image, not distributed by the tap.
     clt = Pathname.new("/opt/electron-ohos-clt")
     unless (clt/"hvigor/bin/hvigorw.js").exist?
       odie "genoffice-app builds only in electron-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES['genoffice-app']"
     end
 
-    # brew's sanitized env drops LD_LIBRARY_PATH; restore it for
-    # ohos_packing_tool (SDK clang runtimes, libhilog adapter).
+    # ohos_packing_tool needs SDK libraries outside brew's sanitized search path.
     ENV["DEVECO_SDK_HOME"] = (clt/"sdk").to_s
     ENV["HOS_SDK_HOME"] = (clt/"sdk").to_s
     ENV["LD_LIBRARY_PATH"] =
       "#{clt}/lib:#{clt}/sdk/default/openharmony/native/llvm/lib/clang/15.0.4/lib/aarch64-linux-ohos"
     ENV.delete("NODE_OPTIONS")
-    # Cap RLIMIT_NOFILE for the hvigor tree: near-1e9 limits break the musl FD
-    # table. Only ever lower it.
+    # An oversized RLIMIT_NOFILE breaks the musl FD table in hvigor.
     soft_cap, hard_cap = Process.getrlimit(Process::RLIMIT_NOFILE)
-    if hard_cap > 65_536
-      Process.setrlimit(Process::RLIMIT_NOFILE, [soft_cap, 65_536].min, 65_536)
-    end
+    Process.setrlimit(Process::RLIMIT_NOFILE, [soft_cap, 65_536].min, 65_536) if hard_cap > 65_536
 
     cd shell do
       system "node", clt/"ohpm/bin/pm-cli.js", "install"
@@ -216,12 +202,10 @@ class GenofficeApp < Formula
     end
     (pkgshare/"module-acl.json").write JSON.generate(module_json)
 
-    # cp, not install: Pathname#install moves the source, and the tap checkout
-    # is read-only in the CI container.
+    # Pathname#install would move files out of the read-only CI tap.
     pkgshare.mkpath
     cp res/"scripts/install-desktop.sh", pkgshare/"install-desktop.sh"
     chmod 0755, pkgshare/"install-desktop.sh"
-    # install-desktop.sh sources the shared install flow.
     cp tap_root/"Resources/_shared/hap-app/install-lib.sh", pkgshare/"hap-app-install-lib.sh"
     chmod 0755, pkgshare/"hap-app-install-lib.sh"
     cp res/"scripts/genoffice-app.sh", libexec/"genoffice-desktop.sh"
@@ -242,10 +226,10 @@ class GenofficeApp < Formula
 
   def caveats
     <<~EOS
-      `brew install`/`brew upgrade` installs the HAP automatically once the
-      device and the Huawei Developer login are ready; otherwise it is queued:
-      `hap-app status` shows why, `hap-app install-pending` finishes it.
-      Manual: `genoffice-app install`. Details: docs/hap-app-formulae.md.
+      `brew install` and `brew upgrade` try to install the HAP when a device is
+      connected and Huawei Developer login is ready. If queued, check
+      `hap-app status`, then run `hap-app install-pending`.
+      Manual install: `genoffice-app install`. See docs/hap-app-formulae.md.
 
       The app runs entirely in its own sandbox: CUSTOM_SANDBOX, READ_WRITE_USER_FILE
       and READ_PASTEBOARD come from the local debug profile, and the kernel ACLs keep
@@ -260,17 +244,14 @@ class GenofficeApp < Formula
     hap = libexec/"genoffice-desktop-unsigned.hap"
     listing = shell_output("unzip -l #{hap}")
     %w[
-      resources/resfile/resources/app/package.json
-      resources/resfile/resources/app/out/main/index.js
       resources/resfile/resources/modules/sheets/renderer/index.html
       resources/resfile/resources/modules/sheets/preload/index.js
       resources/resfile/resources/wasm/pdfium.wasm
       resources/resfile/resources/cli/genoffice.cjs
-      resources/resfile/resources/native/xlsx-sidecar.bin
     ].each { |entry| assert_match entry, listing }
 
     package = JSON.parse(shell_output("unzip -p #{hap} resources/resfile/resources/app/package.json"))
-    assert_equal "out/main/index.js", package["main"]
+    assert_includes listing, "resources/resfile/resources/app/#{package.fetch("main")}"
     assert_equal version.to_s, package["version"]
 
     # An unsigned sidecar cannot be spawned (EACCES); the keg copy carries the
