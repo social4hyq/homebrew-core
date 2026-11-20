@@ -42,7 +42,7 @@ function fixture(t) {
       fs.writeFileSync(root + '/entry/src/main/module.json5', '{// comment\\n module: {name:"entry", type:"entry", requestPermissions:[{name:"old"}],},}');
     }
     if (args[0] === 'signature') {
-      if (process.env.CAPTURE_NET_ENV) fs.writeFileSync(process.env.CAPTURE_NET_ENV, JSON.stringify({ca: process.env.NODE_EXTRA_CA_CERTS || '', proxy: process.env.HTTPS_PROXY || ''}));
+      if (process.env.CAPTURE_NET_ENV) fs.writeFileSync(process.env.CAPTURE_NET_ENV, JSON.stringify({ca: process.env.NODE_EXTRA_CA_CERTS || '', proxy: process.env.HTTPS_PROXY || '', insecure: process.env.NODE_TLS_REJECT_UNAUTHORIZED || ''}));
       if (process.env.FAIL_TLS) { console.error('Network connection failed (SELF_SIGNED_CERT_IN_CHAIN)'); process.exit(1); }
       const p = JSON.parse(fs.readFileSync('entry/src/main/module.json5', 'utf8'));
       fs.writeFileSync(process.env.TEST_PERMISSIONS, JSON.stringify(p.module.requestPermissions));
@@ -442,7 +442,18 @@ test('tls_ca and https_proxy come from ~/.app-installer/config', t => {
   const r = f.run([], { CAPTURE_NET_ENV: capture });
   assert.equal(r.status, 0, r.stdout + r.stderr);
   assert.deepEqual(JSON.parse(fs.readFileSync(capture, 'utf8')),
-    { ca, proxy: 'http://127.0.0.1:7890' });
+    { ca, proxy: 'http://127.0.0.1:7890', insecure: '' });
+});
+
+test('tls_insecure=1 disables certificate verification for the DevEco CLI', t => {
+  const f = fixture(t);
+  fs.mkdirSync(path.join(f.root, '.app-installer'));
+  fs.writeFileSync(path.join(f.root, '.app-installer', 'config'), 'tls_insecure=1\n');
+  const capture = path.join(f.root, 'net-env.json');
+  const r = f.run([], { CAPTURE_NET_ENV: capture });
+  assert.equal(r.status, 0, r.stdout + r.stderr);
+  assert.equal(JSON.parse(fs.readFileSync(capture, 'utf8')).insecure, '0');
+  assert.match(r.stderr, /tls_insecure=1 — TLS certificate verification is disabled/);
 });
 
 test('a TLS trust failure records tls and prints the CA hint', t => {
