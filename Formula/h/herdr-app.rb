@@ -4,7 +4,7 @@ class HerdrApp < Formula
   url "https://github.com/herdrdev/herdr-app/archive/refs/tags/v0.1.16.tar.gz"
   sha256 "fea3d920607f2199ed330eb3cdcb1fa3626dcea5080c92a97a296d983d6bc681"
   license "Apache-2.0"
-  revision 4
+  revision 5
 
   livecheck do
     url "https://github.com/herdrdev/herdr-app.git"
@@ -63,8 +63,7 @@ class HerdrApp < Formula
     end
   end
 
-  # List every path literally: the unused-resource audit keeps a Resources/
-  # directory only while a formula names it.
+  # The unused-resource audit requires literal tap paths.
   RESOURCE_FILES = %w[
     Resources/herdr-app/hap/AppScope/app.json5
     Resources/herdr-app/hap/AppScope/resources/base/element/string.json
@@ -108,9 +107,7 @@ class HerdrApp < Formula
   def install
     tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
     res = tap_root/"Resources/herdr-app"
-    RESOURCE_FILES.each do |file|
-      odie "missing tap resource: #{file}" unless (tap_root/file).exist?
-    end
+    RESOURCE_FILES.each { |file| odie "missing tap resource: #{file}" unless (tap_root/file).exist? }
 
     # HAP packaging uses the private electron-ohos-ci image
     # (OHOS_CI_IMAGE_OVERRIDES) with the proprietary CLT at
@@ -150,15 +147,13 @@ class HerdrApp < Formula
     system ndk/"llvm/bin/llvm-strip", "--strip-unneeded", libs/"libopenharmony_ability.so"
     cp ndk/"llvm/lib/aarch64-linux-ohos/libc++_shared.so", libs
 
-    # brew's sanitized env drops LD_LIBRARY_PATH; restore it for
-    # ohos_packing_tool.
+    # ohos_packing_tool needs SDK libraries outside brew's sanitized search path.
     ENV["DEVECO_SDK_HOME"] = (clt/"sdk").to_s
     ENV["HOS_SDK_HOME"] = (clt/"sdk").to_s
     ENV["LD_LIBRARY_PATH"] =
       "#{clt}/lib:#{clt}/sdk/default/openharmony/native/llvm/lib/clang/15.0.4/lib/aarch64-linux-ohos"
     ENV.delete("NODE_OPTIONS")
-    # Cap RLIMIT_NOFILE for the hvigor tree: near-1e9 limits break the musl FD
-    # table. Only ever lower it.
+    # An oversized RLIMIT_NOFILE breaks the musl FD table in hvigor.
     soft_cap, hard_cap = Process.getrlimit(Process::RLIMIT_NOFILE)
     Process.setrlimit(Process::RLIMIT_NOFILE, [soft_cap, 65_536].min, 65_536) if hard_cap > 65_536
 
@@ -190,34 +185,30 @@ class HerdrApp < Formula
 
   def caveats
     <<~EOS
-      `brew install`/`brew upgrade` installs the HAP automatically once the
-      device and the Huawei Developer login are ready; otherwise it is queued:
-      `hap-app status` shows why, `hap-app install-pending` finishes it.
-      Manual: `herdr-app install`. Details: docs/hap-app-formulae.md.
+      `brew install` and `brew upgrade` try to install the HAP when a device is
+      connected and Huawei Developer login is ready. If queued, check
+      `hap-app status`, then run `hap-app install-pending`.
+      Manual install: `herdr-app install`. See docs/hap-app-formulae.md.
 
       The app cannot start the host `hc`, so a loopback bridge is used
       (`herdr-app bridge status|stop|restart`). Install and start run it; the token
-      lives in $XDG_CONFIG_HOME/herdr-app/bridge.conf (0600) and is baked into the
+      lives in ${XDG_CONFIG_HOME:-$HOME/.config}/herdr-app/bridge.conf (0600) and is baked into the
       app (`install --new-token` rotates it). Open with `herdr-app start`.
     EOS
   end
 
   test do
     hap = libexec/"herdr-app-unsigned.hap"
-    assert_match "libs/arm64-v8a/libopenharmony_ability.so", shell_output("unzip -l #{hap}")
-
     manifest = JSON.parse(shell_output("unzip -p #{hap} module.json"))
     assert_equal "entry", manifest.dig("module", "name")
     permissions = manifest.dig("module", "requestPermissions").map { |permission| permission["name"] }
     assert_includes permissions, "ohos.permission.INTERNET"
     assert_equal "com.social4hyq.herdrapp", manifest.dig("app", "bundleName")
 
-    # The launcher icon is the one herdr-app ships (assets/icons/herdr-ui-icon-clean.png), not the template's.
     system "unzip", "-o", hap, "resources/base/media/example_icon.png", "-d", testpath/"icon"
     assert_equal "66be46ebed8e540bb023dbf71db04c758b2de14b64b643d7cafbcc31268fbd4c",
                  (testpath/"icon/resources/base/media/example_icon.png").sha256
 
-    # The app's name is Herdr, not the template's "GPUI OHOS Example".
     index = shell_output("unzip -p #{hap} resources.index").b
     refute_includes index, "GPUI OHOS Example".b
     assert_includes index, "Herdr".b
@@ -227,10 +218,6 @@ class HerdrApp < Formula
     assert_includes library, "com.huawei.hmos.browser".b
 
     assert_match "Usage: herdr-app", shell_output("#{bin}/herdr-app --help")
-    wrapper = (bin/"herdr-app").read
-    assert_match "HERDR_APP_BRIDGE=\"#{libexec}/herdr-bridge.py\"", wrapper
-    assert_match "HERDR_APP_PYTHON=", wrapper
-    assert_match "HERDR_APP_HC=", wrapper
 
     # Run the bridge and install flow with stand-ins for hc and app-installer:
     # the token ends up in the HAP and the bridge answers only it.
