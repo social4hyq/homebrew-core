@@ -1,0 +1,86 @@
+'use strict';
+
+const assert = require('node:assert/strict');
+const path = require('node:path');
+const test = require('node:test');
+const vm = require('node:vm');
+const fs = require('node:fs');
+
+const source = fs.readFileSync(
+  path.join(__dirname, '../app/chatgpt-bootstrap.cjs'), 'utf8',
+);
+const vendor = path.join(__dirname, 'vendor.asar');
+const hostConfig = {
+  home: '/storage/Users/currentUser',
+  codexCli: '/storage/Users/currentUser/.harmonybrew/opt/codex/bin/codex',
+  codexHome: '/storage/Users/currentUser/.codex',
+  path: '/storage/Users/currentUser/.harmonybrew/bin:/system/bin',
+};
+
+function boot(packageVersion = '26.1111.71704') {
+  const runtimeProcess = { env: {} };
+  const state = { appPath: null, loaded: null, name: null, childProcess: null, process: runtimeProcess };
+  const app = {
+    setAppPath(value) { state.appPath = value; },
+    setName(value) { state.name = value; },
+  };
+  const childProcess = {};
+  for (const name of ['spawn', 'spawnSync', 'execFile', 'execFileSync']) {
+    childProcess[name] = (...args) => ({ called: name, args });
+  }
+  state.childProcess = childProcess;
+  const fakeRequire = id => {
+    if (id === 'node:path') return path;
+    if (id === 'node:fs') return { readFileSync: () => JSON.stringify(hostConfig) };
+    if (id === 'node:child_process') return childProcess;
+    if (id === 'electron') return { app };
+    if (id === vendor) return {};
+    if (id === path.join(vendor, 'package.json')) {
+      return { version: packageVersion, main: '.vite/build/early-bootstrap.js' };
+    }
+    if (id === path.join(vendor, '.vite/build/early-bootstrap.js')) {
+      state.loaded = id;
+      return {};
+    }
+    throw new Error(`unexpected require: ${id}`);
+  };
+  vm.runInNewContext(source, { require: fakeRequire, __dirname, process: runtimeProcess, console });
+  return state;
+}
+
+test('loads the official app and configures the supported host Codex CLI override', () => {
+  const state = boot();
+  assert.equal(state.name, 'ChatGPT');
+  assert.equal(state.appPath, vendor);
+  assert.equal(state.loaded, path.join(vendor, '.vite/build/early-bootstrap.js'));
+  assert.equal(state.process.env.CODEX_CLI_PATH, hostConfig.codexCli);
+});
+
+test('launches Codex with host HOME, CODEX_HOME and PATH while preserving workspace cwd', () => {
+  const state = boot();
+  const child = state.childProcess.spawn('/usr/bin/codex', ['app-server'], {
+    cwd: '/storage/Users/currentUser/HarmonyPC/Project',
+    env: { HOME: '/sandbox/home', CODEX_HOME: '/sandbox/.codex', PATH: '/sandbox/bin' },
+  });
+  assert.equal(child.args[0], hostConfig.codexCli);
+  assert.equal(child.args[2].cwd, '/storage/Users/currentUser/HarmonyPC/Project');
+  assert.equal(child.args[2].env.HOME, hostConfig.home);
+  assert.equal(child.args[2].env.CODEX_HOME, hostConfig.codexHome);
+  assert.equal(child.args[2].env.PATH, hostConfig.path);
+});
+
+test('uses host HOME when the requested working directory is relative', () => {
+  const state = boot();
+  const child = state.childProcess.spawn(hostConfig.codexCli, ['app-server'], { cwd: 'relative' });
+  assert.equal(child.args[2].cwd, hostConfig.home);
+});
+
+test('does not rewrite unrelated subprocesses', () => {
+  const state = boot();
+  const child = state.childProcess.spawn('/usr/bin/git', ['status']);
+  assert.equal(child.args[0], '/usr/bin/git');
+});
+
+test('refuses an unexpected official package version', () => {
+  assert.throws(() => boot('0.0.0'), /unexpected official ChatGPT application entry point/);
+});
