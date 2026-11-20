@@ -54,7 +54,8 @@ function fixture(t) {
       if (cmd.includes('bm install')) { console.log(process.env.INSTALL_FAIL ? 'error: failed' : 'install bundle successfully'); }
       if (cmd.includes('aa start')) { console.log(process.env.START_FAIL ? 'screen locked' : 'start ability successfully'); }
       if (cmd.includes('bm uninstall')) { console.log(process.env.UNINSTALL_FAIL ? 'error: bundle not found' : 'uninstall bundle successfully.'); }
-      if (cmd.includes('bm dump') && process.env.DUMP_FAIL) { console.log('error: failed to get information and the parameters may be wrong.'); }
+      if (cmd.includes('bm dump') && process.env.TEST_BM_DUMP) { console.log(fs.readFileSync(process.env.TEST_BM_DUMP, 'utf8')); }
+      else if (cmd.includes('bm dump') && process.env.DUMP_FAIL) { console.log('error: failed to get information and the parameters may be wrong.'); }
       else if (cmd.includes('bm dump')) { console.log('{\\n  "bundleName": "' + cmd.split(' ').pop() + '",\\n  "versionName": "1.2.3",\\n  "irrelevant": 1\\n}'); }
     }
   `);
@@ -356,4 +357,73 @@ test('a zip64 HAP is signed as it is, with a warning, and never rewritten', t =>
   assert.ok(fs.readFileSync(out).equals(original)); assert.ok(fs.readFileSync(f.hap).equals(original));
   assert.equal(names(out).filter(n=>n.endsWith('/')).length,2);
   assert.deepEqual(fs.readdirSync(path.dirname(out)),['signed.hap']);
+});
+
+test('ready reports one device and the login state without touching anything', t => {
+  const f=fixture(t);
+  const ready = (overrides={}) => spawnSync('bash',[script,'ready'],{env:{...f.env,...overrides},encoding:'utf8'});
+  let r=ready(); assert.equal(r.status,0,r.stdout+r.stderr); assert.equal(r.stdout.trim(),'ok local');
+  r=ready({NEED_LOGIN:'1'}); assert.equal(r.status,1); assert.equal(r.stdout.trim(),'no-login');
+  r=ready({TEST_TARGETS:'local TCP Offline localhost hdc'}); assert.equal(r.status,1); assert.equal(r.stdout.trim(),'no-device');
+  r=spawnSync('bash',[script,'ready','--hdc','/nonexistent/hdc'],{env:f.env,encoding:'utf8'});
+  assert.equal(r.status,1); assert.equal(r.stdout.trim(),'no-hdc');
+  assert.ok(!f.calls().some(c=>c[0]==='signer'||c.join(' ').includes('bm install')), 'ready must not sign or install');
+});
+test('login runs the DevEco login once and reports the result', t => {
+  const f=fixture(t);
+  let r=spawnSync('bash',[script,'login','--no-browser'],{env:{...f.env,NEED_LOGIN:'1'},encoding:'utf8'});
+  assert.equal(r.status,0,r.stdout+r.stderr); assert.match(r.stdout,/logged in/);
+  assert.ok(f.calls().some(c=>c.join(' ').includes('auth login')));
+  r=spawnSync('bash',[script,'login','--no-browser'],{env:{...f.env,NEED_LOGIN:'1'},encoding:'utf8'});
+  assert.equal(r.status,0,r.stdout+r.stderr); assert.match(r.stdout,/already logged in/);
+});
+function permissionDefinitions(f, entries) {
+  const file=path.join(f.root,'definitions.json');
+  fs.writeFileSync(file, JSON.stringify({definePermissions:entries}));
+  return file;
+}
+function permissionDump(f, names, states) {
+  const file=path.join(f.root,`dump-${names.length}-${states.join('_')}.json`);
+  fs.writeFileSync(file, JSON.stringify({reqPermissions:names, reqPermissionStates:states}));
+  return file;
+}
+test('permissions fails only for install-time permissions, not for pending user_grant ones', t => {
+  const f=fixture(t);
+  const definitions=permissionDefinitions(f,[{name:'ohos.permission.INTERNET',grantMode:'system_grant'},{name:'ohos.permission.READ_PASTEBOARD',grantMode:'user_grant'}]);
+  const ok=permissionDump(f,['ohos.permission.INTERNET','ohos.permission.READ_PASTEBOARD'],[0,-1]);
+  let r=spawnSync('bash',[script,'permissions','--bundle-id',bundle],{env:{...f.env,HAP_INSTALLER_PERMISSIONS:definitions,TEST_BM_DUMP:ok},encoding:'utf8'});
+  assert.equal(r.status,0,r.stdout+r.stderr);
+  assert.match(r.stdout,/pending ohos.permission.READ_PASTEBOARD user_grant/);
+  assert.match(r.stdout,/permissions: 1 granted, 1 user_grant, 0 missing/);
+  const bad=permissionDump(f,['ohos.permission.INTERNET'],[-1]);
+  r=spawnSync('bash',[script,'permissions','--bundle-id',bundle],{env:{...f.env,HAP_INSTALLER_PERMISSIONS:definitions,TEST_BM_DUMP:bad},encoding:'utf8'});
+  assert.equal(r.status,1); assert.match(r.stdout,/missing ohos.permission.INTERNET system_grant state=-1/);
+});
+test('permissions with --expect-acl proves the ACL variant was installed', t => {
+  const f=fixture(t);
+  const definitions=permissionDefinitions(f,[{name:'ohos.permission.INTERNET',grantMode:'system_grant'},{name:'ohos.permission.CUSTOM_SANDBOX',grantMode:'system_grant'}]);
+  const dump=permissionDump(f,['ohos.permission.INTERNET'],[0]);
+  const acl=path.join(f.root,'module-acl.json');
+  fs.writeFileSync(acl, JSON.stringify({module:{requestPermissions:[{name:'ohos.permission.INTERNET'},{name:'ohos.permission.CUSTOM_SANDBOX'}]}}));
+  const r=spawnSync('bash',[script,'permissions','--bundle-id',bundle,'--expect-acl',acl],{env:{...f.env,HAP_INSTALLER_PERMISSIONS:definitions,TEST_BM_DUMP:dump},encoding:'utf8'});
+  assert.equal(r.status,1);
+  assert.match(r.stdout,/missing-variant ohos.permission.CUSTOM_SANDBOX/);
+});
+test('HAP_INSTALLER_NO_START installs without starting the app', t => {
+  const f=fixture(t); const r=f.run([],{HAP_INSTALLER_NO_START:'1'});
+  assert.equal(r.status,0,r.stdout+r.stderr);
+  assert.ok(!f.calls().some(c=>c.join(' ').includes('aa start')));
+});
+test('HAP_INSTALLER_DEVICE is used for every device operation', t => {
+  const f=fixture(t); const r=f.run([],{HAP_INSTALLER_DEVICE:'fromenv'});
+  assert.equal(r.status,0,r.stdout+r.stderr);
+  const operations=f.calls().filter(c=>c[0]==='hdc'&&c[1]!=='list');
+  assert.ok(operations.length>0); assert.ok(operations.every(c=>c[1]==='-t'&&c[2]==='fromenv'));
+});
+test('HAP_INSTALLER_NO_LOGIN stops before the DevEco login when not signed in', t => {
+  const f=fixture(t); const r=f.run([],{NEED_LOGIN:'1',HAP_INSTALLER_NO_LOGIN:'1'});
+  assert.equal(r.status,3,r.stdout+r.stderr);
+  assert.match(r.stderr,/HAP_INSTALLER_NO_LOGIN/);
+  assert.ok(!f.calls().some(c=>c.join(' ').includes('auth login')));
+  assert.ok(!f.calls().some(c=>c[0]==='signer'));
 });

@@ -8,6 +8,9 @@ Usage: app-installer --hap <unsigned.hap> --bundle-id <id> [options]
        app-installer uninstall --bundle-id <id> [--device <id>] [--hdc <path>]
        app-installer info      --bundle-id <id> [--device <id>] [--hdc <path>]
        app-installer doctor    [--device <id>] [--hdc <path>]
+       app-installer ready     [--device <id>] [--hdc <path>]
+       app-installer login     [--no-browser] [--timeout <seconds>]
+       app-installer permissions --bundle-id <id> [--expect-acl <module-acl.json>]
 
 Sign an existing HAP with a local DevEco debug profile, install it over hdc,
 and start its main ability unless --no-start is given. `install` is the default
@@ -42,6 +45,15 @@ together, passwords are read from the environment, never from the command line):
   --key-alias <alias>     --sign-alg <alg>        (default SHA256withECDSA)
   APP_INSTALLER_KEYSTORE_PWD  keystore password
   APP_INSTALLER_KEY_PWD       key password (default: the keystore password)
+
+ready prints one line for the caller: `ok <device>`, `no-device`, `no-login`,
+`no-hdc` or `multiple-devices`, and exits 0 only for `ok`. `login` runs the
+DevEco CLI login (optionally bounded by --timeout). `permissions` reads the
+installed bundle from the device and checks that every permission the installer
+grants at install time (system_grant, the ACL ones) is granted; user_grant
+permissions that the user has not granted yet are reported, not failed. With
+--expect-acl, every permission in that module.json must also be present, which
+proves the ACL variant was the one installed.
 EOF
 }
 
@@ -49,7 +61,7 @@ die() { printf 'app-installer: %s\n' "$1" >&2; exit "${2:-1}"; }
 
 cmd=install
 case "${1:-}" in
-  install|uninstall|info|doctor) cmd="$1"; shift ;;
+  install|uninstall|info|doctor|ready|login|permissions) cmd="$1"; shift ;;
 esac
 
 hap=
@@ -59,7 +71,7 @@ module=entry
 ability=EntryAbility
 project_dir=
 signed_hap=
-device=
+device="${HAP_INSTALLER_DEVICE:-}"
 profile_arg=
 method=auto
 sign_only=0
@@ -72,10 +84,12 @@ hdc_bin="${HAP_INSTALLER_HDC:-hdc}"
 prepare="${HAP_INSTALLER_PREPARE:-$(dirname "${BASH_SOURCE[0]}")/prepare-profile.cjs}"
 start_app=1
 open_browser=1
+login_timeout=0
+expect_acl=
 
 while (($#)); do
   case "$1" in
-    --hap|--bundle-id|--app-name|--module|--ability|--project-dir|--signed-hap|--output|--device|--profile|--hdc|--method|--keystore|--cert|--profile-file|--key-alias|--sign-alg)
+    --hap|--bundle-id|--app-name|--module|--ability|--project-dir|--signed-hap|--output|--device|--profile|--hdc|--method|--keystore|--cert|--profile-file|--key-alias|--sign-alg|--expect-acl|--timeout)
       if (($# < 2)) || [[ -z "$2" || "$2" == --* ]]; then
         printf 'app-installer: missing value for %s\n' "$1" >&2; usage >&2; exit 2
       fi
@@ -97,6 +111,8 @@ while (($#)); do
         --profile-file) profile_file="$value" ;;
         --key-alias) key_alias="$value" ;;
         --sign-alg) sign_alg="$value" ;;
+        --expect-acl) expect_acl="$value" ;;
+        --timeout) login_timeout="$value" ;;
       esac
       ;;
     --sign-only) sign_only=1; shift ;;
@@ -106,6 +122,12 @@ while (($#)); do
     *) printf 'app-installer: unknown option: %s\n' "$1" >&2; usage >&2; exit 2 ;;
   esac
 done
+
+if [[ "${HAP_INSTALLER_NO_START:-0}" != "0" ]]; then
+  start_app=0
+  ability=
+fi
+[[ "$login_timeout" =~ ^[0-9]+$ ]] || die "invalid --timeout: $login_timeout" 2
 
 case "$method" in
   auto|hdc|sideload) ;;
@@ -132,8 +154,8 @@ connected_targets() {
   "$hdc_bin" list targets -v 2>/dev/null | awk '{for (i=2; i<=NF; i++) if ($i == "Connected") {print $1; break}}'
 }
 
-# Sets $device to the one connected hdc target, or exits with guidance.
-resolve_device() {
+# Sets $device to the one connected hdc target. 0 one target, 1 none, 2 several.
+pick_device() {
   [[ -z "$device" ]] || return 0
   local targets count local_port
   targets="$(connected_targets || true)"
@@ -146,13 +168,28 @@ resolve_device() {
   fi
   count=$(printf '%s\n' "$targets" | awk 'NF' | wc -l | tr -d ' ')
   if ((count == 0)); then
-    die 'no connected hdc target; connect and unlock the device, or pass --device.'
+    return 1
   elif ((count > 1)); then
-    printf 'app-installer: %s hdc targets attached; pass --device <connect-key>:\n' "$count" >&2
-    printf '%s\n' "$targets" | sed 's/^/  /' >&2
-    exit 2
+    device_targets="$targets"
+    return 2
   fi
   device="$targets"
+}
+
+# Sets $device, or exits with guidance.
+resolve_device() {
+  local rc=0
+  pick_device || rc=$?
+  case "$rc" in
+    0) return 0 ;;
+    1) die 'no connected hdc target; connect and unlock the device, or pass --device.' ;;
+    2)
+      printf 'app-installer: %s hdc targets attached; pass --device <connect-key>:\n' \
+        "$(printf '%s\n' "$device_targets" | awk 'NF' | wc -l | tr -d ' ')" >&2
+      printf '%s\n' "$device_targets" | sed 's/^/  /' >&2
+      exit 2
+      ;;
+  esac
 }
 
 home="${HOME:?HOME must be set}"
@@ -196,8 +233,16 @@ open_url() {
 # open the first URL that shows up, while still passing every line through.
 login_with_browser() {
   local line opened=0 url_re='https?://[A-Za-z0-9._~:/?#@!$&*+,;=%-]+'
-  if ((!open_browser)); then devecocli auth login; return; fi
-  devecocli auth login 2>&1 | while IFS= read -r line; do
+  local -a runner=()
+  if ((login_timeout > 0)); then
+    if command -v timeout >/dev/null 2>&1; then
+      runner=(timeout "$login_timeout")
+    else
+      printf 'app-installer: WARN: timeout not found; the login wait is unbounded.\n' >&2
+    fi
+  fi
+  if ((!open_browser)); then "${runner[@]}" devecocli auth login; return; fi
+  "${runner[@]}" devecocli auth login 2>&1 | while IFS= read -r line; do
     printf '%s\n' "$line"
     if ((!opened)) && [[ "$line" =~ $url_re ]]; then
       opened=1
@@ -208,6 +253,16 @@ login_with_browser() {
       fi
     fi
   done
+}
+
+# 0 logged in, 1 not logged in, 2 the status could not be read.
+login_state() {
+  local out
+  out="$(devecocli auth status 2>&1)" || return 2
+  case "$out" in
+    *'Not logged in'*|*'未登录'*) return 1 ;;
+  esac
+  return 0
 }
 
 # --- Installation backends ----------------------------------------------------
@@ -275,6 +330,57 @@ require_hdc() {
 }
 
 case "$cmd" in
+  ready)
+    if ! command -v "$hdc_bin" >/dev/null 2>&1 && [[ ! -x "$hdc_bin" ]]; then
+      printf 'no-hdc\n'; exit 1
+    fi
+    rc=0; pick_device || rc=$?
+    case "$rc" in
+      0) ;;
+      2) printf 'multiple-devices\n'; exit 1 ;;
+      *) printf 'no-device\n'; exit 1 ;;
+    esac
+    rc=0; login_state || rc=$?
+    case "$rc" in
+      0) printf 'ok %s\n' "$device"; exit 0 ;;
+      1) printf 'no-login\n'; exit 1 ;;
+      *) printf 'unknown-login\n'; exit 1 ;;
+    esac
+    ;;
+  login)
+    rc=0; login_state || rc=$?
+    if ((rc == 0)); then printf 'already logged in\n'; exit 0; fi
+    if ((rc == 2)); then
+      printf '%s\n' 'app-installer: could not check Huawei Developer login status.' >&2; exit 1
+    fi
+    printf '%s\n' 'A Huawei Developer account login is required; opening DevEco CLI login.'
+    login_with_browser
+    rc=0; login_state || rc=$?
+    if ((rc == 0)); then printf 'logged in\n'; exit 0; fi
+    printf '%s\n' 'app-installer: login was not completed.' >&2; exit 1
+    ;;
+  permissions)
+    [[ -n "$bundle_id" ]] || { usage >&2; exit 2; }
+    require_hdc
+    resolve_device
+    out=$(hdc_cmd shell "bm dump -n $bundle_id" 2>&1) || { printf '%s\n' "$out" >&2; exit 1; }
+    if printf '%s\n' "$out" | grep -qE '^error:'; then
+      printf '%s\n' "$out" >&2
+      die "could not read permissions for $bundle_id; is it installed?"
+    fi
+    perms_tool="${HAP_INSTALLER_PERMISSIONS_TOOL:-$(dirname "${BASH_SOURCE[0]}")/check-permissions.cjs}"
+    definitions="${HAP_INSTALLER_PERMISSIONS:-}"
+    [[ -n "$definitions" && -f "$definitions" ]] ||
+      die 'permission definitions not found; reinstall app-installer'
+    dump_file="$(mktemp "${TMPDIR:-/tmp}/app-installer-dump.XXXXXX")"
+    printf '%s\n' "$out" >"$dump_file"
+    perms_args=("$dump_file" "$definitions")
+    [[ -z "$expect_acl" ]] || perms_args+=("$expect_acl")
+    rc=0
+    node "$perms_tool" "${perms_args[@]}" || rc=$?
+    rm -f "$dump_file"
+    exit "$rc"
+    ;;
   uninstall|info)
     [[ -n "$bundle_id" ]] || { usage >&2; exit 2; }
     require_hdc
@@ -317,8 +423,7 @@ case "$cmd" in
       rc=0; ((n >= 1)) || rc=1
       check "hdc target connected ($n)" "$rc" 'turn on developer mode and wireless debugging, unlock the device, or pass --device'
     fi
-    rc=0; status_output=$(devecocli auth status 2>&1) || rc=1
-    case "$status_output" in *'Not logged in'*|*'未登录'*) rc=1 ;; esac
+    rc=0; login_state || rc=1
     check 'Huawei Developer login' "$rc" 'run: devecocli auth login (not needed with --profile or --keystore)'
     if [[ -d "$projects_root" ]]; then
       for dir in "$projects_root"/*/; do
@@ -385,18 +490,18 @@ elif [[ -n "$profile_arg" ]]; then
   printf '%s\n' "Signing with the given profile: $profile"
   sign_args+=(--profile "$profile")
 else
-  status_output=$(devecocli auth status 2>&1) || {
-    printf '%s\n' 'app-installer: could not check Huawei Developer login status.' >&2; exit 1
-  }
-  case "$status_output" in
-    *'Not logged in'*|*'未登录'*)
+  rc=0; login_state || rc=$?
+  case "$rc" in
+    1)
+      if [[ "${HAP_INSTALLER_NO_LOGIN:-0}" != "0" ]]; then
+        printf '%s\n' 'app-installer: Huawei Developer login is required; not starting it (HAP_INSTALLER_NO_LOGIN).' >&2
+        exit 3
+      fi
       printf '%s\n' 'A Huawei Developer account login is required; opening DevEco CLI login.'
       login_with_browser
-      status_output=$(devecocli auth status 2>&1) || {
-        printf '%s\n' 'app-installer: could not verify Huawei Developer login.' >&2; exit 1
-      }
-      case "$status_output" in *'Not logged in'*|*'未登录'*) printf '%s\n' 'app-installer: login was not completed.' >&2; exit 1 ;; esac
+      login_state || { printf '%s\n' 'app-installer: login was not completed.' >&2; exit 1; }
       ;;
+    2) printf '%s\n' 'app-installer: could not check Huawei Developer login status.' >&2; exit 1 ;;
   esac
   if [[ ! -f "$project_dir/AppScope/app.json5" ]]; then
     if [[ -e "$project_dir" ]]; then printf 'app-installer: incomplete signing project: %s\n' "$project_dir" >&2; exit 1; fi

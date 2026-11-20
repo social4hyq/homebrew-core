@@ -57,6 +57,46 @@
 
 wrapper（`write_env_script`）的环境变量统一用 `<PREFIX>_` 加这些后缀：`UNSIGNED_HAP`、`INSTALL_SCRIPT`、`MODULE_ACL`、`HDC_DEFAULT`、`<BACKEND>_BIN`，另有可覆盖的 `BUNDLE`、`APP_NAME`、`HDC`。前缀见下面的历史例外表。
 
+## `brew install` 后自动装机
+
+每个 HAP app 的 formula 在 `install` 之后、`caveats` 之前声明一步 post-install：
+
+```ruby
+post_install_steps do
+  run "{{HOMEBREW_PREFIX}}/bin/hap-app",
+      args: ["auto-install", "orca-app", "com.social4hyq.orca"],
+      must_succeed: false, print_stdout: true, network_access: true
+end
+```
+
+`hap-app` 由 `app-installer` 提供（所有 app 都依赖它）。Homebrew 在 link 之后执行
+`post_install_steps`，bottle 安装与 `brew upgrade` 都会走；`--build-bottle` 与
+`--skip-post-install` 会跳过，所以 CI 构建不会碰设备。**不要用 `def post_install`**：
+`brew style` 的 `InstallSteps` cop 已禁止，必须用 `post_install_steps`。
+
+行为：
+
+- 设备已连接、华为开发者已登录：立刻签名安装，装完用 `bm dump` 校验权限；
+  stdout 一行结果，stderr 是进度。
+- 设备没连、多个设备、没登录、装机失败、权限未授予：不报错、不阻塞 brew，
+  把 `<command>` 登记到 `$XDG_CONFIG_HOME/hap-app/pending/<command>.json`，
+  提示运行 `hap-app install-pending`；登录只做一次。
+- 自动路径**不启动** app（`HAP_INSTALLER_NO_START=1` 传给 app-installer），
+  也不弹登录（除非 `HAP_APP_AUTO_LOGIN=1`，最多等 120s，每次 brew 进程只试一次）。
+- 手动 `<app>-app install` 行为不变：仍会启动 app、仍会阻塞登录。
+- 权限：自动路径永远用默认 ACL 变体，不传 `--no-acl`；`hap-app` 从 app wrapper
+  的 `*_MODULE_ACL` 取 ACL 清单传给 `app-installer permissions --expect-acl`，
+  既确认装的是 ACL 变体，也只要求 `system_grant`（安装时授予）的权限为 granted；
+  `user_grant` 权限（粘贴、截屏等）装机后是 -1，只报告不判失败。
+- CI、root、`HAP_APP_AUTO_INSTALL=0`（或配置文件
+  `$XDG_CONFIG_HOME/hap-app/config` 里 `auto_install=0`）下静默 no-op。
+- 逃生口：`brew install --skip-post-install`；补跑用 `brew postinstall <app>`。
+
+`hap-app` 子命令：`auto-install`（formula 用）、`install-pending`、`status`、
+`forget`。`app-installer` 另有 `ready`（无副作用预检，输出 `ok <device>` /
+`no-device` / `no-login` / `no-hdc` / `multiple-devices`）、`login`、
+`permissions`。
+
 ## 共享安装库
 
 `Resources/_shared/hap-app/install-lib.sh` 是 Electron 壳 app 共用的安装流程：解析参数、检查工具、ACL 的 `module.json` 与 HAP 的 bundle 一致性预检、暂存目录、把要注入的文件加进 HAP 副本、流式调用 `app-installer`、`--keep`、结果行。formula 把它 `cp` 到 `pkgshare/"hap-app-install-lib.sh"`，与每个 app 自己的薄脚本 `install-desktop.sh` 放在同一目录，薄脚本 `source` 它。

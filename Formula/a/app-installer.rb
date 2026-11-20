@@ -4,7 +4,7 @@ class AppInstaller < Formula
   url "https://registry.npmjs.org/@deveco/deveco-cli-openharmony-arm64/-/deveco-cli-openharmony-arm64-1.3.10.tgz"
   sha256 "7fdee1bfb7393c151fa09b3714ecc4796e53d9876557e9933c5890319ffb4daa"
   license "MIT"
-  revision 10
+  revision 11
 
   livecheck do
     url :stable
@@ -12,10 +12,11 @@ class AppInstaller < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/app-installer-v1.3.10-r7"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3c385f15c271803ee484cc538374e6a1714106652f6d8c4810e2e865a72f8488"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/app-installer-v1.3.10-r8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "79aedc3f26b76b2edcb7b69da032492d093b2e8cec5c75d5f8bfc6f35ece49c9"
   end
 
+  depends_on "bash"
   depends_on "node"
   depends_on "ohos-sdk-toolchains"
   depends_on "unzip"
@@ -26,9 +27,12 @@ class AppInstaller < Formula
   # formula names it.
   RESOURCE_FILES = %w[
     Resources/app-installer/app-installer.sh
+    Resources/app-installer/check-permissions.cjs
+    Resources/app-installer/hap-app.sh
     Resources/app-installer/package-lock.json
     Resources/app-installer/prepare-profile.cjs
     Resources/app-installer/sign-hap.cjs
+    Resources/app-installer/test-hap-app.cjs
     Resources/app-installer/test-install.cjs
   ].freeze
 
@@ -112,8 +116,13 @@ class AppInstaller < Formula
     cp res/"sign-hap.cjs", libexec/"sign-hap.cjs"
     cp res/"prepare-profile.cjs", libexec/"prepare-profile.cjs"
     cp res/"test-install.cjs", libexec/"test-install.cjs"
+    cp res/"test-hap-app.cjs", libexec/"test-hap-app.cjs"
+    cp res/"check-permissions.cjs", libexec/"check-permissions.cjs"
+    cp res/"hap-app.sh", libexec/"hap-app.sh"
     chmod 0755, libexec/"app-installer.sh"
     chmod 0755, libexec/"sign-hap.cjs"
+    chmod 0755, libexec/"check-permissions.cjs"
+    chmod 0755, libexec/"hap-app.sh"
     cli_wrapper = libexec/"devecocli.sh"
     cli_wrapper.write <<~SH
       #!/bin/sh
@@ -132,12 +141,28 @@ class AppInstaller < Formula
       DEVECO_CLI_JS: cli_js,
       HAP_SIGN_TOOL: sdk_tools/"lib/hap-sign-tool",
       PATH:          "#{formula_opt_bin("node")}:$PATH"
+    installer_path = [
+      formula_opt_bin("node"),
+      formula_opt_bin("bash"),
+      sdk/"toolchains",
+      sdk_tools,
+      "$PATH",
+    ].join(":")
     (bin/"app-installer").write_env_script libexec/"app-installer.sh",
-      COMMAND_LINE_TOOL_PATH: toolchain,
-      DEVECO_CLI_JS:          cli_js,
-      HAP_INSTALLER_SIGNER:   libexec/"sign-hap.cjs",
-      HAP_SIGN_TOOL:          sdk_tools/"lib/hap-sign-tool",
-      PATH:                   "#{formula_opt_bin("node")}:#{sdk}/toolchains:#{sdk_tools}:$PATH"
+      COMMAND_LINE_TOOL_PATH:         toolchain,
+      DEVECO_CLI_JS:                  cli_js,
+      HAP_INSTALLER_SIGNER:           libexec/"sign-hap.cjs",
+      HAP_INSTALLER_PERMISSIONS:      sdk/"toolchains/lib/PermissionDefinitions.json",
+      HAP_INSTALLER_PERMISSIONS_TOOL: libexec/"check-permissions.cjs",
+      HAP_SIGN_TOOL:                  sdk_tools/"lib/hap-sign-tool",
+      PATH:                           installer_path
+    # `hap-app` is the post-install entry point: it queues the HAP when the
+    # device or the Huawei Developer login is not ready and installs it later.
+    # HOMEBREW_PREFIX/bin is on PATH so the app commands resolve when brew runs
+    # the post_install step with a minimal environment.
+    (bin/"hap-app").write_env_script libexec/"hap-app.sh",
+      HAP_APP_APP_INSTALLER: opt_bin/"app-installer",
+      PATH:                  "#{HOMEBREW_PREFIX}/bin:#{formula_opt_bin("node")}:#{formula_opt_bin("bash")}:$PATH"
     bin.install_symlink bin/"app-installer" => "hap-installer"
     bin.install_symlink bin/"app-installer-sign" => "hap-installer-sign"
   end
@@ -155,6 +180,10 @@ class AppInstaller < Formula
       `app-installer --sign-only` writes a signed HAP without needing a device,
       and `--keystore` signs with your own certificate instead of logging in.
       System sideloading is not used yet: installs go through hdc.
+
+      The tap's desktop apps install themselves after `brew install` through
+      `hap-app`. When the device or the login is not ready they are queued:
+      `hap-app status` lists them and `hap-app install-pending` finishes them.
     EOS
   end
 
@@ -180,7 +209,7 @@ class AppInstaller < Formula
       assert_path_exists libexec/"app-installer-toolchain/sdk/default/openharmony/toolchains/lib"/name
     end
     ENV["DEVECO_CLI_JS"] = (libexec/"node_modules/@deveco/deveco-cli-openharmony-arm64/dist/cli.js").to_s
-    system formula_opt_bin("node")/"node", "--test", libexec/"test-install.cjs"
+    system formula_opt_bin("node")/"node", "--test", libexec/"test-install.cjs", libexec/"test-hap-app.cjs"
     refute_path_exists bin/"hdc"
     assert_match(/else if \(authIsObject\) \{\s+proxyAuth = false;/,
                  (libexec/"node_modules/axios/lib/adapters/http.js").read)
