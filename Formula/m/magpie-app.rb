@@ -12,8 +12,9 @@ class MagpieApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/magpie-app-v0.1.4402-r9"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e76b149675768019b5f51d611fade9b6bcf326114062b080d4871f94870fd290"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/magpie-app-v0.1.4402-r10"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cb27aaa7bc4e652e4583dadba29e5331f0e8154a1abef001fc6fe252b7d0404d"
   end
 
   depends_on "app-installer"
@@ -28,9 +29,8 @@ class MagpieApp < Formula
     sha256 "5268fe3c994ec2ce48a999fd6b5029d9cb0e409b07c0395e2a6072e50cb3e1ac"
   end
 
-  # Shell sources live in the tap so they are reviewable in the PR. Every path
-  # is listed literally: the weekly remove-unused-patches job keeps a
-  # Resources/ directory only while a formula names it.
+  # List every path literally: the unused-resource audit keeps a Resources/
+  # directory only while a formula names it.
   RESOURCE_FILES = %w[
     Resources/_shared/hap-app/install-lib.sh
     Resources/magpie-app/app/config.json
@@ -68,10 +68,8 @@ class MagpieApp < Formula
     %w[app_icon.png startIcon.png].each do |name|
       cp icon, shell/"AppScope/resources/base/media"/name
     end
-    # App name and ability labels live in per-locale string resources: patching
-    # only the base file leaves the zh_CN/en_US overrides intact and the
-    # launcher keeps showing the template's "Electron" label, so glob every
-    # locale directory.
+    # Patch app name/labels in every locale: the base file alone leaves the
+    # zh_CN/en_US overrides showing "Electron".
     (shell.glob("AppScope/resources/*/element/string.json") +
      shell.glob("electron/src/main/resources/*/element/string.json")).each do |file|
       strings = JSON.parse(file.read)
@@ -84,16 +82,14 @@ class MagpieApp < Formula
       file.write JSON.pretty_generate(strings) + "\n"
     end
 
-    # CI's electron-ohos-ci CLT carries an NDK-less SDK subset (no llvm-strip);
-    # mirror the multica packaging deltas that keep hvigor away from the strip
-    # task and from signing material the container does not have.
+    # Mirror the packaging deltas for the CI image's NDK-less SDK subset
+    # (no llvm-strip).
     inreplace shell/"build-profile.json5", /^[ \t]*"signingConfig": "default",\r?\n/, ""
     inreplace shell/"electron/src/main/module.json5", '"mainElement": "EntryAbility",',
               '"mainElement": "EntryAbility", "extractNativeLibs": true,'
 
-    # Restricted permissions (pasteboard, location, ...) cannot be granted with
-    # local auto-signing; the shell only needs loopback HTTP, and this trim
-    # installs under local auto-signing.
+    # Trim ACL-gated permissions local auto-signing cannot grant; the shell
+    # only needs loopback HTTP.
     inreplace shell/"web_engine/src/main/module.json5", /"requestPermissions": \[.*?\r?\n    \],/m,
               <<~JSON5.chomp
                 "requestPermissions": [
@@ -102,12 +98,8 @@ class MagpieApp < Formula
                     ],
               JSON5
 
-    # The caption close button never reaches Electron's BrowserWindow close
-    # event: electron-ohos tears down the window UIAbility first, and the
-    # Electron process (with the Magpie backend it started) follows.
-    # Register a windowStageClose handler that hides the ability and cancels the
-    # close, so closing the window only sends it to the tray. The tray's quit
-    # item calls app.exit() because a normal quit would be cancelled here.
+    # windowStageClose hides the ability and cancels the close, so the window
+    # goes to the tray; the tray quit calls app.exit() to bypass that handler.
     close_handler = [
       "    super.onWindowStageCreate(windowStage);",
       "    try {",
@@ -127,28 +119,23 @@ class MagpieApp < Formula
     inreplace shell/"web_engine/src/main/ets/ability/WebAbility.ets",
               "    super.onWindowStageCreate(windowStage);\n", close_handler
 
-    # HAP shell build. CI runs in the private electron-ohos-ci image (the
-    # generic Electron-on-OHOS build image, selected via the
-    # OHOS_CI_IMAGE_OVERRIDES repo variable), which bakes the HarmonyOS
-    # command-line toolchain at /opt/electron-ohos-clt — repacked from a
-    # licensed system CLT install, not publicly redistributable. The shell
-    # compiles no C++, so the NDK-less SDK subset the image carries suffices.
+    # The shell builds in the private electron-ohos-ci image
+    # (OHOS_CI_IMAGE_OVERRIDES) with the proprietary CLT at
+    # /opt/electron-ohos-clt; it compiles no C++, so the NDK-less SDK suffices.
     clt = Pathname.new("/opt/electron-ohos-clt")
     unless (clt/"hvigor/bin/hvigorw.js").exist?
       odie "magpie-app builds only in electron-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES['magpie-app']"
     end
 
-    # brew's sanitized build env drops the container's LD_LIBRARY_PATH, but
-    # ohos_packing_tool needs the SDK clang runtimes and the libhilog
-    # stderr adapter baked into the image.
+    # brew's sanitized env drops LD_LIBRARY_PATH; restore it for
+    # ohos_packing_tool.
     ENV["DEVECO_SDK_HOME"] = (clt/"sdk").to_s
     ENV["HOS_SDK_HOME"] = (clt/"sdk").to_s
     ENV["LD_LIBRARY_PATH"] =
       "#{clt}/lib:#{clt}/sdk/default/openharmony/native/llvm/lib/clang/15.0.4/lib/aarch64-linux-ohos"
     ENV.delete("NODE_OPTIONS")
-    # A container inheriting RLIMIT_NOFILE near 1e9 drives the musl FD-table
-    # sizing into a refused mapping; cap it for the hvigor process tree
-    # (only ever lowering — never raise an environment's existing limit).
+    # Cap RLIMIT_NOFILE for the hvigor tree: near-1e9 limits break the musl FD
+    # table. Only ever lower it.
     soft_cap, hard_cap = Process.getrlimit(Process::RLIMIT_NOFILE)
     if hard_cap > 65_536
       Process.setrlimit(Process::RLIMIT_NOFILE, [soft_cap, 65_536].min, 65_536)
@@ -166,8 +153,7 @@ class MagpieApp < Formula
     hap_module = Utils.safe_popen_read("unzip", "-p", libexec/"magpie-desktop-unsigned.hap", "module.json")
     module_json = JSON.parse(hap_module)
     requested = module_json.fetch("module").fetch("requestPermissions")
-    # READ_PASTEBOARD makes paste work in the shell; without it pasting into the
-    # window does nothing.
+    # READ_PASTEBOARD is required for pasting into the shell.
     %w[ohos.permission.CUSTOM_SANDBOX ohos.permission.READ_WRITE_USER_FILE
        ohos.permission.READ_PASTEBOARD
        ohos.permission.kernel.ALLOW_WRITABLE_CODE_MEMORY
@@ -178,9 +164,8 @@ class MagpieApp < Formula
 
     cp res/"scripts/magpie-app.sh", libexec/"magpie-app.sh"
     chmod 0755, libexec/"magpie-app.sh"
-    # `magpie-app install` runs this script, which sources the install flow
-    # shared by the HAP apps from the same directory. cp, not install: the tap
-    # checkout is a read-only host mount inside the CI container.
+    # Sources the shared install flow; cp, not install: the tap checkout is
+    # read-only in the CI container.
     cp res/"scripts/install-desktop.sh", pkgshare/"install-desktop.sh"
     chmod 0755, pkgshare/"install-desktop.sh"
     cp tap_root/"Resources/_shared/hap-app/install-lib.sh", pkgshare/"hap-app-install-lib.sh"
@@ -202,19 +187,15 @@ class MagpieApp < Formula
 
   def caveats
     <<~EOS
-      `brew install` runs `magpie-app install` automatically once the device is
-      connected and the Huawei Developer login is done; otherwise it is queued:
-      `hap-app install-pending` finishes it. To install by hand, run
-      `magpie-app install` to sign and install the desktop HAP locally.
-      By default it starts the installed Magpie CLI and shares that CLI's
-      settings. The web interface listens on loopback and requires a fresh key
-      for each launch. Installing this variant needs a developer debug profile.
-      The profile grants READ_PASTEBOARD, without which pasting into the window
-      does not work.
+      `brew install`/`brew upgrade` installs the HAP automatically once the
+      device and the Huawei Developer login are ready; otherwise it is queued:
+      `hap-app status` shows why, `hap-app install-pending` finishes it.
+      Manual: `magpie-app install`. Details: docs/hap-app-formulae.md.
 
-      If the ACL profile is unavailable, run `magpie-app install --no-acl`
-      and start `magpie web --addr 127.0.0.1:3430 --no-open` separately.
-      Enter the key printed by Magpie in the desktop window.
+      Starts the installed Magpie CLI and shares its settings; the web UI listens on
+      loopback with a per-launch key. Needs a debug profile for READ_PASTEBOARD
+      (paste). Without ACLs: `magpie-app install --no-acl`, then run
+      `magpie web --addr 127.0.0.1:3430 --no-open` yourself.
     EOS
   end
 
@@ -262,15 +243,14 @@ class MagpieApp < Formula
                  permissions.sort
 
     system bin/"magpie-app", "install", "--no-acl"
-    # The strong-sandbox HAP carries the same settings as the ACL one (it used to
-    # keep the placeholder); only the permissions differ.
+    # The strong-sandbox HAP has the same settings as the ACL one; only the
+    # permissions differ.
     assert_equal config, JSON.parse(shell_output("unzip -p #{staged} #{entry}/config.json"))
     plain = JSON.parse(shell_output("unzip -p #{staged} module.json"))
     permissions = plain.fetch("module").fetch("requestPermissions").map { |permission| permission.fetch("name") }
     assert_equal %w[ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET], permissions.sort
 
-    # --keep leaves the signed HAP next to the other temporary files and the
-    # result line names the variant that was installed.
+    # --keep leaves the signed HAP in the temporary directory.
     kept_output = shell_output("#{bin}/magpie-app install --keep 2>&1")
     assert_match "installed (com.social4hyq.magpiedesktop, ACL)", kept_output
     assert_match "signed HAP kept", kept_output

@@ -9,8 +9,9 @@ class CodexApp < Formula
   revision 2
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codex-app-v26.1117.31558-r3"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "aaadd79f4d529a35960ec0d8f4821f9c26f4924e92ae60e625b17e8ef817137f"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codex-app-v26.1117.31558-r4"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f2dc1b30b222222a4a4f3c86783afd9151d6b20aa47ad7728167e0aeeb4fee8b"
   end
 
   depends_on "binutils" => :build
@@ -27,15 +28,14 @@ class CodexApp < Formula
     sha256 "5268fe3c994ec2ce48a999fd6b5029d9cb0e409b07c0395e2a6072e50cb3e1ac"
   end
 
-  # OHOS build of node-pty for the in-app terminal; the Electron-side shim runs it
-  # in a host Node helper because the official linux/glibc addon cannot load here.
+  # OHOS node-pty build; the Electron shim runs it in a host Node helper (the
+  # official linux/glibc addon cannot load here).
   resource "node-pty" do
     url "https://registry.npmjs.org/@ohos-ports/node-pty/-/node-pty-1.1.0-beta.4.tgz"
     sha256 "c032f4d4e3a95b99eef4c586928ccff62f35da6d1d716ea5ede00357563c9883"
   end
 
-  # The shell staging files and official ChatGPT icon are listed literally so
-  # the tap's resource audit retains every file used by the formula.
+  # List every path literally: the resource audit retains only named files.
   RESOURCE_FILES = %w[
     Resources/codex-app/assets/icon.png
     Resources/codex-app/app/chatgpt-bootstrap.cjs
@@ -79,8 +79,8 @@ class CodexApp < Formula
     project = buildpath/"chatgpt-ohos-shell"
     system "bash", res/"scripts/stage-ohos-shell.sh", shell, project, version.to_s
 
-    # Electron's HAP build tooling is proprietary and is provided by the
-    # dedicated electron-ohos-ci runner. Signing remains a local user action.
+    # Electron HAP tooling is proprietary and comes from the CI image; signing
+    # stays a local user action.
     clt = Pathname.new("/opt/electron-ohos-clt")
     unless (clt/"hvigor/bin/hvigorw.js").exist?
       odie "codex-app builds only in electron-ohos-ci; configure OHOS_CI_IMAGE_OVERRIDES"
@@ -164,25 +164,17 @@ class CodexApp < Formula
 
   def caveats
     <<~EOS
-      `brew install` runs `codex-app install` automatically once the device is
-      connected and the Huawei Developer login is done; otherwise it is queued:
-      `hap-app install-pending` finishes it. To install by hand, run
-      `codex-app install` to create a local debug signing profile, sign the HAP,
-      and install ChatGPT. A connected, unlocked OpenHarmony PC device is
-      required. The app starts the stable Homebrew `codex` CLI when
-      opened. Installation injects host paths into a private signed HAP copy
-      and requests ACL permissions for host project access. A Huawei Developer
-      login is required for the first ACL-capable signing. Use
-      `codex-app install --no-acl` to install a strong-sandbox variant; host
-      Codex features will not work in that variant.
+      `brew install`/`brew upgrade` installs the HAP automatically once the
+      device and the Huawei Developer login are ready; otherwise it is queued:
+      `hap-app status` shows why, `hap-app install-pending` finishes it.
+      Manual: `codex-app install`. Details: docs/hap-app-formulae.md.
 
-      The installer also prepares two host settings for the app: it sets
-      `[desktop] projectlessWorkspaceRoot` in `$CODEX_HOME/config.toml` (the
-      app cannot create folders under ~/Documents; the original file is kept
-      as `config.toml.pre-owl`), and, when the file does not exist yet, writes
-      the proxy variables of the current shell to `~/.config/codex-app/env.json`
-      for the Codex CLI, the cloud connection and the in-app terminal. An
-      existing `env.json` is never overwritten; edit it when the proxy changes.
+      The app starts the Homebrew `codex` CLI; install injects host paths into a
+      private signed HAP (ACLs are needed to reach host projects). `--no-acl` gives a
+      strong-sandbox variant without host Codex features. Install keeps
+      `[desktop] projectlessWorkspaceRoot` in `$CODEX_HOME/config.toml` (original
+      saved as `config.toml.pre-owl`) and, when missing, writes the shell's proxy
+      variables to `~/.config/codex-app/env.json` (never overwritten).
     EOS
   end
 
@@ -245,8 +237,7 @@ class CodexApp < Formula
                  Digest::SHA256.file(icon).hexdigest
     system "unzip", "-tq", hap
 
-    # Exercise host-config injection and both signing profiles without a
-    # device or real signing credentials.
+    # Exercise host-config injection and both signing profiles without a device.
     fixture_dir = testpath/"install-fixture"
     fixture_dir.mkpath
     fixture_manifest = { "app"    => { "bundleName" => "com.social4hyq.chatgpt" },

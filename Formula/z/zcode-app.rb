@@ -1,14 +1,13 @@
 class ZcodeApp < Formula
   desc "Desktop shell for the ZCode agent (Electron window on a local zcode --web)"
   homepage "https://zcode.z.ai"
-  # Same upstream pin as `zcode`: the shell only provides the window, the web
-  # workbench comes from the installed CLI, so both formulae are versioned
-  # against the same upstream snapshot.
+  # Same upstream pin as `zcode`: the shell only provides the window, the
+  # workbench comes from the installed CLI.
   url "https://github.com/zai-org/ZCode.git",
       revision: "fec975905a2abd4c07e35c40d51fa097a2258ec9"
   version "3.18.2"
-  # Tap-authored shell scripts (MIT) packaging the CPF-Electron runtime
-  # (Chromium/Electron, mixed MIT/BSD/LGPL).
+  # Tap-authored shell scripts (MIT) on the CPF-Electron runtime (mixed
+  # MIT/BSD/LGPL).
   license :cannot_represent
   revision 21
 
@@ -20,8 +19,9 @@ class ZcodeApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-app-v3.18.2-r22"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "86d250a72c631c2c7eb94124a9ba62cf3aee7ccdf57d0e428b0bb0b203da5d88"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-app-v3.18.2-r23"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1836d791603f4a0475407535ad5b45ee35066dd076aefd77ca9a7f8dacbb90b8"
   end
 
   depends_on "app-installer"
@@ -33,10 +33,8 @@ class ZcodeApp < Formula
   depends_on "zcode"
   depends_on "zip"
 
-  # Shell sources live in the tap so they are reviewable in the PR and no
-  # opaque release payload is involved. Every path is listed literally: the
-  # weekly remove-unused-patches job keeps a Resources/ directory only while a
-  # formula names it.
+  # List every path literally: the unused-resource audit keeps a Resources/
+  # directory only while a formula names it.
   RESOURCE_FILES = %w[
     Resources/_shared/electron-shell/tray.cjs
     Resources/_shared/hap-app/install-lib.sh
@@ -76,9 +74,8 @@ class ZcodeApp < Formula
       cp res/"app"/name, app/name
     end
     cp tap_root/"Resources/_shared/electron-shell/tray.cjs", app/"tray.cjs"
-    # waiting.html is rendered from the page template shared by the HAP apps and
-    # this app's strings. The result is byte for byte the page that used to be
-    # kept here; Resources/_shared/waiting-page/expected.sha256 pins it.
+    # waiting.html is generated from the shared page template;
+    # Resources/_shared/waiting-page/expected.sha256 pins the output.
     system "node", tap_root/"Resources/_shared/waiting-page/render-waiting.cjs",
            tap_root/"Resources/_shared/waiting-page/waiting.html.in",
            res/"app/waiting.json", app/"waiting.html"
@@ -92,9 +89,8 @@ class ZcodeApp < Formula
     %w[app_icon.png startIcon.png].each do |name|
       cp res/"assets/icon.png", shell/"AppScope/resources/base/media"/name
     end
-    # App name and ability labels live in per-locale string resources: patching
-    # only the base file leaves the zh_CN/en_US overrides intact and the
-    # launcher keeps showing the template's "Electron" label.
+    # Patch app name/labels in every locale: the base file alone leaves the
+    # zh_CN/en_US overrides showing "Electron".
     (shell.glob("AppScope/resources/*/element/string.json") +
      shell.glob("electron/src/main/resources/*/element/string.json")).each do |file|
       strings = JSON.parse(file.read)
@@ -107,8 +103,8 @@ class ZcodeApp < Formula
       file.write JSON.pretty_generate(strings) + "\n"
     end
 
-    # Remove template signing settings and select the SDK supported by the
-    # shared HAP build toolchain. This profile is strict JSON.
+    # Remove template signing settings and select the shared toolchain's SDK;
+    # this profile is strict JSON.
     profile = JSON.parse((shell/"build-profile.json5").read)
     profile.fetch("app").fetch("products").each do |product|
       product.delete("signingConfig")
@@ -121,9 +117,8 @@ class ZcodeApp < Formula
     inreplace shell/"electron/src/main/module.json5", '"mainElement": "EntryAbility",',
               '"mainElement": "EntryAbility", "extractNativeLibs": true,'
 
-    # The shell only talks to the host service over loopback. Restricted
-    # permissions (JIT, pasteboard) are added to the install-time ACL variant
-    # instead of every install; see module-acl.json below.
+    # The shell only talks to the host service over loopback; restricted
+    # permissions go into the ACL variant (module-acl.json).
     inreplace shell/"web_engine/src/main/module.json5", /"requestPermissions": \[.*?\r?\n    \],/m,
               <<~JSON5.chomp
                 "requestPermissions": [
@@ -132,12 +127,8 @@ class ZcodeApp < Formula
                     ],
               JSON5
 
-    # The caption close button never reaches Electron's BrowserWindow close
-    # event: electron-ohos tears down the window UIAbility first and the shell
-    # exits with it. Register a windowStageClose handler that hides the ability
-    # and cancels the close, so closing the window only sends it to the tray.
-    # The tray's quit item calls app.exit() because a normal quit would be
-    # cancelled here.
+    # windowStageClose hides the ability and cancels the close so the window
+    # goes to the tray; the tray quit calls app.exit() to bypass that handler.
     close_handler = [
       "    super.onWindowStageCreate(windowStage);",
       "    try {",
@@ -157,28 +148,23 @@ class ZcodeApp < Formula
     inreplace shell/"web_engine/src/main/ets/ability/WebAbility.ets",
               "    super.onWindowStageCreate(windowStage);\n", close_handler
 
-    # HAP shell build. CI runs in the private electron-ohos-ci image (the
-    # generic Electron-on-OHOS build image, selected via the
-    # OHOS_CI_IMAGE_OVERRIDES repo variable), which bakes the HarmonyOS
-    # command-line toolchain at /opt/electron-ohos-clt — repacked from a
-    # licensed system CLT install, not publicly redistributable. The shell
-    # compiles no C++, so the NDK-less SDK subset the image carries suffices.
+    # The shell builds in the private electron-ohos-ci image
+    # (OHOS_CI_IMAGE_OVERRIDES) with the proprietary CLT at
+    # /opt/electron-ohos-clt; it compiles no C++, so the NDK-less SDK suffices.
     clt = Pathname.new("/opt/electron-ohos-clt")
     unless (clt/"hvigor/bin/hvigorw.js").exist?
       odie "zcode-app builds only in electron-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES['zcode-app']"
     end
 
-    # brew's sanitized build env drops the container's LD_LIBRARY_PATH, but
-    # ohos_packing_tool needs the SDK clang runtimes and the libhilog stderr
-    # adapter baked into the image.
+    # brew's sanitized env drops LD_LIBRARY_PATH; restore it for
+    # ohos_packing_tool.
     ENV["DEVECO_SDK_HOME"] = (clt/"sdk").to_s
     ENV["HOS_SDK_HOME"] = (clt/"sdk").to_s
     ENV["LD_LIBRARY_PATH"] =
       "#{clt}/lib:#{clt}/sdk/default/openharmony/native/llvm/lib/clang/15.0.4/lib/aarch64-linux-ohos"
     ENV.delete("NODE_OPTIONS")
-    # A container inheriting RLIMIT_NOFILE near 1e9 drives the musl FD-table
-    # sizing into a refused mapping; cap it for the hvigor process tree
-    # (only ever lowering — never raise an environment's existing limit).
+    # Cap RLIMIT_NOFILE for the hvigor tree: near-1e9 limits break the musl FD
+    # table. Only ever lower it.
     soft_cap, hard_cap = Process.getrlimit(Process::RLIMIT_NOFILE)
     if hard_cap > 65_536
       Process.setrlimit(Process::RLIMIT_NOFILE, [soft_cap, 65_536].min, 65_536)
@@ -193,12 +179,9 @@ class ZcodeApp < Formula
     libexec.install shell/"electron/build/default/outputs/default/electron-default-unsigned.hap" =>
                     "zcode-desktop-unsigned.hap"
 
-    # The default install swaps in this module.json: CUSTOM_SANDBOX and
-    # READ_WRITE_USER_FILE let the shell run the host zcode-app to start the
-    # service on launch, the two kernel ACLs keep the renderer out of --jitless
-    # (WebAssembly, so document previews and the diff worker work) and
-    # READ_PASTEBOARD makes paste work. Everything else stays out of the HAP so
-    # a local debug profile can grant it.
+    # ACL variant: CUSTOM_SANDBOX and READ_WRITE_USER_FILE let the shell run the
+    # host zcode-app on launch; the kernel ACLs keep WebAssembly (previews, diff
+    # worker) and READ_PASTEBOARD makes paste work.
     hap_module = Utils.safe_popen_read("unzip", "-p", libexec/"zcode-desktop-unsigned.hap", "module.json")
     module_json = JSON.parse(hap_module)
     requested = module_json.fetch("module").fetch("requestPermissions")
@@ -208,10 +191,8 @@ class ZcodeApp < Formula
        ohos.permission.READ_PASTEBOARD].each do |name|
       requested << { "name" => name } unless requested.any? { |permission| permission["name"] == name }
     end
-    # Register zcode://<host>/callback so the browser's OAuth handoff opens the
-    # shell instead of OHOS's "no application can open this" dialog. The web
-    # client finishes the login through the server poll; the handoff only has
-    # to reach the app.
+    # Register zcode://<host>/callback so the browser OAuth handoff opens the
+    # shell; the web client finishes the login through the server poll.
     entry = module_json.fetch("module").fetch("abilities").find { |ability| ability["name"] == "EntryAbility" }
     skills = entry["skills"] ||= []
     unless skills.any? { |skill| Array(skill["uris"]).any? { |uri| uri["scheme"] == "zcode" } }
@@ -223,12 +204,11 @@ class ZcodeApp < Formula
     (pkgshare/"module-acl.json").write JSON.generate(module_json)
 
     # cp, not install: Pathname#install moves the source, and the tap checkout
-    # is a read-only host mount inside the CI container.
+    # is read-only in the CI container.
     pkgshare.mkpath
     cp res/"scripts/install-desktop.sh", pkgshare/"install-desktop.sh"
     chmod 0755, pkgshare/"install-desktop.sh"
-    # install-desktop.sh sources the install flow shared by the HAP apps from
-    # the same directory.
+    # install-desktop.sh sources the shared install flow.
     cp tap_root/"Resources/_shared/hap-app/install-lib.sh", pkgshare/"hap-app-install-lib.sh"
     chmod 0755, pkgshare/"hap-app-install-lib.sh"
     cp res/"scripts/zcode-desktop.sh", libexec/"zcode-desktop.sh"
@@ -254,66 +234,23 @@ class ZcodeApp < Formula
 
   def caveats
     <<~EOS
-      The desktop HAP is unsigned in the bottle. `brew install` runs
-      `zcode-app install` automatically once the device is connected and the
-      Huawei Developer login is done; otherwise it is queued: `hap-app
-      install-pending` finishes it. To install by hand, run:
+      `brew install`/`brew upgrade` installs the HAP automatically once the
+      device and the Huawei Developer login are ready; otherwise it is queued:
+      `hap-app status` shows why, `hap-app install-pending` finishes it.
+      Manual: `zcode-app install`. Details: docs/hap-app-formulae.md.
 
-        zcode-app install
+      Install does not start `zcode --web`; the shell starts its own copy on launch
+      (weak-sandbox ACLs from the local debug profile). A service you start yourself
+      outlives the app:
 
-      app-installer generates a local debug profile (the first run asks for a
-      Huawei Developer login), signs the HAP and installs it.
+        zcode-app serve | status | stop
 
-      `zcode-app install` does not start the backing `zcode --web` instance.
-      When the app icon is opened and the service is not running, the shell
-      starts it itself by running `zcode-app serve`, and `zcode-app start`
-      does the same before it opens the app. This needs the weak-sandbox permissions CUSTOM_SANDBOX and
-      READ_WRITE_USER_FILE, which are granted through a debug profile generated
-      on the spot (no approval wait; the release path still goes through AGC
-      review). The service the shell starts belongs to the app: it runs as the
-      app's user and goes away when the app exits (tray menu: Quit), so the next
-      launch starts it again. A service you start yourself with
-      `zcode-app serve` belongs to your terminal user and keeps running after the
-      app exits; only that one can be stopped with `zcode-app stop`. To stop a
-      service the shell started, quit the app. To manage it by hand:
-
-        zcode-app serve
-        zcode-app status
-        zcode-app stop
-
-      The service state (config.json, web.pid, web.log and the patched server
-      copy) lives in ~/.config/zcode-desktop, so the shell and the terminal see
-      the same files, port and process. Older versions kept it under
-      $XDG_CONFIG_HOME, which is a different directory inside the shell's app
-      sandbox; the first `zcode-app` command moves it over.
-
-      `serve` also creates ~/.zcode/v2/credential-secret and exports
-      ZCODE_CREDENTIAL_SECRET_FILE. ZCode 3.18.2 refuses to start without a
-      credential secret and HarmonyOS has no Secret Service, so the file is
-      required even when no Z.ai account is used.
-
-      Project routing: 3.18.2's `zcode --web` advertises itself as a remote
-      source server, so the browser workbench's "this computer" projects are
-      routed to a remote host and creating one fails with project.host-offline.
-      `serve` therefore runs the bundled server from a per-version copy with
-      projectStorageHostId pinned to "local". If that copy cannot be prepared it
-      falls back to `zcode --web` and logs the warning.
-
-      Account login: the workbench served on loopback signs in through the
-      server-side OAuth flow (patched zcode): the login dialog's "browser
-      authorization" button opens the authorize URL in the system browser and
-      the server polls for the token. `zcode-app login [zai|bigmodel]` runs
-      the same flow from the terminal and restarts the managed server. The HAP
-      registers the zcode:// scheme so a browser handoff launches the shell
-      instead of OHOS's "no application can open this" dialog.
-
-      The default install carries the two kernel ACLs (JIT/WebAssembly for the
-      renderer) and READ_PASTEBOARD; `zcode-app install --no-acl` installs
-      the strong-sandbox variant instead (no JIT, no paste, and the shell cannot
-      start the service: run `zcode-app serve` yourself). 坚盾守护模式
-      disables JIT regardless of the ACLs. The workbench's embedded terminal is
-      unavailable because node-pty cannot spawn child processes under bun on
-      HarmonyOS.
+      State is shared in `~/.config/zcode-desktop`. `zcode-app login
+      [zai|bigmodel]` runs the browser OAuth flow. `--no-acl` gives the
+      strong-sandbox variant (no JIT/paste, cannot start the service). 坚盾守护模式
+      disables JIT. The embedded terminal is unavailable (node-pty cannot spawn under
+      bun on HarmonyOS). `serve` pins projectStorageHostId to "local" so 3.18.2's
+      remote routing does not break "this computer" projects.
     EOS
   end
 
@@ -323,9 +260,8 @@ class ZcodeApp < Formula
     ENV.delete("XDG_CONFIG_HOME")
     assert_match "Usage: zcode-app", shell_output("#{bin}/zcode-app --help")
 
-    # A minimal stand-in for the shell HAP: the installer only rewrites
-    # config.json (and swaps module.json for the ACL variant), so the 200 MB
-    # artifact does not need to be copied around in the test.
+    # Minimal stand-in HAP: the installer only rewrites config.json and swaps
+    # module.json.
     fake_hap = testpath/"shell.hap"
     hap_tree = testpath/"hap-tree"
     (hap_tree/"resources/resfile/resources/app").mkpath
@@ -385,8 +321,7 @@ class ZcodeApp < Formula
     )
     assert_equal host_config.fetch("port"), injected_config.fetch("port")
     assert_equal Dir.home, injected_config.fetch("workspace")
-    # The shell starts the service by running the host zcode-app with this
-    # environment.
+    # The shell starts the service by running the host zcode-app with this env.
     assert_equal (opt_bin/"zcode-app").to_s, injected_config.fetch("launcher")
     assert_equal Dir.home, injected_config.dig("host", "home")
     assert_includes injected_config.dig("host", "path"), fake_bin.to_s
@@ -414,8 +349,7 @@ class ZcodeApp < Formula
     strong_permissions = strong_requests.map { |permission| permission.fetch("name") }
     assert_equal %w[ohos.permission.INTERNET], strong_permissions
 
-    # --keep is passed through to the install script, which copies the signed
-    # HAP out and says where.
+    # --keep is passed through; the install script copies the signed HAP out.
     keep_tmp = testpath/"keep-tmp"
     keep_tmp.mkpath
     ENV["TMPDIR"] = keep_tmp.to_s
@@ -451,8 +385,8 @@ class ZcodeApp < Formula
     assert_match "no managed server running", shell_output("#{bin}/zcode-app stop")
     assert_match "not healthy", shell_output("#{bin}/zcode-app status 2>&1", 1)
 
-    # The state lives under $HOME. What an older version kept under
-    # XDG_CONFIG_HOME is moved over by the first command, once.
+    # State lives under $HOME; what an older version kept under
+    # XDG_CONFIG_HOME is moved once.
     legacy = testpath/"xdg/zcode-desktop"
     legacy.mkpath
     (legacy/"config.json").write JSON.generate("port" => 14_777, "workspace" => "/legacy")

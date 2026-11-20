@@ -7,8 +7,9 @@ class SnowShotApp < Formula
   revision 22
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-app-v1.5.7-r10"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c9481382d7c86d6086414faa2d43b7316fbb6eb32cdc6d4297ccabc335db0f3d"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-app-v1.5.7-r11"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5183ba74267a82d8701463db80d90680a3771500d990e108c27ff6477f8954ed"
   end
 
   depends_on "brotli" => :build
@@ -96,10 +97,8 @@ class SnowShotApp < Formula
     sha256 "d3a20e0c1b2758c4545b0a97490afa2986e39c8b4387c3dba2007def742cbeb0"
   end
 
-  # The Qt SDK ships a QtNetwork configured with -no-openssl, so QSslSocket does
-  # not exist at all and every https request fails. Rebuild the same qtbase
-  # snapshot with the runtime OpenSSL backend and ship the replacement library
-  # together with its TLS plugin.
+  # The SDK QtNetwork is built with -no-openssl (no QSslSocket): rebuild that
+  # qtbase snapshot with the OpenSSL backend and ship it with its TLS plugin.
   resource "qtbase" do
     url "https://github.com/qt/qtbase/archive/45a213e8d07f3823148ee59481e2fe3d7f4ef2df.tar.gz"
     sha256 "b2c167f8f32e5b0ae5347ff368ad2a39edf45a7d72162ac6baf4a4554d3afad3"
@@ -118,9 +117,7 @@ class SnowShotApp < Formula
     end
   end
 
-  # Tap-authored HAP template, staging scripts and launcher. They are not
-  # patches, so they live in Resources/ rather than Patches/. Every path is
-  # listed literally: the weekly remove-unused-patches job keeps a Resources/
+  # List every path literally: the unused-resource audit keeps a Resources/
   # directory only while a formula names it.
   RESOURCE_FILES = %w[
     Resources/snow-shot-app/ohos-template/AppScope/resources/base/media/app_icon.png
@@ -224,10 +221,8 @@ class SnowShotApp < Formula
       end
     end
 
-    # Rebuild QtNetwork with OpenSSL before the application build and keep only
-    # its two payload files; the application itself keeps linking against the
-    # SSL-less SDK copy. Building it first also frees the Qt build tree before
-    # the much larger application build needs the disk.
+    # Rebuild QtNetwork with OpenSSL first and keep only its two payload files;
+    # this also frees the Qt build tree before the larger application build.
     qt_tls = build_qt_tls(qt, ohos_sdk)
 
     zlib_ng = formula_opt_prefix("zlib-ng-compat")
@@ -521,11 +516,8 @@ class SnowShotApp < Formula
         "extra-libs-dirs": #{JSON.generate(runtime_lib_dirs)}
       }
     JSON
-    # Let harmonydeployqt write to the build log directly. Redirecting it to a
-    # file and reading that file back on failure hid the real error: the
-    # redirect target was never created, so the failure path raised ENOENT.
-    # Formula#system returns nil on success and raises BuildError on failure,
-    # so do not test its return value.
+    # Let harmonydeployqt write to the build log directly: redirecting it hid
+    # failures, and Formula#system raises instead of returning a status.
     system qt_sdk/"bin/harmonydeployqt", "--input", buildpath/"hd.json",
            "--output", stage, "--no-build", "--verbose"
 
@@ -535,10 +527,8 @@ class SnowShotApp < Formula
            "--template", res/"ohos-template", "--stage", stage
     cp res/"ohos-template/entry/src/main/ets/qability/QAbility.ets",
        stage/"entry/src/main/ets/qability/QAbility.ets"
-    # The Qt HAP template has no statusBarView extension, and the Qt OHOS tray
-    # plugin registers its icon through @kit.StatusBarExtensionKit, which needs
-    # one. Ship a minimal extension plus the page the quick panel loads, and
-    # declare both in the generated project.
+    # Add the minimal statusBarView extension and quick-panel page the Qt tray
+    # plugin needs, and declare both in the generated project.
     mkdir_p stage/"entry/src/main/ets/statusbar"
     %w[StatusBarAbility.ets StatusBarPage.ets].each do |name|
       cp res/"ohos-template/entry/src/main/ets/statusbar"/name,
@@ -610,12 +600,13 @@ class SnowShotApp < Formula
 
   def caveats
     <<~EOS
-      The HAP is unsigned in the bottle. `brew install` runs `snow-shot-app install`
-      automatically once the device is connected and the Huawei Developer login
-      is done; otherwise it is queued: `hap-app install-pending` finishes it.
-      To install by hand, run `snow-shot-app install`: app-installer handles
-      Huawei Developer login, local
-      debug profile generation, signing, installation, and launch.
+      `brew install`/`brew upgrade` installs the HAP automatically once the
+      device and the Huawei Developer login are ready; otherwise it is queued:
+      `hap-app status` shows why, `hap-app install-pending` finishes it.
+      Manual: `snow-shot-app install`. Details: docs/hap-app-formulae.md.
+
+      The HAP is unsigned in the bottle; install signs it with a local debug profile
+      (Huawei Developer login on first run).
     EOS
   end
 

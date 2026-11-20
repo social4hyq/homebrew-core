@@ -3,19 +3,14 @@ class ObsidianApp < Formula
   homepage "https://obsidian.md"
   url "https://github.com/obsidianmd/obsidian-releases/releases/download/v1.15.1/obsidian-1.15.1.asar.gz"
   sha256 "3f6808c14204063349d5a7a59b9f2f637958063fa85eeebe767e13e06d314c0f"
-  # The stable url is the vendor app package, so `version`, `brew bump-formula-pr`
-  # and autobump all follow Obsidian itself. The tap-authored host payload lives
-  # under Resources/obsidian-app and stays version-independent. Obsidian is
-  # proprietary and is never redistributed here: the asar is fetched from
-  # Obsidian's own release at install time (never copied into the bottle); see
-  # obsidian.md terms and multica.rb.
+  # The url is the vendor package, so version and autobump follow Obsidian; the
+  # host payload in Resources/obsidian-app is version-independent. The asar is
+  # fetched at install time and never put in the bottle.
   license :cannot_represent
   revision 8
 
-  # Upstream is the vendor app, not the tap-authored host payload: the formula
-  # version tracks Obsidian so `brew upgrade` follows new releases, while the
-  # payload stays version-independent. desktop-releases.json carries the latest
-  # desktop version together with the asar URL and its sha256.
+  # desktop-releases.json carries the latest desktop version, asar URL and
+  # sha256.
   livecheck do
     url "https://raw.githubusercontent.com/obsidianmd/obsidian-releases/master/desktop-releases.json"
     strategy :json do |json|
@@ -24,8 +19,9 @@ class ObsidianApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/obsidian-app-v1.15.1-r7"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "471a5db3f968d2e5f7f55dbfb2d81b615b2fcb7921d861f52641a1816ba2f9f8"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/obsidian-app-v1.15.1-r8"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ab4c72dbefd24c988038e0e90044674c998aa9ec7ac692bdf7bd0a238e25f29d"
   end
 
   depends_on "app-installer"
@@ -35,9 +31,8 @@ class ObsidianApp < Formula
   depends_on "unzip"
   depends_on "zip"
 
-  # The payload is copied from the tap's read-only checkout during CI. Keep all
-  # source files literal here: the weekly remove-unused-patches job keeps a
-  # Resources/ directory only while a formula names it.
+  # List every path literally: the unused-resource audit keeps a Resources/
+  # directory only while a formula names it.
   RESOURCE_FILES = %w[
     Resources/_shared/hap-app/install-lib.sh
     Resources/obsidian-app/app/bootstrap.cjs
@@ -95,9 +90,8 @@ class ObsidianApp < Formula
     system "tar", "-xzf", buildpath/"libelectron_144.tar.gz", "-C", buildpath
     shell = buildpath/"libelectron/ohos_hap"
 
-    # Host payload only: bootstrap + @electron/remote. The vendor app package
-    # (obsidian.asar) is injected by `obsidian-app install`, so this HAP
-    # stays free of closed-source bytes.
+    # Host payload only (bootstrap + @electron/remote); the vendor asar is
+    # injected at install time.
     app = shell/"web_engine/src/main/resources/resfile/resources/app"
     rm_r app if app.exist?
     app.mkpath
@@ -108,9 +102,8 @@ class ObsidianApp < Formula
     inreplace shell/"AppScope/app.json5", '"bundleName": "com.huawei.ohos_electron"',
                                           '"bundleName": "com.social4hyq.obsidiandesktop"'
     inreplace shell/"AppScope/app.json5", '"vendor": "example"', '"vendor": "social4hyq"'
-    # App name and ability labels live in per-locale string resources: patching
-    # only the base file leaves the zh_CN/en_US overrides intact and the
-    # launcher keeps showing the template's "Electron" label.
+    # Patch app name/labels in every locale: the base file alone leaves the
+    # zh_CN/en_US overrides showing "Electron".
     (shell.glob("AppScope/resources/*/element/string.json") +
      shell.glob("electron/src/main/resources/*/element/string.json")).each do |file|
       strings = JSON.parse(file.read)
@@ -123,16 +116,14 @@ class ObsidianApp < Formula
       file.write JSON.pretty_generate(strings) + "\n"
     end
 
-    # Icons: the template ships the Electron logo and the copied working project
-    # still had the OpenCode icon, so brand from the vendor package's own icon
-    # (assets/ comes from the official tarball's resources/icon.png).
+    # Brand from the vendor icon (assets/ from the official tarball); the
+    # template ships the Electron/OpenCode icons.
     %w[app_icon.png startIcon.png].each do |name|
       cp res/"assets/icon.png", shell/"AppScope/resources/base/media"/name
     end
     cp res/"assets/icon32.png", shell/"AppScope/resources/base/media/product_logo_32.png"
 
-    # The Electron template ships CRLF in files patched below; normalize them so
-    # exact replacements and the deep-link insertion work across release builds.
+    # Normalize CRLF so exact replacements and the deep-link insertion match.
     [
       shell/"build-profile.json5",
       shell/"electron/src/main/module.json5",
@@ -143,9 +134,8 @@ class ObsidianApp < Formula
       file.atomic_write(text.gsub("\r\n", "\n")) if text.include?("\r\n")
     end
 
-    # CI's electron-ohos-ci CLT carries an NDK-less SDK subset (no llvm-strip);
-    # mirror the multica/opencode packaging deltas that keep hvigor away from
-    # the strip task and from signing material the container does not have.
+    # Mirror the packaging deltas for the CI image's NDK-less SDK subset
+    # (no llvm-strip).
     inreplace shell/"build-profile.json5", "        \"signingConfig\": \"default\",\n", ""
     inreplace shell/"electron/src/main/module.json5", "    \"mainElement\": \"EntryAbility\",\n",
               "    \"mainElement\": \"EntryAbility\",\n    \"extractNativeLibs\": true,\n"
@@ -211,9 +201,8 @@ class ObsidianApp < Formula
 
     entry_ability.atomic_write(entry_text)
 
-    # Restricted permissions cannot be granted with local auto-signing. The
-    # strong-sandbox shell only needs network access; vaults live in the app
-    # sandbox (Documents redirect) until an ACL variant exists.
+    # The strong-sandbox shell only needs network; vaults stay in the app
+    # sandbox.
     inreplace shell/"web_engine/src/main/module.json5", /"requestPermissions": \[.*?\n    \],/m,
               <<~JSON5.chomp
                 "requestPermissions": [
@@ -227,15 +216,15 @@ class ObsidianApp < Formula
       odie "obsidian-app builds only in electron-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES['obsidian-app']"
     end
 
-    # brew's sanitized build env drops the container's LD_LIBRARY_PATH, but
-    # ohos_packing_tool needs the SDK clang runtimes baked into the image.
+    # brew's sanitized env drops LD_LIBRARY_PATH; restore it for
+    # ohos_packing_tool.
     ENV["DEVECO_SDK_HOME"] = (clt/"sdk").to_s
     ENV["HOS_SDK_HOME"] = (clt/"sdk").to_s
     ENV["LD_LIBRARY_PATH"] =
       "#{clt}/lib:#{clt}/sdk/default/openharmony/native/llvm/lib/clang/15.0.4/lib/aarch64-linux-ohos"
     ENV.delete("NODE_OPTIONS")
-    # A container inheriting RLIMIT_NOFILE near 1e9 drives the musl FD-table
-    # sizing into a refused mapping; cap it for the hvigor process tree.
+    # Cap RLIMIT_NOFILE for the hvigor tree: near-1e9 limits break the musl FD
+    # table.
     soft_cap, hard_cap = Process.getrlimit(Process::RLIMIT_NOFILE)
     if hard_cap > 65_536
       Process.setrlimit(Process::RLIMIT_NOFILE, [soft_cap, 65_536].min, 65_536)
@@ -250,10 +239,8 @@ class ObsidianApp < Formula
     libexec.install shell/"electron/build/default/outputs/default/electron-default-unsigned.hap" =>
                     "obsidian-desktop-unsigned.hap"
 
-    # ACL variant of module.json: sandbox/file access, pasteboard reads and the
-    # two kernel JIT ACLs. `obsidian-app install` swaps it into the HAP copy
-    # and points the signing project at the same permissions, so hap-installer's
-    # locally generated debug profile carries them (no AGC profile needed).
+    # ACL variant: sandbox/file access, pasteboard and the two kernel JIT ACLs;
+    # install swaps it in and points signing at the same permissions.
     hap_module = Utils.safe_popen_read("unzip", "-p", libexec/"obsidian-desktop-unsigned.hap", "module.json")
     module_json = JSON.parse(hap_module)
     requested = module_json.fetch("module").fetch("requestPermissions")
@@ -269,8 +256,7 @@ class ObsidianApp < Formula
 
     cp res/"scripts/install-desktop.sh", pkgshare/"install-desktop.sh"
     chmod 0755, pkgshare/"install-desktop.sh"
-    # install-desktop.sh sources the install flow shared by the HAP apps from
-    # the same directory.
+    # install-desktop.sh sources the shared install flow.
     cp tap_root/"Resources/_shared/hap-app/install-lib.sh", pkgshare/"hap-app-install-lib.sh"
     chmod 0755, pkgshare/"hap-app-install-lib.sh"
     cp res/"scripts/obsidian-desktop.sh", libexec/"obsidian-desktop.sh"
@@ -297,42 +283,20 @@ class ObsidianApp < Formula
 
   def caveats
     <<~EOS
-      The desktop HAP is unsigned in the bottle and contains no Obsidian code.
-      `brew install` runs `obsidian-app install` automatically once the device
-      is connected and the Huawei Developer login is done; otherwise it is
-      queued: `hap-app install-pending` finishes it. To install by hand, run:
+      `brew install`/`brew upgrade` installs the HAP automatically once the
+      device and the Huawei Developer login are ready; otherwise it is queued:
+      `hap-app status` shows why, `hap-app install-pending` finishes it.
+      Manual: `obsidian-app install`. Details: docs/hap-app-formulae.md.
 
-        obsidian-app install
+      It downloads Obsidian #{version} from the official release, verifies the
+      sha256, injects it into the HAP and signs with a local debug profile;
+      `--asar PATH` uses a local copy (offline). Vaults default to
+      `~/Obsidian/Obsidian Vault`; paste and WebAssembly work. `--no-acl` gives the
+      strong-sandbox variant (vaults in the app sandbox, no paste/JIT).
 
-      It downloads Obsidian #{version} from Obsidian's official release,
-      checks the pinned sha256, injects the app package into the HAP, signs with
-      a locally generated debug profile, installs and starts it. Use
-      `obsidian-app install --asar PATH` to install from a local copy
-      instead (offline devices).
-
-      The HAP requests the weak-sandbox ACLs (CUSTOM_SANDBOX,
-      READ_WRITE_USER_FILE, READ_PASTEBOARD) and the two kernel JIT ACLs, and
-      `install` points the signing project at the same list. app-installer
-      generates the matching local debug profile, so vaults live in your home
-      directory (default ~/Obsidian/Obsidian Vault), image paste works, and the
-      renderer keeps WebAssembly. The first install asks for a Huawei Developer
-      login to create the profile. ACL profiles need a app-installer whose
-      toolchain ships the SDK permission definitions (tap app-installer r3+);
-      an older one silently generates a profile without ACLs and the device
-      rejects the install with 9568289. `--no-acl` installs the strong-sandbox
-      variant instead (vaults in the app sandbox, no paste, no JIT).
-
-      Command line interface: enable Settings -> General -> Command line
-      interface once, then use `obsidian-app cli <command>` (same commands
-      as Obsidian's own `obsidian` CLI: try `obsidian-app cli help`). The
-      app listens on a UNIX socket inside its sandbox; the host process bridges
-      it to loopback TCP with a token stored in
-      ~/.cache/obsidian-app/cli.json.
-
-      Desktop self-update is disabled; upgrading is `brew upgrade` plus
-      `obsidian-app install`. The formula version follows Obsidian's
-      releases, so `brew bump-formula-pr` / autobump handles a new version
-      without touching the host payload.
+      CLI: enable Settings -> General -> Command line interface, then
+      `obsidian-app cli <command>` (try `cli help`). Desktop self-update is disabled;
+      upgrade with `brew upgrade`.
     EOS
   end
 
@@ -363,8 +327,8 @@ class ObsidianApp < Formula
                     ohos.permission.kernel.DISABLE_CODE_MEMORY_PROTECTION].sort,
                  acl_permissions.sort
 
-    # `install` injects the vendor package before signing and hands the HAP to
-    # the (fake) hap-installer, which is where the ACL profile is generated.
+    # install injects the vendor package, signs, then hands the HAP to
+    # hap-installer.
     fake_bin = testpath/"bin"
     fake_bin.mkpath
     injected = testpath/"injected.hap"

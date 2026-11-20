@@ -12,8 +12,9 @@ class DeepseekHarnessApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/deepseek-harness-app-v0.2.2-rc.5-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5677576f5e90e3f9a0cb451a474372f90da1805f1e5b0866569d0d1d6cf00a20"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/deepseek-harness-app-v0.2.2-rc.5-r3"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d2fe1ac7a92a1cb33c7a69a968f56ee5317fb77162e2765996c7dd1170a4d44c"
   end
 
   depends_on "app-installer"
@@ -31,9 +32,8 @@ class DeepseekHarnessApp < Formula
     sha256 "5268fe3c994ec2ce48a999fd6b5029d9cb0e409b07c0395e2a6072e50cb3e1ac"
   end
 
-  # Shell sources live in the tap so they are reviewable in the PR. Every path
-  # is listed literally: the weekly remove-unused-patches job keeps a
-  # Resources/ directory only while a formula names it.
+  # List every path literally: the unused-resource audit keeps a Resources/
+  # directory only while a formula names it.
   RESOURCE_FILES = %w[
     Resources/_shared/hap-app/install-lib.sh
     Resources/_shared/waiting-page/render-waiting.cjs
@@ -77,9 +77,8 @@ class DeepseekHarnessApp < Formula
     cp res/"app/tray.cjs", app
     cp res/"app/package.json", app
     cp res/"app/config.json", app
-    # waiting.html is rendered from the page template shared by the HAP apps and
-    # this app's strings. The result is byte for byte the page that used to be
-    # kept here; Resources/_shared/waiting-page/expected.sha256 pins it.
+    # waiting.html is generated from the shared page template;
+    # Resources/_shared/waiting-page/expected.sha256 pins the output.
     system "node", tap_root/"Resources/_shared/waiting-page/render-waiting.cjs",
            tap_root/"Resources/_shared/waiting-page/waiting.html.in",
            res/"app/waiting.json", app/"waiting.html"
@@ -115,14 +114,9 @@ class DeepseekHarnessApp < Formula
                     ],
               JSON5
 
-    # The caption close button never reaches Electron's BrowserWindow close
-    # event, and this runtime cannot cancel the close either: the window
-    # UIAbility is torn down whatever windowStageClose returns. What keeps the
-    # shell (and the dsh web backend it may have started) alive is calling
-    # hideAbility() before that teardown -- the platform then recreates the
-    # shell as a hidden instance whose tray restores the window. Hiding after
-    # the teardown instead makes the app exit, so the call stays synchronous.
-    # The tray's quit item calls app.exit() for the same reason.
+    # hideAbility() must run synchronously before the window teardown: the
+    # platform recreates the shell as a hidden instance, and hiding afterwards
+    # makes the app exit. The tray quit item calls app.exit() for the same reason.
     close_handler = [
       "    super.onWindowStageCreate(windowStage);",
       "    try {",
@@ -169,8 +163,7 @@ class DeepseekHarnessApp < Formula
     hap_module = Utils.safe_popen_read("unzip", "-p", libexec/"deepseek-harness-desktop-unsigned.hap", "module.json")
     module_json = JSON.parse(hap_module)
     requested = module_json.fetch("module").fetch("requestPermissions")
-    # READ_PASTEBOARD makes paste work in the shell; without it pasting into the
-    # window does nothing.
+    # READ_PASTEBOARD is required for pasting into the shell.
     %w[ohos.permission.CUSTOM_SANDBOX ohos.permission.READ_WRITE_USER_FILE
        ohos.permission.READ_PASTEBOARD
        ohos.permission.kernel.ALLOW_WRITABLE_CODE_MEMORY
@@ -183,9 +176,8 @@ class DeepseekHarnessApp < Formula
       (res/"scripts/install-desktop.sh").read,
     )
     chmod 0755, pkgshare/"install-desktop.sh"
-    # install-desktop.sh sources the install flow shared by the HAP apps from
-    # the same directory. cp, not install: the tap checkout is a read-only host
-    # mount inside the CI container.
+    # install-desktop.sh sources the shared install flow; use cp, not install:
+    # the tap checkout is read-only in the CI container.
     cp tap_root/"Resources/_shared/hap-app/install-lib.sh", pkgshare/"hap-app-install-lib.sh"
     chmod 0755, pkgshare/"hap-app-install-lib.sh"
     (libexec/"deepseek-harness-desktop.sh").write(
@@ -215,22 +207,15 @@ class DeepseekHarnessApp < Formula
 
   def caveats
     <<~EOS
-      The desktop HAP is unsigned in the bottle. `brew install` runs
-      `dsh-app install` automatically once the device is connected and the
-      Huawei Developer login is done; otherwise it is queued:
-      `hap-app install-pending` finishes it (or run `dsh-app install`).
+      `brew install`/`brew upgrade` installs the HAP automatically once the
+      device and the Huawei Developer login are ready; otherwise it is queued:
+      `hap-app status` shows why, `hap-app install-pending` finishes it.
+      Manual: `dsh-app install`. Details: docs/hap-app-formulae.md.
 
-      Closing the window hides it to the DeepSeek Harness system tray icon.
-      `dsh-app install` and `dsh-app start` start a detached CLI-managed
-      `dsh web` backend before opening the shell, so it survives the shell's
-      window lifecycle. Use the tray menu to show the window again or to quit.
-
-      The shell needs weak-sandbox ACLs, granted through a local debug profile
-      generated by app-installer. They include READ_PASTEBOARD, without which
-      pasting into the window does not work.
-
-      The formula follows the deepseek-harness upstream version. If the CLI and
-      desktop versions differ, install/start prints a warning but does not stop.
+      Closing the window hides it to the tray. `dsh-app install`/`start` run a
+      detached `dsh web` backend that survives the window; the tray menu shows or
+      quits it. Weak-sandbox ACLs (including READ_PASTEBOARD) come from the local
+      debug profile. CLI and desktop versions may differ (warning only).
     EOS
   end
 
@@ -293,8 +278,7 @@ class DeepseekHarnessApp < Formula
     strong = JSON.parse(shell_output("unzip -p #{injected_copy} module.json"))
     assert_equal %w[ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET],
                  strong.fetch("module").fetch("requestPermissions").map { |entry| entry.fetch("name") }.sort
-    # --keep leaves the signed HAP next to the other temporary files and the
-    # result line names the variant that was installed.
+    # --keep leaves the signed HAP in the temporary directory.
     kept_output = shell_output("#{bin}/dsh-app install --keep 2>&1")
     assert_match "installed (com.social4hyq.deepseekharness, ACL)", kept_output
     assert_match "signed HAP kept", kept_output
