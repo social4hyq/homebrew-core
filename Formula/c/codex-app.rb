@@ -9,8 +9,8 @@ class CodexApp < Formula
   revision 1
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codex-app-v26.1117.31558-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "db14c79aeab62108fd4a39aa1e27bae77ac563dec4a6efe753a2fdfea4b4f95f"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codex-app-v26.1117.31558-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "27dc798137be0a7564e65b3ba77c98a4bce8361f28117cc0edcb0c23f777a784"
   end
 
   depends_on "binutils" => :build
