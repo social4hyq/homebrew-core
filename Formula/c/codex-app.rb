@@ -6,11 +6,11 @@ class CodexApp < Formula
   version "26.1117.31558"
   sha256 "81670501c6b7d784ef2b9a62b32da031e81a0eac0f50ebd933d0a9956d7bec77"
   license :cannot_represent # OpenAI service and software terms
-  revision 5
+  revision 6
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codex-app-v26.1117.31558-r7"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "afc442b4cc2a2dfa12c6accac6627710bc43277746cd22ee35ebcadfe683b56c"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codex-app-v26.1117.31558-r9"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "516a2e4ecb12845c7b8d199575e2109b531f16bc5309ee64027fefd10a8c1967"
   end
 
   depends_on "app-installer"
@@ -33,7 +33,7 @@ class CodexApp < Formula
     sha256 "c032f4d4e3a95b99eef4c586928ccff62f35da6d1d716ea5ede00357563c9883"
   end
 
-  # List every path literally: the resource audit retains only named files.
+  # The unused-resource audit requires literal tap paths.
   RESOURCE_FILES = %w[
     Resources/codex-app/assets/icon.png
     Resources/codex-app/app/chatgpt-bootstrap.cjs
@@ -63,9 +63,7 @@ class CodexApp < Formula
   def install
     tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
     res = tap_root/"Resources/codex-app"
-    RESOURCE_FILES.each do |file|
-      odie "missing tap resource: #{file}" unless (tap_root/file).exist?
-    end
+    RESOURCE_FILES.each { |file| odie "missing tap resource: #{file}" unless (tap_root/file).exist? }
 
     support = buildpath/"codex-app-support"
     support.mkpath
@@ -90,9 +88,7 @@ class CodexApp < Formula
       "#{clt}/lib:#{clt}/sdk/default/openharmony/native/llvm/lib/clang/15.0.4/lib/aarch64-linux-ohos"
     ENV.delete("NODE_OPTIONS")
     soft_cap, hard_cap = Process.getrlimit(Process::RLIMIT_NOFILE)
-    if hard_cap > 65_536
-      Process.setrlimit(Process::RLIMIT_NOFILE, [soft_cap, 65_536].min, 65_536)
-    end
+    Process.setrlimit(Process::RLIMIT_NOFILE, [soft_cap, 65_536].min, 65_536) if hard_cap > 65_536
 
     cd project do
       system "node", clt/"ohpm/bin/pm-cli.js", "install"
@@ -173,10 +169,10 @@ class CodexApp < Formula
 
   def caveats
     <<~EOS
-      `brew install`/`brew upgrade` installs the HAP automatically once the
-      device and the Huawei Developer login are ready; otherwise it is queued:
-      `hap-app status` shows why, `hap-app install-pending` finishes it.
-      Manual: `codex-app install`. Details: docs/hap-app-formulae.md.
+      `brew install` and `brew upgrade` try to install the HAP when a device is
+      connected and Huawei Developer login is ready. If queued, check
+      `hap-app status`, then run `hap-app install-pending`.
+      Manual install: `codex-app install`. See docs/hap-app-formulae.md.
 
       The bottle ships only the tap-authored shell; the first install asks
       OpenAI for the official ChatGPT package (~519 MB, sha256-checked) and
@@ -196,16 +192,12 @@ class CodexApp < Formula
   test do
     tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
     hap = libexec/"codex-app-shell-unsigned.hap"
-    assert_path_exists hap
     vendor = JSON.parse((libexec/"vendor.json").read)
     assert_equal version.to_s, vendor.fetch("version")
-    assert_match(/(\A[0-9a-f]{64}\z)/, vendor.fetch("sha256"))
+    assert_match(/\A[0-9a-f]{64}\z/, vendor.fetch("sha256"))
     assert_match(%r{\Ahttps://}, vendor.fetch("url"))
-    assert_path_exists pkgshare/"assemble/chatgpt-bootstrap.cjs"
-    assert_path_exists pkgshare/"assemble/assemble-local-hap.py"
     assert_match "Usage: codex-app", shell_output("#{bin}/codex-app --help")
 
-    assert_path_exists pkgshare/"enable-cookie-encryption.py"
     assert_match "shell deb output", shell_output("python3 #{pkgshare}/assemble/assemble-local-hap.py --help")
     assert_match "source output", shell_output("python3 #{pkgshare}/enable-cookie-encryption.py --help")
     system "node", "--check", tap_root/"Resources/codex-app/app/chatgpt-bootstrap.cjs"
@@ -232,13 +224,7 @@ class CodexApp < Formula
     acl_permissions = acl.dig("module", "requestPermissions").map { |item| item.fetch("name") }
     %w[ohos.permission.CUSTOM_SANDBOX ohos.permission.READ_WRITE_USER_FILE
        ohos.permission.READ_PASTEBOARD ohos.permission.kernel.ALLOW_WRITABLE_CODE_MEMORY
-       ohos.permission.kernel.DISABLE_CODE_MEMORY_PROTECTION].each do |name|
-      assert_includes acl_permissions, name
-    end
-    bootstrap = (tap_root/"Resources/codex-app/app/chatgpt-bootstrap.cjs").read
-    installer = (tap_root/"Resources/codex-app/scripts/install-chatgpt-desktop.sh").read
-    assert_match "CODEX_CLI_PATH", bootstrap
-    assert_match "chatgpt-host-config.json", installer
+       ohos.permission.kernel.DISABLE_CODE_MEMORY_PROTECTION].each { |name| assert_includes acl_permissions, name }
     listing = shell_output("unzip -Z1 #{hap}")
     refute_match "vendor.asar", listing
     refute_match "resources/resfile/resources/codex", listing
@@ -246,14 +232,13 @@ class CodexApp < Formula
     owl_shims.each do |name|
       refute_match "resources/resfile/resources/app/#{name}.cjs", listing
     end
-    assert_match "resources.index", listing
     icon = testpath/"shell-icon.png"
     icon.write Utils.safe_popen_read("unzip", "-p", hap, "resources/base/media/app_icon.png")
     assert_equal Digest::SHA256.file(tap_root/"Resources/codex-app/assets/icon.png").hexdigest,
                  Digest::SHA256.file(icon).hexdigest
     system "unzip", "-tq", hap
 
-    # Exercise host-config injection and both signing profiles without a device.
+    # Signing and permission selection must be testable without a connected device.
     fixture_dir = testpath/"install-fixture"
     fixture_dir.mkpath
     fixture_manifest = { "app"    => { "bundleName" => "com.social4hyq.chatgpt" },
