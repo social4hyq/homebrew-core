@@ -36,9 +36,7 @@ class MulticaApp < Formula
     end
   end
 
-  # Tap-authored files that are copied into the build but are not patches, so
-  # they live in Resources/ rather than Patches/. Every path is listed
-  # literally: the weekly remove-unused-patches job keeps a Resources/
+  # List every path literally: the unused-resource audit keeps a Resources/
   # directory only while a formula names it.
   RESOURCE_FILES = %w[
     Resources/multica-app/assets/tray-icon.png
@@ -49,9 +47,7 @@ class MulticaApp < Formula
     system "unzip", "-o", resource("electron-ohos").cached_download, "-d", buildpath
     system "tar", "-xzf", buildpath/"libelectron_144.tar.gz", "-C", buildpath
 
-    # The vendor templates mix CRLF and LF. Normalize files patched below so
-    # Homebrew's patch utility can match the mainElement, signingConfig, and
-    # requestPermissions lines consistently.
+    # Normalize CRLF to LF so patches match the template lines consistently.
     %w[
       libelectron/ohos_hap/build-profile.json5
       libelectron/ohos_hap/electron/src/main/module.json5
@@ -86,8 +82,8 @@ class MulticaApp < Formula
     chmod 0755, pkgshare/"desktop.sh"
     libexec.install "scripts/multica-desktop-dispatch-ohos.sh" => "multica-desktop-dispatch.sh"
     chmod 0755, libexec/"multica-desktop-dispatch.sh"
-    # The daemon the bridge starts inherits this environment, and it locks its
-    # per-task temp dir with flock, which /tmp refuses on OHOS.
+    # The daemon inherits this env; it flocks its per-task temp dir, which /tmp
+    # refuses on OHOS.
     (bin/"multica-app").write_env_script libexec/"multica-desktop-dispatch.sh",
       MULTICA_AGENT_TEMP_BASE: "${MULTICA_AGENT_TEMP_BASE:-/data/storage/el2/base/cache}",
       MULTICA_DESKTOP:         pkgshare/"desktop.sh",
@@ -103,9 +99,8 @@ class MulticaApp < Formula
 
     shell = buildpath/"libelectron/ohos_hap"
 
-    # Every HAP built from the vendor template ships the template's bundle name,
-    # so two Electron apps installed from it displace each other and share one
-    # app sandbox (and its data). Give this one its own identity.
+    # Give this app its own bundle name: the vendor template's is shared, so
+    # two Electron apps installed from it would displace each other.
     inreplace shell/"AppScope/app.json5", '"bundleName": "com.huawei.ohos_electron"',
                                           '"bundleName": "com.social4hyq.multica"'
     inreplace shell/"AppScope/app.json5", '"vendor": "example"', '"vendor": "social4hyq"'
@@ -113,14 +108,9 @@ class MulticaApp < Formula
               '"bundleName": "com.huawei.ohos_electron"',
               '"bundleName": "com.social4hyq.multica"'
 
-    # The caption close button never reaches Electron's BrowserWindow close
-    # event, and this runtime cannot cancel the close: the window UIAbility is
-    # torn down whatever windowStageClose returns. Calling hideAbility() before
-    # that teardown keeps the app (and the host daemon bridge it runs) alive --
-    # the platform recreates the shell as a hidden instance whose tray restores
-    # the window. Hiding after the teardown instead makes the app exit, so the
-    # call stays synchronous. The tray's quit item calls app.exit() because a
-    # normal quit would be prevented by the shell's own close handler.
+    # hideAbility() must run synchronously before the teardown; hiding afterwards
+    # makes the app exit. The tray quit calls app.exit() to bypass the close
+    # handler and keep the bridge alive.
     close_handler = [
       "    super.onWindowStageCreate(windowStage);",
       "    try {",
@@ -140,8 +130,8 @@ class MulticaApp < Formula
     inreplace shell/"web_engine/src/main/ets/ability/WebAbility.ets",
               "    super.onWindowStageCreate(windowStage);\n", close_handler
 
-    # Desktop payload: the patch carried the OHOS dependency wiring
-    # (pnpm overrides to @ohos-npm-ports, scoped registry, signpost dev dep).
+    # Desktop payload: the patch adds the OHOS dependency wiring (pnpm
+    # overrides, scoped registry, signpost).
     ENV["CI"] = "true"
     system "npm", "exec", "--yes", "--", "pnpm@10.28.2", "install",
            "--ignore-scripts", "--frozen-lockfile", "--reporter=append-only"
@@ -192,28 +182,23 @@ class MulticaApp < Formula
       }
     JS
 
-    # HAP shell build. CI runs in the private electron-ohos-ci image (the
-    # generic Electron-on-OHOS build image, selected via the
-    # OHOS_CI_IMAGE_OVERRIDES repo variable), which bakes the HarmonyOS
-    # command-line toolchain at /opt/electron-ohos-clt — repacked from a
-    # licensed system CLT install, not publicly redistributable. The shell
-    # compiles no C++, so the NDK-less SDK subset the image carries suffices.
+    # The shell builds in the private electron-ohos-ci image
+    # (OHOS_CI_IMAGE_OVERRIDES) with the proprietary CLT at
+    # /opt/electron-ohos-clt; it compiles no C++, so the NDK-less SDK suffices.
     clt = Pathname.new("/opt/electron-ohos-clt")
     unless (clt/"hvigor/bin/hvigorw.js").exist?
       odie "multica-app builds only in electron-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES['multica-app']"
     end
 
-    # brew's sanitized build env drops the container's LD_LIBRARY_PATH, but
-    # ohos_packing_tool needs the SDK clang runtimes and the libhilog
-    # stderr adapter baked into the image.
+    # brew's sanitized env drops LD_LIBRARY_PATH; restore it for
+    # ohos_packing_tool.
     ENV["DEVECO_SDK_HOME"] = (clt/"sdk").to_s
     ENV["HOS_SDK_HOME"] = (clt/"sdk").to_s
     ENV["LD_LIBRARY_PATH"] =
       "#{clt}/lib:#{clt}/sdk/default/openharmony/native/llvm/lib/clang/15.0.4/lib/aarch64-linux-ohos"
     ENV.delete("NODE_OPTIONS")
-    # A container inheriting RLIMIT_NOFILE near 1e9 drives the musl FD-table
-    # sizing into a refused mapping; cap it for the hvigor process tree
-    # (only ever lowering — never raise an environment's existing limit).
+    # Cap RLIMIT_NOFILE for the hvigor tree: near-1e9 limits break the musl FD
+    # table. Only ever lower it.
     soft_cap, hard_cap = Process.getrlimit(Process::RLIMIT_NOFILE)
     if hard_cap > 65_536
       Process.setrlimit(Process::RLIMIT_NOFILE, [soft_cap, 65_536].min, 65_536)
@@ -228,10 +213,8 @@ class MulticaApp < Formula
     libexec.install shell/"electron/build/default/outputs/default/electron-default-unsigned.hap" =>
                     "multica-desktop-unsigned.hap"
 
-    # The default HAP requests only what local automatic signing can grant.
-    # `multica-app install --acl-profile` swaps in this variant, which also
-    # requests the two ACL-gated permissions, for devices whose signing profile
-    # carries those ACLs.
+    # The ACL variant also requests the two ACL-gated permissions
+    # (`--acl-profile`).
     hap_module = Utils.safe_popen_read("unzip", "-p", libexec/"multica-desktop-unsigned.hap", "module.json")
     module_json = JSON.parse(hap_module)
     requested = module_json.fetch("module").fetch("requestPermissions")
@@ -283,15 +266,14 @@ class MulticaApp < Formula
     assert_match "unknown command: bogus", shell_output("#{bin}/multica-app bogus 2>&1", 2)
     cli = formula_opt_prefix("multica")/"libexec/multica-cli"
     cli_version = Formula["multica"].version.to_s
-    # The bridge outlives `brew upgrade`, so the CLI it is told to run must be
-    # the stable opt path of the multica formula, never a Cellar version directory.
+    # The bridge outlives `brew upgrade`: point it at the stable opt path, not a
+    # Cellar directory.
     wrapper = (bin/"multica-app").read
     assert_match cli.to_s, wrapper
     refute_match "Cellar/multica/", wrapper
     assert_match "MULTICA_DESKTOP_VERSION=\"#{version}\"", wrapper
-    # The daemon the bridge starts locks its per-task temp dir with flock, which
-    # /tmp refuses on OHOS, so this wrapper must carry a usable base as well. A
-    # value the user set explicitly still wins.
+    # The bridge's daemon flocks a temp dir that /tmp refuses on OHOS: carry a
+    # usable base (an explicit user value wins).
     temp_base = "/data/storage/el2/base/cache"
     assert_match "MULTICA_AGENT_TEMP_BASE=\"${MULTICA_AGENT_TEMP_BASE:-#{temp_base}}\"", wrapper
     env_probe = testpath/"env-probe"
@@ -300,8 +282,8 @@ class MulticaApp < Formula
                  shell_output("env -u MULTICA_AGENT_TEMP_BASE sh #{env_probe}")
     assert_match "MULTICA_AGENT_TEMP_BASE=#{testpath}/custom\n",
                  shell_output("MULTICA_AGENT_TEMP_BASE=#{testpath}/custom sh #{env_probe}")
-    # A shell startup file can run before Homebrew's bin is on PATH, so the
-    # line the caveats suggest for it has to use the absolute path.
+    # Startup files may run before Homebrew's bin is on PATH: document the
+    # absolute path.
     assert_match "\"$HOME/.harmonybrew/bin/multica-app\" start --bridge-only", caveats
     assert_match "before Homebrew's bin is on PATH", caveats
     refute_match "`multica-app start --bridge-only`", caveats
@@ -392,8 +374,7 @@ class MulticaApp < Formula
       ENV["MULTICA_MODULE_ACL"] = (pkgshare/"module-acl.json").to_s
       (testpath/"build-profile.json5").write "{}"
       shell_output("#{desktop_installer} --acl-profile #{testpath}/build-profile.json5")
-      # The ACL variant goes through hap-installer too, with the given profile.
-      # installer_args holds one argument per line.
+      # The ACL variant also goes through hap-installer with the given profile.
       acl_args = installer_args.read.lines(chomp: true)
       assert_equal "#{testpath}/build-profile.json5", acl_args[acl_args.index("--profile") + 1]
       refute_path_exists signer_args
@@ -418,8 +399,8 @@ class MulticaApp < Formula
       assert_equal "200", allowed.code
       assert_match cli_version, JSON.parse(allowed.body).fetch("stdout")
 
-      # A bridge started from a keg that later disappears (as `brew upgrade`
-      # does) must be reported stale and be replaced by `multica-app start`.
+      # A bridge from a keg that later disappears is reported stale and replaced
+      # by `multica-app start`.
       old_keg = testpath/"old-keg"
       old_keg.mkpath
       ln_s cli, old_keg/"multica-cli"
@@ -455,23 +436,21 @@ class MulticaApp < Formula
     package = JSON.parse(shell_output("unzip -p #{hap} resources/resfile/resources/app/package.json"))
     assert_empty package.fetch("devDependencies", {})
     profile = JSON.parse(shell_output("unzip -p #{hap} module.json"))
-    # The vendor template's bundle name is shared by every Electron app built
-    # from it; installing this desktop under it would displace another app.
+    # The vendor bundle name is shared; installing under it would displace
+    # another app.
     assert_equal "com.social4hyq.multica", profile.fetch("app").fetch("bundleName")
     assert_equal "social4hyq", profile.fetch("app").fetch("vendor")
     # The installer and the launcher act on this id, so both must match the HAP.
     assert_match 'BUNDLE_ID="com.social4hyq.multica"', desktop_installer.read
     assert_match 'BUNDLE_ID="com.social4hyq.multica"', (pkgshare/"desktop.sh").read
-    # ArkTS record names embed the bundle name, so a HAP renamed only in
-    # module.json cannot resolve its entry point. The compiled payload and the
-    # manifest must carry the same identity.
+    # ArkTS records embed the bundle name: the compiled payload and the
+    # manifest must match.
     bytecode = Utils.safe_popen_read("unzip", "-p", hap, "ets/modules.abc")
     assert_includes bytecode.force_encoding(Encoding::BINARY), "com.social4hyq.multica"
     # hvigor reformats the JSON (tabs instead of spaces), so match loosely.
     assert_match(/"bundleName":\s*"com\.social4hyq\.multica"/,
                  shell_output("unzip -p #{hap} resources/base/profile/shortcuts_config.json"))
-    # The launcher label comes from the app_name / EntryAbility_label resource
-    # values, not from the web app's productName; keep the capital M there.
+    # The launcher label comes from string resources, not productName.
     resource_index = Utils.safe_popen_read("unzip", "-p", hap, "resources.index")
     resource_index = resource_index.force_encoding(Encoding::BINARY)
     assert_includes resource_index, "Multica"

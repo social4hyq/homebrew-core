@@ -1,13 +1,12 @@
 class OrcaApp < Formula
   desc "Desktop shell for the Orca agent runtime (Electron window on its web client)"
   homepage "https://github.com/stablyai/orca"
-  # Version follows the Orca release the tap-authored shell is built against;
-  # the shell sources live in Resources/orca-app and the host runtime comes from
-  # the `orca` formula, so both formulae track the same upstream tag.
+  # Version follows the Orca release; shell sources live in Resources/orca-app
+  # and the host runtime comes from the `orca` formula (same upstream tag).
   url "https://github.com/stablyai/orca/archive/refs/tags/v1.4.261.tar.gz"
   sha256 "5b8a21bb9cde62a1dd7ca3c0ffd2f684faf168ea401191068777a8a9e7466909"
-  # Tap-authored shell scripts (MIT) packaging the CPF-Electron runtime
-  # (Chromium/Electron, mixed MIT/BSD/LGPL).
+  # Tap-authored shell scripts (MIT) on the CPF-Electron runtime (mixed
+  # MIT/BSD/LGPL).
   license :cannot_represent
   revision 9
 
@@ -28,10 +27,8 @@ class OrcaApp < Formula
   depends_on "unzip"
   depends_on "zip"
 
-  # Shell sources live in the tap so they are reviewable in the PR and no
-  # opaque release payload is involved. Every path is listed literally: the
-  # weekly remove-unused-patches job keeps a Resources/ directory only while a
-  # formula names it.
+  # List every path literally: the unused-resource audit keeps a Resources/
+  # directory only while a formula names it.
   RESOURCE_FILES = %w[
     Resources/_shared/electron-shell/tray.cjs
     Resources/_shared/hap-app/install-lib.sh
@@ -79,9 +76,8 @@ class OrcaApp < Formula
     %w[app_icon.png startIcon.png].each do |name|
       cp res/"assets/icon.png", shell/"AppScope/resources/base/media"/name
     end
-    # App name and ability labels live in per-locale string resources: patching
-    # only the base file leaves the zh_CN/en_US overrides intact and the
-    # launcher keeps showing the template's "Electron" label.
+    # Patch app name/labels in every locale: the base file alone leaves the
+    # zh_CN/en_US overrides showing "Electron".
     (shell.glob("AppScope/resources/*/element/string.json") +
      shell.glob("electron/src/main/resources/*/element/string.json")).each do |file|
       strings = JSON.parse(file.read)
@@ -94,8 +90,8 @@ class OrcaApp < Formula
       file.write JSON.pretty_generate(strings) + "\n"
     end
 
-    # Remove template signing settings and select the SDK supported by the
-    # shared HAP build toolchain. This profile is strict JSON.
+    # Remove template signing settings and select the shared toolchain's SDK;
+    # this profile is strict JSON.
     profile = JSON.parse((shell/"build-profile.json5").read)
     profile.fetch("app").fetch("products").each do |product|
       product.delete("signingConfig")
@@ -108,9 +104,8 @@ class OrcaApp < Formula
     inreplace shell/"electron/src/main/module.json5", '"mainElement": "EntryAbility",',
               '"mainElement": "EntryAbility", "extractNativeLibs": true,'
 
-    # The shell only talks to the runtime server over loopback. Restricted
-    # permissions (weak sandbox, host files, JIT, pasteboard) are added to the
-    # install-time ACL variant instead of every install; see module-acl.json.
+    # The shell only talks to the runtime over loopback; restricted
+    # permissions go into the ACL variant (module-acl.json).
     inreplace shell/"web_engine/src/main/module.json5", /"requestPermissions": \[.*?\r?\n    \],/m,
               <<~JSON5.chomp
                 "requestPermissions": [
@@ -119,12 +114,8 @@ class OrcaApp < Formula
                     ],
               JSON5
 
-    # The caption close button never reaches Electron's BrowserWindow close
-    # event: electron-ohos tears down the window UIAbility first and the shell
-    # exits with it. Register a windowStageClose handler that hides the ability
-    # and cancels the close, so closing the window only sends it to the tray.
-    # The tray's quit item calls app.exit() because a normal quit would be
-    # cancelled here.
+    # windowStageClose hides the ability and cancels the close so the window
+    # goes to the tray; the tray quit calls app.exit() to bypass that handler.
     close_handler = [
       "    super.onWindowStageCreate(windowStage);",
       "    try {",
@@ -144,28 +135,23 @@ class OrcaApp < Formula
     inreplace shell/"web_engine/src/main/ets/ability/WebAbility.ets",
               "    super.onWindowStageCreate(windowStage);\n", close_handler
 
-    # HAP shell build. CI runs in the private electron-ohos-ci image (the
-    # generic Electron-on-OHOS build image, selected via the
-    # OHOS_CI_IMAGE_OVERRIDES repo variable), which bakes the HarmonyOS
-    # command-line toolchain at /opt/electron-ohos-clt — repacked from a
-    # licensed system CLT install, not publicly redistributable. The shell
-    # compiles no C++, so the NDK-less SDK subset the image carries suffices.
+    # The shell builds in the private electron-ohos-ci image
+    # (OHOS_CI_IMAGE_OVERRIDES) with the proprietary CLT at
+    # /opt/electron-ohos-clt; it compiles no C++, so the NDK-less SDK suffices.
     clt = Pathname.new("/opt/electron-ohos-clt")
     unless (clt/"hvigor/bin/hvigorw.js").exist?
       odie "orca-app builds only in electron-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES['orca-app']"
     end
 
-    # brew's sanitized build env drops the container's LD_LIBRARY_PATH, but
-    # ohos_packing_tool needs the SDK clang runtimes and the libhilog stderr
-    # adapter baked into the image.
+    # brew's sanitized env drops LD_LIBRARY_PATH; restore it for
+    # ohos_packing_tool.
     ENV["DEVECO_SDK_HOME"] = (clt/"sdk").to_s
     ENV["HOS_SDK_HOME"] = (clt/"sdk").to_s
     ENV["LD_LIBRARY_PATH"] =
       "#{clt}/lib:#{clt}/sdk/default/openharmony/native/llvm/lib/clang/15.0.4/lib/aarch64-linux-ohos"
     ENV.delete("NODE_OPTIONS")
-    # A container inheriting RLIMIT_NOFILE near 1e9 drives the musl FD-table
-    # sizing into a refused mapping; cap it for the hvigor process tree
-    # (only ever lowering — never raise an environment's existing limit).
+    # Cap RLIMIT_NOFILE for the hvigor tree: near-1e9 limits break the musl FD
+    # table. Only ever lower it.
     soft_cap, hard_cap = Process.getrlimit(Process::RLIMIT_NOFILE)
     if hard_cap > 65_536
       Process.setrlimit(Process::RLIMIT_NOFILE, [soft_cap, 65_536].min, 65_536)
@@ -180,11 +166,9 @@ class OrcaApp < Formula
     libexec.install shell/"electron/build/default/outputs/default/electron-default-unsigned.hap" =>
                     "orca-app-unsigned.hap"
 
-    # The default install swaps in this module.json: CUSTOM_SANDBOX and
-    # READ_WRITE_USER_FILE let the shell spawn the host `orca` runtime and read
-    # the host profile, the two kernel ACLs keep the renderer out of --jitless
-    # (WebAssembly) and READ_PASTEBOARD makes paste work. Everything else stays
-    # out of the HAP so a local debug profile can grant it.
+    # ACL variant: CUSTOM_SANDBOX and READ_WRITE_USER_FILE let the shell spawn
+    # `orca` and read the host profile; the kernel ACLs keep WebAssembly and
+    # READ_PASTEBOARD makes paste work.
     hap_module = Utils.safe_popen_read("unzip", "-p", libexec/"orca-app-unsigned.hap", "module.json")
     module_json = JSON.parse(hap_module)
     requested = module_json.fetch("module").fetch("requestPermissions")
@@ -199,11 +183,10 @@ class OrcaApp < Formula
     (pkgshare/"module-acl.json").write JSON.generate(module_json)
 
     # cp, not install: Pathname#install moves the source, and the tap checkout
-    # is a read-only host mount inside the CI container.
+    # is read-only in the CI container.
     cp res/"scripts/install-desktop.sh", pkgshare/"install-desktop.sh"
     chmod 0755, pkgshare/"install-desktop.sh"
-    # install-desktop.sh sources the install flow shared by the HAP apps from
-    # the same directory.
+    # install-desktop.sh sources the shared install flow.
     cp tap_root/"Resources/_shared/hap-app/install-lib.sh", pkgshare/"hap-app-install-lib.sh"
     chmod 0755, pkgshare/"hap-app-install-lib.sh"
     cp res/"scripts/orca-desktop.sh", libexec/"orca-desktop.sh"
@@ -248,15 +231,13 @@ class OrcaApp < Formula
   end
 
   test do
-    # The launcher keeps its state in ~/.config/orca-app whatever XDG_CONFIG_HOME
-    # says; HOME is the test sandbox, so server and pairing state stay inside it.
+    # The launcher keeps state in ~/.config/orca-app; HOME is the test sandbox.
     ENV["HOME"] = testpath/"home"
     ENV["XDG_CONFIG_HOME"] = testpath/"home/.config"
     assert_match "Usage: orca-app", shell_output("#{bin}/orca-app --help")
 
-    # A minimal stand-in for the shell HAP: the installer only rewrites
-    # config.json (and swaps module.json for the ACL variant), so the 200 MB
-    # artifact does not need to be copied around in the test.
+    # Minimal stand-in HAP: the installer only rewrites config.json and swaps
+    # module.json.
     fake_hap = testpath/"shell.hap"
     hap_tree = testpath/"hap-tree"
     (hap_tree/"resources/resfile/resources/app").mkpath
@@ -343,9 +324,7 @@ class OrcaApp < Formula
                              .dig("module", "requestPermissions").map { |permission| permission.fetch("name") }
     assert_equal %w[ohos.permission.INTERNET], strong_permissions
 
-    # --keep is passed through to the install script, which copies the signed
-    # HAP out and says where. It does not change the variant, so the installed
-    # mode stays acl.
+    # --keep is passed through; it does not change the installed variant.
     keep_tmp = testpath/"keep-tmp"
     keep_tmp.mkpath
     ENV["TMPDIR"] = keep_tmp.to_s
@@ -366,8 +345,7 @@ class OrcaApp < Formula
     end
     refute_match(/aa start/, (testpath/"hdc-log").read)
 
-    # status/stop read the port from the state file, so pin it to a port this
-    # machine cannot have an Orca server on.
+    # Pin the port to one this machine cannot have an Orca server on.
     (testpath/"home/.config/orca-app").mkpath
     (testpath/"home/.config/orca-app/config.json").write JSON.generate("port" => free_port)
 
@@ -396,8 +374,7 @@ class OrcaApp < Formula
       Process.wait(web)
     end
 
-    # State an older launcher kept under XDG_CONFIG_HOME is moved to
-    # ~/.config/orca-app once, whatever XDG_CONFIG_HOME is later on.
+    # State from an older launcher is moved to ~/.config/orca-app once.
     saved_home = Dir.home
     saved_xdg = ENV.fetch("XDG_CONFIG_HOME", nil)
     ENV["HOME"] = (testpath/"home2").to_s

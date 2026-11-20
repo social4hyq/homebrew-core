@@ -1,12 +1,12 @@
 class OpencodeApp < Formula
   desc "Desktop shell for the OpenCode agent (Electron window on local opencode serve)"
   homepage "https://opencode.ai"
-  # Version follows the upstream opencode tag: this shell wraps that release,
-  # and the OHOS shell sources live in Resources/opencode-app.
+  # Version follows the upstream opencode tag; OHOS sources live in
+  # Resources/opencode-app.
   url "https://github.com/anomalyco/opencode/archive/refs/tags/v2.3.0.tar.gz"
   sha256 "48b0ab7c4732d693c59e0ad7d73656a2965b2def78cef3c6319e444b7e6c0300"
-  # Tap-authored shell sources (MIT) packaging the CPF-Electron runtime
-  # (Chromium/Electron, mixed MIT/BSD/LGPL).
+  # Tap-authored shell sources (MIT) on the CPF-Electron runtime (mixed
+  # MIT/BSD/LGPL).
   license :cannot_represent
   revision 14
 
@@ -29,9 +29,8 @@ class OpencodeApp < Formula
   depends_on "unzip"
   depends_on "zip"
 
-  # Shell sources live in the tap so they are reviewable in the PR. Every path
-  # is listed literally: the weekly remove-unused-patches job keeps a
-  # Resources/ directory only while a formula names it.
+  # List every path literally: the unused-resource audit keeps a Resources/
+  # directory only while a formula names it.
   RESOURCE_FILES = %w[
     Resources/_shared/electron-shell/tray.cjs
     Resources/_shared/hap-app/install-lib.sh
@@ -71,9 +70,8 @@ class OpencodeApp < Formula
       cp res/"app"/name, app/name
     end
     cp tap_root/"Resources/_shared/electron-shell/tray.cjs", app/"tray.cjs"
-    # waiting.html is rendered from the page template shared by the HAP apps and
-    # this app's strings. The result is byte for byte the page that used to be
-    # kept here; Resources/_shared/waiting-page/expected.sha256 pins it.
+    # waiting.html is generated from the shared page template;
+    # Resources/_shared/waiting-page/expected.sha256 pins the output.
     system "node", tap_root/"Resources/_shared/waiting-page/render-waiting.cjs",
            tap_root/"Resources/_shared/waiting-page/waiting.html.in",
            res/"app/waiting.json", app/"waiting.html"
@@ -87,10 +85,8 @@ class OpencodeApp < Formula
     %w[app_icon.png startIcon.png].each do |name|
       cp res/"assets/icon.png", shell/"AppScope/resources/base/media"/name
     end
-    # App name and ability labels live in per-locale string resources: patching
-    # only the base file leaves the zh_CN/en_US overrides intact and the
-    # launcher keeps showing the template's "Electron" label, so glob every
-    # locale directory.
+    # Patch app name/labels in every locale: the base file alone leaves the
+    # zh_CN/en_US overrides showing "Electron".
     (shell.glob("AppScope/resources/*/element/string.json") +
      shell.glob("electron/src/main/resources/*/element/string.json")).each do |file|
       strings = JSON.parse(file.read)
@@ -103,16 +99,14 @@ class OpencodeApp < Formula
       file.write JSON.pretty_generate(strings) + "\n"
     end
 
-    # CI's electron-ohos-ci CLT carries an NDK-less SDK subset (no llvm-strip);
-    # mirror the multica packaging deltas that keep hvigor away from the strip
-    # task and from signing material the container does not have.
+    # Mirror the packaging deltas for the CI image's NDK-less SDK subset
+    # (no llvm-strip).
     inreplace shell/"build-profile.json5", /^[ \t]*"signingConfig": "default",\r?\n/, ""
     inreplace shell/"electron/src/main/module.json5", '"mainElement": "EntryAbility",',
               '"mainElement": "EntryAbility", "extractNativeLibs": true,'
 
-    # Restricted permissions (pasteboard, location, ...) cannot be granted with
-    # local auto-signing; the shell only needs loopback HTTP, and this trim
-    # installs under local auto-signing.
+    # Trim ACL-gated permissions local auto-signing cannot grant; the shell
+    # only needs loopback HTTP.
     inreplace shell/"web_engine/src/main/module.json5", /"requestPermissions": \[.*?\r?\n    \],/m,
               <<~JSON5.chomp
                 "requestPermissions": [
@@ -121,12 +115,8 @@ class OpencodeApp < Formula
                     ],
               JSON5
 
-    # The caption close button never reaches Electron's BrowserWindow close
-    # event: electron-ohos tears down the window UIAbility first, and the
-    # Electron process (with the opencode serve backend it started) follows.
-    # Register a windowStageClose handler that hides the ability and cancels the
-    # close, so closing the window only sends it to the tray. The tray's quit
-    # item calls app.exit() because a normal quit would be cancelled here.
+    # windowStageClose hides the ability and cancels the close so the window
+    # goes to the tray; the tray quit calls app.exit() to bypass that handler.
     close_handler = [
       "    super.onWindowStageCreate(windowStage);",
       "    try {",
@@ -146,28 +136,23 @@ class OpencodeApp < Formula
     inreplace shell/"web_engine/src/main/ets/ability/WebAbility.ets",
               "    super.onWindowStageCreate(windowStage);\n", close_handler
 
-    # HAP shell build. CI runs in the private electron-ohos-ci image (the
-    # generic Electron-on-OHOS build image, selected via the
-    # OHOS_CI_IMAGE_OVERRIDES repo variable), which bakes the HarmonyOS
-    # command-line toolchain at /opt/electron-ohos-clt — repacked from a
-    # licensed system CLT install, not publicly redistributable. The shell
-    # compiles no C++, so the NDK-less SDK subset the image carries suffices.
+    # The shell builds in the private electron-ohos-ci image
+    # (OHOS_CI_IMAGE_OVERRIDES) with the proprietary CLT at
+    # /opt/electron-ohos-clt; it compiles no C++, so the NDK-less SDK suffices.
     clt = Pathname.new("/opt/electron-ohos-clt")
     unless (clt/"hvigor/bin/hvigorw.js").exist?
       odie "opencode-app builds only in electron-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES['opencode-app']"
     end
 
-    # brew's sanitized build env drops the container's LD_LIBRARY_PATH, but
-    # ohos_packing_tool needs the SDK clang runtimes and the libhilog
-    # stderr adapter baked into the image.
+    # brew's sanitized env drops LD_LIBRARY_PATH; restore it for
+    # ohos_packing_tool.
     ENV["DEVECO_SDK_HOME"] = (clt/"sdk").to_s
     ENV["HOS_SDK_HOME"] = (clt/"sdk").to_s
     ENV["LD_LIBRARY_PATH"] =
       "#{clt}/lib:#{clt}/sdk/default/openharmony/native/llvm/lib/clang/15.0.4/lib/aarch64-linux-ohos"
     ENV.delete("NODE_OPTIONS")
-    # A container inheriting RLIMIT_NOFILE near 1e9 drives the musl FD-table
-    # sizing into a refused mapping; cap it for the hvigor process tree
-    # (only ever lowering — never raise an environment's existing limit).
+    # Cap RLIMIT_NOFILE for the hvigor tree: near-1e9 limits break the musl FD
+    # table. Only ever lower it.
     soft_cap, hard_cap = Process.getrlimit(Process::RLIMIT_NOFILE)
     if hard_cap > 65_536
       Process.setrlimit(Process::RLIMIT_NOFILE, [soft_cap, 65_536].min, 65_536)
@@ -182,16 +167,13 @@ class OpencodeApp < Formula
     libexec.install shell/"electron/build/default/outputs/default/electron-default-unsigned.hap" =>
                     "opencode-desktop-unsigned.hap"
 
-    # The default HAP requests only what local automatic signing can grant
-    # without ACLs. `opencode-app install` swaps in this variant (which
-    # also requests the two ACL-gated permissions) when it can prepare an
-    # ACL-capable signing profile, so the shell may start `opencode serve`
-    # itself and reach the host user files.
+    # The ACL variant also requests the two ACL-gated permissions; install swaps
+    # it in when it can prepare an ACL-capable profile, so the shell may start
+    # `opencode serve` and reach host user files.
     hap_module = Utils.safe_popen_read("unzip", "-p", libexec/"opencode-desktop-unsigned.hap", "module.json")
     module_json = JSON.parse(hap_module)
     requested = module_json.fetch("module").fetch("requestPermissions")
-    # READ_PASTEBOARD makes paste work in the shell; without it pasting into the
-    # window does nothing.
+    # READ_PASTEBOARD is required for pasting into the shell.
     %w[ohos.permission.CUSTOM_SANDBOX ohos.permission.READ_WRITE_USER_FILE
        ohos.permission.READ_PASTEBOARD
        ohos.permission.kernel.ALLOW_WRITABLE_CODE_MEMORY
@@ -201,12 +183,11 @@ class OpencodeApp < Formula
     (pkgshare/"module-acl.json").write JSON.generate(module_json)
 
     # cp, not install: Pathname#install moves the source, and the tap checkout
-    # is a read-only host mount inside the CI container.
+    # is read-only in the CI container.
     pkgshare.mkpath
     cp res/"scripts/install-desktop.sh", pkgshare/"install-desktop.sh"
     chmod 0755, pkgshare/"install-desktop.sh"
-    # install-desktop.sh sources the install flow shared by the HAP apps from
-    # the same directory.
+    # install-desktop.sh sources the shared install flow.
     cp tap_root/"Resources/_shared/hap-app/install-lib.sh", pkgshare/"hap-app-install-lib.sh"
     chmod 0755, pkgshare/"hap-app-install-lib.sh"
     cp res/"scripts/opencode-desktop.sh", libexec/"opencode-desktop.sh"
@@ -247,8 +228,8 @@ class OpencodeApp < Formula
     assert_match "Usage: opencode-app", shell_output("#{bin}/opencode-desktop --help")
     assert_match "Usage: opencode-app", shell_output("#{bin}/opencode-app --help")
 
-    # The application only stages its config and permission variant. Device
-    # operations and signing-project management belong to hap-installer.
+    # The app stages its config and permission variant; device and
+    # signing-project work belongs to hap-installer.
     fake_bin = testpath/"bin"
     fake_bin.mkpath
     injected_copy = testpath/"injected.hap"
@@ -287,13 +268,13 @@ class OpencodeApp < Formula
     refute_empty config.fetch("password")
     refute_empty config.fetch("opencode")
     assert_equal Dir.home, config.dig("host", "home")
-    # XDG values reach the shell unchanged, whatever the path, so the server it
-    # spawns reads the same configuration as the terminal; an unset one is "".
+    # XDG values reach the shell unchanged, so the spawned server reads the
+    # terminal's config (an unset one is "").
     assert_equal "/opencode-xdg-test/config", config.dig("host", "xdgConfig")
     assert_equal "/opencode-xdg-test/data", config.dig("host", "xdgData")
     assert_equal "", config.dig("host", "xdgState")
-    # Only this install runs with the made-up XDG paths; the service started
-    # below must see the test's own environment.
+    # Only this install runs with the test's XDG paths; the service below must
+    # see the test environment.
     saved_xdg.each { |key, value| ENV[key] = value }
     acl_module = JSON.parse(shell_output("unzip -p #{injected_copy} module.json"))
     acl_requested = acl_module.fetch("module").fetch("requestPermissions")
@@ -313,8 +294,7 @@ class OpencodeApp < Formula
     strong = JSON.parse(shell_output("unzip -p #{injected_copy} module.json"))
     assert_equal %w[ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET],
                  strong.fetch("module").fetch("requestPermissions").map { |entry| entry.fetch("name") }.sort
-    # --keep leaves the signed HAP next to the other temporary files and the
-    # result line names the variant that was installed.
+    # --keep leaves the signed HAP in the temporary directory.
     kept_output = shell_output("#{bin}/opencode-app install --keep 2>&1")
     assert_match "installed (com.social4hyq.opencodedesktop, ACL)", kept_output
     assert_match "signed HAP kept", kept_output

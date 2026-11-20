@@ -35,9 +35,8 @@ class ClaudeCodeApp < Formula
     end
   end
 
-  # Shell packaging sources and the official Claude app icon are tap-authored
-  # or extracted from the pinned upstream package. List every file literally so
-  # the tap's unused-resource audit retains the directory.
+  # List every path literally: the unused-resource audit keeps a Resources/
+  # directory only while a formula names it.
   RESOURCE_FILES = %w[
     Resources/claude-code-app/assets/icon.png
     Resources/claude-code-app/scripts/claude-code-app.sh
@@ -80,9 +79,8 @@ class ClaudeCodeApp < Formula
     ENV["CLAUDE_DESKTOP_APP_VERSION"] = version.to_s
     system "bash", res/"scripts/stage-ohos-shell.sh", shell, project
 
-    # The HarmonyOS CLT is proprietary and is available to CI only through the
-    # dedicated electron-ohos-ci image. Never put its signing credentials in a
-    # bottle; end users sign locally through app-installer.
+    # The HarmonyOS CLT is proprietary and CI-only; never put signing
+    # credentials in a bottle (users sign locally via app-installer).
     clt = Pathname.new("/opt/electron-ohos-clt")
     unless (clt/"hvigor/bin/hvigorw.js").exist?
       odie "claude-code-app builds only in electron-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES['claude-code-app']"

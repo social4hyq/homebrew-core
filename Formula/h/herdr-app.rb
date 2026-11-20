@@ -26,12 +26,8 @@ class HerdrApp < Formula
   depends_on "python@3.15"
   depends_on "social4hyq/core/herdr-core"
 
-  # The terminal engine builds libghostty-vt from the ghostty submodule, which
-  # GitHub archives leave out. Its simdutf package only requests PIC for
-  # musl/android/freebsd, so the OHOS ABI fails to link with R_AARCH64_ABS64
-  # relocation errors. Its translate_c package is only published on
-  # codeberg.org, which the CI container could not always resolve, so the second
-  # patch fetches the same package (same zig hash) from a release of this tap.
+  # libghostty-vt builds from the ghostty submodule (GitHub archives omit it);
+  # simdutf needs PIC for OHOS, and translate_c is mirrored in a tap release.
   resource "ghostty" do
     url "https://github.com/ghostty-org/ghostty/archive/291fd050b9e9c293c8adb6a140742649b7e42d3a.tar.gz"
     sha256 "f35b464f1aee22ffda9f6359038b9ad18a784342b4a4fa1cb97a79fb9ade79a4"
@@ -45,16 +41,15 @@ class HerdrApp < Formula
     end
   end
 
-  # The JS runtime's sys crate picks its pre-generated bindings by target
-  # triple and ships none for OHOS, so Cargo.toml points the quickjs-jit crates
-  # at this checkout (the revision Cargo.lock pins) and install adds the file.
+  # The JS runtime's sys crate has no OHOS bindings; Cargo.toml points the
+  # quickjs-jit crates at this checkout and install adds the file.
   resource "quickjs-jit" do
     url "https://github.com/longbridge/quickjs-jit/archive/96593cd7a54440ac060a391b8baea7e9a3cf1393.tar.gz"
     sha256 "6c11680bff4b74ca55288a34ca00b6a55bcb68a6b63688c84211aaa7aefc94ec"
   end
 
-  # The quickjs-jit-sys build compiles QuickJS from the sys/quickjs submodule,
-  # which GitHub archives leave out as well.
+  # quickjs-jit-sys builds QuickJS from the sys/quickjs submodule (also omitted
+  # from GitHub archives).
   resource "quickjs-ng" do
     url "https://github.com/quickjs-ng/quickjs/archive/fd0a0210b7be00957751871e7e01b8291268fc29.tar.gz"
     sha256 "39d931489e99f80b496f900f88d67d7aad6b5f25ce83810a408eb42f6af6839e"
@@ -67,9 +62,7 @@ class HerdrApp < Formula
     end
   end
 
-  # Tap-authored HAP project template and launcher scripts. They are not
-  # patches, so they live in Resources/ rather than Patches/. Every path is
-  # listed literally: the weekly remove-unused-patches job keeps a Resources/
+  # List every path literally: the unused-resource audit keeps a Resources/
   # directory only while a formula names it.
   RESOURCE_FILES = %w[
     Resources/herdr-app/hap/AppScope/app.json5
@@ -97,9 +90,7 @@ class HerdrApp < Formula
     Resources/herdr-app/scripts/herdr-bridge.py
   ].freeze
 
-  # The cargo build runs `zig build`, which fetches its packages, and ohpm
-  # fetches the ArkTS packages. Both servers now and then answer 5xx or a
-  # broken response, which is not worth a 30 minute build: retry the step.
+  # zig and ohpm fetch packages over the network; retry on transient 5xx.
   def retrying(attempts = 3)
     tries = 0
     begin
@@ -120,10 +111,9 @@ class HerdrApp < Formula
       odie "missing tap resource: #{file}" unless (tap_root/file).exist?
     end
 
-    # HAP packaging. CI runs in the private electron-ohos-ci image (selected
-    # via the OHOS_CI_IMAGE_OVERRIDES repo variable), which bakes the
-    # HarmonyOS command-line toolchain at /opt/electron-ohos-clt, repacked
-    # from a licensed system CLT install and not publicly redistributable.
+    # HAP packaging uses the private electron-ohos-ci image
+    # (OHOS_CI_IMAGE_OVERRIDES) with the proprietary CLT at
+    # /opt/electron-ohos-clt.
     clt = Pathname.new("/opt/electron-ohos-clt")
     unless (clt/"hvigor/bin/hvigorw.js").exist?
       odie "herdr-app builds only in electron-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES['herdr-app']"
@@ -159,17 +149,15 @@ class HerdrApp < Formula
     system ndk/"llvm/bin/llvm-strip", "--strip-unneeded", libs/"libopenharmony_ability.so"
     cp ndk/"llvm/lib/aarch64-linux-ohos/libc++_shared.so", libs
 
-    # brew's sanitized build env drops the container's LD_LIBRARY_PATH, but
-    # ohos_packing_tool needs the SDK clang runtimes and the libhilog
-    # stderr adapter baked into the image.
+    # brew's sanitized env drops LD_LIBRARY_PATH; restore it for
+    # ohos_packing_tool.
     ENV["DEVECO_SDK_HOME"] = (clt/"sdk").to_s
     ENV["HOS_SDK_HOME"] = (clt/"sdk").to_s
     ENV["LD_LIBRARY_PATH"] =
       "#{clt}/lib:#{clt}/sdk/default/openharmony/native/llvm/lib/clang/15.0.4/lib/aarch64-linux-ohos"
     ENV.delete("NODE_OPTIONS")
-    # A container inheriting RLIMIT_NOFILE near 1e9 drives the musl FD-table
-    # sizing into a refused mapping; cap it for the hvigor process tree
-    # (only ever lowering, never raising an environment's existing limit).
+    # Cap RLIMIT_NOFILE for the hvigor tree: near-1e9 limits break the musl FD
+    # table. Only ever lower it.
     soft_cap, hard_cap = Process.getrlimit(Process::RLIMIT_NOFILE)
     Process.setrlimit(Process::RLIMIT_NOFILE, [soft_cap, 65_536].min, 65_536) if hard_cap > 65_536
 
@@ -243,9 +231,8 @@ class HerdrApp < Formula
     assert_match "HERDR_APP_PYTHON=", wrapper
     assert_match "HERDR_APP_HC=", wrapper
 
-    # The bridge and the install flow, run from the script itself (the wrapper above exports its own hc and
-    # python) with a stand-in for hc and for app-installer: the token ends up in the HAP that would be signed,
-    # the bridge answers it and nothing else.
+    # Run the bridge and install flow with stand-ins for hc and app-installer:
+    # the token ends up in the HAP and the bridge answers only it.
     port = free_port
     (testpath/"tmp").mkpath
     (testpath/"bin").mkpath
