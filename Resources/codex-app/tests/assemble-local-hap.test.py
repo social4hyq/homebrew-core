@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 """Exercise the HAP assembler with a tiny shell and controlled vendor payload."""
 import importlib.util
+import io
 import json
+import lzma
 import shutil
 import struct
+import tarfile
 import tempfile
 import zipfile
 from pathlib import Path
@@ -83,6 +86,37 @@ def main():
         asar = root / "test.asar"
         asar.write_bytes(struct.pack("<4I", 4, len(package) + 8, 0, len(package)) + package + package_bytes)
         assert assembler.asar_entry(asar, "package.json") == package_bytes
+
+        # Real selected_payload path: stream data.tar.xz from a synthetic .deb
+        # (an ar archive) without binutils.
+        def write_ar(path, members):
+            blob = io.BytesIO()
+            blob.write(b"!<arch>\n")
+            for name, data in members.items():
+                assert len(name) <= 16
+                blob.write(name.ljust(16).encode() + b"0".ljust(12) + b"0".ljust(6)
+                           + b"0".ljust(6) + b"100644".ljust(8)
+                           + str(len(data)).ljust(10).encode() + b"`\n")
+                blob.write(data)
+                if len(data) % 2:
+                    blob.write(b"\n")
+            path.write_bytes(blob.getvalue())
+
+        inner = io.BytesIO()
+        with tarfile.open(fileobj=inner, mode="w") as tar:
+            payload = b"tar-payload"
+            info = tarfile.TarInfo("./usr/lib/chatgpt/resources/icon-chatgpt.png")
+            info.size = len(payload)
+            tar.addfile(info, io.BytesIO(payload))
+        fake_deb = root / "fixture.deb"
+        data_member = lzma.compress(inner.getvalue())
+        write_ar(fake_deb, {
+            "debian-binary": b"2.0\n",
+            "control.tar.gz": b"control",
+            "data.tar.xz": data_member,
+        })
+        with assembler.deb_member(fake_deb, "data.tar.xz") as stream:
+            assert stream.read() == data_member
 
 
 if __name__ == "__main__":

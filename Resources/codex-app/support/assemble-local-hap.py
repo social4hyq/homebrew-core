@@ -2,10 +2,10 @@
 """Assemble a local-only ChatGPT HAP from the pinned official ARM64 Debian package."""
 import argparse
 import hashlib
+import io
 import json
 import shutil
 import struct
-import subprocess
 import tarfile
 import tempfile
 import zipfile
@@ -45,13 +45,86 @@ def asar_entry(archive, name):
         return data
 
 
+class DebMemberReader(io.RawIOBase):
+    """Read-only, seekable view over one ar-member byte range of a file."""
+
+    def __init__(self, file, start, size):
+        super().__init__()
+        self._file = file
+        self._start = start
+        self._size = size
+        self._pos = 0
+
+    def readable(self):
+        return True
+
+    def seekable(self):
+        return True
+
+    def tell(self):
+        return self._pos
+
+    def seek(self, offset, whence=0):
+        if whence == 0:
+            target = offset
+        elif whence == 1:
+            target = self._pos + offset
+        else:
+            target = self._size + offset
+        self._pos = max(0, min(target, self._size))
+        return self._pos
+
+    def readinto(self, b):
+        want = min(len(b), self._size - self._pos)
+        if want <= 0:
+            return 0
+        self._file.seek(self._start + self._pos)
+        got = self._file.readinto(memoryview(b)[:want]) or 0
+        self._pos += got
+        return got
+
+    def read(self, size=-1):
+        if size < 0:
+            size = self._size - self._pos
+        buf = bytearray(size)
+        return bytes(buf[:self.readinto(buf)])
+
+    def close(self):
+        if not self.closed:
+            try:
+                self._file.close()
+            finally:
+                super().close()
+
+
+def deb_member(deb, member):
+    """Stream one member of a Debian package (an ar archive) without binutils."""
+    file = deb.open("rb")
+    try:
+        if file.read(8) != b"!<arch>\n":
+            raise ValueError(f"{deb} is not a Debian package")
+        while True:
+            header = file.read(60)
+            if len(header) < 60:
+                raise ValueError(f"no {member} member in {deb}")
+            name = header[:16].decode("ascii", "replace").rstrip()
+            if name.endswith("/"):
+                name = name[:-1]
+            size = int(header[48:58].decode('ascii').strip() or "0")
+            if name == member:
+                return DebMemberReader(file, file.tell(), size)
+            file.seek(size + (size % 2), 1)
+    except Exception:
+        file.close()
+        raise
+
+
 def selected_payload(deb, scratch):
     if sha256(deb) != DEB_SHA256:
         raise ValueError(f"official ChatGPT {VERSION} package SHA-256 mismatch")
     selected = {}
-    ar = subprocess.Popen(["ar", "p", str(deb), "data.tar.xz"], stdout=subprocess.PIPE)
-    try:
-        with tarfile.open(fileobj=ar.stdout, mode="r|xz") as package:
+    with deb_member(deb, "data.tar.xz") as stream:
+        with tarfile.open(fileobj=stream, mode="r|xz") as package:
             for member in package:
                 name = member.name.removeprefix("./")
                 if name == OWL_RUNTIME:
@@ -76,12 +149,8 @@ def selected_payload(deb, scratch):
                 with source, target.open("wb") as output:
                     shutil.copyfileobj(source, output)
                 selected[relative] = (target, member.mode)
-        if ar.wait():
-            raise RuntimeError("failed to read the official Debian data archive")
-    finally:
-        if ar.poll() is None:
-            ar.kill()
-            ar.wait()
+        while stream.read(128 * 1024):
+            pass
 
     required = {
         "app.asar", "icon-chatgpt.png", "owl-electron-app.json", "owl-app.ini",
