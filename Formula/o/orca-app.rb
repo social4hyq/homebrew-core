@@ -9,7 +9,7 @@ class OrcaApp < Formula
   # Tap-authored shell scripts (MIT) packaging the CPF-Electron runtime
   # (Chromium/Electron, mixed MIT/BSD/LGPL).
   license :cannot_represent
-  revision 7
+  revision 8
 
   livecheck do
     url :stable
@@ -220,7 +220,7 @@ class OrcaApp < Formula
   end
 
   post_install_steps do
-    run "{HOMEBREW_PREFIX}/bin/hap-app",
+    run "{{HOMEBREW_PREFIX}}/bin/hap-app",
         args: ["auto-install", "orca-app", "com.social4hyq.orca"],
         must_succeed: false, print_stdout: true, network_access: true
   end
