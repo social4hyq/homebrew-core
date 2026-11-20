@@ -6,6 +6,7 @@ class CodexApp < Formula
   version "26.1111.71704"
   sha256 "f0550dee1f99127d357ad760aef739c557d49bd67728d2f105d00a7a4780f740"
   license :cannot_represent # OpenAI service and software terms
+  revision 1
 
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codex-app-v26.1111.71704-r1"
