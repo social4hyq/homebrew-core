@@ -1,0 +1,29 @@
+OHOS: tooltips for the shell's own caption buttons (zh and en; other locales
+fall back to en).
+
+diff --git a/apps/shell/src/renderer/src/strings.ts b/apps/shell/src/renderer/src/strings.ts
+index 16889ef..475eb99 100644
+--- a/apps/shell/src/renderer/src/strings.ts
++++ b/apps/shell/src/renderer/src/strings.ts
+@@ -449,6 +449,10 @@ export const strings = {
+     // Language / tab strip
+     language: '语言',
+     closeTab: '关闭标签',
++    windowMinimize: '最小化',
++    windowMaximize: '最大化',
++    windowRestore: '还原',
++    windowClose: '关闭窗口',
+     tabList: '全部标签',
+     appMenu: '菜单',
+     newTab: '新建标签页',
+@@ -991,6 +995,10 @@ export const strings = {
+     yesterday: 'Yesterday',
+     language: 'Language',
+     closeTab: 'Close tab',
++    windowMinimize: 'Minimize',
++    windowMaximize: 'Maximize',
++    windowRestore: 'Restore',
++    windowClose: 'Close window',
+     tabList: 'All tabs',
+     appMenu: 'Menu',
+     newTab: 'New tab',

@@ -1,0 +1,49 @@
+OHOS: expose the caption-button channel to the shell renderer (aiOfficeWindow):
+minimize, toggle maximize, close, and the window's maximize state. The tab strip
+draws the buttons only when process.platform is 'openharmony'.
+
+diff --git a/apps/shell/src/preload/index.ts b/apps/shell/src/preload/index.ts
+index ff1bb1c..316699c 100644
+--- a/apps/shell/src/preload/index.ts
++++ b/apps/shell/src/preload/index.ts
+@@ -40,6 +40,8 @@ import type {
+ import type { FoundSkill, RecommendedSkill } from '../shared/found-skill'
+ import type { TabsApi, TabSummary } from '../shared/tabs-api'
+ import { TABS_CHANNELS } from '../shared/tabs-api'
++import { WINDOW_CHANNELS } from '../shared/window-api'
++import type { WindowApi, WindowControlAction } from '../shared/window-api'
+ 
+ const UI_LANGUAGES: readonly UiLanguage[] = [
+   'zh',
+@@ -882,5 +884,31 @@ const tabsApi: TabsApi = {
+ 
+ contextBridge.exposeInMainWorld('aiOfficeTabs', tabsApi)
+ 
++// Caption buttons the shell draws on OpenHarmony (no title bar of its own there)
++const windowApi: WindowApi = {
++  platform: process.platform,
++  minimize() {
++    void ipcRenderer.invoke(WINDOW_CHANNELS.control, 'minimize' satisfies WindowControlAction)
++  },
++  toggleMaximize() {
++    return ipcRenderer.invoke(WINDOW_CHANNELS.control, 'toggle-maximize' satisfies WindowControlAction)
++  },
++  close() {
++    void ipcRenderer.invoke(WINDOW_CHANNELS.control, 'close' satisfies WindowControlAction)
++  },
++  isMaximized() {
++    return ipcRenderer.invoke(WINDOW_CHANNELS.isMaximized)
++  },
++  onMaximizedChange(handler) {
++    const listener = (_event: IpcRendererEvent, maximized: unknown) => {
++      if (typeof maximized === 'boolean') handler(maximized)
++    }
++    ipcRenderer.on(WINDOW_CHANNELS.maximizedChanged, listener)
++    return () => ipcRenderer.removeListener(WINDOW_CHANNELS.maximizedChanged, listener)
++  },
++}
++
++contextBridge.exposeInMainWorld('aiOfficeWindow', windowApi)
++
+ // open documents dragged from the OS anywhere over Home or the tab strip
+ installDropOpenBridge()

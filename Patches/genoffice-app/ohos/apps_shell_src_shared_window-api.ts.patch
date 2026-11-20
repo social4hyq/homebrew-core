@@ -1,0 +1,32 @@
+OHOS: the channel and API the shell renderer uses to drive its window's
+caption buttons.
+
+diff --git a/apps/shell/src/shared/window-api.ts b/apps/shell/src/shared/window-api.ts
+new file mode 100644
+index 0000000..69a941a
+--- /dev/null
++++ b/apps/shell/src/shared/window-api.ts
+@@ -0,0 +1,23 @@
++/** Caption buttons the shell paints itself when the platform has no title bar
++ * of its own. OpenHarmony's window decor is all-or-nothing and electron-ohos
++ * implements no titleBarOverlay, so on OpenHarmony the shell draws minimize,
++ * maximize/restore and close at the right end of its own tab strip. */
++export const WINDOW_CHANNELS = {
++  control: 'window:control',
++  isMaximized: 'window:is-maximized',
++  maximizedChanged: 'window:maximized-changed',
++} as const
++
++export type WindowControlAction = 'minimize' | 'toggle-maximize' | 'close'
++
++export interface WindowApi {
++  /** process.platform of the main process: the shell draws the caption
++   * buttons only when it is 'openharmony' */
++  platform: string
++  minimize(): void
++  /** returns the maximize state after the toggle */
++  toggleMaximize(): Promise<boolean>
++  close(): void
++  isMaximized(): Promise<boolean>
++  onMaximizedChange(listener: (maximized: boolean) => void): () => void
++}
