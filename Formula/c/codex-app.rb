@@ -6,14 +6,13 @@ class CodexApp < Formula
   version "26.1117.31558"
   sha256 "81670501c6b7d784ef2b9a62b32da031e81a0eac0f50ebd933d0a9956d7bec77"
   license :cannot_represent # OpenAI service and software terms
-  revision 4
+  revision 5
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codex-app-v26.1117.31558-r6"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7fb99aa14b6d67e74f59d1466586e5ef336839c9f68e5b29242ef4345652f7a8"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codex-app-v26.1117.31558-r7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "afc442b4cc2a2dfa12c6accac6627710bc43277746cd22ee35ebcadfe683b56c"
   end
 
-  depends_on "binutils" => :build
   depends_on "app-installer"
   depends_on "codex"
   depends_on "node"
