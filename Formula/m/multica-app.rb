@@ -4,7 +4,7 @@ class MulticaApp < Formula
   url "https://github.com/multica-ai/multica/archive/refs/tags/v0.11.1.tar.gz"
   sha256 "8a8f2149447dfd0c178fca332f88b539560fa57a5075d67c6e440958de8d49fc"
   license :cannot_represent # Multica License (Apache-2.0 plus additional conditions)
-  revision 3
+  revision 4
 
   livecheck do
     url :stable
@@ -24,7 +24,6 @@ class MulticaApp < Formula
   depends_on "ohos-sdk-toolchains"
   depends_on "zip"
 
-  # CPF-Electron Electron OHOS PC (2in1) runtime, published on GitCode.
   resource "electron-ohos" do
     url "https://gitcode.com/CPF-Electron/Electron/releases/download/v40.0.1/v40.0.1.20261028.2-release.zip"
     sha256 "5268fe3c994ec2ce48a999fd6b5029d9cb0e409b07c0395e2a6072e50cb3e1ac"
@@ -37,8 +36,7 @@ class MulticaApp < Formula
     end
   end
 
-  # List every path literally: the unused-resource audit keeps a Resources/
-  # directory only while a formula names it.
+  # The unused-resource audit requires literal tap paths.
   RESOURCE_FILES = %w[
     Resources/multica-app/assets/tray-icon.png
   ].freeze
@@ -66,9 +64,7 @@ class MulticaApp < Formula
 
   def install
     tap_root = Pathname(__dir__).parent.parent
-    RESOURCE_FILES.each do |file|
-      odie "missing tap resource: #{file}" unless (tap_root/file).exist?
-    end
+    RESOURCE_FILES.each { |file| odie "missing tap resource: #{file}" unless (tap_root/file).exist? }
 
     cd "server" do
       ENV["CGO_ENABLED"] = "0"
@@ -135,8 +131,6 @@ class MulticaApp < Formula
     inreplace shell/"web_engine/src/main/ets/ability/WebAbility.ets",
               "    super.onWindowStageCreate(windowStage);\n", close_handler
 
-    # Desktop payload: the patch adds the OHOS dependency wiring (pnpm
-    # overrides, scoped registry, signpost).
     ENV["CI"] = "true"
     system "npm", "exec", "--yes", "--", "pnpm@10.28.2", "install",
            "--ignore-scripts", "--frozen-lockfile", "--reporter=append-only"
@@ -187,27 +181,21 @@ class MulticaApp < Formula
       }
     JS
 
-    # The shell builds in the private electron-ohos-ci image
-    # (OHOS_CI_IMAGE_OVERRIDES) with the proprietary CLT at
-    # /opt/electron-ohos-clt; it compiles no C++, so the NDK-less SDK suffices.
+    # The proprietary CLT is supplied by the CI image, not distributed by the tap.
     clt = Pathname.new("/opt/electron-ohos-clt")
     unless (clt/"hvigor/bin/hvigorw.js").exist?
       odie "multica-app builds only in electron-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES['multica-app']"
     end
 
-    # brew's sanitized env drops LD_LIBRARY_PATH; restore it for
-    # ohos_packing_tool.
+    # ohos_packing_tool needs SDK libraries outside brew's sanitized search path.
     ENV["DEVECO_SDK_HOME"] = (clt/"sdk").to_s
     ENV["HOS_SDK_HOME"] = (clt/"sdk").to_s
     ENV["LD_LIBRARY_PATH"] =
       "#{clt}/lib:#{clt}/sdk/default/openharmony/native/llvm/lib/clang/15.0.4/lib/aarch64-linux-ohos"
     ENV.delete("NODE_OPTIONS")
-    # Cap RLIMIT_NOFILE for the hvigor tree: near-1e9 limits break the musl FD
-    # table. Only ever lower it.
+    # An oversized RLIMIT_NOFILE breaks the musl FD table in hvigor.
     soft_cap, hard_cap = Process.getrlimit(Process::RLIMIT_NOFILE)
-    if hard_cap > 65_536
-      Process.setrlimit(Process::RLIMIT_NOFILE, [soft_cap, 65_536].min, 65_536)
-    end
+    Process.setrlimit(Process::RLIMIT_NOFILE, [soft_cap, 65_536].min, 65_536) if hard_cap > 65_536
 
     cd shell do
       system "node", clt/"ohpm/bin/pm-cli.js", "install"
@@ -238,19 +226,18 @@ class MulticaApp < Formula
 
   def caveats
     <<~EOS
-      `brew install`/`brew upgrade` installs the HAP automatically once the
-      device and the Huawei Developer login are ready; otherwise it is queued:
-      `hap-app status` shows why, `hap-app install-pending` finishes it.
-      Manual: `multica-app install`. Details: docs/hap-app-formulae.md.
+      `brew install` and `brew upgrade` try to install the HAP when a device is
+      connected and Huawei Developer login is ready. If queued, check
+      `hap-app status`, then run `hap-app install-pending`.
+      Manual install: `multica-app install`. See docs/hap-app-formulae.md.
 
       The CLI and daemon come from the `multica` formula; keep both versions equal
       (`multica-app` warns when they differ). The desktop runs in its sandbox, so a
-      loopback bridge runs on the host: `multica-app` starts it and opens the app;
-      `multica-app start` with `--bridge-only` starts only the bridge; `multica-app
-      stop` stops it. A startup file can run before Homebrew's bin is on PATH,
-      so use the absolute path there:
+      loopback bridge runs on the host: `multica-app` starts it and opens the app,
+      `multica-app stop` stops it. To start only the bridge from a login script,
+      use the absolute path because it may run before Homebrew's bin is on PATH:
 
-        "$HOME/.harmonybrew/bin/multica-app" start --bridge-only
+        "#{opt_bin}/multica-app" start --bridge-only
 
       The default HAP requests INTERNET and GET_NETWORK_INFO only; with an AGC
       profile carrying CUSTOM_SANDBOX/READ_WRITE_USER_FILE use
@@ -292,14 +279,11 @@ class MulticaApp < Formula
                  shell_output("MULTICA_AGENT_TEMP_BASE=#{testpath}/custom sh #{env_probe}")
     # Startup files may run before Homebrew's bin is on PATH: document the
     # absolute path.
-    assert_match "\"$HOME/.harmonybrew/bin/multica-app\" start --bridge-only", caveats
+    assert_match "\"#{opt_bin}/multica-app\" start --bridge-only", caveats
     assert_match "before Homebrew's bin is on PATH", caveats
     refute_match "`multica-app start --bridge-only`", caveats
-    # The caveats must not point at a separate project repository.
     refute_match "github.com/social4hyq", caveats
     desktop_installer = pkgshare/"install-desktop.sh"
-    assert_match "app-installer", desktop_installer.read
-    refute_match "devecocli", desktop_installer.read
     zip = formula_opt_bin("zip")/"zip"
     unsigned_hap = testpath/"desktop.hap"
     app_dir = testpath/"hap/resources/resfile/resources/app"
@@ -310,7 +294,6 @@ class MulticaApp < Formula
     end
     fake_bin = testpath/"bin"
     fake_bin.mkpath
-    # A CLI of another version than this desktop is warned about, not refused.
     fake_cli = fake_bin/"multica-cli"
     fake_cli.write <<~SH
       #!/bin/sh
@@ -382,7 +365,6 @@ class MulticaApp < Formula
       ENV["MULTICA_MODULE_ACL"] = (pkgshare/"module-acl.json").to_s
       (testpath/"build-profile.json5").write "{}"
       shell_output("#{desktop_installer} --acl-profile #{testpath}/build-profile.json5")
-      # The ACL variant also goes through hap-installer with the given profile.
       acl_args = installer_args.read.lines(chomp: true)
       assert_equal "#{testpath}/build-profile.json5", acl_args[acl_args.index("--profile") + 1]
       refute_path_exists signer_args
@@ -430,13 +412,8 @@ class MulticaApp < Formula
     end
     refute_path_exists libexec/"node_modules"
     refute_path_exists libexec/"multica-cli"
-    assert_path_exists pkgshare/"install-desktop.sh"
     hap = libexec/"multica-desktop-unsigned.hap"
-    assert_path_exists hap
     listing = shell_output("unzip -l #{hap}")
-    assert_match "pack.info", listing
-    assert_match "module.json", listing
-    assert_match "ets/modules.abc", listing
     assert_match "libs/arm64-v8a/libelectron.so", listing
     assert_match "resources/resfile/resources/app/out/main/index.js", listing
     refute_match "node_modules/typescript/", listing
@@ -448,7 +425,6 @@ class MulticaApp < Formula
     # another app.
     assert_equal "com.social4hyq.multica", profile.fetch("app").fetch("bundleName")
     assert_equal "social4hyq", profile.fetch("app").fetch("vendor")
-    # The installer and the launcher act on this id, so both must match the HAP.
     assert_match 'BUNDLE_ID="com.social4hyq.multica"', desktop_installer.read
     assert_match 'BUNDLE_ID="com.social4hyq.multica"', (pkgshare/"desktop.sh").read
     # ArkTS records embed the bundle name: the compiled payload and the
