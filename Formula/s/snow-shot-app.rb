@@ -610,12 +610,13 @@ class SnowShotApp < Formula
 
   def caveats
     <<~EOS
-      The HAP is unsigned in the bottle. `brew install` runs `snow-shot-app install`
-      automatically once the device is connected and the Huawei Developer login
-      is done; otherwise it is queued: `hap-app install-pending` finishes it.
-      To install by hand, run `snow-shot-app install`: app-installer handles
-      Huawei Developer login, local
-      debug profile generation, signing, installation, and launch.
+      `brew install`/`brew upgrade` installs the HAP automatically once the
+      device and the Huawei Developer login are ready; otherwise it is queued:
+      `hap-app status` shows why, `hap-app install-pending` finishes it.
+      Manual: `snow-shot-app install`. Details: docs/hap-app-formulae.md.
+
+      The HAP is unsigned in the bottle; install signs it with a local debug profile
+      (Huawei Developer login on first run).
     EOS
   end
 
