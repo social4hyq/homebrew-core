@@ -7,7 +7,7 @@ class ObsidianApp < Formula
   # host payload in Resources/obsidian-app is version-independent. The asar is
   # fetched at install time and never put in the bottle.
   license :cannot_represent
-  revision 8
+  revision 9
 
   # desktop-releases.json carries the latest desktop version, asar URL and
   # sha256.
@@ -31,8 +31,7 @@ class ObsidianApp < Formula
   depends_on "unzip"
   depends_on "zip"
 
-  # List every path literally: the unused-resource audit keeps a Resources/
-  # directory only while a formula names it.
+  # The unused-resource audit requires literal tap paths.
   RESOURCE_FILES = %w[
     Resources/_shared/hap-app/install-lib.sh
     Resources/obsidian-app/app/bootstrap.cjs
@@ -72,7 +71,6 @@ class ObsidianApp < Formula
     Resources/obsidian-app/scripts/obsidian-desktop.sh
   ].freeze
 
-  # CPF-Electron's OpenHarmony desktop build, downloaded directly from GitCode.
   resource "electron-ohos" do
     url "https://gitcode.com/CPF-Electron/Electron/releases/download/v40.0.1/v40.0.1.20261028.2-release.zip"
     sha256 "5268fe3c994ec2ce48a999fd6b5029d9cb0e409b07c0395e2a6072e50cb3e1ac"
@@ -81,9 +79,7 @@ class ObsidianApp < Formula
   def install
     tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
     res = tap_root/"Resources/obsidian-app"
-    RESOURCE_FILES.each do |file|
-      odie "missing tap resource: #{file}" unless (tap_root/file).exist?
-    end
+    RESOURCE_FILES.each { |file| odie "missing tap resource: #{file}" unless (tap_root/file).exist? }
 
     resource("electron-ohos").fetch
     system "unzip", "-o", resource("electron-ohos").cached_download, "-d", buildpath
@@ -102,8 +98,7 @@ class ObsidianApp < Formula
     inreplace shell/"AppScope/app.json5", '"bundleName": "com.huawei.ohos_electron"',
                                           '"bundleName": "com.social4hyq.obsidiandesktop"'
     inreplace shell/"AppScope/app.json5", '"vendor": "example"', '"vendor": "social4hyq"'
-    # Patch app name/labels in every locale: the base file alone leaves the
-    # zh_CN/en_US overrides showing "Electron".
+    # Locale overrides would otherwise keep the Electron launcher label.
     (shell.glob("AppScope/resources/*/element/string.json") +
      shell.glob("electron/src/main/resources/*/element/string.json")).each do |file|
       strings = JSON.parse(file.read)
@@ -134,13 +129,11 @@ class ObsidianApp < Formula
       file.atomic_write(text.gsub("\r\n", "\n")) if text.include?("\r\n")
     end
 
-    # Mirror the packaging deltas for the CI image's NDK-less SDK subset
-    # (no llvm-strip).
+    # The CI SDK lacks llvm-strip and local signing material.
     inreplace shell/"build-profile.json5", "        \"signingConfig\": \"default\",\n", ""
     inreplace shell/"electron/src/main/module.json5", "    \"mainElement\": \"EntryAbility\",\n",
               "    \"mainElement\": \"EntryAbility\",\n    \"extractNativeLibs\": true,\n"
 
-    # Deep links: register obsidian:// and persist a cold-start launch uri.
     module_file = shell/"electron/src/main/module.json5"
     module_text = module_file.read
     link_skill = [
@@ -216,19 +209,15 @@ class ObsidianApp < Formula
       odie "obsidian-app builds only in electron-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES['obsidian-app']"
     end
 
-    # brew's sanitized env drops LD_LIBRARY_PATH; restore it for
-    # ohos_packing_tool.
+    # ohos_packing_tool needs SDK libraries outside brew's sanitized search path.
     ENV["DEVECO_SDK_HOME"] = (clt/"sdk").to_s
     ENV["HOS_SDK_HOME"] = (clt/"sdk").to_s
     ENV["LD_LIBRARY_PATH"] =
       "#{clt}/lib:#{clt}/sdk/default/openharmony/native/llvm/lib/clang/15.0.4/lib/aarch64-linux-ohos"
     ENV.delete("NODE_OPTIONS")
-    # Cap RLIMIT_NOFILE for the hvigor tree: near-1e9 limits break the musl FD
-    # table.
+    # An oversized RLIMIT_NOFILE breaks the musl FD table in hvigor.
     soft_cap, hard_cap = Process.getrlimit(Process::RLIMIT_NOFILE)
-    if hard_cap > 65_536
-      Process.setrlimit(Process::RLIMIT_NOFILE, [soft_cap, 65_536].min, 65_536)
-    end
+    Process.setrlimit(Process::RLIMIT_NOFILE, [soft_cap, 65_536].min, 65_536) if hard_cap > 65_536
 
     cd shell do
       system "node", clt/"ohpm/bin/pm-cli.js", "install"
@@ -256,7 +245,6 @@ class ObsidianApp < Formula
 
     cp res/"scripts/install-desktop.sh", pkgshare/"install-desktop.sh"
     chmod 0755, pkgshare/"install-desktop.sh"
-    # install-desktop.sh sources the shared install flow.
     cp tap_root/"Resources/_shared/hap-app/install-lib.sh", pkgshare/"hap-app-install-lib.sh"
     chmod 0755, pkgshare/"hap-app-install-lib.sh"
     cp res/"scripts/obsidian-desktop.sh", libexec/"obsidian-desktop.sh"
@@ -283,10 +271,10 @@ class ObsidianApp < Formula
 
   def caveats
     <<~EOS
-      `brew install`/`brew upgrade` installs the HAP automatically once the
-      device and the Huawei Developer login are ready; otherwise it is queued:
-      `hap-app status` shows why, `hap-app install-pending` finishes it.
-      Manual: `obsidian-app install`. Details: docs/hap-app-formulae.md.
+      `brew install` and `brew upgrade` try to install the HAP when a device is
+      connected and Huawei Developer login is ready. If queued, check
+      `hap-app status`, then run `hap-app install-pending`.
+      Manual install: `obsidian-app install`. See docs/hap-app-formulae.md.
 
       It downloads Obsidian #{version} from the official release, verifies the
       sha256, injects it into the HAP and signs with a local debug profile;
@@ -304,12 +292,12 @@ class ObsidianApp < Formula
     home = testpath/"home"
     home.mkpath
     ENV["HOME"] = home
-    assert_match "Usage: obsidian-app", shell_output("#{bin}/obsidian-app --help")
-    assert_match "cli ...", shell_output("#{bin}/obsidian-app --help")
-    assert_path_exists libexec/"obsidian-cli.cjs"
+    help = shell_output("#{bin}/obsidian-app --help")
+    assert_match "Usage: obsidian-app", help
+    assert_match "cli ...", help
+    system formula_opt_bin("node")/"node", "--check", libexec/"obsidian-cli.cjs"
 
     hap = libexec/"obsidian-desktop-unsigned.hap"
-    assert_path_exists hap
     listing = shell_output("unzip -l #{hap}")
     assert_match "libs/arm64-v8a/libelectron.so", listing
     assert_match "resources/resfile/resources/app/bootstrap.cjs", listing
@@ -327,8 +315,6 @@ class ObsidianApp < Formula
                     ohos.permission.kernel.DISABLE_CODE_MEMORY_PROTECTION].sort,
                  acl_permissions.sort
 
-    # install injects the vendor package, signs, then hands the HAP to
-    # hap-installer.
     fake_bin = testpath/"bin"
     fake_bin.mkpath
     injected = testpath/"injected.hap"
@@ -370,13 +356,13 @@ class ObsidianApp < Formula
     # progress messages go to stderr, keep them in the captured output
     assert_match "installed",
                  shell_output("#{bin}/obsidian-app install --asar #{asar} 2>&1")
-    assert_match "--bundle-id", installer_args.read
     assert_match "resources/resfile/resources/app/obsidian.asar", shell_output("unzip -l #{injected}")
     injected_module = JSON.parse(shell_output("unzip -p #{injected} module.json"))
     injected_permissions = injected_module.fetch("module").fetch("requestPermissions").map { |p| p.fetch("name") }
     assert_equal acl_permissions.sort, injected_permissions.sort
     refute_path_exists home/".hap-installer"
     installer = installer_args.read.lines(chomp: true)
+    assert_includes installer, "--bundle-id"
     assert_equal fake_hdc.to_s, installer[installer.index("--hdc") + 1]
     assert_match "installed", shell_output("#{bin}/obsidian-app install --asar #{asar} --no-acl 2>&1")
     strong = JSON.parse(shell_output("unzip -p #{injected} module.json"))
