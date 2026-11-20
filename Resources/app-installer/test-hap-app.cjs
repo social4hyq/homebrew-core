@@ -46,7 +46,7 @@ function fixture(t) {
     if (args[0] === 'install') {
       if (process.env.APP_FAIL_REASON && process.env.HAP_INSTALLER_RESULT_FILE) {
         fs.writeFileSync(process.env.HAP_INSTALLER_RESULT_FILE,
-          JSON.stringify({ v: 1, reason: process.env.APP_FAIL_REASON }) + String.fromCharCode(10));
+          JSON.stringify({ v: 1, reason: process.env.APP_FAIL_REASON, detail: process.env.APP_FAIL_DETAIL || '' }) + String.fromCharCode(10));
       }
       if (process.env.APP_LOG_LINE) console.log(process.env.APP_LOG_LINE);
       process.exit(process.env.APP_INSTALL_FAIL ? 1 : 0);
@@ -292,4 +292,67 @@ test('a clean PC without marker files still gets the queue in the real home', t 
   });
   assert.equal(r.status, 0, r.stdout + r.stderr);
   assert.deepEqual(f.queued(), ["orca-app.json"], "the queue must use the recovered home");
+});
+
+test('an unresolved TLS failure short-circuits the next automatic attempt', t => {
+  const f = fixture(t);
+  const first = f.run(["auto-install", "orca-app", "com.example.desktop"],
+    { APP_INSTALL_FAIL: "1", APP_FAIL_REASON: "tls" });
+  assert.equal(first.status, 0, first.stdout + first.stderr);
+  assert.equal(f.queuedEntry("orca-app").reason, "tls");
+  const second = f.run(["auto-install", "zcode-app", "com.example.zcode"]);
+  assert.equal(second.status, 0, second.stdout + second.stderr);
+  assert.match(second.stdout, /未重复尝试/);
+  assert.equal(f.queuedEntry("zcode-app").reason, "tls");
+  assert.ok(!f.calls().some(c => c[0] === "zcode-app" && c[1] === "install"),
+    "the skipped attempt must not call the app installer");
+});
+
+test('changing the network config re-enables the automatic attempt', t => {
+  const f = fixture(t);
+  assert.equal(f.run(["auto-install", "orca-app", "com.example.desktop"],
+    { APP_INSTALL_FAIL: "1", APP_FAIL_REASON: "tls" }).status, 0);
+  fs.mkdirSync(path.join(f.root, ".app-installer"), { recursive: true });
+  fs.writeFileSync(path.join(f.root, ".app-installer", "config"), "tls_ca=/tmp/fixed.pem\n");
+  const r = f.run(["auto-install", "zcode-app", "com.example.zcode"]);
+  assert.equal(r.status, 0, r.stdout + r.stderr);
+  assert.ok(f.calls().some(c => c[0] === "zcode-app" && c[1] === "install"));
+  assert.deepEqual(f.queued(), ["orca-app.json"]);
+});
+
+test('install-pending clears the TLS short-circuit marker', t => {
+  const f = fixture(t);
+  assert.equal(f.run(["auto-install", "orca-app", "com.example.desktop"],
+    { APP_INSTALL_FAIL: "1", APP_FAIL_REASON: "tls" }).status, 0);
+  const marker = path.join(f.root, ".cache", "hap-app", "tls-blocked");
+  assert.ok(fs.existsSync(marker), "the failure must leave a marker");
+  assert.equal(f.run(["install-pending"]).status, 0);
+  assert.ok(!fs.existsSync(marker), "a manual retry must clear the marker");
+});
+
+test('queue entries keep the failure detail and the attempt count', t => {
+  const f = fixture(t);
+  assert.equal(f.run(["auto-install", "orca-app", "com.example.desktop"],
+    { APP_INSTALL_FAIL: "1", APP_FAIL_REASON: "tls", APP_FAIL_DETAIL: "certificate chain" }).status, 0);
+  let entry = f.queuedEntry("orca-app");
+  assert.equal(entry.detail, "certificate chain");
+  assert.equal(entry.attempts, 1);
+  fs.rmSync(path.join(f.root, ".cache", "hap-app", "tls-blocked"));
+  assert.equal(f.run(["auto-install", "orca-app", "com.example.desktop"],
+    { APP_INSTALL_FAIL: "1", APP_FAIL_REASON: "tls", APP_FAIL_DETAIL: "certificate chain" }).status, 0);
+  entry = f.queuedEntry("orca-app");
+  assert.equal(entry.attempts, 2);
+  const r = f.run(["status"]);
+  assert.match(r.stdout, /最近失败：certificate chain/);
+});
+
+test('a broken queue entry is kept and reported for forget', t => {
+  const f = fixture(t);
+  const dir = path.join(f.root, ".cache", "hap-app", "pending");
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, "bad.json"), "{not json");
+  const r = f.run(["install-pending"]);
+  assert.notEqual(r.status, 0, r.stdout + r.stderr);
+  assert.match(r.stderr, /队列条目损坏：bad/);
+  assert.deepEqual(f.queued(), ["bad.json"], "the broken entry must stay for inspection");
 });

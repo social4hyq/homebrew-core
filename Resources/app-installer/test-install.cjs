@@ -481,3 +481,28 @@ test('doctor reports the configured TLS CA', t => {
   const r = spawnSync('bash', [script, 'doctor'], { env: f.env, encoding: 'utf8' });
   assert.match(r.stdout + r.stderr, /TLS config \(tls_ca=/);
 });
+
+test('doctor --network reports a reachable endpoint', t => {
+  const f = fixture(t);
+  const probe = path.join(f.root, 'probe');
+  fs.writeFileSync(probe, `#!${process.execPath}\nconsole.log('HTTP 200');\n`);
+  fs.chmodSync(probe, 0o755);
+  const r = spawnSync('bash', [script, 'doctor', '--network'], {
+    env: { ...f.env, HAP_INSTALLER_NETWORK_PROBE_CMD: probe, HTTPS_PROXY: '', https_proxy: '' },
+    encoding: 'utf8',
+  });
+  assert.match(r.stdout + r.stderr, /network probe \(HTTP 200\)/);
+});
+
+test('doctor --network reports an untrusted certificate chain', t => {
+  const f = fixture(t);
+  const probe = path.join(f.root, 'probe');
+  fs.writeFileSync(probe, `#!${process.execPath}\nconsole.error('SELF_SIGNED_CERT_IN_CHAIN'); process.exit(1);\n`);
+  fs.chmodSync(probe, 0o755);
+  const r = spawnSync('bash', [script, 'doctor', '--network'], {
+    env: { ...f.env, HAP_INSTALLER_NETWORK_PROBE_CMD: probe, HTTPS_PROXY: '', https_proxy: '' },
+    encoding: 'utf8',
+  });
+  assert.match(r.stdout + r.stderr, /TLS trust probe/);
+  assert.match(r.stdout + r.stderr, /tls_ca=/);
+});
