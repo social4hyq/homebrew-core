@@ -92,8 +92,9 @@ end
   既确认装的是 ACL 变体，也只要求 `system_grant`（安装时授予）的权限为 granted；
   `user_grant` 权限（粘贴、截屏等）装机后是 -1，只报告不判失败。
 - 失败会带原因（`tls` / `network` / `login` / `device` / `permissions` /
-  `install-failed`）入队，`hap-app status` 按原因给出下一步；`hap-app status --tsv`
-  保留机器可读的四列输出。
+  `install-failed`）入队，并记录 `attempts` 和最近一次失败的 `detail`；
+  `hap-app status` 按原因给出下一步和最近失败，`hap-app status --tsv` 保留机器可读的
+  四列输出。损坏的队列条目不会被静默删除，`status` 可见，用 `hap-app forget` 移除。
 - CI、root、`HAP_APP_AUTO_INSTALL=0`（或配置文件 `~/.config/hap-app/config`
   里 `auto_install=0`）下静默 no-op。
 - 逃生口：`brew install --skip-post-install`；补跑用 `brew postinstall <app>`。
@@ -129,8 +130,12 @@ tls_ca=/absolute/path/to/proxy-ca.pem     # 首选：信任代理/VPN 的 CA
 
 - 文件只影响 app-installer 调 DevEco 签名的环境；shell 里已有的同名变量优先。
 - `tls_ca` 指向不存在的文件会直接报错，不会悄悄跳过。
-- `app-installer doctor` 会显示当前 TLS 配置；`hap-app install-pending` 失败后按
-  提示改好配置再重试即可，不用重装 brew 包。
+- `app-installer doctor` 显示当前 TLS 配置；`app-installer doctor --network` 会用
+  同样的 TLS 设置探测 `https://developer.huawei.com`（配了 HTTPS 代理时跳过，因为
+  DevEco 可能走不同路由）；确认证书不被信任时按提示改配置再重试，不用重装 brew 包。
+- 同一轮 brew 里如果签名已因证书链失败，10 分钟内（且 `~/.app-installer/config`
+  没变）后续 app 直接入队、不再重复尝试；`hap-app install-pending` 会清除这个标记，
+  所以改完配置手动补装一定能重试。
 - `~/.config/hap-app/config` 管行为：`auto_install=0`、`auto_login=1`、`verbose=1`。
 - 日志在 `~/.cache/hap-app/logs/`（0600，保留最近 20 个），失败时结果里会打印路径。
 

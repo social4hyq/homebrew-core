@@ -46,6 +46,8 @@ together, passwords are read from the environment, never from the command line):
   APP_INSTALLER_KEYSTORE_PWD  keystore password
   APP_INSTALLER_KEY_PWD       key password (default: the keystore password)
 
+doctor --network also probes https://developer.huawei.com with the configured TLS
+settings (SKIP when an HTTPS proxy is set: the DevEco client may route differently).
 ready prints one line for the caller: `ok <device>`, `no-device`, `no-login`,
 `no-hdc` or `multiple-devices`, and exits 0 only for `ok`. `login` runs the
 DevEco CLI login (optionally bounded by --timeout). `permissions` reads the
@@ -101,6 +103,7 @@ start_app=1
 open_browser=1
 login_timeout=0
 expect_acl=
+network_probe=0
 
 while (($#)); do
   case "$1" in
@@ -131,6 +134,7 @@ while (($#)); do
       esac
       ;;
     --sign-only) sign_only=1; shift ;;
+    --network) network_probe=1; shift ;;
     --no-start) start_app=0; ability=; shift ;;
     --no-browser) open_browser=0; shift ;;
     -h|--help) usage; exit 0 ;;
@@ -493,6 +497,34 @@ case "$cmd" in
     fi
     if [[ -n "${HTTPS_PROXY:-}${https_proxy:-}" ]]; then
       echo "  info     HTTPS proxy: ${HTTPS_PROXY:-$https_proxy}"
+    fi
+    if ((network_probe)); then
+      if [[ -n "${HTTPS_PROXY:-}${https_proxy:-}" ]]; then
+        echo '  skip     network probe (an HTTPS proxy is configured; a real signature is the only trustworthy check)'
+      else
+        probe_rc=0
+        if [[ -n "${HAP_INSTALLER_NETWORK_PROBE_CMD:-}" ]]; then
+          probe_out="$("$HAP_INSTALLER_NETWORK_PROBE_CMD" 2>&1)" || probe_rc=$?
+        else
+          probe_out="$(node -e '
+const https = require("node:https");
+const request = https.request({ host: "developer.huawei.com", path: "/consumer/cn/", method: "HEAD", timeout: 5000 }, response => {
+  console.log("HTTP " + response.statusCode);
+  process.exit(0);
+});
+request.on("timeout", () => { console.error("timeout"); process.exit(2); });
+request.on("error", error => { console.error(error.code || error.message); process.exit(1); });
+request.end();
+' 2>&1)" || probe_rc=$?
+        fi
+        if ((probe_rc == 0)); then
+          echo "  ok       network probe (${probe_out:-reachable})"
+        elif printf '%s' "$probe_out" | grep -qiE 'CERT|self-signed|issuer|certificate'; then
+          check 'TLS trust probe' 1 "certificate chain not trusted: ${probe_out}; set tls_ca=... in ~/.app-installer/config"
+        else
+          check 'network probe' 1 "cannot reach developer.huawei.com: ${probe_out}"
+        fi
+      fi
     fi
     rc=0; login_state || rc=1
     check 'Huawei Developer login' "$rc" 'run: devecocli auth login (not needed with --profile or --keystore)'

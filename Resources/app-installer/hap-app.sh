@@ -96,6 +96,42 @@ result_reason() {
   "$node_bin" -e 'const fs=require("node:fs");try{const v=JSON.parse(fs.readFileSync(process.argv[1],"utf8"));process.stdout.write(String(v.reason||""))}catch{}' "$file" 2>/dev/null
 }
 
+result_detail() {
+  local file="$1"
+  [ -f "$file" ] || return 0
+  "$node_bin" -e 'const fs=require("node:fs");try{const v=JSON.parse(fs.readFileSync(process.argv[1],"utf8"));process.stdout.write(String(v.detail||"").slice(0,200))}catch{}' "$file" 2>/dev/null
+}
+
+# A TLS trust failure is deterministic until the CA configuration changes, so
+# skip the next automatic attempts for a short while instead of paying the same
+# timeout for every app in one brew run.
+network_config_fingerprint() {
+  local file="$HOME/.app-installer/config"
+  [ -f "$file" ] || { printf 'none'; return; }
+  stat -c '%Y-%s' "$file" 2>/dev/null || printf 'unknown'
+}
+
+tls_blocked_recently() {
+  local marker="$cache_dir/tls-blocked" at fingerprint now
+  [ -f "$marker" ] || return 1
+  at="$(sed -n 's/^at=//p' "$marker" | tail -n 1)"
+  fingerprint="$(sed -n 's/^config=//p' "$marker" | tail -n 1)"
+  [[ "$at" =~ ^[0-9]+$ ]] || return 1
+  now="$(date +%s)"
+  ((now >= at && now - at < 600)) || return 1
+  [ "$fingerprint" = "$(network_config_fingerprint)" ]
+}
+
+mark_tls_blocked() {
+  mkdir -p "$cache_dir" 2>/dev/null || return 0
+  printf 'at=%s\nconfig=%s\n' "$(date +%s)" "$(network_config_fingerprint)" >"$cache_dir/tls-blocked" 2>/dev/null || true
+  chmod 600 "$cache_dir/tls-blocked" 2>/dev/null || true
+}
+
+clear_tls_blocked() {
+  rm -f "$cache_dir/tls-blocked" 2>/dev/null || true
+}
+
 log() { printf 'hap-app: %s\n' "$*" >&2; }
 say() { printf 'hap-app: %s\n' "$*"; }
 die() { log "$*"; exit 1; }
@@ -167,20 +203,26 @@ queue_file() {
 }
 
 queue_add() {
-  local command="$1" bundle="$2" reason="$3"
+  local command="$1" bundle="$2" reason="$3" detail="${4:-}"
   valid_command "$command" || { log "invalid app command: $command"; return 1; }
   valid_bundle "$bundle" || { log "invalid bundle id: $bundle"; return 1; }
   mkdir -p "$queue_dir" || { log "cannot create $queue_dir"; return 1; }
   chmod 700 "$config_dir" "$queue_dir" 2>/dev/null || true
+  local previous=0 attempts=1
+  if [ -f "$(queue_file "$command")" ]; then
+    previous="$(queue_field "$(queue_file "$command")" attempts)"
+    [[ "$previous" =~ ^[0-9]+$ ]] || previous=0
+    attempts=$((previous + 1))
+  fi
   "$node_bin" -e '
 const fs = require("node:fs");
-const [file, command, bundle, reason] = process.argv.slice(1);
-const value = { command, bundle, reason, updated: new Date().toISOString() };
+const [file, command, bundle, reason, detail, attempts] = process.argv.slice(1);
+const value = { command, bundle, reason, detail, attempts: Number(attempts) || 1, updated: new Date().toISOString() };
 const temporary = `${file}.${process.pid}.tmp`;
 fs.writeFileSync(temporary, JSON.stringify(value) + "\n", { mode: 0o600 });
 fs.chmodSync(temporary, 0o600);
 fs.renameSync(temporary, file);
-' "$(queue_file "$command")" "$command" "$bundle" "$reason" ||
+' "$(queue_file "$command")" "$command" "$bundle" "$reason" "$detail" "$attempts" ||
     { log "cannot write the pending queue"; return 1; }
 }
 
@@ -270,7 +312,8 @@ install_one() {
     reason="$(result_reason "$result_file")"
     [ -z "$reason" ] && reason=install-failed
     [ "$(probe_ready)" = "no-login" ] && reason=login
-    queue_add "$command" "$bundle" "$reason"
+    queue_add "$command" "$bundle" "$reason" "$(result_detail "$result_file")"
+    [ "$reason" = tls ] && mark_tls_blocked
     printf 'hap-app: ✖ %s 装机失败：%s（已登记，共 %s 个待装）\n' \
       "$command" "$(reason_label "$reason")" "$(pending_count)"
     printf 'hap-app:   → %s\n' "$(reason_hint "$reason")"
@@ -295,6 +338,7 @@ install_one() {
   fi
 
   queue_remove "$command"
+  clear_tls_blocked
   install_status=installed
   say "$command: 已装机 $bundle${device:+（设备 $device）}"
   prune_logs
@@ -348,6 +392,13 @@ cmd_auto_install() {
 
   auto_install_guarded "$command" || exit 0
 
+  if tls_blocked_recently; then
+    # Keep the original entry (and its detail): skipping is not a new attempt.
+    [ -f "$(queue_file "$command")" ] || queue_add "$command" "$bundle" tls 'skipped: the last TLS trust failure is not fixed yet'
+    say "$command: 已登记待装（同一签名服务刚因证书链失败，未重复尝试；共 $(pending_count) 个）；修复 tls_ca 后运行 hap-app install-pending"
+    exit 0
+  fi
+
   local login_attempted=0
   local ready
   ready="$(probe_ready)"
@@ -400,6 +451,7 @@ cmd_install_pending() {
     return 0
   fi
 
+  clear_tls_blocked
   local ready selected=""
   ready="$(probe_ready)"
   case "$ready" in
@@ -420,8 +472,7 @@ cmd_install_pending() {
     local bundle=""
     bundle="$(queue_field "$(queue_file "$name")" bundle)"
     if ! valid_command "$name" || ! valid_bundle "$bundle"; then
-      log "丢弃损坏的队列条目：$name"
-      queue_remove "$name"
+      log "队列条目损坏：$name（运行 hap-app forget $name 移除）"
       failed=$((failed + 1))
       continue
     fi
@@ -465,6 +516,8 @@ cmd_status() {
     printf '  %s  %s  %s  %s\n' \
       "$name" "$(queue_field "$file" bundle)" "${reason:-unknown}" "$(queue_field "$file" updated)"
     printf '    → %s\n' "$(reason_hint "$reason")"
+    detail="$(queue_field "$file" detail)"
+    [ -n "$detail" ] && printf '    最近失败：%s\n' "$detail"
   done
   printf 'hap-app: 配置：%s（verbose）、%s/.app-installer/config（tls_ca/https_proxy）\n' \
     "$config_dir/config" "$HOME"

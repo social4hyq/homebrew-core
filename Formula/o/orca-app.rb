@@ -370,8 +370,7 @@ class OrcaApp < Formula
     refute_match "signed HAP kept",
                  shell_output("#{bin}/orca-app install --hap #{fake_hap} --config #{host_config} --no-serve 2>&1")
 
-    # The automatic install path exports HAP_INSTALLER_NO_START; an install must
-    # then leave the window closed even without --no-serve.
+    # The automatic path sets HAP_INSTALLER_NO_START; no --no-serve needed.
     (testpath/"hdc-log").write("")
     with_env("HAP_INSTALLER_NO_START" => "1") do
       shell_output("#{bin}/orca-app install --hap #{fake_hap} --config #{host_config}")

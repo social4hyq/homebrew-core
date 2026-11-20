@@ -4,7 +4,7 @@ class AppInstaller < Formula
   url "https://registry.npmjs.org/@deveco/deveco-cli-openharmony-arm64/-/deveco-cli-openharmony-arm64-1.3.10.tgz"
   sha256 "7fdee1bfb7393c151fa09b3714ecc4796e53d9876557e9933c5890319ffb4daa"
   license "MIT"
-  revision 14
+  revision 15
 
   livecheck do
     url :stable
@@ -12,8 +12,8 @@ class AppInstaller < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/app-installer-v1.3.10-r11"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "827a3eec949968ccd10c70b45e27fdcea21e0fbdba0f0820b412ccc10f1b5eb9"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/app-installer-v1.3.10-r12"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "21ddcaaca1deb748d5ba8930b0706e1f4f018b6898d10b7bbf56fe2cb06751ff"
   end
 
   depends_on "bash"
@@ -21,10 +21,8 @@ class AppInstaller < Formula
   depends_on "ohos-sdk-toolchains"
   depends_on "unzip"
 
-  # Launcher scripts and the npm lockfile live in the tap so they are
-  # reviewable in the PR. Every path is listed literally: the weekly
-  # remove-unused-patches job keeps a Resources/ directory only while a
-  # formula names it.
+  # List every path literally: the weekly remove-unused-patches job keeps a
+  # Resources/ directory only while a formula names it.
   RESOURCE_FILES = %w[
     Resources/app-installer/app-installer.sh
     Resources/app-installer/check-permissions.cjs
@@ -103,12 +101,8 @@ class AppInstaller < Formula
     signer = sdk/"toolchains/lib/hap-sign-tool"
     signer.dirname.mkpath
     signer.write_env_script sdk_tools/"lib/hap-sign-tool", {}
-    # `devecocli signature generate` consults the SDK permission definitions to
-    # decide which restricted permissions go into the local debug profile. The
-    # bundled toolchain had none, so profiles were silently generated without
-    # ACLs and any HAP requesting CUSTOM_SANDBOX / READ_PASTEBOARD failed to
-    # install with 9568289. Ship both spellings: the CLI reads the lowercase one
-    # on case-sensitive filesystems, and copying twice is harmless on macOS.
+    # Both spellings: `signature generate` reads the lowercase one on
+    # case-sensitive filesystems.
     cp sdk_tools/"lib/PermissionDefinitions.json", sdk/"toolchains/lib/PermissionDefinitions.json"
     cp sdk_tools/"lib/PermissionDefinitions.json", sdk/"toolchains/lib/permissionDefinitions.json"
 
@@ -129,10 +123,8 @@ class AppInstaller < Formula
       exec node "$DEVECO_CLI_JS" "$@"
     SH
     chmod 0755, cli_wrapper
-    # Bare `devecocli` (used by the desktop install scripts for `create` and
-    # `auth`) must see the bundled toolchain too: without COMMAND_LINE_TOOL_PATH
-    # its ToolProvider throws "No toolchain found" on machines that lack the
-    # system CLT under /data/service.
+    # Bare `devecocli` needs the bundled toolchain; otherwise ToolProvider
+    # reports "No toolchain found" when no system CLT is installed.
     (bin/"devecocli").write_env_script cli_wrapper,
       COMMAND_LINE_TOOL_PATH: toolchain,
       DEVECO_CLI_JS:          cli_js,
@@ -156,10 +148,8 @@ class AppInstaller < Formula
       HAP_INSTALLER_PERMISSIONS_TOOL: libexec/"check-permissions.cjs",
       HAP_SIGN_TOOL:                  sdk_tools/"lib/hap-sign-tool",
       PATH:                           installer_path
-    # `hap-app` is the post-install entry point: it queues the HAP when the
-    # device or the Huawei Developer login is not ready and installs it later.
-    # HOMEBREW_PREFIX/bin is on PATH so the app commands resolve when brew runs
-    # the post_install step with a minimal environment.
+    # The post-install entry point; HOMEBREW_PREFIX/bin is on PATH for brew's
+    # minimal post_install environment.
     (bin/"hap-app").write_env_script libexec/"hap-app.sh",
       HAP_APP_APP_INSTALLER: opt_bin/"app-installer",
       PATH:                  "#{HOMEBREW_PREFIX}/bin:#{formula_opt_bin("node")}:#{formula_opt_bin("bash")}:$PATH"
@@ -171,7 +161,8 @@ class AppInstaller < Formula
     <<~EOS
       The debug profile app-installer signs with is tied to this device and
       expires. Run `app-installer doctor` to see how many days are left and
-      whether hdc and the Huawei Developer login are ready.
+      whether hdc and the Huawei Developer login are ready; add `--network` to
+      probe the signing endpoint with the configured TLS settings.
 
       The first login to the Huawei Developer account opens the login page in
       your default browser through `aa start`; pass `--no-browser` to open the
