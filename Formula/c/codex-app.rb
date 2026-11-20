@@ -14,8 +14,8 @@ class CodexApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codex-app-v26.1117.31558-r9"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "516a2e4ecb12845c7b8d199575e2109b531f16bc5309ee64027fefd10a8c1967"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codex-app-v26.1117.31558-r10"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "804db8fb6c8fde65f289006340554ef0d5e2ecbf7fa43c40c6782bb7fc7f5662"
   end
 
   depends_on "app-installer"
