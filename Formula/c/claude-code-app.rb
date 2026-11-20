@@ -6,11 +6,16 @@ class ClaudeCodeApp < Formula
   version "5.11492.5"
   sha256 "fe6cd8a70f96b96eb4e6b647300cfaee6aaff4ce133a0fbbe11c2cdb775f5a6a"
   license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
-  revision 7
+  revision 8
+
+  livecheck do
+    url "https://downloads.claude.ai/claude-desktop/apt/stable/dists/stable/main/binary-arm64/Packages"
+    regex(%r{^Filename: pool/main/c/claude-desktop/claude-desktop_(\d+(?:\.\d+)+)_arm64\.deb$}i)
+  end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-app-v5.11492.5-r10"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "93811e9ae9a1836148ef44dff821a204ec442d1af289415cbcfd75f84b3e567b"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-app-v5.11492.5-r11"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fbb82d09ea59be2bba56d4353e1ec60b4069d24d3adf781ffec4928db4b71ff0"
   end
 
   depends_on "app-installer"
