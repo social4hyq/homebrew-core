@@ -2,7 +2,7 @@ class Opencv < Formula
   desc "Open source computer vision library"
   homepage "https://opencv.org/"
   license "Apache-2.0"
-  revision 1
+  revision 2
   compatibility_version 3
 
   stable do
@@ -21,7 +21,7 @@ class Opencv < Formula
 
   livecheck do
     url :stable
-    regex(/^v?(\d+(?:\.\d+)+)$/i)
+    regex(/^v?(5(?:\.\d+)+)$/i)
   end
 
   bottle do
@@ -85,7 +85,9 @@ class Opencv < Formula
   end
 
   def install
-    resource("contrib").stage buildpath/"opencv_contrib"
+    contrib = resource("contrib")
+    odie "opencv_contrib must match OpenCV #{version}" if !build.head? && contrib.version != version
+    contrib.stage buildpath/"opencv_contrib"
 
     # Avoid Accelerate.framework
     ENV["OpenBLAS_HOME"] = formula_opt_prefix("openblas")
