@@ -1,11 +1,9 @@
 class DeepseekHarnessApp < Formula
   desc "Desktop shell for the DeepSeek Harness agent (Electron window on local dsh web)"
   homepage "https://github.com/deepseek-ai/deepseek-harness"
-  url "https://github.com/deepseek-ai/deepseek-harness/archive/refs/tags/dsh-v0.2.2-rc.4.tar.gz"
-  sha256 "4668e9b8a5f836693c731a808214445f5fce6cfa2956cf47f473e9b6e023f4b3"
+  url "https://github.com/deepseek-ai/deepseek-harness/archive/refs/tags/dsh-v0.2.2-rc.5.tar.gz"
+  sha256 "4e24e132a9fc267d5cdc5724525873db2575680e073fd2db4519b92553614215"
   license :cannot_represent
-
-  revision 5
 
   livecheck do
     url "https://github.com/deepseek-ai/deepseek-harness.git"
@@ -13,9 +11,8 @@ class DeepseekHarnessApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/deepseek-harness-app-v0.2.2-rc.4-r10"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "53776163746f01c7af731f67f0f805990bd630d57d7eda72e28a5eee7862e14a"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/deepseek-harness-app-v0.2.2-rc.5-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "61b05291afffd90b5294e8e8d442c051a70bba974e3296c70f035cd79c144da6"
   end
 
   depends_on "app-installer"
