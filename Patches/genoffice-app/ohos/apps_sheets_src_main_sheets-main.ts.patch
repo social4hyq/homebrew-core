@@ -1,0 +1,78 @@
+OHOS: save a workbook into the app's temp dir when the picked path is refused.
+The dialog grants this app access to the picked file only, and the xlsx
+sidecar's File::create on that path fails with EPERM ("Operation not permitted
+(os error 1)"), so Save As to a picked folder failed while the main process can
+write the same file in place. Retry in the app's temp directory and copy the
+bytes over the picked file. Gated on OpenHarmony and on that error only.
+
+diff --git a/apps/sheets/src/main/sheets-main.ts b/apps/sheets/src/main/sheets-main.ts
+index 4680f7c..d1428d0 100644
+--- a/apps/sheets/src/main/sheets-main.ts
++++ b/apps/sheets/src/main/sheets-main.ts
+@@ -4737,6 +4737,16 @@ export function resolveSheetsSessionPath(senderId: number, sessionId: string): s
+   return sheetsTabs.get(senderId)?.sessions.get(sessionId)?.path ?? null
+ }
+ 
++/// True only for the save the picked-file sandbox refused on OpenHarmony: the
++/// sidecar reports the refused File::create as an io error that carries no
++/// errno, so the message is the only signal. Other platforms keep failing the
++/// save as before.
++function pickedPathRefusesSidecar(error: unknown): boolean {
++  if ((process.platform as string) !== 'openharmony') return false
++  const message = error instanceof Error ? error.message : String(error)
++  return message.includes('Operation not permitted (os error 1)') || message.includes('EPERM')
++}
++
+ /**
+  * Resolve a save request's sheet ops / name mappings and write the workbook through
+  * the sidecar. Split out of the save handler so a crash-recovery copy can reuse the
+@@ -5018,15 +5028,14 @@ async function writeWorkbookTo(
+   const plainTargetPath = encryptedSaveTempDir
+     ? join(encryptedSaveTempDir, 'workbook.xlsx')
+     : targetPath
+-  let mutation: Awaited<ReturnType<typeof saveWorkbookViaSidecar>>
+-  try {
+-    mutation = await saveWorkbookViaSidecar({
++  const saveWorkbookTo = (path: string) =>
++    saveWorkbookViaSidecar({
+       client,
+       // The snapshot, not the live path: the save base must be the bytes this
+       // session's pending edits were made against, regardless of what other
+       // programs did to the file since.
+       sourcePath: session.snapshotPath,
+-      targetPath: plainTargetPath,
++      targetPath: path,
+       edits,
+       bulkConstantFills,
+       structuralOps,
+@@ -5073,6 +5082,30 @@ async function writeWorkbookTo(
+       redactionStates,
+       externalLinkOps: request.externalLinkOps,
+     })
++  // A path picked in the save dialog only allows writing the picked file
++  // itself: the xlsx sidecar's File::create there is refused with EPERM, while
++  // the main process may write that file in place. Save into the app's temp
++  // directory and copy the bytes over the picked file instead of failing.
++  const saveWithPickedFileFallback = async (): Promise<
++    Awaited<ReturnType<typeof saveWorkbookViaSidecar>>
++  > => {
++    try {
++      return await saveWorkbookTo(plainTargetPath)
++    } catch (error) {
++      if (encryptedSaveTempDir !== undefined || !pickedPathRefusesSidecar(error)) throw error
++      const retryPath = join(app.getPath('temp'), `genoffice-save-${randomUUID()}.xlsx`)
++      try {
++        const result = await saveWorkbookTo(retryPath)
++        await writeFile(plainTargetPath, await readFile(retryPath))
++        return result
++      } finally {
++        await rm(retryPath, { force: true }).catch(() => undefined)
++      }
++    }
++  }
++  let mutation: Awaited<ReturnType<typeof saveWorkbookViaSidecar>>
++  try {
++    mutation = await saveWithPickedFileFallback()
+     if (session.password) {
+       const encryptedBytes = encryptOoxml(await readFile(plainTargetPath), session.password)
+       await atomicWriteFile(targetPath, encryptedBytes)

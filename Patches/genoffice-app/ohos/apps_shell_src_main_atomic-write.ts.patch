@@ -1,0 +1,40 @@
+OHOS: write the picked file in place when the save dialog's grant refuses a
+sibling temp file. The dialog grants this app access to the picked file only:
+creating <name>.<random>.tmp next to it fails with EPERM, so atomicWriteFile
+threw before it wrote anything and Save As to a picked folder always failed
+(hilog: EPERM: operation not permitted, open '.../name.<random>.tmp'). Writing
+the picked file itself is allowed, so fall back to it there. Gated on
+OpenHarmony, so every other platform keeps the untouched-on-failure contract.
+
+diff --git a/apps/shell/src/main/atomic-write.ts b/apps/shell/src/main/atomic-write.ts
+index cde2a4a..739fb32 100644
+--- a/apps/shell/src/main/atomic-write.ts
++++ b/apps/shell/src/main/atomic-write.ts
+@@ -13,8 +13,25 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+ 
+ /// Not the electron-utils helper: that one falls back to an in-place write, this
+ /// one must leave the destination untouched on failure (export-atomicity.test.ts).
+-export function atomicWriteFile(filePath: string, data: Uint8Array): Promise<void> {
+-  return viaTemp(filePath, (tmp) => writeFile(tmp, data))
++export async function atomicWriteFile(filePath: string, data: Uint8Array): Promise<void> {
++  try {
++    await viaTemp(filePath, (tmp) => writeFile(tmp, data))
++  } catch (error) {
++    // OpenHarmony's save dialog grants the app access to the picked file only:
++    // a temp file next to it is refused with EPERM, so the atomic path cannot
++    // run for a picked path at all. The new bytes are then written over the
++    // picked file in place, which is the one write the grant does allow.
++    if (!pickedPathRefusesSibling(error)) throw error
++    await writeFile(filePath, data)
++  }
++}
++
++/// True only for the OpenHarmony case above, so every other platform keeps the
++/// untouched-on-failure contract when the temp file or the rename is refused.
++function pickedPathRefusesSibling(error: unknown): boolean {
++  if ((process.platform as string) !== 'openharmony') return false
++  const code = (error as NodeJS.ErrnoException).code ?? ''
++  return code === 'EPERM' || code === 'EACCES'
+ }
+ 
+ async function viaTemp(filePath: string, fill: (tmp: string) => Promise<void>): Promise<void> {

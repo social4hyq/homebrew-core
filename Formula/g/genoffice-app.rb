@@ -9,7 +9,7 @@ class GenofficeApp < Formula
   # Apache-2.0 upstream with tap-authored packaging scripts, on the CPF-Electron
   # runtime (Chromium/Electron, mixed MIT/BSD/LGPL).
   license :cannot_represent
-  revision 6
+  revision 7
 
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/genoffice-app-v0.13.18-r7"
@@ -300,14 +300,6 @@ class GenofficeApp < Formula
     sidecar_signature = shell_output("unzip -p #{hap} resources/resfile/resources/native/xlsx-sidecar.bin | " \
                                      "grep -a -c -i codesign")
     assert_operator sidecar_signature.to_i, :>, 0
-
-    # the temporary diagnostics patch must have reached the shell's main bundle
-    diag_lines = shell_output("unzip -p #{hap} 'resources/resfile/resources/app/out/main/*' | " \
-                              "grep -c -F '[diag] main started'")
-    assert_operator diag_lines.to_i, :>, 0
-    save_probe_lines = shell_output("unzip -p #{hap} 'resources/resfile/resources/app/out/main/*' | " \
-                                    "grep -c -F '[diag-save] dialog.showSaveDialog is wrapped'")
-    assert_operator save_probe_lines.to_i, :>, 0
 
     module_json = JSON.parse(shell_output("unzip -p #{hap} module.json"))
     assert_equal %w[ohos.permission.FILE_ACCESS_PERSIST ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET],
