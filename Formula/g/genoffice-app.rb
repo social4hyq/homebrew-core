@@ -9,7 +9,7 @@ class GenofficeApp < Formula
   # Apache-2.0 upstream with tap-authored packaging scripts, on the CPF-Electron
   # runtime (Chromium/Electron, mixed MIT/BSD/LGPL).
   license :cannot_represent
-  revision 9
+  revision 10
 
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/genoffice-app-v0.13.18-r10"
@@ -258,10 +258,19 @@ class GenofficeApp < Formula
       PATH:                             "#{formula_opt_bin("node")}:$PATH"
   end
 
+  post_install_steps do
+    run "{HOMEBREW_PREFIX}/bin/hap-app",
+        args: ["auto-install", "genoffice-app", "com.social4hyq.genoffice"],
+        must_succeed: false, print_stdout: true, network_access: true
+  end
+
   def caveats
     <<~EOS
-      The desktop HAP is unsigned in the bottle. Connect and unlock the device,
-      then run `genoffice-app install`. app-installer handles Huawei Developer
+      The desktop HAP is unsigned in the bottle. `brew install` runs
+      `genoffice-app install` automatically once the device is connected and the
+      Huawei Developer login is done; otherwise it is queued: `hap-app
+      install-pending` finishes it. To install by hand, run `genoffice-app install`.
+      app-installer handles Huawei Developer
       login, local debug profile generation, signing, installation, and launch;
       `genoffice-app start` opens it again.
 
