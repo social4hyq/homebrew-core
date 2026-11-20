@@ -1,0 +1,64 @@
+OHOS: styles for the caption buttons the tab strip paints itself: full-height
+hit areas staying out of the strip's drag region, a hover/active wash, and the
+close button's red hover.
+
+diff --git a/apps/shell/src/renderer/src/tabbar.css b/apps/shell/src/renderer/src/tabbar.css
+index eae2da6..e2c3b7b 100644
+--- a/apps/shell/src/renderer/src/tabbar.css
++++ b/apps/shell/src/renderer/src/tabbar.css
+@@ -55,6 +55,55 @@ body.overlay-title-bar .tab-bar-drag-spacer {
+   width: calc(100vw - env(titlebar-area-x, 0px) - env(titlebar-area-width, 100vw));
+ }
+ 
++/* OpenHarmony: no title bar and no caption overlay, so the strip paints the
++   window buttons itself at its right end */
++.window-controls {
++  display: flex;
++  align-self: stretch;
++  flex-shrink: 0;
++  -webkit-app-region: no-drag;
++}
++
++.window-control-btn {
++  display: flex;
++  align-items: center;
++  justify-content: center;
++  width: 44px;
++  padding: 0;
++  border: none;
++  background: transparent;
++  color: var(--tabstrip-text);
++  cursor: pointer;
++}
++
++.window-control-btn:hover {
++  background: rgba(0, 0, 0, 0.08);
++}
++
++.window-control-btn:active {
++  background: rgba(0, 0, 0, 0.14);
++}
++
++.window-control-close:hover {
++  background: #e81123;
++  color: #fff;
++}
++
++.window-control-close:active {
++  background: #c50f1f;
++  color: #fff;
++}
++
++[data-theme='dark'] .window-control-btn:hover {
++  background: rgba(255, 255, 255, 0.1);
++}
++
++[data-theme='dark'] .window-control-close:hover,
++[data-theme='dark'] .window-control-close:active {
++  background: #e81123;
++  color: #fff;
++}
++
+ .tab-app-menu-btn {
+   margin-right: 2px;
+ }

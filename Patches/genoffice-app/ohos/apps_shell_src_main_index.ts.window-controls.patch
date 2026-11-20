@@ -1,0 +1,65 @@
+OHOS: draw the window's caption buttons in the tab strip. The shell asks for
+titleBarStyle 'hidden' and leaves minimize, maximize/restore and close to the
+platform's titleBarOverlay; electron-ohos implements no overlay and its window
+decor is all-or-nothing, so a window created that way has no button to close,
+maximize or minimize it. The renderer drives the window it lives in through a
+small IPC channel instead.
+
+diff --git a/apps/shell/src/main/index.ts b/apps/shell/src/main/index.ts
+index f79d441..c61f8c4 100644
+--- a/apps/shell/src/main/index.ts
++++ b/apps/shell/src/main/index.ts
+@@ -320,6 +320,7 @@ import {
+ } from '@genoffice/ui/ai-panel-prefs'
+ import type { TabKind } from '../shared/tabs-api'
+ import { TABS_CHANNELS } from '../shared/tabs-api'
++import { WINDOW_CHANNELS } from '../shared/window-api'
+ import { showErrorDialog } from './error-dialog'
+ import { startRendererWatchdog } from './renderer-watchdog'
+ import {
+@@ -5928,6 +5929,37 @@ function tabMenuActions(): TabMenuActions {
+   }
+ }
+ 
++/** Caption buttons for the windows that have no title bar of their own
++ * (OpenHarmony): the renderer drives the window it lives in, so the main
++ * window and a detached one share the handlers. */
++function registerWindowControlsIpc(): void {
++  app.on('browser-window-created', (_event, win) => {
++    const send = (): void => {
++      if (win.isDestroyed()) return
++      win.webContents.send(WINDOW_CHANNELS.maximizedChanged, win.isMaximized())
++    }
++    win.on('maximize', send)
++    win.on('unmaximize', send)
++  })
++  ipcMain.handle(
++    WINDOW_CHANNELS.isMaximized,
++    (event) => BrowserWindow.fromWebContents(event.sender)?.isMaximized() ?? false,
++  )
++  ipcMain.handle(WINDOW_CHANNELS.control, (event, action: unknown) => {
++    const win = BrowserWindow.fromWebContents(event.sender)
++    if (!win || win.isDestroyed()) return false
++    if (action === 'minimize') win.minimize()
++    else if (action === 'close') win.close()
++    else if (action === 'toggle-maximize') {
++      if (win.isMaximized()) win.unmaximize()
++      else win.maximize()
++    } else {
++      return false
++    }
++    return win.isMaximized()
++  })
++}
++
+ function registerTabsIpc(): void {
+   ipcMain.on(TABS_CHANNELS.chromePressed, (event) => broadcastChromePressed(event.sender))
+   ipcMain.handle(TABS_CHANNELS.list, () => tabManager?.list() ?? [])
+@@ -7071,6 +7103,7 @@ registerIntegrationsIpc({
+     : join(APPS_ROOT, '..', 'skills', 'recommended'),
+ })
+ registerTabsIpc()
++registerWindowControlsIpc()
+ registerDroppedFilesIpc()
+ registerUserSkillsIpc({
+   cliRunner: makeUserCliRunner,
