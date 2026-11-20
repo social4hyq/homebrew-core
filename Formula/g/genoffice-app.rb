@@ -9,7 +9,7 @@ class GenofficeApp < Formula
   # Apache-2.0 upstream with tap-authored packaging scripts, on the CPF-Electron
   # runtime (Chromium/Electron, mixed MIT/BSD/LGPL).
   license :cannot_represent
-  revision 10
+  revision 11
 
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/genoffice-app-v0.13.18-r11"
@@ -32,9 +32,13 @@ class GenofficeApp < Formula
     Resources/genoffice-app/scripts/install-desktop.sh
   ].freeze
 
-  resource "electron-ohos" do
-    url "https://gitcode.com/CPF-Electron/Electron/releases/download/v40.0.1/v40.0.1.20261028.2-release.zip"
-    sha256 "5268fe3c994ec2ce48a999fd6b5029d9cb0e409b07c0395e2a6072e50cb3e1ac"
+  # PROBE ONLY: v37.2.1 (Chromium 138) instead of the release every other HAP
+  # formula pins, to compare what process.execPath reports on each runtime (see
+  # the exec-probe patch). Named apart from "electron-ohos" so the pin check,
+  # which guards the shipped formulae, does not read this probe as drift.
+  resource "electron-ohos-37" do
+    url "https://gitcode.com/CPF-Electron/Electron/releases/download/v37.2.1/v37.2.1-openharmony-arm64.zip"
+    sha256 "2a1421f6219ac760092aecb4a82bf5ab49b19918f23edec5a9420d1b41eea9e8"
   end
 
   patch_root = Pathname(__dir__).parent.parent
@@ -76,9 +80,9 @@ class GenofficeApp < Formula
     end
     system "npm", "run", "build", "-w", "@genoffice/shell"
 
-    resource("electron-ohos").fetch
-    system "unzip", "-o", resource("electron-ohos").cached_download, "-d", buildpath
-    system "tar", "-xzf", buildpath/"libelectron_144.tar.gz", "-C", buildpath
+    resource("electron-ohos-37").fetch
+    system "unzip", "-o", resource("electron-ohos-37").cached_download, "-d", buildpath
+    system "tar", "-xzf", buildpath/"libelectron_138.tar.gz", "-C", buildpath
     shell = buildpath/"libelectron/ohos_hap"
 
     # The layout of the packaged upstream app (apps/shell/electron-builder.cjs):
