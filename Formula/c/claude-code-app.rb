@@ -6,7 +6,12 @@ class ClaudeCodeApp < Formula
   version "5.11492.5"
   sha256 "fe6cd8a70f96b96eb4e6b647300cfaee6aaff4ce133a0fbbe11c2cdb775f5a6a"
   license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
-  revision 7
+  revision 8
+
+  livecheck do
+    url "https://downloads.claude.ai/claude-desktop/apt/stable/dists/stable/main/binary-arm64/Packages"
+    regex(%r{^Filename: pool/main/c/claude-desktop/claude-desktop_(\d+(?:\.\d+)+)_arm64\.deb$}i)
+  end
 
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-app-v5.11492.5-r10"
