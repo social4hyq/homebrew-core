@@ -1,12 +1,11 @@
 class GenofficeApp < Formula
   desc "GenOffice AI office suite (docs, sheets, slides, PDF, Markdown, HTML) as a HAP"
   homepage "https://github.com/genspark-ai/genoffice"
-  url "https://github.com/genspark-ai/genoffice/archive/refs/tags/v0.13.18.tar.gz"
-  sha256 "156528d8fa1e6878d6c61d3576d6d6b093eda4abbef223e7fbc4bd4855c9cb08"
+  url "https://github.com/genspark-ai/genoffice/archive/refs/tags/v0.13.615.tar.gz"
+  sha256 "bd8cbe95dcee05ec20785b2aee015d5a1d69c0552683d808932ee5fa342c7505"
   # Apache-2.0 upstream with tap-authored packaging on the CPF-Electron runtime
   # (mixed MIT/BSD/LGPL).
   license :cannot_represent
-  revision 13
 
   livecheck do
     url :stable
