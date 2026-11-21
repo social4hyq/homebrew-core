@@ -203,8 +203,14 @@ class Opencv < Formula
         return 0;
       }
     CPP
-    system ENV.cxx, "-std=c++17", "test.cpp", "-I#{include}/opencv#{version.major}", "-o", "test",
-                    "-L#{lib}", "-lopencv_core", "-lopencv_imgcodecs"
+    # Homebrew puts HOMEBREW_PREFIX/lib in LD_LIBRARY_PATH for tests. On the OHOS PC the
+    # vendor-signed SDK linker (lld) refuses the self-signed libxml2.so.16 found there
+    # before its own, so the link step fails. Build without it; the test binary below
+    # still needs it to find this formula's libraries.
+    with_env(LD_LIBRARY_PATH: nil) do
+      system ENV.cxx, "-std=c++17", "test.cpp", "-I#{include}/opencv#{version.major}", "-o", "test",
+                      "-L#{lib}", "-lopencv_core", "-lopencv_imgcodecs"
+    end
     assert_equal version.to_s, shell_output("./test").strip
 
     # The test below seems to time out on Intel macOS.
