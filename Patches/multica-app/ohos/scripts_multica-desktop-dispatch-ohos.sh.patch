@@ -4,7 +4,7 @@ desktop.
 
 diff --git a/scripts/multica-desktop-dispatch-ohos.sh b/scripts/multica-desktop-dispatch-ohos.sh
 new file mode 100755
-index 0000000..4433910
+index 0000000..b0f7703
 --- /dev/null
 +++ b/scripts/multica-desktop-dispatch-ohos.sh
 @@ -0,0 +1,47 @@
@@ -13,9 +13,9 @@ index 0000000..4433910
 +
 +usage() {
 +  printf '%s\n' 'Usage: multica-app <command> [options]' '' \
-+    '  install [--acl-profile <build-profile.json5>]' \
-+    '                sign the bottled desktop HAP, install it on a connected device' \
-+    '                and start it' \
++    '  install [--no-acl] [--device <hdc serial>] [--keep]' \
++    '                sign the bottled desktop HAP with your Huawei Developer account and' \
++    '                install and start it on a connected device (--no-acl: basic permissions)' \
 +    '  start [--bridge-only]' \
 +    '                ensure the host bridge is running, then open the app (default)' \
 +    '  stop          stop the bridge; the daemon keeps running' \

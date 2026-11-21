@@ -4,7 +4,7 @@ class MulticaApp < Formula
   url "https://github.com/multica-ai/multica/archive/refs/tags/v0.11.1.tar.gz"
   sha256 "8a8f2149447dfd0c178fca332f88b539560fa57a5075d67c6e440958de8d49fc"
   license :cannot_represent # Multica License (Apache-2.0 plus additional conditions)
-  revision 4
+  revision 5
 
   livecheck do
     url :stable
@@ -12,8 +12,8 @@ class MulticaApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-app-v0.11.1-r6"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ffa8d0b4722414b3e2bca67901c56c552d7a0d1e07996d1999510899d42c6d27"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-app-v0.11.1-r7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2dced026755063e844f7979d015b95d8b7f46fa104ff00c44b34b89da816d871"
   end
 
   depends_on "go" => :build
@@ -37,7 +37,9 @@ class MulticaApp < Formula
 
   # The unused-resource audit requires literal tap paths.
   RESOURCE_FILES = %w[
+    Resources/_shared/hap-app/install-lib.sh
     Resources/multica-app/assets/tray-icon.png
+    Resources/multica-app/scripts/install-desktop.sh
   ].freeze
 
   def patch
@@ -76,9 +78,10 @@ class MulticaApp < Formula
     # license (and NOTICE, if present) to travel with redistributed binaries.
     pkgshare.install "LICENSE" => "MULTICA-LICENSE"
     cp "NOTICE", pkgshare/"MULTICA-NOTICE" if File.exist?("NOTICE")
-    pkgshare.install "scripts/install-desktop-ohos.sh" => "install-desktop.sh"
     pkgshare.install "scripts/multica-desktop-ohos.sh" => "desktop.sh"
-    chmod 0755, pkgshare/"install-desktop.sh"
+    cp tap_root/"Resources/multica-app/scripts/install-desktop.sh", pkgshare/"install-desktop.sh"
+    cp tap_root/"Resources/_shared/hap-app/install-lib.sh", pkgshare/"hap-app-install-lib.sh"
+    chmod 0755, [pkgshare/"install-desktop.sh", pkgshare/"hap-app-install-lib.sh"]
     chmod 0755, pkgshare/"desktop.sh"
     libexec.install "scripts/multica-desktop-dispatch-ohos.sh" => "multica-desktop-dispatch.sh"
     chmod 0755, libexec/"multica-desktop-dispatch.sh"
@@ -205,8 +208,8 @@ class MulticaApp < Formula
     libexec.install shell/"electron/build/default/outputs/default/electron-default-unsigned.hap" =>
                     "multica-desktop-unsigned.hap"
 
-    # The ACL variant also requests the two ACL-gated permissions
-    # (`--acl-profile`).
+    # The default install is the ACL variant: it also requests the two ACL-gated
+    # permissions (`--no-acl` installs the basic one).
     hap_module = Utils.safe_popen_read("unzip", "-p", libexec/"multica-desktop-unsigned.hap", "module.json")
     module_json = JSON.parse(hap_module)
     requested = module_json.fetch("module").fetch("requestPermissions")
@@ -238,11 +241,11 @@ class MulticaApp < Formula
 
         "#{opt_bin}/multica-app" start --bridge-only
 
-      The default HAP requests INTERNET and GET_NETWORK_INFO only; with an AGC
-      profile carrying CUSTOM_SANDBOX/READ_WRITE_USER_FILE use
-      `install --acl-profile <build-profile.json5>`. The bundle is
-      `com.social4hyq.multica`; older `com.huawei.ohos_electron` copies are left in
-      place.
+      The default install also requests CUSTOM_SANDBOX and READ_WRITE_USER_FILE,
+      which the locally generated debug profile grants; `install --no-acl` installs
+      the basic variant that asks only for INTERNET and GET_NETWORK_INFO. The bundle
+      is `com.social4hyq.multica`; older `com.huawei.ohos_electron` copies are left
+      in place.
     EOS
   end
 
@@ -288,8 +291,11 @@ class MulticaApp < Formula
     app_dir = testpath/"hap/resources/resfile/resources/app"
     app_dir.mkpath
     (app_dir/"package.json").write "{}"
+    # The install checks that the ACL module.json belongs to the same bundle as the HAP.
+    shell_module = JSON.generate("app" => { "bundleName" => "com.social4hyq.multica" })
+    (testpath/"hap/module.json").write shell_module
     cd testpath/"hap" do
-      system zip, "-q", "-r", unsigned_hap, "resources"
+      system zip, "-q", "-r", unsigned_hap, "resources", "module.json"
     end
     fake_bin = testpath/"bin"
     fake_bin.mkpath
@@ -328,6 +334,8 @@ class MulticaApp < Formula
     ENV["MULTICA_DESKTOP_STATE"] = (testpath/"state").to_s
     ENV["MULTICA_REAL_CLI"] = cli.to_s
     ENV["MULTICA_ZIP"] = zip.to_s
+    ENV["MULTICA_MODULE_ACL"] = (pkgshare/"module-acl.json").to_s
+    ENV.prepend_path "PATH", formula_opt_bin("node")
     ENV.prepend_path "PATH", fake_bin
     signer_args = testpath/"signer-args"
     signer_input = testpath/"signer-input.hap"
@@ -347,26 +355,31 @@ class MulticaApp < Formula
     SH
     chmod 0755, fake_signer
     begin
-      shell_output(desktop_installer.to_s)
+      # --no-acl installs the basic variant: no module.json is swapped in.
+      shell_output("#{desktop_installer} --no-acl")
       args = installer_args.read.lines(chomp: true)
       assert_equal "--hap", args.first
       refute_equal unsigned_hap.to_s, args[1]
       assert_equal ["--bundle-id", "com.social4hyq.multica", "--app-name", "MulticaSigning",
-                    "--module", "electron", "--ability", "EntryAbility"], args.drop(2)
+                    "--module", "electron", "--ability", "EntryAbility"], args[2, 8]
+      refute_includes args, "--profile"
 
       pairing = testpath/"home/.multica/desktop-bridge.json"
       assert_equal pairing.read,
                    shell_output("unzip -p #{injected_hap} resources/resfile/resources/app/desktop-bridge.json")
       assert_match "bridge: running", shell_output("#{pkgshare}/desktop.sh status")
       refute_path_exists signer_args
-      refute_match(/module\.json$/, shell_output("unzip -l #{injected_hap}"))
+      assert_equal shell_module, shell_output("unzip -p #{injected_hap} module.json")
 
-      ENV["MULTICA_MODULE_ACL"] = (pkgshare/"module-acl.json").to_s
-      (testpath/"build-profile.json5").write "{}"
-      shell_output("#{desktop_installer} --acl-profile #{testpath}/build-profile.json5")
+      # The default is the ACL variant, signed with the locally generated debug
+      # profile: no --profile is passed to app-installer.
+      assert_match "installed (com.social4hyq.multica, ACL)", shell_output(desktop_installer.to_s)
       acl_args = installer_args.read.lines(chomp: true)
-      assert_equal "#{testpath}/build-profile.json5", acl_args[acl_args.index("--profile") + 1]
+      refute_includes acl_args, "--profile"
       refute_path_exists signer_args
+      # The old option that asked for a signing configuration is refused with a reason.
+      assert_match "--acl-profile is no longer needed",
+                   shell_output("#{desktop_installer} --acl-profile #{testpath}/build-profile.json5 2>&1", 1)
       signed_module = JSON.parse(shell_output("unzip -p #{injected_hap} module.json"))
       signed_permissions = signed_module.fetch("module").fetch("requestPermissions").map do |permission|
         permission.fetch("name")
@@ -424,7 +437,7 @@ class MulticaApp < Formula
     # another app.
     assert_equal "com.social4hyq.multica", profile.fetch("app").fetch("bundleName")
     assert_equal "social4hyq", profile.fetch("app").fetch("vendor")
-    assert_match 'BUNDLE_ID="com.social4hyq.multica"', desktop_installer.read
+    assert_match "BUNDLE_ID_DEFAULT=com.social4hyq.multica", desktop_installer.read
     assert_match 'BUNDLE_ID="com.social4hyq.multica"', (pkgshare/"desktop.sh").read
     # ArkTS records embed the bundle name: the compiled payload and the
     # manifest must match.
