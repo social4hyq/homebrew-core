@@ -1,10 +1,9 @@
 class AppInstaller < Formula
   desc "Sign and install OpenHarmony HAP packages"
   homepage "https://www.npmjs.com/package/@deveco/deveco-cli-openharmony-arm64"
-  url "https://registry.npmjs.org/@deveco/deveco-cli-openharmony-arm64/-/deveco-cli-openharmony-arm64-1.3.10.tgz"
-  sha256 "7fdee1bfb7393c151fa09b3714ecc4796e53d9876557e9933c5890319ffb4daa"
+  url "https://registry.npmjs.org/@deveco/deveco-cli-openharmony-arm64/-/deveco-cli-openharmony-arm64-1.3.12.tgz"
+  sha256 "eaa29900d4892e89b2ae6156733ffa97597971b7a26fa1df6c686cc5934a02fb"
   license "MIT"
-  revision 16
 
   livecheck do
     url :stable
