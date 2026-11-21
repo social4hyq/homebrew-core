@@ -41,7 +41,13 @@ class Lunasvg < Formula
       -lplutovg
     ]
 
-    system ENV.cxx, pkgshare/"examples/svg2png.cpp", "-o", "svg2png", *args
+    # Homebrew puts HOMEBREW_PREFIX/lib in LD_LIBRARY_PATH for tests. On the OHOS PC the
+    # vendor-signed SDK linker (lld) refuses the self-signed libxml2.so.16 found there
+    # before its own, so the link step fails. Build without it; the test binary below
+    # still needs it to find this formula's libraries.
+    with_env(LD_LIBRARY_PATH: nil) do
+      system ENV.cxx, pkgshare/"examples/svg2png.cpp", "-o", "svg2png", *args
+    end
     system testpath/"svg2png", test_fixtures("test.svg")
     assert File.size("test.svg.png").positive?
   end
