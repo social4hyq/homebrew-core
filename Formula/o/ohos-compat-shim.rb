@@ -6,7 +6,8 @@ class OhosCompatShim < Formula
   license "0BSD"
 
   livecheck do
-    skip "development tool, manually versioned"
+    url :stable
+    strategy :github_latest
   end
 
   bottle do
