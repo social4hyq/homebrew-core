@@ -6,6 +6,7 @@ class ClaudeCodeApp < Formula
   version "6.28899.2"
   sha256 "7ec2a354ecb8bafae3e3ccafe620144232b7429b216ab59a05a0d6cc340f1455"
   license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
+  revision 1
 
   livecheck do
     url "https://downloads.claude.ai/claude-desktop/apt/stable/dists/stable/main/binary-arm64/Packages"
@@ -48,7 +49,7 @@ class ClaudeCodeApp < Formula
     Resources/claude-code-app/app/claude-launch-bridge.cjs
     Resources/claude-code-app/app/claude-ohos-config.cjs
     Resources/claude-code-app/support/assemble-local-hap.py
-    Resources/claude-code-app/support/enable-cookie-encryption.py
+    Resources/_shared/hap-app/enable-cookie-encryption.py
     Resources/claude-code-app/support/patch-code-runtime-hap.py
     Resources/claude-code-app/tests/claude-bootstrap.test.cjs
     Resources/claude-code-app/tests/claude-code-platform-patch.test.cjs
