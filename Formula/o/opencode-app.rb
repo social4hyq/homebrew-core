@@ -6,7 +6,7 @@ class OpencodeApp < Formula
   # Tap-authored shell sources (MIT) on the CPF-Electron runtime (mixed
   # MIT/BSD/LGPL).
   license :cannot_represent
-  revision 15
+  revision 16
 
   livecheck do
     url :stable
@@ -15,8 +15,8 @@ class OpencodeApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-app-v2.3.0-r18"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "db930b6c1e6d3c8d67e78cd56bcd396b1d7f693060b0b63c5d4552c78783ae72"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-app-v2.3.0-r19"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "894a3f77b1b66d1a526bf79ab360f8a058d65bd69fe3d56f1d3b010bc5292777"
   end
 
   depends_on "app-installer"
@@ -61,9 +61,11 @@ class OpencodeApp < Formula
     app = shell/"web_engine/src/main/resources/resfile/resources/app"
     rm_r app if app.exist?
     app.mkpath
-    %w[main.cjs package.json config.json].each do |name|
+    %w[main.cjs config.json].each do |name|
       cp res/"app"/name, app/name
     end
+    package = JSON.parse((res/"app/package.json").read)
+    (app/"package.json").write JSON.generate(package.merge("version" => version.to_s))
     cp tap_root/"Resources/_shared/electron-shell/tray.cjs", app/"tray.cjs"
     system "node", tap_root/"Resources/_shared/waiting-page/render-waiting.cjs",
            tap_root/"Resources/_shared/waiting-page/waiting.html.in",
