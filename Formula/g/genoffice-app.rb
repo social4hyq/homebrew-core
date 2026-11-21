@@ -260,9 +260,8 @@ class GenofficeApp < Formula
 
     # An unsigned sidecar cannot be spawned (EACCES); the keg copy carries the
     # code signature.
-    sidecar_signature = shell_output("unzip -p #{hap} resources/resfile/resources/native/xlsx-sidecar.bin | " \
-                                     "grep -a -c -i codesign")
-    assert_operator sidecar_signature.to_i, :>, 0
+    sidecar = shell_output("unzip -p #{hap} resources/resfile/resources/native/xlsx-sidecar.bin")
+    assert_includes sidecar.b, ".codesign"
 
     module_json = JSON.parse(shell_output("unzip -p #{hap} module.json"))
     assert_equal %w[ohos.permission.FILE_ACCESS_PERSIST ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET],
