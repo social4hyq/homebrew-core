@@ -4,7 +4,7 @@ class DeepseekHarnessApp < Formula
   url "https://github.com/deepseek-ai/deepseek-harness/archive/refs/tags/dsh-v0.2.2-rc.5.tar.gz"
   sha256 "4e24e132a9fc267d5cdc5724525873db2575680e073fd2db4519b92553614215"
   license :cannot_represent
-  revision 2
+  revision 3
 
   livecheck do
     url "https://github.com/deepseek-ai/deepseek-harness.git"
@@ -12,9 +12,8 @@ class DeepseekHarnessApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/deepseek-harness-app-v0.2.2-rc.5-r6"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "96d9c50ffe9ceed0fc6dcd39f54c3a3e8ace6c130e44dfda2f6b8b6dafa78dbe"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/deepseek-harness-app-v0.2.2-rc.5-r7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ad3fcecf228009bba670c12acc1c90a001b1d78387b4852db3f5ba9a69a4a46e"
   end
 
   depends_on "app-installer"
