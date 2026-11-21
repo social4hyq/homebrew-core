@@ -128,6 +128,25 @@ class CodexApp < Formula
     assemble_dir.mkpath
     cp support/"assemble-local-hap.py", assemble_dir
     RESOURCE_FILES.grep(%r{/app/}).each { |file| cp tap_root/file, assemble_dir }
+
+    # Run the assembler's package checks (hash pin, icon, app metadata, file
+    # list) on the deb Homebrew just downloaded. `codex-app install` assembles
+    # it on the user's device, so a release that breaks the assembler has to
+    # fail this build and not the install.
+    ENV["CHATGPT_APP_VENDOR_JSON"] = (libexec/"vendor.json").to_s
+    mktemp("chatgpt-payload") do |scratch|
+      system "python3", "-I", "-c", <<~PYTHON, assemble_dir/"assemble-local-hap.py", cached_download, scratch.tmpdir
+        import importlib.util
+        import sys
+        from pathlib import Path
+
+        sys.dont_write_bytecode = True
+        spec = importlib.util.spec_from_file_location("assemble", sys.argv[1])
+        assemble = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(assemble)
+        assemble.selected_payload(Path(sys.argv[2]), Path(sys.argv[3]))
+      PYTHON
+    end
     cp support/"enable-cookie-encryption.py", pkgshare/"enable-cookie-encryption.py"
     chmod 0755, [libexec/"codex-app.sh", pkgshare/"codex-app.sh",
                  pkgshare/"install-desktop.sh", pkgshare/"hap-app-install-lib.sh",
