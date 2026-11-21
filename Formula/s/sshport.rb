@@ -7,7 +7,9 @@ class Sshport < Formula
   revision 2
 
   livecheck do
-    skip "development tool, manually versioned"
+    url :stable
+    regex(/^v?(\d+(?:\.\d+)+)$/i)
+    strategy :git
   end
 
   bottle do
