@@ -25,8 +25,8 @@ BODY="$TAG bottle (CI run $RUN_NUMBER)"
 [ -n "$REASON" ] && BODY="$BODY — $REASON"
 ag "$API/releases/tags/$TAG" \
   || ag -X POST -H "Content-Type: application/json" \
-       -d "$(jq -n --arg tag "$TAG" --arg body "$BODY" \
-             '{tag_name: $tag, name: $tag, target_commitish: "main", body: $body}')" \
+       -d "$(jq -n --arg tag "$TAG" --arg name "Harmonybrew bottle" --arg body "$BODY" \
+             '{tag_name: $tag, name: $name, target_commitish: "main", body: $body}')" \
        "$API/releases"
 
 # 2. tune TCP for the trans-Pacific OBS upload. CUBIC's loss-based window
