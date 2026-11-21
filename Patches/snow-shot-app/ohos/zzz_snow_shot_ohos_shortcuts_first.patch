@@ -1,10 +1,10 @@
 OHOS: add screen-recording defaults (Ctrl+Alt+F2 / Ctrl+F2) alongside the existing screenshot pair (Ctrl+Alt+F1 / Ctrl+F1).
 
 diff --git a/snow_shot/src/storage/configurationschema.cpp b/snow_shot/src/storage/configurationschema.cpp
-index 2deaa17..6425064 100644
+index 713e851..d13d256 100644
 --- a/snow_shot/src/storage/configurationschema.cpp
 +++ b/snow_shot/src/storage/configurationschema.cpp
-@@ -1893,6 +1893,21 @@ QVector<ConfigurationSchemaEntry> buildEntries() {
+@@ -1931,6 +1931,21 @@ QVector<ConfigurationSchemaEntry> buildEntries() {
                     macGlobalShortcutDefault(QStringLiteral("Meta+Shift+3"), 20));
      replaceDefault(QStringLiteral("global_shortcuts/pin_clipboard_content"),
                     macGlobalShortcutDefault(QStringLiteral("Meta+3"), 20));

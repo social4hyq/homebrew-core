@@ -34,23 +34,23 @@ index bfe9fbc..1c6ad62 100644
 +++ b/snow_shot/include/snow_shot/presentation/screenshotscrollingthumbnailwidget.h
 @@ -26,6 +26,9 @@ class ScreenshotScrollingThumbnailWidget final : public QWidget {
      Q_OBJECT
-
+ 
    public:
 +    // A parentless thumbnail is a top-level window; OHOS uses it so the preview
 +    // survives while the full-screen scrolling overlay hides itself.
 +    ScreenshotScrollingThumbnailWidget();
      explicit ScreenshotScrollingThumbnailWidget(QWidget& parent);
-
+ 
      void reset();
 @@ -53,8 +56,13 @@ class ScreenshotScrollingThumbnailWidget final : public QWidget {
-
+ 
    signals:
      void hoverSourceRectChanged(const QRect& sourceRect, bool cropping);
 +    void previewShown();
 +
 +  private:
 +    void initialize();
-
+ 
    protected:
 +    void showEvent(QShowEvent* event) override;
      bool event(QEvent* event) override;
@@ -74,7 +74,7 @@ index f3ec6be..0ec7e64 100644
      bool m_rememberedDrawingToolRestorePending = true;
 +    bool m_scrollingPresentationActive = false;
  };
-
+ 
  #endif // SNOW_SHOT_PRESENTATION_SCREENSHOTTOOLBARWINDOW_H
 diff --git a/snow_shot/src/presentation/capture/screenshotscrollingcapturecontroller.cpp b/snow_shot/src/presentation/capture/screenshotscrollingcapturecontroller.cpp
 index aa949f1..2e02032 100644
@@ -86,11 +86,11 @@ index aa949f1..2e02032 100644
  #include "snow_shot/presentation/screenshotoverlaywindow.h"
 +#include "snow_shot/presentation/screenshotscrollingthumbnailwidget.h"
  #include "snow_shot/presentation/screenshottoolbarwindow.h"
-
+ 
  #if defined(Q_OS_WIN) || defined(_WIN32) || defined(Q_OS_MACOS)
 @@ -224,13 +225,49 @@ struct ScreenshotScrollingCaptureController::Impl {
          pipelineInitialized = false;
-
+ 
          context.overlayCoordinator.setScrollingCaptureMode(context.displaySession, true);
 +#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
 +        // The OHOS compositor keeps a full-screen main window opaque, so the frozen
@@ -118,7 +118,7 @@ index aa949f1..2e02032 100644
 +            }
 +        }
 +#endif
-
+ 
          logPreparation();
          logScrollingEvent("scrolling.prepared", generation);
          const QRect requestPhysicalSelection =
@@ -165,12 +165,12 @@ index 196fe43..6f51270 100644
  #include <QWheelEvent>
 +#include <QWindow>
  #include <QtMath>
-
+ 
  #include <algorithm>
 @@ -63,8 +65,16 @@ void copyPreviewSpan(const QImage& source, int sourceStart, QImage& destination,
  }
  } // namespace
-
+ 
 +ScreenshotScrollingThumbnailWidget::ScreenshotScrollingThumbnailWidget() : QWidget(nullptr) {
 +    initialize();
 +}
@@ -187,7 +187,7 @@ index 196fe43..6f51270 100644
 @@ -122,6 +132,15 @@ void ScreenshotScrollingThumbnailWidget::reset() {
      update();
  }
-
+ 
 +void ScreenshotScrollingThumbnailWidget::showEvent(QShowEvent* event) {
 +    QWidget::showEvent(event);
 +#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
@@ -207,7 +207,7 @@ index 9657522..32dcfa7 100644
 @@ -444,17 +444,47 @@ void ScreenshotOverlayWindow::setScrollingCaptureMode(bool enabled) {
      }
  }
-
+ 
 +void ScreenshotOverlayWindow::setScrollingCaptureOverlayHidden(bool hidden) {
 +#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
 +    if (m_scrollingCaptureOverlayHidden == hidden)
@@ -267,7 +267,7 @@ index 9657522..32dcfa7 100644
          snow_shot::platform::configureScreenshotToolbarWindow(m_scrollingThumbnail);
  #endif
 diff --git a/snow_shot/src/presentation/toolbar/screenshottoolbarwindow.cpp b/snow_shot/src/presentation/toolbar/screenshottoolbarwindow.cpp
-index 4463690..3754dd9 100644
+index d2bc891..18d7ca2 100644
 --- a/snow_shot/src/presentation/toolbar/screenshottoolbarwindow.cpp
 +++ b/snow_shot/src/presentation/toolbar/screenshottoolbarwindow.cpp
 @@ -16,8 +16,12 @@
@@ -276,16 +276,16 @@ index 4463690..3754dd9 100644
  #include <QSignalBlocker>
 +#include <QTimer>
 +#include <QWindow>
-
+ 
  namespace {
 +constexpr int kScrollingToolbarRaiseDelayMs = 120;
 +
  ScreenshotToolPalette::Options screenshotToolbarOptions() {
      ScreenshotToolPalette::Options options;
      options.showDragHandle = true;
-@@ -577,6 +581,9 @@ void ScreenshotToolbarWindow::resetForNewCapture() {
+@@ -581,6 +585,9 @@ void ScreenshotToolbarWindow::resetForNewCapture() {
  }
-
+ 
  void ScreenshotToolbarWindow::setScrollingScreenshotMode(bool enabled) {
 +    if (!enabled) {
 +        m_scrollingPresentationActive = false;
@@ -293,10 +293,10 @@ index 4463690..3754dd9 100644
      ScreenshotToolPaletteHost* host = paletteHost();
      if (host == nullptr || host->palette() == nullptr) {
          return;
-@@ -595,6 +602,34 @@ void ScreenshotToolbarWindow::setScrollingScreenshotMode(bool enabled) {
+@@ -599,6 +606,34 @@ void ScreenshotToolbarWindow::setScrollingScreenshotMode(bool enabled) {
      }
  }
-
+ 
 +void ScreenshotToolbarWindow::presentForScrollingCapture(QWidget* previewOwner) {
 +    m_scrollingPresentationActive = true;
 +#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
@@ -334,7 +334,7 @@ index 59f3104..7835b94 100644
 +++ b/snow_shot/src/presentation/tools/screenshotfloatingtoolpalettenative.cpp
 @@ -15,7 +15,12 @@ HWND toNativeHwnd(WId windowId) {
  #endif
-
+ 
  Qt::WindowFlags screenshot_floating_palette_native::windowFlags() {
 -    Qt::WindowFlags flags = Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint |
 +#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
@@ -361,7 +361,7 @@ index a7b5bd5..577cfe9 100644
  #include <QThread>
 +#include <QTimer>
  #include <QWindow>
-
+ 
  #include <cstdlib>
 @@ -751,6 +753,74 @@ void speechBubbleReachesScreenshotCommands() {
      require(palette->activeTool() == ScreenshotToolPalette::Tool::SpeechBubble,
@@ -458,7 +458,7 @@ index e2937f5..fd19eba 100644
 @@ -137,6 +137,24 @@ void constrainedViewportPreservesAspectAndSourceBounds(ScreenshotScrollingRecogn
              "fractional display extent at the scrollbar maximum must reach the final source pixel");
  }
-
+ 
 +void topLevelThumbnailSurvivesHiddenOverlay() {
 +    QWidget overlay;
 +    overlay.show();

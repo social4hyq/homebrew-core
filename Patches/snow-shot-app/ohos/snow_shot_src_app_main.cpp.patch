@@ -4,10 +4,10 @@ rather than adding a new public API for it. Drop the startup-stage diagnostic
 lambda and its call sites.
 
 diff --git a/snow_shot/src/app/main.cpp b/snow_shot/src/app/main.cpp
-index f2151e3..1b1af39 100644
+index 26a2124..4366b12 100644
 --- a/snow_shot/src/app/main.cpp
 +++ b/snow_shot/src/app/main.cpp
-@@ -495,8 +495,8 @@ int main(int argc, char* argv[]) {
+@@ -496,8 +496,8 @@ int main(int argc, char* argv[]) {
      QObject::connect(&app, &QCoreApplication::aboutToQuit, &singleInstance,
                       [&singleInstance] { singleInstance.stopAcceptingLaunchRequests(); });
  

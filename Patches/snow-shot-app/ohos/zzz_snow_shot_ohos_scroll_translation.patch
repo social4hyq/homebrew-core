@@ -6,10 +6,10 @@ wheel step through OH_Input_InjectMouseEventGlobal and request the
 user-authorized injection permission on the first step.
 
 diff --git a/snow_shot/CMakeLists.txt b/snow_shot/CMakeLists.txt
-index 31000e2..1489ebc 100644
+index 43dee5b..f15a464 100644
 --- a/snow_shot/CMakeLists.txt
 +++ b/snow_shot/CMakeLists.txt
-@@ -1357,7 +1357,8 @@ if(APPLE)
+@@ -1353,7 +1353,8 @@ if(APPLE)
  endif()
  if(OHOS)
      target_sources(snow_shot_global_mouse PRIVATE

@@ -4,7 +4,7 @@ filters are narrowed to only the encoders the backend actually supports,
 with a PDF special case kept.
 
 diff --git a/snow_shot/src/presentation/services/screenshotimagefileservice.cpp b/snow_shot/src/presentation/services/screenshotimagefileservice.cpp
-index 2142aa1..08a0be3 100644
+index 121a568..2116a06 100644
 --- a/snow_shot/src/presentation/services/screenshotimagefileservice.cpp
 +++ b/snow_shot/src/presentation/services/screenshotimagefileservice.cpp
 @@ -3,6 +3,9 @@
@@ -17,7 +17,7 @@ index 2142aa1..08a0be3 100644
  
  #include <QClipboard>
  #include <QCoreApplication>
-@@ -235,15 +238,17 @@ QString ScreenshotImageFileService::dialogFilter(ScreenshotImageFileFormat forma
+@@ -331,15 +334,17 @@ QString ScreenshotImageFileService::dialogFilter(ScreenshotImageFileFormat forma
  }
  
  QString ScreenshotImageFileService::saveDialogFilter() {
@@ -44,7 +44,7 @@ index 2142aa1..08a0be3 100644
  }
  
  QStringList ScreenshotImageFileService::automaticDirectories() {
-@@ -349,6 +354,11 @@ QString ScreenshotImageFileService::formatKey(ScreenshotImageFileFormat format)
+@@ -445,6 +450,11 @@ QString ScreenshotImageFileService::formatKey(ScreenshotImageFileFormat format)
  }
  
  QString ScreenshotImageFileService::normalizedPath(QString path, ScreenshotImageFileFormat format) {

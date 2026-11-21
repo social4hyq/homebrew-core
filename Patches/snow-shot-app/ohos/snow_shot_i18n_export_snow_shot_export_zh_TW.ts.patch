@@ -9,10 +9,10 @@ temp-file-staging failure. All of them are new OHOS strings, so nothing in
 this catalog is dropped.
 
 diff --git a/snow_shot/i18n/export/snow_shot_export_zh_TW.ts b/snow_shot/i18n/export/snow_shot_export_zh_TW.ts
-index 2b3c042..0b95c79 100644
+index 8617de9..2c5a692 100644
 --- a/snow_shot/i18n/export/snow_shot_export_zh_TW.ts
 +++ b/snow_shot/i18n/export/snow_shot_export_zh_TW.ts
-@@ -258,6 +258,22 @@
+@@ -397,6 +397,22 @@
              <source>The output directory could not be created</source>
              <translation>無法建立輸出目錄</translation>
          </message>
@@ -35,7 +35,7 @@ index 2b3c042..0b95c79 100644
          <message>
              <source>The result file could not be published</source>
              <translation>無法寫入結果檔案</translation>
-@@ -565,6 +581,14 @@
+@@ -719,6 +735,14 @@
              <source>The screenshot pixels could not be read</source>
              <translation>無法讀取截圖像素</translation>
          </message>

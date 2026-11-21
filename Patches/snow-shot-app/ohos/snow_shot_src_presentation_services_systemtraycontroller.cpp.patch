@@ -3,10 +3,10 @@ QOhosTaskPromise being destroyed without notifying the caller, which aborts the
 process when the status bar item is created.
 
 diff --git a/snow_shot/src/presentation/services/systemtraycontroller.cpp b/snow_shot/src/presentation/services/systemtraycontroller.cpp
-index 0fb3c4f..1988920 100644
+index 5b4793b..7a06e22 100644
 --- a/snow_shot/src/presentation/services/systemtraycontroller.cpp
 +++ b/snow_shot/src/presentation/services/systemtraycontroller.cpp
-@@ -416,8 +416,13 @@ class SystemTrayController::Impl {
+@@ -420,8 +420,13 @@ class SystemTrayController::Impl {
          }
          q.setObjectName(QStringLiteral("systemTrayController"));
          trayIcon->setObjectName(QStringLiteral("snowShotSystemTrayIcon"));
@@ -20,7 +20,7 @@ index 0fb3c4f..1988920 100644
  #ifdef Q_OS_MACOS
          notifications = std::make_unique<platform::macos::SystemNotificationService>(&q);
          using NotificationService = platform::macos::SystemNotificationService;
-@@ -762,8 +767,10 @@ class SystemTrayController::Impl {
+@@ -801,8 +806,10 @@ class SystemTrayController::Impl {
      }
  
      void retranslateUi() {
@@ -31,7 +31,7 @@ index 0fb3c4f..1988920 100644
          for (const settings::SettingsTrayMenuGroupDefinition& group : groups) {
              for (const settings::SettingsTrayMenuOptionDefinition& option : group.options) {
                  if (QAction* action = actions.value(option.id)) {
-@@ -991,8 +998,13 @@ void SystemTrayController::showRecordingExportMessage(const QString& path) {
+@@ -1032,8 +1039,13 @@ void SystemTrayController::showRecordingExportMessage(const QString& path) {
      if (path.isEmpty())
          return;
      const QString absolutePath = QFileInfo(path).absoluteFilePath();
