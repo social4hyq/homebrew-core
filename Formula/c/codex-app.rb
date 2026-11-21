@@ -6,6 +6,7 @@ class CodexApp < Formula
   version "26.1117.41037"
   sha256 "714146e9c667b26a1bd4e57633c544334a9ed47c399989bfd98cf764140bdc53"
   license :cannot_represent # OpenAI service and software terms
+  revision 1
 
   livecheck do
     url "https://persistent.oaistatic.com/codex-app-prod/linux/deb/dists/stable/main/binary-arm64/Packages"
@@ -13,9 +14,8 @@ class CodexApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codex-app-v26.1117.41037-r2"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "843e3bd0cce69084ec675a8e474b4a11d01c6fba3673dfaee10a8147a6f2664f"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codex-app-v26.1117.41037-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "30ed56658f9dc2cea82659dbf32179b3d207eaf2f46ae53d42db44fac503409e"
   end
 
   depends_on "app-installer"
@@ -52,7 +52,7 @@ class CodexApp < Formula
     Resources/codex-app/scripts/install-chatgpt-desktop.sh
     Resources/codex-app/scripts/stage-ohos-shell.sh
     Resources/codex-app/support/assemble-local-hap.py
-    Resources/codex-app/support/enable-cookie-encryption.py
+    Resources/_shared/hap-app/enable-cookie-encryption.py
     Resources/codex-app/tests/chatgpt-bootstrap.test.cjs
     Resources/codex-app/tests/assemble-local-hap.test.py
     Resources/_shared/hap-app/install-lib.sh
@@ -75,6 +75,7 @@ class CodexApp < Formula
     RESOURCE_FILES.grep(%r{/app/|/support/}).each do |file|
       cp tap_root/file, support/File.basename(file)
     end
+    cp tap_root/"Resources/_shared/hap-app/enable-cookie-encryption.py", support
 
     shell = buildpath/"libelectron/ohos_hap"
     project = buildpath/"chatgpt-ohos-shell"
