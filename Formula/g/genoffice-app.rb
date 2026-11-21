@@ -13,9 +13,9 @@ class GenofficeApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/genoffice-app-v0.13.615-r2"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "16354fde0c706896dba87ac0d0081dc92265d54b7472932aa4f2c2860c0e7e51"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/genoffice-app-v0.13.615-r3"
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2888e344f67aefed0bc82ab651f69d60a76890ff95505c68f2956d842b3ba226"
   end
 
   depends_on "genoffice" => :build
@@ -260,9 +260,8 @@ class GenofficeApp < Formula
 
     # An unsigned sidecar cannot be spawned (EACCES); the keg copy carries the
     # code signature.
-    sidecar_signature = shell_output("unzip -p #{hap} resources/resfile/resources/native/xlsx-sidecar.bin | " \
-                                     "grep -a -c -i codesign")
-    assert_operator sidecar_signature.to_i, :>, 0
+    sidecar = shell_output("unzip -p #{hap} resources/resfile/resources/native/xlsx-sidecar.bin")
+    assert_includes sidecar.b, ".codesign"
 
     module_json = JSON.parse(shell_output("unzip -p #{hap} module.json"))
     assert_equal %w[ohos.permission.FILE_ACCESS_PERSIST ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET],
