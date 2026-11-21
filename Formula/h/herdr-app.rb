@@ -4,7 +4,7 @@ class HerdrApp < Formula
   url "https://github.com/herdrdev/herdr-app/archive/refs/tags/v0.1.16.tar.gz"
   sha256 "fea3d920607f2199ed330eb3cdcb1fa3626dcea5080c92a97a296d983d6bc681"
   license "Apache-2.0"
-  revision 6
+  revision 7
 
   livecheck do
     url "https://github.com/herdrdev/herdr-app.git"
@@ -13,8 +13,8 @@ class HerdrApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/herdr-app-v0.1.16-r10"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "08f85c2107ccb38cbd12db27cbdf2520997b6cf6e8b7aa46f3e4a65f97c120ec"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/herdr-app-v0.1.16-r11"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9f3575e85541c79b130bd8a3f550ae1153139ab5ce3e05b66ed83403406a201d"
   end
 
   depends_on "node" => :build
@@ -34,6 +34,15 @@ class HerdrApp < Formula
 
     patch do
       file "Patches/herdr-app/ghostty/0001-simdutf-pic-ohos.patch"
+    end
+  end
+
+  resource "openharmony-ability" do
+    url "https://static.crates.io/crates/openharmony-ability/openharmony-ability-1.0.0-beta.5.crate"
+    sha256 "c3d65db22273d3afdef8fd8eb9411546243aae365236829e67a8deca79eed5f1"
+
+    patch do
+      file "Patches/herdr-app/openharmony-ability/0001-ime-fast-typing.patch"
     end
   end
 
@@ -113,6 +122,7 @@ class HerdrApp < Formula
     end
 
     resource("ghostty").stage(buildpath/"vendor/ghostty")
+    resource("openharmony-ability").stage(buildpath/"vendor/openharmony-ability")
     quickjs = buildpath/"vendor/quickjs-jit-src/96593cd"
     resource("quickjs-jit").stage(quickjs)
     resource("quickjs-ng").stage(quickjs/"sys/quickjs")
