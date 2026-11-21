@@ -21,12 +21,13 @@ class Opencv < Formula
 
   livecheck do
     url :stable
-    regex(/^v?(5(?:\.\d+)+)$/i)
+    regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencv-v5.1.0-r3"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7504964b68d5838a82ba24448786cff92dbc469bfe8b72484e0e61c6ba905779"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencv-v5.1.0-r4"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "13f80b9f7563890683069de1751f33c3656e09f4f28b570cdb0d4a7fe3505621"
   end
 
   head do
@@ -85,9 +86,7 @@ class Opencv < Formula
   end
 
   def install
-    contrib = resource("contrib")
-    odie "opencv_contrib must match OpenCV #{version}" if !build.head? && contrib.version != version
-    contrib.stage buildpath/"opencv_contrib"
+    resource("contrib").stage buildpath/"opencv_contrib"
 
     # Avoid Accelerate.framework
     ENV["OpenBLAS_HOME"] = formula_opt_prefix("openblas")
@@ -132,7 +131,6 @@ class Opencv < Formula
       -DWITH_GPHOTO2=OFF
       -DWITH_GSTREAMER=OFF
       -DWITH_JASPER=OFF
-      -DWITH_KLEIDICV=OFF
       -DWITH_OPENEXR=ON
       -DWITH_OPENGL=OFF
       -DWITH_OPENVINO=#{OS.ohos? ? "OFF" : "ON"}
@@ -143,6 +141,7 @@ class Opencv < Formula
       -DBUILD_opencv_python3=ON
       -DPYTHON3_EXECUTABLE=#{python3}
     ]
+    args << "-DWITH_KLEIDICV=OFF" if OS.ohos?
 
     args += if OS.mac?
       # Requires closed-source, pre-built Orbbec SDK on macOS
