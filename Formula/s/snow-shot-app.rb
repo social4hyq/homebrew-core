@@ -12,8 +12,9 @@ class SnowShotApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-app-v1.6.1-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e1e45012e9ee5616d736c55ec26fa30afe3386ccd9af260caf359dcf87967844"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-app-v1.6.1-r2"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ec165154a7c5854b1a564aa0461092f57f196aaa7d9d638626e5b0179f95e32c"
   end
 
   depends_on "brotli" => :build

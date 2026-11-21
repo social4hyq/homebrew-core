@@ -8,7 +8,7 @@ manifest check now verifies the actual loaded `libsnow_ocr_inprocess.so`
 instead of a stand-in for the removed out-of-process worker.
 
 diff --git a/snow_shot/src/presentation/ocr/screenshotocrassets.cpp b/snow_shot/src/presentation/ocr/screenshotocrassets.cpp
-index cc169a2..c7e388f 100644
+index 97aa3f3..d9f5d67 100644
 --- a/snow_shot/src/presentation/ocr/screenshotocrassets.cpp
 +++ b/snow_shot/src/presentation/ocr/screenshotocrassets.cpp
 @@ -12,6 +12,7 @@
@@ -38,8 +38,8 @@ index cc169a2..c7e388f 100644
  constexpr auto kInterruptedError = "OCR asset preparation was interrupted";
  constexpr int kShutdownJoinTimeoutMs = 10'000;
  
-@@ -246,13 +254,17 @@ std::optional<Descriptor> loadDescriptor(const QString& root, QString* error) {
-     Descriptor result;
+@@ -249,13 +257,17 @@ std::optional<Descriptor> loadDescriptor(const QString& root, QString* error) {
+     result.paragraphModel = rootObject.value(QStringLiteral("paragraph_model")).toObject();
      result.runtimeVersion = runtime.value(QStringLiteral("version")).toString();
      result.platform = runtime.value(QStringLiteral("platform")).toString();
 -#ifdef Q_OS_MACOS
@@ -57,7 +57,7 @@ index cc169a2..c7e388f 100644
      const auto defaultModel =
          parseModelType(rootObject.value(QStringLiteral("default_model")).toString());
      if (rootObject.value(QStringLiteral("schema")).toInt() != (result.bundled ? 3 : 2) ||
-@@ -424,10 +436,16 @@ bool verifyComponentIntegrity(const QString& directory, const QList<FileDescript
+@@ -427,10 +439,16 @@ bool verifyComponentIntegrity(const QString& directory, const QList<FileDescript
  bool validateBundledRuntime(const QString& directory, const Descriptor& descriptor,
                              QString* error) {
      if (!validateComponent(directory, descriptor.runtimeFiles, descriptor.runtimeVersion, false,
@@ -76,7 +76,7 @@ index cc169a2..c7e388f 100644
  #ifdef Q_OS_MACOS
      // Bundled runtimes use thin, little-endian Mach-O files matching the app.
      // Check both binaries before launching, rather than relying on Rosetta or dyld.
-@@ -927,12 +945,16 @@ class ScreenshotOcrAssets::Impl final {
+@@ -937,12 +955,16 @@ class ScreenshotOcrAssets::Impl final {
              return false;
          auto descriptor = loadDescriptor(options.offlineRoot, error);
          const bool requireBundledRuntime =
@@ -94,7 +94,7 @@ index cc169a2..c7e388f 100644
  #endif
              return false;
          }
-@@ -968,7 +990,7 @@ class ScreenshotOcrAssets::Impl final {
+@@ -994,7 +1016,7 @@ class ScreenshotOcrAssets::Impl final {
          }
          const bool offlineModel =
              validateComponent(modelDirectory(options.offlineRoot, *model), model->files, model->id,
