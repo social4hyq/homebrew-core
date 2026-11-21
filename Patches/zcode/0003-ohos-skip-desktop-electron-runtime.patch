@@ -1,14 +1,12 @@
+diff --git a/packages/desktop/scripts/node-pty-rebuild.mjs b/packages/desktop/scripts/node-pty-rebuild.mjs
+index 26e7d1fc..afee5a75 100644
 --- a/packages/desktop/scripts/node-pty-rebuild.mjs
 +++ b/packages/desktop/scripts/node-pty-rebuild.mjs
-@@ -98,6 +98,12 @@ function runElectronRebuild() {
-   });
+@@ -99,6 +99,9 @@ function runElectronRebuild() {
  }
  
  export async function main() {
-+  // OHOS 移植：Electron 没有 openharmony 运行时，桌面端也不在本 formula
-+  // 的构建范围内。跳过安装阶段的 Electron 下载与 electron-rebuild，
-+  // 否则 pnpm install 会因 `Electron builds are not available on
-+  // platform: openharmony` 直接失败。
++  // The CLI bottle does not include Electron or its OpenHarmony runtime.
 +  if (process.platform === "openharmony") return;
 +
    await ensureElectronRuntime();
