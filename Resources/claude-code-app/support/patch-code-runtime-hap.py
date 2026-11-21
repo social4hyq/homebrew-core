@@ -44,7 +44,9 @@ REPLACED_HELPERS = {
 }
 HOST_CONFIG_PATH = APP + "claude-host-config.json"
 ASAR_PATH = APP + "vendor.asar"
-TARGET_CHUNK = ".vite/build/index.chunk-D36Fs5XU.js"
+BUILD_DIR = ".vite/build/"
+# Chunk file names are build hashes, so the Code manager is found by content.
+CHUNK_MARKER = b"getHostPlatform(){"
 ACL_PERMISSIONS = [
     "ohos.permission.CUSTOM_SANDBOX",
     "ohos.permission.READ_WRITE_USER_FILE",
@@ -52,6 +54,20 @@ ACL_PERMISSIONS = [
     "ohos.permission.kernel.ALLOW_WRITABLE_CODE_MEMORY",
     "ohos.permission.kernel.DISABLE_CODE_MEMORY_PROTECTION",
 ]
+
+
+def find_target_chunk(archive: bytes, root: dict, header_size: int) -> str:
+    build = root["files"][".vite"]["files"]["build"]["files"]
+    found = []
+    for name, node in build.items():
+        if not (name.startswith("index.chunk-") and name.endswith(".js")) or "offset" not in node:
+            continue
+        start = 8 + header_size + int(node["offset"])
+        if archive.find(CHUNK_MARKER, start, start + int(node["size"])) != -1:
+            found.append(BUILD_DIR + name)
+    if len(found) != 1:
+        raise ValueError(f"expected one Code manager chunk, found {len(found)}")
+    return found[0]
 
 
 def patch_asar(archive: bytes) -> bytes:
@@ -62,24 +78,30 @@ def patch_asar(archive: bytes) -> bytes:
         raise ValueError("unexpected vendor ASAR header")
     header_bytes = archive[16:16 + json_size]
     root = json.loads(header_bytes)
+    target_chunk = find_target_chunk(archive, root, header_size)
     target = root
-    for part in TARGET_CHUNK.split("/"):
+    for part in target_chunk.split("/"):
         target = target["files"][part]
     size = int(target["size"])
     start = 8 + header_size + int(target["offset"])
     original = archive[start:start + size]
     if len(original) != size:
         raise ValueError("truncated Code manager chunk")
-    result = subprocess.run(
-        ["node", str(ROOT / "claude-code-platform-patch.cjs")],
-        input=original,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        check=False,
-    )
-    if result.returncode:
-        raise ValueError("Code manager patch failed: " + result.stderr.decode(errors="replace").strip())
-    patched = result.stdout
+    # The chunk is megabytes: feeding it through pipes stalls on OHOS, so use files.
+    with tempfile.TemporaryFile() as source, tempfile.TemporaryFile() as output:
+        source.write(original)
+        source.seek(0)
+        result = subprocess.run(
+            ["node", str(ROOT / "claude-code-platform-patch.cjs")],
+            stdin=source,
+            stdout=output,
+            stderr=subprocess.PIPE,
+            check=False,
+        )
+        if result.returncode:
+            raise ValueError("Code manager patch failed: " + result.stderr.decode(errors="replace").strip())
+        output.seek(0)
+        patched = output.read()
     old_integrity = target.get("integrity")
     if not old_integrity or old_integrity.get("algorithm") != "SHA256":
         raise ValueError("Code manager chunk has no supported ASAR integrity metadata")
@@ -108,7 +130,7 @@ def patch_asar(archive: bytes) -> bytes:
         data = archive[old_start:old_start + data_size]
         if len(data) != data_size:
             raise ValueError(f"truncated ASAR member: {path}")
-        if path == TARGET_CHUNK:
+        if path == target_chunk:
             data = patched
             target_seen = True
         node["offset"] = str(next_offset)
