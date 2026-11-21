@@ -1,12 +1,11 @@
 class ClaudeCodeApp < Formula
   desc "Claude Code Desktop shell for OpenHarmony/HarmonyOS PC"
   homepage "https://code.claude.com/docs/en/desktop-linux"
-  url "https://downloads.claude.ai/claude-desktop/apt/stable/pool/main/c/claude-desktop/claude-desktop_5.11492.5_arm64.deb",
+  url "https://downloads.claude.ai/claude-desktop/apt/stable/pool/main/c/claude-desktop/claude-desktop_6.28899.2_arm64.deb",
       using: :nounzip
-  version "5.11492.5"
-  sha256 "fe6cd8a70f96b96eb4e6b647300cfaee6aaff4ce133a0fbbe11c2cdb775f5a6a"
+  version "6.28899.2"
+  sha256 "7ec2a354ecb8bafae3e3ccafe620144232b7429b216ab59a05a0d6cc340f1455"
   license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
-  revision 8
 
   livecheck do
     url "https://downloads.claude.ai/claude-desktop/apt/stable/dists/stable/main/binary-arm64/Packages"
@@ -14,8 +13,8 @@ class ClaudeCodeApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-app-v5.11492.5-r11"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fbb82d09ea59be2bba56d4353e1ec60b4069d24d3adf781ffec4928db4b71ff0"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-app-v6.28899.2-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "122f3ea3d606e417dfdbf01794a4056a2dd4559114c50b46435b9c1e765be987"
   end
 
   depends_on "app-installer"
@@ -192,7 +191,7 @@ class ClaudeCodeApp < Formula
     assert_equal "com.social4hyq.claudecode", module_json.dig("app", "bundleName")
     assert_equal version.to_s, module_json.dig("app", "versionName")
     major, minor, patch = version.to_s.split(".").map(&:to_i)
-    assert_equal (major << 22) | (minor << 8) | patch, module_json.dig("app", "versionCode")
+    assert_equal (major << 25) | (minor << 8) | patch, module_json.dig("app", "versionCode")
     permissions = module_json.dig("module", "requestPermissions").map { |entry| entry.fetch("name") }
     assert_includes permissions, "ohos.permission.INTERNET"
     refute_includes permissions, "ohos.permission.CUSTOM_SANDBOX"
