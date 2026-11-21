@@ -3,12 +3,11 @@ class OrcaApp < Formula
   homepage "https://github.com/stablyai/orca"
   # Version follows the Orca release; shell sources live in Resources/orca-app
   # and the host runtime comes from the `orca` formula (same upstream tag).
-  url "https://github.com/stablyai/orca/archive/refs/tags/v1.4.261.tar.gz"
-  sha256 "5b8a21bb9cde62a1dd7ca3c0ffd2f684faf168ea401191068777a8a9e7466909"
+  url "https://github.com/stablyai/orca/archive/refs/tags/v1.4.267.tar.gz"
+  sha256 "161f405b4226bfc0a7b22a4a4213394473190118b5223c24096200d6c3c00b06"
   # Tap-authored shell scripts (MIT) on the CPF-Electron runtime (mixed
   # MIT/BSD/LGPL).
   license :cannot_represent
-  revision 10
 
   livecheck do
     url :stable
@@ -16,10 +15,11 @@ class OrcaApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/orca-app-v1.4.261-r17"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "07d8db5744a794d26923ad8c42f8796d07f3393de1bb5581c92a3b2f47a0e205"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/orca-app-v1.4.267-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c97deb93de82b32fcc0e884ca461c6245a1534d07eb5957ed050ca9c1803d609"
   end
 
+  depends_on "openjdk" => :build
   depends_on "app-installer"
   depends_on "node"
   depends_on "ohos-sdk-toolchains"
@@ -140,8 +140,15 @@ class OrcaApp < Formula
     # ohos_packing_tool needs SDK libraries outside brew's sanitized search path.
     ENV["DEVECO_SDK_HOME"] = (clt/"sdk").to_s
     ENV["HOS_SDK_HOME"] = (clt/"sdk").to_s
-    ENV["LD_LIBRARY_PATH"] =
-      "#{clt}/lib:#{clt}/sdk/default/openharmony/native/llvm/lib/clang/15.0.4/lib/aarch64-linux-ohos"
+    # hvigor's PackageHap runs the SDK's hap-sign-tool through `java`.
+    ENV["JAVA_HOME"] = formula_opt_prefix("openjdk").to_s
+    ENV.prepend_path "PATH", formula_opt_bin("openjdk")
+    ENV["LD_LIBRARY_PATH"] = [
+      "#{clt}/lib",
+      "#{clt}/sdk/default/hms/toolchains/lib",
+      "#{clt}/sdk/default/openharmony/toolchains/lib",
+      "#{clt}/sdk/default/openharmony/native/llvm/lib/clang/15.0.4/lib/aarch64-linux-ohos",
+    ].join(":")
     ENV.delete("NODE_OPTIONS")
     # An oversized RLIMIT_NOFILE breaks the musl FD table in hvigor.
     soft_cap, hard_cap = Process.getrlimit(Process::RLIMIT_NOFILE)
