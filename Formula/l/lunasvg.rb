@@ -6,11 +6,6 @@ class Lunasvg < Formula
   license "MIT"
   revision 1
 
-  livecheck do
-    url :stable
-    strategy :github_latest
-  end
-
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/lunasvg-v3.5.0-r2"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "f872581e62e435ba26239ba8336bea21c35d65176e5251f4ca5b4c7c3e047090"
@@ -22,10 +17,10 @@ class Lunasvg < Formula
   deny_network_access!
 
   def install
-    args = [
-      "-DBUILD_SHARED_LIBS=ON",
-      "-DUSE_SYSTEM_PLUTOVG=ON",
-      "-DLUNASVG_BUILD_EXAMPLES=OFF",
+    args = %w[
+      -DBUILD_SHARED_LIBS=ON
+      -DUSE_SYSTEM_PLUTOVG=ON
+      -DLUNASVG_BUILD_EXAMPLES=OFF
     ]
 
     system "cmake", "-S", ".", "-B", "build", *args, *std_cmake_args
@@ -36,7 +31,7 @@ class Lunasvg < Formula
 
   test do
     args = %W[
-      -std=c++17
+      -std=c++11
       -I#{include}/lunasvg
       -I#{formula_opt_include("plutovg")}/plutovg
       -L#{lib}
