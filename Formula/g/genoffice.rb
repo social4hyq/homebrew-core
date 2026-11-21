@@ -15,16 +15,8 @@ class Genoffice < Formula
     sha256 cellar: :any_skip_relocation, arm64_ohos: "676a37b65c1a8120fe464c3e7f1c9c780b92acaab6fca5bbfb6565621db12f61"
   end
 
-  depends_on "node" => :build
   depends_on "rust" => :build
   depends_on "node"
-
-  # DRAFT, NOT BUILT. Open items before this can go to a PR:
-  # 1. esbuild (install script) and any native npm dep need the
-  #    @ohos-npm-ports overrides; copy the approach from multica-app.rb.
-  # 2. Confirm `npm ci --ignore-scripts` is enough for `npm run build -w @genoffice/cli`.
-  # 3. Verify the packaged layout below against packages/cli/src/resources.ts:
-  #    packagedResourcesDir() = <cli dir>/.. and requires wasm/pdfium.wasm.
 
   def install
     # root `postinstall` runs install-electron; the CLI does not need it
