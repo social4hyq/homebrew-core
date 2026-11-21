@@ -5,10 +5,22 @@ set -euo pipefail
 BUNDLE_ID="com.social4hyq.herdrapp"
 ABILITY="EntryAbility"
 DEFAULT_PORT="${HERDR_APP_PORT:-8765}"
-STATE="${HERDR_APP_STATE:-${XDG_CONFIG_HOME:-$HOME/.config}/herdr-app}"
+# State lives under the real home, like every other *-app. brew's post_install run gets
+# a throw-away XDG_CONFIG_HOME: a state dir taken from it holds a bridge nobody can find
+# again (no pidfile in the dir the user's shell looks at), which then keeps the port busy.
+STATE="${HERDR_APP_STATE:-$HOME/.config/herdr-app}"
 CONF="$STATE/bridge.conf"
 PIDFILE="$STATE/bridge.pid"
 LOGFILE="$STATE/bridge.log"
+
+# Earlier versions kept the state under $XDG_CONFIG_HOME. Adopt its bridge.conf once so an
+# app installed earlier keeps its token.
+legacy_conf="${XDG_CONFIG_HOME:+$XDG_CONFIG_HOME/herdr-app/bridge.conf}"
+if [[ -z "${HERDR_APP_STATE:-}" && -n "$legacy_conf" && "$legacy_conf" != "$CONF" &&
+      ! -f "$CONF" && -f "$legacy_conf" ]]; then
+  mkdir -p "$STATE" && chmod 700 "$STATE" 2>/dev/null || true
+  cp "$legacy_conf" "$CONF" && chmod 600 "$CONF" 2>/dev/null || true
+fi
 
 usage() {
   cat <<'EOF'
