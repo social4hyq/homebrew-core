@@ -1,9 +1,10 @@
 class ClaudeCodeLatest < Formula
   desc "Anthropic Claude Code CLI (latest release channel)"
   homepage "https://code.claude.com/docs/en/overview"
-  url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.330.tgz"
+  url "https://registry.npmjs.org/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.330.tgz"
   sha256 "75c77a2921e6ff10c811af70de02798633fca7735fb54a09d4838e49ee88e2af"
   license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
+  revision 1
 
   livecheck do
     url "https://downloads.claude.ai/claude-code-releases/latest"
@@ -64,7 +65,6 @@ class ClaudeCodeLatest < Formula
       minimumReleaseAgeExclude:
         - '#{package}@#{version}'
     YAML
-    (libexec/".npmrc").write "strict-ssl=false\n"
     (libexec/"install-claude.sh").write <<~SH
       set -eu
       prefix="$1"
@@ -74,7 +74,7 @@ class ClaudeCodeLatest < Formula
       trap 'rm -rf "$work"; [ -z "$pending" ] || rm -f "$pending"' EXIT
       trap 'exit 1' HUP INT TERM
       cd "$work"
-      cp "$(dirname "$0")/package.json" "$(dirname "$0")/pnpm-lock.yaml" "$(dirname "$0")/pnpm-workspace.yaml" "$(dirname "$0")/.npmrc" .
+      cp "$(dirname "$0")/package.json" "$(dirname "$0")/pnpm-lock.yaml" "$(dirname "$0")/pnpm-workspace.yaml" .
       "$prefix/opt/pnpm/bin/pnpm" install --frozen-lockfile \
         --os=linux --cpu=arm64 --libc=musl --ignore-scripts \
         --store-dir "$work/store"
