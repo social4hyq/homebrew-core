@@ -12,9 +12,9 @@ class SnowShotOpencv < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-opencv-v4.14.0-r4"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cc9ce0e2566db8f2b3872827064f14828741d66f892886f0e3cdb7ddde68f4fd"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-opencv-v4.14.0-r5"
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7a29a82b806b53e3830d568eedbc9ba0ee18ee75e549d441f78bdf02d0c4fcf8"
   end
 
   keg_only :versioned_formula
@@ -123,8 +123,14 @@ class SnowShotOpencv < Formula
           return detector.detectAndDecode(image).empty() ? 0 : 2;
       }
     CPP
-    system ENV.cxx, "-std=c++17", "runtime.cpp", "-I#{include}/opencv4", "-L#{lib}",
-           "-lopencv_wechat_qrcode", "-lopencv_imgproc", "-lopencv_core", "-o", "runtime"
+    # Homebrew puts HOMEBREW_PREFIX/lib in LD_LIBRARY_PATH for tests. On the OHOS PC the
+    # vendor-signed SDK linker (lld) refuses the self-signed libxml2.so.16 found there
+    # before its own, so the link step fails. Build without it; the test binary below
+    # still needs it to find this formula's libraries.
+    with_env(LD_LIBRARY_PATH: nil) do
+      system ENV.cxx, "-std=c++17", "runtime.cpp", "-I#{include}/opencv4", "-L#{lib}",
+             "-lopencv_wechat_qrcode", "-lopencv_imgproc", "-lopencv_core", "-o", "runtime"
+    end
     system "./runtime"
     version_header = (include/"opencv4/opencv2/core/version.hpp").read
     assert_match "#define CV_VERSION_MAJOR    4", version_header
