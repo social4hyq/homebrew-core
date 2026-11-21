@@ -19,8 +19,9 @@ class ObsidianApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/obsidian-app-v1.15.1-r10"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "eeed0b99b8244132e75245217424e63d73556d924a69bbec0aa65e9edaa01e88"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/obsidian-app-v1.15.1-r11"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "606d199bb1382a4bd94b664c9f97385e1a62f7237c2cad4f72b24dc71109c661"
   end
 
   depends_on "app-installer"
