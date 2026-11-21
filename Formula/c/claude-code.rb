@@ -1,9 +1,10 @@
 class ClaudeCode < Formula
   desc "Anthropic Claude Code CLI"
   homepage "https://code.claude.com/docs/en/overview"
-  url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64/-/claude-code-linux-arm64-2.1.323.tgz"
+  url "https://registry.npmjs.org/@anthropic-ai/claude-code-linux-arm64/-/claude-code-linux-arm64-2.1.323.tgz"
   sha256 "f078cfb81fee8cd00e0639508c152b0a1d4147967a13ffc8fd7188bc33f4ad78"
   license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
+  revision 1
 
   livecheck do
     url "https://downloads.claude.ai/claude-code-releases/stable"
@@ -11,8 +12,8 @@ class ClaudeCode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.323-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "084d7cd9d52236a9c4b6f2f3f95a2b8e118c14d23c238719fae0db4c2532650c"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.323-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9db9919ef825e9a58fa4f2bc73e734d57a1f0b94b0a9e4c6666e7292a9322b49"
   end
 
   depends_on "glibc"
@@ -30,7 +31,6 @@ class ClaudeCode < Formula
     (libexec/"package.json").write JSON.generate({
       private: true, dependencies: { package => stable.url }
     })
-    (libexec/".npmrc").write "strict-ssl=false\n"
     (libexec/"pnpm-lock.yaml").write <<~YAML
       lockfileVersion: '9.0'
       settings:
@@ -61,7 +61,7 @@ class ClaudeCode < Formula
       trap 'rm -rf "$work"; [ -z "$pending" ] || rm -f "$pending"' EXIT
       trap 'exit 1' HUP INT TERM
       cd "$work"
-      cp "$(dirname "$0")/package.json" "$(dirname "$0")/pnpm-lock.yaml" "$(dirname "$0")/.npmrc" .
+      cp "$(dirname "$0")/package.json" "$(dirname "$0")/pnpm-lock.yaml" .
       "$prefix/opt/pnpm/bin/pnpm" install --frozen-lockfile \
         --os=linux --cpu=arm64 --libc=glibc --ignore-scripts \
         --store-dir "$work/store"
