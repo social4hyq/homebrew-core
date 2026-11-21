@@ -1,0 +1,19 @@
+diff --git a/patches/@esbuild__openharmony-arm64@0.28.2.patch b/patches/@esbuild__openharmony-arm64@0.28.2.patch
+new file mode 100644
+index 00000000..db8dc996
+--- /dev/null
++++ b/patches/@esbuild__openharmony-arm64@0.28.2.patch
+@@ -0,0 +1,13 @@
++diff --git a/bin/esbuild b/bin/esbuild
++index e22567d76c1056d5981e9120f4b0282834ce4e1f..86e9c9cc993fafadac803597f4b8c4e40feda164 100755
++--- a/bin/esbuild
+++++ b/bin/esbuild
++@@ -66,6 +66,6 @@ fs.write = function (fd, buf, offset, length, position, callback) {
++ const writeSync = fs.writeSync;
++ fs.writeSync = function (fd, buf) {
++-  if (fd === process.stdout.fd) return process.stdout.write(buf), buf.length;
++-  if (fd === process.stderr.fd) return process.stderr.write(buf), buf.length;
+++  if (fd === process.stdout.fd && process.stdout.constructor.name !== "SyncWriteStream") return process.stdout.write(buf), buf.length;
+++  if (fd === process.stderr.fd && process.stderr.constructor.name !== "SyncWriteStream") return process.stderr.write(buf), buf.length;
++   return writeSync.apply(this, arguments);
++ };

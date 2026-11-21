@@ -40,8 +40,11 @@ class Zcode < Formula
     file "Patches/zcode/0004-web-login-server-oauth.patch"
   end
 
-  patch do
-    file "Patches/zcode/0005-ohos-frozen-lockfile.patch"
+  patch_root = Pathname(__dir__).parent.parent
+  Dir[(patch_root/"Patches/zcode/0005-ohos-frozen-lockfile/*.patch").to_s].each do |path|
+    patch do
+      file Pathname(path).relative_path_from(patch_root).to_s
+    end
   end
 
   deny_network_access! :test
