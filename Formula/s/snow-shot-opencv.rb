@@ -4,7 +4,7 @@ class SnowShotOpencv < Formula
   url "https://github.com/opencv/opencv/archive/refs/tags/4.14.0.tar.gz"
   sha256 "ee8fb9b30eb60850431b4656447080e3737b56e45719c92b67f245950609f86e"
   license "Apache-2.0"
-  revision 1
+  revision 2
 
   livecheck do
     url :stable
@@ -12,8 +12,8 @@ class SnowShotOpencv < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-opencv-v4.14.0-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c460e62eae1395dcef8f093f47d8e39894301d20dcb35cd9fefd580f80cd0671"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-opencv-v4.14.0-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "50566d45120b127e2f931fff0b516fb4979064eccf83fccc520ea021313f856b"
   end
 
   keg_only :versioned_formula
@@ -39,7 +39,9 @@ class SnowShotOpencv < Formula
   end
 
   def install
-    resource("contrib").stage buildpath/"opencv_contrib"
+    contrib = resource("contrib")
+    odie "opencv_contrib must match OpenCV #{version}" if contrib.version != version
+    contrib.stage buildpath/"opencv_contrib"
 
     qr_model_dir = buildpath/"build/downloads/wechat_qrcode"
     mkdir_p qr_model_dir
