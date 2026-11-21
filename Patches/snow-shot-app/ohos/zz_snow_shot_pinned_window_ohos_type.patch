@@ -6,10 +6,10 @@ rect). Use an ordinary top-level Window on OHOS instead, keeping the frameless
 and always-on-top hints, matching the existing capture-overlay workaround.
 
 diff --git a/snow_shot/src/presentation/pinned/screenshotpinnedwindow.cpp b/snow_shot/src/presentation/pinned/screenshotpinnedwindow.cpp
-index e5b71cd..8b5e66b 100644
+index 189d67f..0405a83 100644
 --- a/snow_shot/src/presentation/pinned/screenshotpinnedwindow.cpp
 +++ b/snow_shot/src/presentation/pinned/screenshotpinnedwindow.cpp
-@@ -955,7 +955,16 @@ ScreenshotPinnedWindow::ScreenshotPinnedWindow(QWidget* parent)
+@@ -995,7 +995,16 @@ ScreenshotPinnedWindow::ScreenshotPinnedWindow(QWidget* parent)
          reconcilePlatformEnvironment(layoutChanged);
      };
      livePinnedWindows().push_back(QPointer<ScreenshotPinnedWindow>(this));

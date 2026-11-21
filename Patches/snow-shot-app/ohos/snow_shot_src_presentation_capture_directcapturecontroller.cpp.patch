@@ -4,7 +4,7 @@ fails to resolve against the capture backend's `enumerate_monitors` naming
 contract.
 
 diff --git a/snow_shot/src/presentation/capture/directcapturecontroller.cpp b/snow_shot/src/presentation/capture/directcapturecontroller.cpp
-index 0dc90a9..f4b26b4 100644
+index 7f87694..8c98b81 100644
 --- a/snow_shot/src/presentation/capture/directcapturecontroller.cpp
 +++ b/snow_shot/src/presentation/capture/directcapturecontroller.cpp
 @@ -29,6 +29,10 @@
@@ -18,7 +18,7 @@ index 0dc90a9..f4b26b4 100644
  #if defined(Q_OS_WIN)
  #include <windows.h>
  #endif
-@@ -313,6 +317,11 @@ void DirectCaptureController::captureCurrentMonitor() {
+@@ -308,6 +312,11 @@ void DirectCaptureController::captureCurrentMonitor() {
      const quint32 id = platform::screenshotDisplayAtCursor();
      if (id)
          request.monitorName = QStringLiteral("display:%1").arg(id);

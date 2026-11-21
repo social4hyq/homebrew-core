@@ -5,7 +5,7 @@ into an unauthorized shared directory. The explicit automation path keeps
 its existing path constraints unchanged.
 
 diff --git a/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp b/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp
-index 0e9dd42..c663a32 100644
+index b3d7988..6f29abd 100644
 --- a/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp
 +++ b/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp
 @@ -45,12 +45,10 @@
@@ -29,7 +29,7 @@ index 0e9dd42..c663a32 100644
  #include <QMessageBox>
  #include <QPushButton>
  #include <QMimeData>
-@@ -1324,6 +1323,41 @@ struct ScreenRecordingController::Impl {
+@@ -1346,6 +1345,41 @@ struct ScreenRecordingController::Impl {
          }
      }
  
@@ -71,7 +71,7 @@ index 0e9dd42..c663a32 100644
      void start() {
          if (sessionEnding)
              return;
-@@ -1376,6 +1410,8 @@ struct ScreenRecordingController::Impl {
+@@ -1398,6 +1432,8 @@ struct ScreenRecordingController::Impl {
              setCaptureActivity(false);
              return;
          }

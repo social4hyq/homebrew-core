@@ -1,8 +1,8 @@
 diff --git a/snow_shot/CMakeLists.txt b/snow_shot/CMakeLists.txt
-index 174c22b..359b42f 100644
+index da5d012..2ce3351 100644
 --- a/snow_shot/CMakeLists.txt
 +++ b/snow_shot/CMakeLists.txt
-@@ -1358,7 +1358,7 @@ endif()
+@@ -1354,7 +1354,7 @@ endif()
  target_link_libraries(snow_shot_settings PRIVATE snow_shot_global_mouse)
  if(OHOS)
      find_library(SNOW_SHOT_ACE_NAPI_LIBRARY NAMES ace_napi.z REQUIRED)
@@ -12,7 +12,7 @@ index 174c22b..359b42f 100644
  snow_enable_unity_build(snow_shot_settings)
  set_source_files_properties(
 diff --git a/snow_shot/include/snow_shot/presentation/screenshotclipboardservice.h b/snow_shot/include/snow_shot/presentation/screenshotclipboardservice.h
-index 146f244..da4b873 100644
+index f04146d..8bedd2f 100644
 --- a/snow_shot/include/snow_shot/presentation/screenshotclipboardservice.h
 +++ b/snow_shot/include/snow_shot/presentation/screenshotclipboardservice.h
 @@ -15,8 +15,14 @@
@@ -30,7 +30,7 @@ index 146f244..da4b873 100644
  class QClipboard;
  class QMimeData;
  class QObject;
-@@ -181,4 +187,35 @@ class ScreenshotClipboardCommitScope final {
+@@ -185,4 +191,35 @@ class ScreenshotClipboardCommitScope final {
      std::shared_ptr<ScreenshotClipboardCommitScopeState> m_state;
  };
  
@@ -67,7 +67,7 @@ index 146f244..da4b873 100644
 +
  #endif // SNOW_SHOT_PRESENTATION_SCREENSHOTCLIPBOARDSERVICE_H
 diff --git a/snow_shot/src/presentation/services/screenshotclipboardcontent.cpp b/snow_shot/src/presentation/services/screenshotclipboardcontent.cpp
-index f37ca0e..5743934 100644
+index e6240a9..403286c 100644
 --- a/snow_shot/src/presentation/services/screenshotclipboardcontent.cpp
 +++ b/snow_shot/src/presentation/services/screenshotclipboardcontent.cpp
 @@ -1,4 +1,5 @@
@@ -76,7 +76,7 @@ index f37ca0e..5743934 100644
  #include "snow_shot/platform/applicationqos.h"
  #include "snow_shot/presentation/screenshotclipboardcontent.h"
  #include "snow_shot/app/supportedpinfiles.h"
-@@ -1268,6 +1269,25 @@ snapshotClipboardOnce(QClipboard* clipboard, qreal devicePixelRatio, AllocationC
+@@ -1273,6 +1274,25 @@ snapshotClipboardOnce(QClipboard* clipboard, qreal devicePixelRatio, AllocationC
                  snapshot->detachedImage = value.value<QPixmap>().toImage();
          }
      }
@@ -103,7 +103,7 @@ index f37ca0e..5743934 100644
  }
  
 diff --git a/snow_shot/src/presentation/services/screenshotclipboardservice.cpp b/snow_shot/src/presentation/services/screenshotclipboardservice.cpp
-index b346101..701579c 100644
+index 5fbb2f0..4527772 100644
 --- a/snow_shot/src/presentation/services/screenshotclipboardservice.cpp
 +++ b/snow_shot/src/presentation/services/screenshotclipboardservice.cpp
 @@ -26,6 +26,14 @@

@@ -10,10 +10,10 @@ ImageEditingWindow's own UI text that the unpatched catalog already carries
 have no OHOS-specific behavior change, so this port does not translate them.
 
 diff --git a/snow_shot/i18n/history/snow_shot_history_en_US.ts b/snow_shot/i18n/history/snow_shot_history_en_US.ts
-index 4f4f68d..0623503 100644
+index 2e03d3e..335e0ca 100644
 --- a/snow_shot/i18n/history/snow_shot_history_en_US.ts
 +++ b/snow_shot/i18n/history/snow_shot_history_en_US.ts
-@@ -164,6 +164,14 @@
+@@ -168,6 +168,14 @@
              <source>No available output filename was found</source>
              <translation>No available output filename was found</translation>
          </message>
@@ -28,7 +28,7 @@ index 4f4f68d..0623503 100644
          <message>
              <source>The editing content could not be prepared for export</source>
              <translation>The editing content could not be prepared for export</translation>
-@@ -184,10 +192,18 @@
+@@ -188,10 +196,18 @@
              <source>The image is too large or there is not enough memory to load it</source>
              <translation>The image is too large or there is not enough memory to load it</translation>
          </message>
@@ -47,7 +47,7 @@ index 4f4f68d..0623503 100644
      </context>
      <context>
          <name>ImageSplitDocument</name>
-@@ -2318,6 +2334,26 @@ Files:
+@@ -2338,6 +2354,26 @@ Files:
              <source>The pinned image save could not be started</source>
              <translation>The pinned image save could not be started</translation>
          </message>

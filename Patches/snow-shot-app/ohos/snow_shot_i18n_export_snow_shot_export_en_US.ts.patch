@@ -9,10 +9,10 @@ temp-file-staging failure. All of them are new OHOS strings, so nothing in
 this catalog is dropped.
 
 diff --git a/snow_shot/i18n/export/snow_shot_export_en_US.ts b/snow_shot/i18n/export/snow_shot_export_en_US.ts
-index ecb9c0f..e0983ec 100644
+index 7c17720..9ad4105 100644
 --- a/snow_shot/i18n/export/snow_shot_export_en_US.ts
 +++ b/snow_shot/i18n/export/snow_shot_export_en_US.ts
-@@ -258,6 +258,22 @@
+@@ -397,6 +397,22 @@
              <source>The output directory could not be created</source>
              <translation>The output directory could not be created</translation>
          </message>
@@ -35,7 +35,7 @@ index ecb9c0f..e0983ec 100644
          <message>
              <source>The result file could not be published</source>
              <translation>The result file could not be published</translation>
-@@ -565,6 +581,14 @@
+@@ -719,6 +735,14 @@
              <source>The screenshot pixels could not be read</source>
              <translation>The screenshot pixels could not be read</translation>
          </message>

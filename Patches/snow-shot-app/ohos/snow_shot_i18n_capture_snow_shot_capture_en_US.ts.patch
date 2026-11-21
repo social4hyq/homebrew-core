@@ -10,10 +10,10 @@ unpatched catalog already carries are untouched: OHOS reuses those existing
 translations and does not build the MCP server or a Finder integration.
 
 diff --git a/snow_shot/i18n/capture/snow_shot_capture_en_US.ts b/snow_shot/i18n/capture/snow_shot_capture_en_US.ts
-index 1edb62f..8f93a0c 100644
+index b06388d..3394384 100644
 --- a/snow_shot/i18n/capture/snow_shot_capture_en_US.ts
 +++ b/snow_shot/i18n/capture/snow_shot_capture_en_US.ts
-@@ -57,6 +57,10 @@
+@@ -53,6 +53,10 @@
              <source>Could not recapture the screen</source>
              <translation>Could not recapture the screen</translation>
          </message>
@@ -24,7 +24,7 @@ index 1edb62f..8f93a0c 100644
          <message>
              <source>Exit</source>
              <translation>Exit</translation>
-@@ -85,6 +89,14 @@
+@@ -81,6 +85,14 @@
              <source>No recognition result is available to copy</source>
              <translation>No recognition result is available to copy</translation>
          </message>
@@ -39,7 +39,7 @@ index 1edb62f..8f93a0c 100644
          <message>
              <source>Preparing cloud upload...</source>
              <translation>Preparing cloud upload...</translation>
-@@ -133,6 +145,10 @@
+@@ -129,6 +141,10 @@
              <source>The clipboard pin queue is full</source>
              <translation>The clipboard pin queue is full</translation>
          </message>
@@ -50,7 +50,7 @@ index 1edb62f..8f93a0c 100644
          <message>
              <source>The dropped content could not be opened</source>
              <translation>The dropped content could not be opened</translation>
-@@ -149,10 +165,34 @@
+@@ -145,10 +161,34 @@
              <source>The pinned windows could not be hidden</source>
              <translation>The pinned windows could not be hidden</translation>
          </message>
@@ -85,7 +85,7 @@ index 1edb62f..8f93a0c 100644
          <message>
              <source>The screenshot clipboard operation could not be started</source>
              <translation>The screenshot clipboard operation could not be started</translation>
-@@ -173,6 +213,14 @@
+@@ -169,6 +209,14 @@
              <source>The screenshot could not be saved: %1</source>
              <translation>The screenshot could not be saved: %1</translation>
          </message>
@@ -100,7 +100,7 @@ index 1edb62f..8f93a0c 100644
          <message>
              <source>The screenshot export queue is full</source>
              <translation>The screenshot export queue is full</translation>
-@@ -189,6 +237,10 @@
+@@ -181,6 +229,10 @@
              <source>The scrolling screenshot could not be prepared</source>
              <translation>The scrolling screenshot could not be prepared</translation>
          </message>

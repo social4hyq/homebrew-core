@@ -1,10 +1,10 @@
 OHOS: retain tray configuration without creating the broken platform tray item.
 
 diff --git a/snow_shot/src/app/applicationcontroller.cpp b/snow_shot/src/app/applicationcontroller.cpp
-index 46076e4..49a2c3a 100644
+index e8bf9fa..e6c096e 100644
 --- a/snow_shot/src/app/applicationcontroller.cpp
 +++ b/snow_shot/src/app/applicationcontroller.cpp
-@@ -1973,6 +1973,14 @@ class ApplicationController::Impl {
+@@ -2077,6 +2077,14 @@ class ApplicationController::Impl {
          if (storage::ApplicationStorage::instance().directoryChanging())
              return;
          ensureMainWindow().showAndActivate();
