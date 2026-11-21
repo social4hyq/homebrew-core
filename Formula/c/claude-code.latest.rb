@@ -1,9 +1,10 @@
 class ClaudeCodeLatest < Formula
   desc "Anthropic Claude Code CLI (latest release channel)"
   homepage "https://code.claude.com/docs/en/overview"
-  url "https://registry.npmmirror.com/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.330.tgz"
+  url "https://registry.npmjs.org/@anthropic-ai/claude-code-linux-arm64-musl/-/claude-code-linux-arm64-musl-2.1.330.tgz"
   sha256 "75c77a2921e6ff10c811af70de02798633fca7735fb54a09d4838e49ee88e2af"
   license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
+  revision 1
 
   livecheck do
     url "https://downloads.claude.ai/claude-code-releases/latest"
@@ -11,8 +12,8 @@ class ClaudeCodeLatest < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code.latest-v2.1.330-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "89d63af54d2d7697d991062f68f7009bc171add9dae15ffc7ef36d877554414d"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code.latest-v2.1.330-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "60a62491c7374437b94e41a55e1a483beb8de72b6bf09ef743e07dc8057a4bdc"
   end
 
   depends_on "ohos-compat-shim"
@@ -64,7 +65,6 @@ class ClaudeCodeLatest < Formula
       minimumReleaseAgeExclude:
         - '#{package}@#{version}'
     YAML
-    (libexec/".npmrc").write "strict-ssl=false\n"
     (libexec/"install-claude.sh").write <<~SH
       set -eu
       prefix="$1"
@@ -74,7 +74,7 @@ class ClaudeCodeLatest < Formula
       trap 'rm -rf "$work"; [ -z "$pending" ] || rm -f "$pending"' EXIT
       trap 'exit 1' HUP INT TERM
       cd "$work"
-      cp "$(dirname "$0")/package.json" "$(dirname "$0")/pnpm-lock.yaml" "$(dirname "$0")/pnpm-workspace.yaml" "$(dirname "$0")/.npmrc" .
+      cp "$(dirname "$0")/package.json" "$(dirname "$0")/pnpm-lock.yaml" "$(dirname "$0")/pnpm-workspace.yaml" .
       "$prefix/opt/pnpm/bin/pnpm" install --frozen-lockfile \
         --os=linux --cpu=arm64 --libc=musl --ignore-scripts \
         --store-dir "$work/store"
