@@ -14,8 +14,9 @@ class ClaudeCodeApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-app-v6.28899.2-r3"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4a467ee4a5256cea2e4240fa385ce441f7d69e72bc75a49af49ee305b1e5daef"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-app-v6.28899.2-r4"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b19eb071604989bc7a1dfcab3097949107f4e07e34c9c0f40cb8a704ed65084d"
   end
 
   depends_on "app-installer"
@@ -126,6 +127,38 @@ class ClaudeCodeApp < Formula
     ].each do |file|
       cp support/file, pkgshare/file
     end
+
+    # Run the two steps of `claude-code-app install` that depend on the shape of
+    # the official package on the deb Homebrew just downloaded: the assembler's
+    # package checks (hash pin, app version and entry) and the runtime patch of
+    # the Code manager chunk. The install runs on the user's device, so a
+    # release that breaks either has to fail this build and not the install.
+    ENV["CLAUDE_CODE_APP_VENDOR_JSON"] = (libexec/"vendor.json").to_s
+    mktemp("claude-payload") do |scratch|
+      system "python3", "-I", "-c", <<~PYTHON, pkgshare, cached_download, scratch.tmpdir
+        import importlib.util
+        import sys
+        from pathlib import Path
+
+        sys.dont_write_bytecode = True
+
+
+        def load(name):
+            spec = importlib.util.spec_from_file_location(name.replace("-", "_"), Path(sys.argv[1]) / f"{name}.py")
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            return module
+
+
+        assemble = load("assemble-local-hap")
+        patch = load("patch-code-runtime-hap")
+        payload = assemble.selected_payload(Path(sys.argv[2]), Path(sys.argv[3]))
+        asar = payload["app.asar"][0]
+        assemble.read_app_package(asar, assemble.vendor_pin()[0])
+        patch.patch_asar(asar.read_bytes())
+      PYTHON
+    end
+
     cp res/"scripts/claude-code-app.sh", libexec/"claude-code-app.sh"
     chmod 0755, [pkgshare/"install-desktop.sh", libexec/"claude-code-app.sh"]
 
