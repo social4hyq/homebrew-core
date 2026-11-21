@@ -8,8 +8,9 @@ class VitePlus < Formula
   head "https://github.com/voidzero-dev/vite-plus.git", branch: "main"
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/vite-plus-v1.7.0-r3"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b0f70a907a61f7e17b49eeda71c6e2b3fea058c5abfcdd6febd809eb237093c2"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/vite-plus-v1.7.0-r4"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d01d22def51c4ff370d2f66cbda999db44810d8c8ca83ae2838394b4d9321ed0"
   end
 
   depends_on "cmake" => :build
@@ -138,6 +139,7 @@ class VitePlus < Formula
     end
 
     system "just", "build"
+    system "cargo", "test", "-p", "vp_js_runtime", "-p", "vp_pm_cli" if OS.ohos?
     system "cargo", "install", *std_cargo_args(path: "crates/vp_global_cli")
 
     deploy_args = %w[--prod --legacy]
@@ -168,7 +170,8 @@ class VitePlus < Formula
     <<~EOS
       On OpenHarmony, a managed Node.js is downloaded from the community mirror
       ohos-node.com, as nodejs.org has no OpenHarmony builds. Downloads are checked
-      against its SHASUMS256.txt only, not a signature. To use another mirror:
+      against SHASUMS256.txt and its signature when the mirror provides one.
+      To use another mirror:
         export VP_NODE_DIST_MIRROR=https://example.com/dist
     EOS
   end
@@ -183,8 +186,16 @@ class VitePlus < Formula
     system "#{bin}/vp create vite:application --no-interactive --directory test-app < /dev/null"
     assert_path_exists testpath/"test-app/package.json"
 
-    # The scaffolded app installs vite-plus from npm, which has no openharmony binding
-    unless OS.ohos?
+    if OS.ohos?
+      # The scaffolded app installs vite-plus from npm, which has no openharmony binding.
+      (testpath/"format").mkpath
+      (testpath/"format/package.json").write '{"private":true}'
+      (testpath/"format/index.js").write "const answer = 42\n"
+      cd testpath/"format" do
+        output = shell_output("#{bin}/vp fmt index.js < /dev/null")
+        assert_match "Finished", output
+      end
+    else
       cd testpath/"test-app" do
         output = shell_output("#{bin}/vp fmt < /dev/null")
         assert_match "Finished", output
