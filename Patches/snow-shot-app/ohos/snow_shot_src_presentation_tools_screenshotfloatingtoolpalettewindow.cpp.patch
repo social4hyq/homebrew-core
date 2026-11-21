@@ -6,12 +6,12 @@ tool window, not a floating-window permission grant; a misleading source
 comment from an earlier revision is corrected without changing behavior.
 
 diff --git a/snow_shot/src/presentation/tools/screenshotfloatingtoolpalettewindow.cpp b/snow_shot/src/presentation/tools/screenshotfloatingtoolpalettewindow.cpp
-index cc9be0c..faa70b8 100644
+index f945e42..138b8c1 100644
 --- a/snow_shot/src/presentation/tools/screenshotfloatingtoolpalettewindow.cpp
 +++ b/snow_shot/src/presentation/tools/screenshotfloatingtoolpalettewindow.cpp
-@@ -55,6 +55,10 @@ constexpr QSize kToolbarWindowPresetSize(1242, 142);
- ScreenshotFloatingToolPaletteWindow::ScreenshotFloatingToolPaletteWindow(
-     const ScreenshotToolPalette::Options& options, QWidget* parent)
+@@ -56,6 +56,10 @@ ScreenshotFloatingToolPaletteWindow::ScreenshotFloatingToolPaletteWindow(
+     const ScreenshotToolPalette::Options& options, QWidget* parent,
+     [[maybe_unused]] bool attachToMacOwner)
      : QWidget(parent, native::windowFlags()) {
 +#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
 +    // Use a normal app window without the restricted SYSTEM_FLOAT_WINDOW permission.

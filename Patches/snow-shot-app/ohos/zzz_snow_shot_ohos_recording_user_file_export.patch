@@ -15,10 +15,10 @@ permission is absent, and add the OHOS input-monitor backend for HAPs signed
 with the INPUT_MONITORING ACL.
 
 diff --git a/snow_shot/CMakeLists.txt b/snow_shot/CMakeLists.txt
-index 359b42f..31000e2 100644
+index 2ce3351..43dee5b 100644
 --- a/snow_shot/CMakeLists.txt
 +++ b/snow_shot/CMakeLists.txt
-@@ -1355,6 +1355,11 @@ if(APPLE)
+@@ -1351,6 +1351,11 @@ if(APPLE)
          "${SNOW_SHOT_APPKIT_FRAMEWORK}"
          "${SNOW_SHOT_CORE_GRAPHICS_FRAMEWORK}")
  endif()
@@ -31,9 +31,10 @@ index 359b42f..31000e2 100644
  if(OHOS)
      find_library(SNOW_SHOT_ACE_NAPI_LIBRARY NAMES ace_napi.z REQUIRED)
 diff --git a/snow_shot/include/snow_shot/presentation/screenrecordingcontroller.h b/snow_shot/include/snow_shot/presentation/screenrecordingcontroller.h
+index b1e1b2d..2329a34 100644
 --- a/snow_shot/include/snow_shot/presentation/screenrecordingcontroller.h
 +++ b/snow_shot/include/snow_shot/presentation/screenrecordingcontroller.h
-@@ -30,6 +30,8 @@
+@@ -30,6 +30,8 @@ class ScreenRecordingController final : public QObject {
      void open(const QRect& recordingRegion);
      using PermissionCheck = std::function<bool(bool microphone, bool input, bool notify)>;
      void setPermissionCheck(PermissionCheck check);
@@ -42,7 +43,7 @@ diff --git a/snow_shot/include/snow_shot/presentation/screenrecordingcontroller.
  #ifdef Q_OS_MACOS
      void
      setPreviewPermissionSnapshot(const snow_shot::presentation::AppPermissionSnapshot& snapshot);
-@@ -62,6 +64,7 @@
+@@ -62,6 +64,7 @@ class ScreenRecordingController final : public QObject {
      void captureActivityChanged(bool active);
      void finalized();
      void exportNotificationRequested(const QString& path);
@@ -390,10 +391,10 @@ index 8763370..7235477 100644
      std::function<void(const QString&)> exported;
  
 diff --git a/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp b/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp
-index c663a32..6deff22 100644
+index 6f29abd..c722eaf 100644
 --- a/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp
 +++ b/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp
-@@ -625,10 +625,24 @@ struct ScreenRecordingController::Impl {
+@@ -629,10 +629,24 @@ struct ScreenRecordingController::Impl {
      }
  
      void showRecordingControls() {
@@ -418,7 +419,7 @@ index c663a32..6deff22 100644
      }
  
      bool followCaptureActive() const {
-@@ -1903,8 +1917,20 @@ struct ScreenRecordingController::Impl {
+@@ -1931,8 +1945,20 @@ struct ScreenRecordingController::Impl {
          trimSession = new RecordingTrimSession(areaWindow, toolbarWindow, &owner);
          trimSession->reportError = [this](const QString& error) { showError(error); };
          trimSession->exported = [this, session = trimSession](const QString& path) {
@@ -439,7 +440,7 @@ index c663a32..6deff22 100644
              notifyExportCompleted(path);
          };
      }
-@@ -2067,6 +2093,10 @@ struct ScreenRecordingController::Impl {
+@@ -2095,6 +2121,10 @@ struct ScreenRecordingController::Impl {
          // Finalized observers can destroy the controller or start a new session.
          // Keep the original Copy intent and its path independent of that callback.
          const QPointer<ScreenRecordingController> guard(&owner);
@@ -450,7 +451,7 @@ index c663a32..6deff22 100644
          notifyExportCompleted(completedPath);
          if (guard)
              emit guard->finalized();
-@@ -2074,6 +2104,21 @@ struct ScreenRecordingController::Impl {
+@@ -2102,6 +2132,21 @@ struct ScreenRecordingController::Impl {
              copyFileToClipboard(completedPath);
      }
  
@@ -472,7 +473,7 @@ index c663a32..6deff22 100644
      void notifyExportCompleted(const QString& path) {
          if (snow_shot::storage::RecordingSettings().notifyAfterExportCompletes())
              emit owner.exportNotificationRequested(path);
-@@ -2177,6 +2222,12 @@ struct ScreenRecordingController::Impl {
+@@ -2205,6 +2250,12 @@ struct ScreenRecordingController::Impl {
                  trimSession->reportError = [this](const QString& error) { showError(error); };
                  trimSession->exported = [this, marker, record](const QString& path) {
                      static_cast<void>(clearRecovery(marker, record));
@@ -485,7 +486,7 @@ index c663a32..6deff22 100644
                      notifyExportCompleted(path);
                  };
                  trimSession->open(record.sourcePath, pendingOutputPath, {}, true, false, {});
-@@ -2960,6 +3011,7 @@ struct ScreenRecordingController::Impl {
+@@ -3040,6 +3091,7 @@ struct ScreenRecordingController::Impl {
      }
  
      PermissionCheck permissionCheck;
@@ -493,9 +494,9 @@ index c663a32..6deff22 100644
      bool sessionEnding = false;
      bool recoveryOffered = false;
      QJsonObject automationOptions;
-@@ -3177,6 +3229,10 @@ void ScreenRecordingController::setPermissionCheck(PermissionCheck check) {
-     m_impl->permissionCheck = std::move(check);
+@@ -3266,6 +3318,10 @@ void ScreenRecordingController::setPreviewPermissionSnapshot(
  }
+ #endif
  
 +void ScreenRecordingController::setUserFileExporter(UserFileExporter exporter) {
 +    m_impl->userFileExporter = std::move(exporter);
@@ -505,10 +506,10 @@ index c663a32..6deff22 100644
      m_impl->open(recordingRegion);
  }
 diff --git a/snow_shot/src/presentation/services/screenshotcontroller.cpp b/snow_shot/src/presentation/services/screenshotcontroller.cpp
-index 8050621..4e3b5a4 100644
+index 5bae152..e569c30 100644
 --- a/snow_shot/src/presentation/services/screenshotcontroller.cpp
 +++ b/snow_shot/src/presentation/services/screenshotcontroller.cpp
-@@ -1505,6 +1505,13 @@ bool ScreenshotController::Impl::ensureRecordingFeature() {
+@@ -1526,6 +1526,13 @@ bool ScreenshotController::Impl::ensureRecordingFeature() {
      QObject::connect(m_screenRecordingController.get(),
                       &ScreenRecordingController::exportNotificationRequested, &owner,
                       &ScreenshotController::recordingExportNotificationRequested);
@@ -522,7 +523,7 @@ index 8050621..4e3b5a4 100644
      QObject::connect(m_screenRecordingController.get(),
                       &ScreenRecordingController::captureActivityChanged, &owner,
                       [this](bool active) {
-@@ -7443,15 +7450,21 @@ void ScreenshotController::openScreenRecordingFolder() {
+@@ -7555,15 +7562,21 @@ void ScreenshotController::openScreenRecordingFolder() {
  
  #ifdef Q_OS_HARMONY
  void ScreenshotController::exportScreenRecordingToUserFile(const QString& path) {
@@ -547,7 +548,7 @@ index 8050621..4e3b5a4 100644
              if (!receiver || receiver->m_impl == nullptr)
                  return;
              if (result == snow_shot::platform::ohos::RecordingFileExport::Result::Failed) {
-@@ -7461,7 +7474,7 @@ void ScreenshotController::exportScreenRecordingToUserFile(const QString& path)
+@@ -7573,7 +7586,7 @@ void ScreenshotController::exportScreenRecordingToUserFile(const QString& path)
                      QCoreApplication::translate("ScreenshotController",
                                                  "Could not write the selected user file"));
              }
