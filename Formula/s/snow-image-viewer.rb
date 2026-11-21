@@ -13,8 +13,8 @@ class SnowImageViewer < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-image-viewer-v1.5.2-r3"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ced53cc38b3681221ba17bc3bf40b56d941be21b21342015bd9b42e93d1598ce"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-image-viewer-v1.5.2-r4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b3861338b925e6de955ccbcd4a54793447d45c3865c87430c1cd37f4b2ff5401"
   end
 
   # These libraries are copied into the HAP after their ELF dependency graph
