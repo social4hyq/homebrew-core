@@ -4,11 +4,17 @@ class SnowShotApp < Formula
   url "https://github.com/mg-chao/snow-shot/archive/refs/tags/v1.5.7_snow-shot.tar.gz"
   sha256 "6d9de662710ccf406dea312c0322e77a3f473bc6121096ec82df713d30f4273c"
   license "GPL-3.0-or-later"
-  revision 23
+  revision 24
+
+  livecheck do
+    url "https://github.com/mg-chao/snow-shot.git"
+    regex(/^v?(\d+(?:\.\d+)+)_snow-shot$/i)
+    strategy :git
+  end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-app-v1.5.7-r12"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "57fa9c3f8331f6304f4cc4a8710a232f19499342afac7f1808feeb01b3c7b1bc"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-app-v1.5.7-r13"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bba292f990ebaba43d0139c3bc718bf63229e530abdbdb44a5a45b8da328608c"
   end
 
   depends_on "brotli" => :build
