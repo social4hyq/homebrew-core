@@ -70,7 +70,7 @@ class ClaudeCodeApp < Formula
     RESOURCE_FILES.each { |file| odie "missing tap resource: #{file}" unless (tap_root/file).exist? }
     support = buildpath/"claude-code-support"
     support.mkpath
-    RESOURCE_FILES.grep(%r{/(app|support)/}).each do |file|
+    RESOURCE_FILES.grep(%r{/(app|support|hap-app)/}).each do |file|
       cp tap_root/file, support/File.basename(file)
     end
 
