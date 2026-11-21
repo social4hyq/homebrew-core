@@ -27,9 +27,13 @@ match = re.fullmatch(r'([1-9][0-9]*)\.([0-9]+)\.([0-9]+)', version)
 if not match:
     raise ValueError(f'invalid Claude Desktop version: {version}')
 major, minor, patch = (int(part) for part in match.groups())
-if major >= 512 or minor >= 16_384 or patch >= 256:
+# versionCode packing: major 6 bits | minor 17 bits | patch 8 bits, kept within
+# the signed 32-bit HAP limit (63 << 25 | 131071 << 8 | 255 == 2**31 - 1).
+# Claude Desktop's minor is a build counter that crossed the old 14-bit field
+# (16_383) at 6.28899.2, so it now owns the wider middle field.
+if major >= 64 or minor >= 131_072 or patch >= 256:
     raise ValueError(f'Claude Desktop version exceeds the app versionCode fields: {version}')
-version_code = (major << 22) | (minor << 8) | patch
+version_code = (major << 25) | (minor << 8) | patch
 def edit(rel, fn):
     p = root / rel
     p.write_text(fn(p.read_text()))
