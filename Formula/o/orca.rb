@@ -125,9 +125,8 @@ class Orca < Formula
     resource("lightningcss-wasm").stage do
       (lightningcss_dir/"wasm").install Dir["*"]
     end
-    (lightningcss_dir/"node/index.js").atomic_write <<~JS
-      module.exports = require("../wasm/wasm-node.cjs")
-    JS
+    system "patch", "-p1", "-d", lightningcss_dir,
+           "-i", tap_root/"Patches/orca/0002-lightningcss-wasm-loader.patch"
 
     # The CLI and web builds stamp the source commit (installed skills pin to it),
     # and a release tarball carries no history: give the build one empty commit.
