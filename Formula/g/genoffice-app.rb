@@ -13,8 +13,8 @@ class GenofficeApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/genoffice-app-v0.13.18-r17"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d0492b97a0e3e1c9663425be7fd50eab8a711a9d309e536172eb08ebe2d09f10"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/genoffice-app-v0.13.615-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e9108ed1955fa9c8c71bced8b91323f27373114a9906f2b48416be50e1511ba1"
   end
 
   depends_on "genoffice" => :build
