@@ -1,0 +1,362 @@
+diff --git a/src/input/ime.rs b/src/input/ime.rs
+index fe4a63c..8d4a9f6 100644
+--- a/src/input/ime.rs
++++ b/src/input/ime.rs
+@@ -55,16 +55,17 @@ impl InputCallback {
+     }
+
+     #[cfg(feature = "keyboard")]
+-    pub(crate) fn key(&self, event: crate::KeyboardEventData) {
++    pub(crate) fn key(&self, id: super::queue::KeyId, event: crate::KeyboardEventData) {
+         self.enqueue(self.queue.push_key(
+             &self.owner,
++            id,
+             InputEvent::ArkUi(crate::ArkUiInputEvent::Key(event)),
+         ));
+     }
+
+     #[cfg(feature = "keyboard")]
+-    pub(crate) fn after_ime(&self) {
+-        if let Err(error) = self.queue.after_ime(&self.owner) {
++    pub(crate) fn after_ime(&self, id: super::queue::KeyId) {
++        if let Err(error) = self.queue.after_ime(&self.owner, id) {
+             crate::warn!("{error}");
+         }
+     }
+diff --git a/src/input/queue.rs b/src/input/queue.rs
+index 920461c..93bcc51 100644
+--- a/src/input/queue.rs
++++ b/src/input/queue.rs
+@@ -41,10 +41,18 @@ enum Entry<T> {
+ struct State<T> {
+     owners: HashMap<String, Arc<()>>,
+     events: VecDeque<Entry<T>>,
++    /// The latest key sent to the IME, with its identity. The IME answers
++    /// asynchronously: with fast typing the post-IME callback of one key can
++    /// arrive after the next key's pre-IME callback, so an answer only applies
++    /// to the key it names (HERDR-OHOS: this duplicated typed characters).
+     #[cfg(any(feature = "keyboard", test))]
+-    current_keys: HashMap<String, Weak<AtomicU8>>,
++    current_keys: HashMap<String, (KeyId, Weak<AtomicU8>)>,
+ }
+
++/// A physical key transition: raw key code and whether it is a press.
++#[cfg(any(feature = "keyboard", test))]
++pub(crate) type KeyId = (i32, bool);
++
+ pub(crate) struct InputQueue<T> {
+     state: Mutex<State<T>>,
+ }
+@@ -96,12 +104,22 @@ impl<T> InputQueue<T> {
+     }
+
+     pub(crate) fn push(&self, owner: &InputOwner, value: T) -> Result<bool, &'static str> {
+-        self.push_with_kind(owner, value, InputKind::Ordinary)
++        self.push_with_kind(owner, value, InputKind::Ordinary, None)
+     }
+
+     #[cfg(any(feature = "keyboard", test))]
+-    pub(crate) fn push_key(&self, owner: &InputOwner, value: T) -> Result<bool, &'static str> {
+-        self.push_with_kind(owner, value, InputKind::Key(Arc::new(AtomicU8::new(0))))
++    pub(crate) fn push_key(
++        &self,
++        owner: &InputOwner,
++        id: KeyId,
++        value: T,
++    ) -> Result<bool, &'static str> {
++        self.push_with_kind(
++            owner,
++            value,
++            InputKind::Key(Arc::new(AtomicU8::new(0))),
++            Some(id),
++        )
+     }
+
+     fn push_with_kind(
+@@ -109,6 +127,7 @@ impl<T> InputQueue<T> {
+         owner: &InputOwner,
+         value: T,
+         kind: InputKind,
++        #[allow(unused_variables)] id: Option<(i32, bool)>,
+     ) -> Result<bool, &'static str> {
+         let mut state = self
+             .state
+@@ -122,11 +141,11 @@ impl<T> InputQueue<T> {
+             return Ok(false);
+         }
+         #[cfg(any(feature = "keyboard", test))]
+-        if let InputKind::Key(disposition) = &kind {
++        if let (InputKind::Key(disposition), Some(id)) = (&kind, id) {
+             if let Some(previous) = state
+                 .current_keys
+-                .insert(owner.name.clone(), Arc::downgrade(disposition))
+-                .and_then(|previous| previous.upgrade())
++                .insert(owner.name.clone(), (id, Arc::downgrade(disposition)))
++                .and_then(|(_, previous)| previous.upgrade())
+             {
+                 let _ = previous.compare_exchange(0, 2, Ordering::AcqRel, Ordering::Acquire);
+             }
+@@ -139,37 +158,50 @@ impl<T> InputQueue<T> {
+         Ok(true)
+     }
+
++    /// The IME declined key `id`: it reaches the app.
+     #[cfg(any(feature = "keyboard", test))]
+-    pub(crate) fn after_ime(&self, owner: &InputOwner) -> Result<(), &'static str> {
+-        self.resolve_key(owner, 1)
++    pub(crate) fn after_ime(&self, owner: &InputOwner, id: KeyId) -> Result<(), &'static str> {
++        self.resolve_key(owner, 1, |key| key == id)
+     }
+
++    /// The IME edited text: the current key, if it is a press, was its input.
+     #[cfg(any(feature = "keyboard", test))]
+     pub(crate) fn ime_edit(&self, owner: &InputOwner) -> Result<(), &'static str> {
+-        self.resolve_key(owner, 2)
++        self.resolve_key(owner, 2, |(_, down)| down)
+     }
+
+     #[cfg(any(feature = "keyboard", test))]
+-    fn resolve_key(&self, owner: &InputOwner, resolved: u8) -> Result<(), &'static str> {
++    fn resolve_key(
++        &self,
++        owner: &InputOwner,
++        resolved: u8,
++        matches: impl Fn(KeyId) -> bool,
++    ) -> Result<(), &'static str> {
+         let mut state = self
+             .state
+             .lock()
+             .map_err(|_| "Native input queue poisoned")?;
+-        // Pre/post callbacks belong to the current platform dispatch, not a timestamp.
+-        // Repeated physical transitions with identical timestamps remain distinct entries.
+-        if state
++        if !state
+             .owners
+             .get(&owner.name)
+             .is_some_and(|active| Arc::ptr_eq(active, &owner.lifetime))
+         {
+-            if let Some(disposition) = state
+-                .current_keys
+-                .remove(&owner.name)
+-                .and_then(|current| current.upgrade())
+-            {
+-                let _ =
+-                    disposition.compare_exchange(0, resolved, Ordering::AcqRel, Ordering::Acquire);
+-            }
++            return Ok(());
++        }
++        // A late answer for an earlier key must not claim the current one.
++        if !state
++            .current_keys
++            .get(&owner.name)
++            .is_some_and(|(id, _)| matches(*id))
++        {
++            return Ok(());
++        }
++        if let Some(disposition) = state
++            .current_keys
++            .remove(&owner.name)
++            .and_then(|(_, current)| current.upgrade())
++        {
++            let _ = disposition.compare_exchange(0, resolved, Ordering::AcqRel, Ordering::Acquire);
+         }
+         Ok(())
+     }
+@@ -228,6 +260,8 @@ impl<T> InputQueue<T> {
+ mod tests {
+     use super::*;
+
++    const K: KeyId = (2017, true);
++
+     fn input<T>(delivery: Option<Delivery<T>>) -> (String, T, Option<bool>) {
+         match delivery.expect("queued delivery") {
+             Delivery::Input {
+@@ -263,10 +297,10 @@ mod tests {
+         let queue = InputQueue::default();
+         let owner = queue.activate("main").unwrap();
+         for _ in 0..3 {
+-            queue.push_key(&owner, (42, "a")).unwrap();
+-            queue.after_ime(&owner).unwrap();
++            queue.push_key(&owner, K, (42, "a")).unwrap();
++            queue.after_ime(&owner, K).unwrap();
+         }
+-        queue.push_key(&owner, (42, "a")).unwrap();
++        queue.push_key(&owner, K, (42, "a")).unwrap();
+         queue.ime_edit(&owner).unwrap();
+         queue.push(&owner, (42, "composition")).unwrap();
+         for _ in 0..3 {
+@@ -282,11 +316,11 @@ mod tests {
+     ) -> Result<(), &'static str> {
+         let queue = InputQueue::default();
+         let owner = queue.activate("main")?;
+-        queue.push_key(&owner, "ctrl-w")?;
++        queue.push_key(&owner, K, "ctrl-w")?;
+         queue.wake()?;
+         assert!(matches!(queue.pop()?, Some(Delivery::Wake)));
+         assert!(queue.pop()?.is_none());
+-        queue.after_ime(&owner)?;
++        queue.after_ime(&owner, K)?;
+         assert_eq!(input(queue.pop()?), ("main".into(), "ctrl-w", Some(false)));
+         assert!(queue.pop()?.is_none());
+         Ok(())
+@@ -296,7 +330,7 @@ mod tests {
+     fn ime_edit_resolves_a_key_after_an_early_foreground_drain() -> Result<(), &'static str> {
+         let queue = InputQueue::default();
+         let owner = queue.activate("main")?;
+-        queue.push_key(&owner, "a")?;
++        queue.push_key(&owner, K, "a")?;
+         assert!(queue.pop()?.is_none());
+         queue.ime_edit(&owner)?;
+         queue.push(&owner, "committed text")?;
+@@ -311,12 +345,12 @@ mod tests {
+         let queue = InputQueue::default();
+         let owner = queue.activate("main").unwrap();
+         assert!(!queue.has_pending());
+-        queue.push_key(&owner, "candidate navigation").unwrap();
++        queue.push_key(&owner, K, "candidate navigation").unwrap();
+         assert!(queue.has_pending());
+         assert!(queue.pop().unwrap().is_none());
+-        queue.push_key(&owner, "next key").unwrap();
++        queue.push_key(&owner, K, "next key").unwrap();
+         assert_eq!(input(queue.pop().unwrap()).1, "candidate navigation");
+-        queue.after_ime(&owner).unwrap();
++        queue.after_ime(&owner, K).unwrap();
+         assert_eq!(input(queue.pop().unwrap()).2, Some(false));
+         assert!(!queue.has_pending());
+     }
+@@ -326,9 +360,9 @@ mod tests {
+         let queue = InputQueue::default();
+         let main = queue.activate("main").unwrap();
+         let child = queue.activate("child").unwrap();
+-        queue.push_key(&main, "main").unwrap();
+-        queue.push_key(&child, "child").unwrap();
+-        queue.after_ime(&main).unwrap();
++        queue.push_key(&main, K, "main").unwrap();
++        queue.push_key(&child, K, "child").unwrap();
++        queue.after_ime(&main, K).unwrap();
+         assert_eq!(input(queue.pop().unwrap()).2, Some(false));
+         assert!(queue.pop().unwrap().is_none());
+         queue.ime_edit(&child).unwrap();
+@@ -339,13 +373,13 @@ mod tests {
+     fn duplicate_post_callback_cannot_reclassify_an_older_consumed_key() {
+         let queue = InputQueue::default();
+         let owner = queue.activate("main").unwrap();
+-        queue.push_key(&owner, "consumed").unwrap();
+-        queue.push_key(&owner, "unconsumed").unwrap();
+-        queue.after_ime(&owner).unwrap();
+-        queue.after_ime(&owner).unwrap();
++        queue.push_key(&owner, K, "consumed").unwrap();
++        queue.push_key(&owner, K, "unconsumed").unwrap();
++        queue.after_ime(&owner, K).unwrap();
++        queue.after_ime(&owner, K).unwrap();
+         assert_eq!(input(queue.pop().unwrap()).2, Some(true));
+         assert_eq!(input(queue.pop().unwrap()).2, Some(false));
+-        queue.after_ime(&owner).unwrap();
++        queue.after_ime(&owner, K).unwrap();
+         assert!(queue.pop().unwrap().is_none());
+     }
+
+@@ -353,12 +387,12 @@ mod tests {
+     fn retired_key_callbacks_cannot_change_replacement_disposition() {
+         let queue = InputQueue::default();
+         let old = queue.activate("main").unwrap();
+-        queue.push_key(&old, "old").unwrap();
++        queue.push_key(&old, K, "old").unwrap();
+         let replacement = queue.activate("main").unwrap();
+-        queue.push_key(&replacement, "replacement").unwrap();
+-        queue.after_ime(&old).unwrap();
++        queue.push_key(&replacement, K, "replacement").unwrap();
++        queue.after_ime(&old, K).unwrap();
+         queue.ime_edit(&old).unwrap();
+-        queue.after_ime(&replacement).unwrap();
++        queue.after_ime(&replacement, K).unwrap();
+         assert_eq!(
+             input(queue.pop().unwrap()),
+             ("main".into(), "replacement", Some(false))
+@@ -405,4 +439,52 @@ mod tests {
+         assert_eq!(input(queue.pop().unwrap()).1, "replacement edit");
+         assert!(queue.pop().unwrap().is_none());
+     }
++
++    #[test]
++    fn late_post_callback_for_a_release_cannot_claim_the_next_press() {
++        // Fast typing: "n" up is still unanswered when "o" down arrives; the IME
++        // then declines "n" up late and types "o". "o" down must stay consumed by
++        // the IME, or the app inserts it a second time.
++        let queue = InputQueue::default();
++        let owner = queue.activate("main").unwrap();
++        let (n_down, n_up, o_down, o_up) =
++            ((2030, true), (2030, false), (2031, true), (2031, false));
++        queue.push_key(&owner, n_down, "n down").unwrap();
++        queue.ime_edit(&owner).unwrap();
++        queue.push_key(&owner, n_up, "n up").unwrap();
++        queue.push_key(&owner, o_down, "o down").unwrap();
++        queue.after_ime(&owner, n_up).unwrap();
++        queue.ime_edit(&owner).unwrap();
++        queue.push_key(&owner, o_up, "o up").unwrap();
++        queue.after_ime(&owner, o_up).unwrap();
++        assert_eq!(
++            input(queue.pop().unwrap()),
++            ("main".into(), "n down", Some(true))
++        );
++        assert_eq!(
++            input(queue.pop().unwrap()),
++            ("main".into(), "n up", Some(true))
++        );
++        assert_eq!(
++            input(queue.pop().unwrap()),
++            ("main".into(), "o down", Some(true))
++        );
++        assert_eq!(
++            input(queue.pop().unwrap()),
++            ("main".into(), "o up", Some(false))
++        );
++        assert!(queue.pop().unwrap().is_none());
++    }
++
++    #[test]
++    fn late_edit_does_not_consume_the_release_that_followed() {
++        let queue = InputQueue::default();
++        let owner = queue.activate("main").unwrap();
++        queue.push_key(&owner, (2017, true), "a down").unwrap();
++        queue.push_key(&owner, (2017, false), "a up").unwrap();
++        queue.ime_edit(&owner).unwrap();
++        queue.after_ime(&owner, (2017, false)).unwrap();
++        assert_eq!(input(queue.pop().unwrap()).2, Some(true));
++        assert_eq!(input(queue.pop().unwrap()).2, Some(false));
++    }
+ }
+diff --git a/src/render/xcomponent.rs b/src/render/xcomponent.rs
+index b639259..9bce9f5 100644
+--- a/src/render/xcomponent.rs
++++ b/src/render/xcomponent.rs
+@@ -541,7 +541,13 @@ pub fn render_for_window(
+                 if let Some(data) = KeyboardEventData::from_node_callback(event) {
+                     if let Some(callback) = pre_ime_app.input_callback(&pre_ime_owner) {
+                         *pre_ime_response.borrow_mut() = Some(data.response.clone());
+-                        callback.key(data);
++                        let id = (
++                            event
++                                .key_event()
++                                .map_or(-1, |key| key.key_code_raw() as i32),
++                            data.action == ohos_xcomponent_binding::Action::Down,
++                        );
++                        callback.key(id, data);
+                     }
+                 }
+                 None
+@@ -549,7 +555,13 @@ pub fn render_for_window(
+             xcomponent_native.on_key_event(move |event| {
+                 if let Some(input) = event.key_event() {
+                     if let Some(callback) = on_key_event_app.input_callback(&on_key_event_owner) {
+-                        callback.after_ime();
++                        // Match the answer to its own key: with fast typing the next
++                        // key's pre-IME callback can come before this one.
++                        let down = matches!(
++                            input.event_type(),
++                            ohos_arkui_binding::event::KeyEventType::Down
++                        );
++                        callback.after_ime((input.key_code_raw() as i32, down));
+                         on_key_event_app.drain_input();
+                         if pending_response
+                             .borrow_mut()
