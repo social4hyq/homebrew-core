@@ -1,12 +1,11 @@
 class GenofficeApp < Formula
   desc "GenOffice AI office suite (docs, sheets, slides, PDF, Markdown, HTML) as a HAP"
   homepage "https://github.com/genspark-ai/genoffice"
-  url "https://github.com/genspark-ai/genoffice/archive/refs/tags/v0.13.18.tar.gz"
-  sha256 "156528d8fa1e6878d6c61d3576d6d6b093eda4abbef223e7fbc4bd4855c9cb08"
+  url "https://github.com/genspark-ai/genoffice/archive/refs/tags/v0.13.615.tar.gz"
+  sha256 "bd8cbe95dcee05ec20785b2aee015d5a1d69c0552683d808932ee5fa342c7505"
   # Apache-2.0 upstream with tap-authored packaging on the CPF-Electron runtime
   # (mixed MIT/BSD/LGPL).
   license :cannot_represent
-  revision 13
 
   livecheck do
     url :stable
@@ -14,8 +13,8 @@ class GenofficeApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/genoffice-app-v0.13.18-r17"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d0492b97a0e3e1c9663425be7fd50eab8a711a9d309e536172eb08ebe2d09f10"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/genoffice-app-v0.13.615-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e9108ed1955fa9c8c71bced8b91323f27373114a9906f2b48416be50e1511ba1"
   end
 
   depends_on "genoffice" => :build
