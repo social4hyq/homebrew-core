@@ -1,0 +1,20 @@
+diff --git a/build.rs b/build.rs
+index bb389a1..1b56da8 100644
+--- a/build.rs
++++ b/build.rs
+@@ -34,6 +34,15 @@ fn embed(base: &Path, folder: &str, name: &str, file: &str) {
+ }
+ 
+ fn main() {
++    if std::env::var("CARGO_CFG_TARGET_ENV").as_deref() == Ok("ohos") {
++        napi_build_ohos::setup();
++        println!("cargo:rustc-link-lib=dylib=c++_shared");
++        // napi-derive-ohos names the registered module after this variable; without
++        // it the ability module would be registered under the compile-time crate
++        // path and the ArkTS side could not import it.
++        println!("cargo:rustc-env=NAPI_BUILD_TARGET_NAME=herdr_app");
++    }
++
+     let base = std::path::PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap());
+     embed(&base, "defaults/mods", "DEFAULT_MODS", "default_mods.rs");
+     embed(&base, "defaults/icons", "DEFAULT_ICONS", "default_icons.rs");

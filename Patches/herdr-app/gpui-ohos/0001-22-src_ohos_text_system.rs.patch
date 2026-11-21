@@ -1,0 +1,71 @@
+diff --git a/src/ohos/text_system.rs b/src/ohos/text_system.rs
+index af12940..61195a1 100644
+--- a/src/ohos/text_system.rs
++++ b/src/ohos/text_system.rs
+@@ -769,6 +769,27 @@ impl OhosTextSystemState {
+         }
+     }
+
++    /// System fonts that must not take part in fallback.
++    ///
++    /// A monospaced text face (a terminal) is first fallen back to *any monospace-flagged font in the
++    /// database that has the glyphs*, ahead of the Han script list. The system's Founder (`FZ*`) display
++    /// fonts (heavy Song, calligraphy, ...) flag themselves monospaced so every glyph has the same width,
++    /// so Chinese terminal text came out in a heavy display serif. CJK serif faces would do the same.
++    /// The system's other single-style Chinese faces do it too, and are no better for a terminal:
++    /// `FangS-SC` (a thin Fang Song, so thin strokes with serifs and no bold), `KaiT-SC` (Kai),
++    /// `ShuS-SC` and `HeiT-SC`. They sort ahead of the script list by file name, so `FangS-SC` drew
++    /// the text. HarmonyOS Sans SC / Noto Sans CJK stay, and the script list picks the former,
++    /// as the system's own terminal (HiShell) does.
++    fn is_unwanted_fallback(path: &Path) -> bool {
++        let Some(name) = path.file_name().and_then(|n| n.to_str()) else {
++            return false;
++        };
++        let name = name.to_ascii_lowercase();
++        name.starts_with("fz")
++            || name.contains("serifcjk")
++            || ["fangs-", "kait-", "shus-", "heit-"].iter().any(|prefix| name.starts_with(prefix))
++    }
++
+     fn load_font_directories(db: &mut cosmic_text::fontdb::Database, roots: &[&Path]) {
+         let mut directories = roots
+             .iter()
+@@ -811,6 +832,9 @@ impl OhosTextSystemState {
+             }
+         }
+         for path in files {
++            if Self::is_unwanted_fallback(&path) {
++                continue;
++            }
+             if let Err(error) = db.load_font_file(&path) {
+                 warn!(
+                     "OHOS text system: could not load {}: {error}",
+@@ -1322,3 +1346,28 @@ fn has_color_glyphs(font: &CosmicTextFont) -> bool {
+         .into_iter()
+         .any(|tag| font.table(u32::from_be_bytes(tag)).is_some())
+ }
++
++#[cfg(test)]
++mod unwanted_fallback_tests {
++    use super::*;
++
++    fn unwanted(file: &str) -> bool {
++        OhosTextSystemState::is_unwanted_fallback(Path::new("/system/fonts").join(file).as_path())
++    }
++
++    #[test]
++    fn single_style_chinese_display_faces_stay_out_of_the_fallback() {
++        // Founder display faces, Fang Song, Kai, Shu and Hei: all flag themselves monospaced.
++        for file in ["FZCSJW.ttf", "FZHeiT-SC-Regular.ttf", "FangS-SC.ttf", "KaiT-SC.ttf", "ShuS-SC.ttf", "HeiT-SC-Regular.ttf", "NotoSerifCJK-Regular.ttc"] {
++            assert!(unwanted(file), "{file} should be skipped");
++        }
++    }
++
++    #[test]
++    fn the_fonts_a_terminal_should_fall_back_to_are_kept() {
++        // The script list picks HarmonyOS Sans SC, then Noto Sans CJK, as HiShell does.
++        for file in ["HarmonyOS_Sans_SC.ttf", "HarmonyOS_Sans_TC.ttf", "HarmonyOS_Sans.ttf", "NotoSansCJK-Regular.ttc", "NotoSansMono-Regular.ttf", "GeistMono-Variable.ttf"] {
++            assert!(!unwanted(file), "{file} should be kept");
++        }
++    }
++}

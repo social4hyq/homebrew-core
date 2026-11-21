@@ -1,0 +1,69 @@
+diff --git a/src/ohos/path_targets.rs b/src/ohos/path_targets.rs
+index ccae951..7fe9687 100644
+--- a/src/ohos/path_targets.rs
++++ b/src/ohos/path_targets.rs
+@@ -3,6 +3,7 @@
+ pub(super) struct PathTargets {
+     intermediate_view: wgpu::TextureView,
+     msaa_view: Option<wgpu::TextureView>,
++    #[cfg(not(feature = "fast"))]
+     pub(super) bind_group: wgpu::BindGroup,
+ }
+
+@@ -11,8 +12,8 @@ impl PathTargets {
+         device: &wgpu::Device,
+         config: &wgpu::SurfaceConfiguration,
+         sample_count: u32,
+-        layout: &wgpu::BindGroupLayout,
+-        sampler: &wgpu::Sampler,
++        _layout: &wgpu::BindGroupLayout,
++        _sampler: &wgpu::Sampler,
+     ) -> Self {
+         let (_, intermediate_view) =
+             Self::create_path_intermediate(device, config.format, config.width, config.height);
+@@ -24,9 +25,10 @@ impl PathTargets {
+             sample_count,
+         )
+         .map(|(_, view)| view);
++        #[cfg(not(feature = "fast"))]
+         let bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
+             label: Some("path_texture_bind_group"),
+-            layout,
++            layout: _layout,
+             entries: &[
+                 wgpu::BindGroupEntry {
+                     binding: 0,
+@@ -34,13 +36,14 @@ impl PathTargets {
+                 },
+                 wgpu::BindGroupEntry {
+                     binding: 1,
+-                    resource: wgpu::BindingResource::Sampler(sampler),
++                    resource: wgpu::BindingResource::Sampler(_sampler),
+                 },
+             ],
+         });
+         Self {
+             intermediate_view,
+             msaa_view,
++            #[cfg(not(feature = "fast"))]
+             bind_group,
+         }
+     }
+@@ -52,7 +55,7 @@ impl PathTargets {
+         }
+     }
+
+-    fn create_path_intermediate(
++    pub(super) fn create_path_intermediate(
+         device: &wgpu::Device,
+         format: wgpu::TextureFormat,
+         width: u32,
+@@ -76,7 +79,7 @@ impl PathTargets {
+         (texture, view)
+     }
+
+-    fn create_msaa_if_needed(
++    pub(super) fn create_msaa_if_needed(
+         device: &wgpu::Device,
+         format: wgpu::TextureFormat,
+         width: u32,

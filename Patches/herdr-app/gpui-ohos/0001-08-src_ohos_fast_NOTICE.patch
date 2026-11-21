@@ -1,0 +1,18 @@
+diff --git a/src/ohos/fast/NOTICE b/src/ohos/fast/NOTICE
+new file mode 100644
+index 0000000..73be775
+--- /dev/null
++++ b/src/ohos/fast/NOTICE
+@@ -0,0 +1,12 @@
++OHOS Fast scene rendering is adapted from gpui-fast-wgpu 0.1.13.
++https://github.com/longbridge/gpui-fast
++https://crates.io/crates/gpui-fast-wgpu/0.1.13
++
++Copyright 2022-2025 Zed Industries, Inc.
++Copyright 2026 Longbridge.
++Licensed under Apache-2.0; see LICENSE in this directory.
++
++The adaptation uses gpui-ohos native surfaces, GLES vertex buffers, shared
++pipeline caches, sprite atlas and image-alpha flags. No gpui-fast core source
++is modified. The frame graph, clip geometry and tile-cache protocol derive
++from the upstream renderer. Files carry modification notices.

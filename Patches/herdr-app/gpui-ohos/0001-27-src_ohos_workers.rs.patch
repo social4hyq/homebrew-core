@@ -1,0 +1,24 @@
+diff --git a/src/ohos/workers.rs b/src/ohos/workers.rs
+index e97128d..889f797 100644
+--- a/src/ohos/workers.rs
++++ b/src/ohos/workers.rs
+@@ -6,8 +6,8 @@ use crate::RunnableVariant;
+ use std::{
+     io,
+     sync::{
+-        Arc, Mutex, OnceLock, Weak,
+         atomic::{AtomicBool, Ordering},
++        Arc, Mutex, OnceLock, Weak,
+     },
+     thread,
+     time::Duration,
+@@ -109,6 +109,9 @@ impl Workers {
+             .push(Arc::downgrade(&worker));
+         thread::Builder::new()
+             .name(format!("OhosWorker-{index}"))
++            // SVG/PNG decoding and text shaping recurse deeply; the default 2 MiB
++            // worker stack overflows inside the HAP.
++            .stack_size(16 * 1024 * 1024)
+             .spawn(move || {
+                 let native = WorkerState::current();
+                 if let Err(error) = &native {

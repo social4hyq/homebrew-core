@@ -1,0 +1,143 @@
+diff --git a/src/ohos/window.rs b/src/ohos/window.rs
+index 5389a91..3ea79b0 100644
+--- a/src/ohos/window.rs
++++ b/src/ohos/window.rs
+@@ -13,22 +13,22 @@ use anyhow::Result;
+ use futures::channel::oneshot;
+ use ohos_accessibility_binding::Provider;
+ use openharmony_ability::{
+-    ArkUiInputEvent, AvoidAreaType, Event, ImeEvent, InputEvent, OpenHarmonyApp, PointerInputData,
+-    XComponentInputEvent,
+     arkui::arkui_input_binding::{UIInputAction, UIInputEvent, UIInputSourceType, UIInputToolType},
+     arkui::component::attribute::{ArkUIAttributeBasic, ArkUICommonAttribute},
+     ime::{
+-        Action as ImeAction, Direction as ImeDirection, EnterKey, IME, ImeResult, InputType,
+-        Rect as ImeCursorRect, TextState,
++        Action as ImeAction, Direction as ImeDirection, EnterKey, ImeResult, InputType,
++        Rect as ImeCursorRect, TextState, IME,
+     },
+     xcomponent::{
+         Action as KeyAction, MouseAction, MouseButton as OhosMouseButton,
+         TouchEvent as OhosTouchEvent, TouchEventData, TouchPointData, TouchPointTool,
+     },
++    ArkUiInputEvent, AvoidAreaType, Event, ImeEvent, InputEvent, OpenHarmonyApp, PointerInputData,
++    XComponentInputEvent,
+ };
+ use openharmony_ability_plugin_menu::{MenuClient, MenuCommandItem, MenuPopupCommandsRequest};
+ use openharmony_ability_plugin_window::{
+-    WindowClient, WindowCloseSubscription, WindowMoveSubscription, on_window_close_requested,
++    on_window_close_requested, WindowClient, WindowCloseSubscription, WindowMoveSubscription,
+ };
+ use raw_window_handle::{HasDisplayHandle, HasWindowHandle};
+ use rustc_hash::FxHashMap;
+@@ -44,15 +44,15 @@ use super::wgpu_context::WgpuContext;
+ use super::wgpu_renderer::{WgpuRenderer, WgpuSurfaceConfig};
+ use super::{mouse_buttons::MouseButtons, scroll_packet::ScrollPacket};
+ use crate::{
+-    A11yCallbacks, AnyWindowHandle, Bounds, Capslock, Corners, CursorStyle, DevicePixels, Edges,
+-    ForegroundExecutor, FrameRequestSource, GestureTuning, GpuSpecs, KeyDownEvent, Keystroke,
+-    Modifiers, MouseButton, MouseDownEvent, MouseExitEvent, MouseMoveEvent, MouseUpEvent,
+-    NavigationDirection, Pixels, PlatformAtlas, PlatformDisplay, PlatformInput,
+-    PlatformInputHandler, PlatformWindow, Point, PromptButton, PromptLevel, RequestFrameOptions,
+-    ResizeEdge, Scene, ScrollDelta, ScrollEvent, ScrollSource, Size, Task, TextInputAction,
+-    TextInputConfiguration, TextInputStateChange, TouchEvent, TouchId, TouchPhase,
++    accesskit, point, px, size, A11yCallbacks, AnyWindowHandle, Bounds, Capslock, Corners,
++    CursorStyle, DevicePixels, Edges, ForegroundExecutor, FrameRequestSource, GestureTuning,
++    GpuSpecs, KeyDownEvent, Keystroke, Modifiers, MouseButton, MouseDownEvent, MouseExitEvent,
++    MouseMoveEvent, MouseUpEvent, NavigationDirection, Pixels, PlatformAtlas, PlatformDisplay,
++    PlatformInput, PlatformInputHandler, PlatformWindow, Point, PromptButton, PromptLevel,
++    RequestFrameOptions, ResizeEdge, Scene, ScrollDelta, ScrollWheelEvent, Size, Task,
++    TextInputAction, TextInputConfiguration, TextInputStateChange, TouchEvent, TouchId, TouchPhase,
+     WindowAppearance, WindowBackgroundAppearance, WindowBounds, WindowControlArea, WindowControls,
+-    WindowDecorations, WindowInsets, WindowParams, WindowVisibility, accesskit, point, px, size,
++    WindowDecorations, WindowInsets, WindowParams, WindowVisibility,
+ };
+
+ pub(crate) type BackHandler = Rc<RefCell<Option<Box<dyn FnMut()>>>>;
+@@ -1330,12 +1330,11 @@ impl OhosWindow {
+     ) -> crate::DispatchEventResult {
+         Self::dispatch_input_with_callbacks(
+             &self.callbacks,
+-            PlatformInput::Scroll(ScrollEvent {
++            PlatformInput::ScrollWheel(ScrollWheelEvent {
+                 position,
+                 delta,
+                 modifiers: self.key_state.borrow().modifiers(),
+                 touch_phase,
+-                source: ScrollSource::Pointer,
+             }),
+         )
+     }
+@@ -1891,7 +1890,6 @@ impl OhosWindow {
+             },
+             // Keyboard overlap is represented by visual_viewport_bounds.
+             ime: Edges::default(),
+-            corner_radii: Corners::default(),
+         }
+     }
+
+@@ -3048,7 +3046,7 @@ impl OhosWindow {
+                         .input_handler
+                         .borrow_mut()
+                         .as_mut()
+-                        .is_some_and(PlatformInputHandler::query_accepts_focused_text_input);
++                        .is_some_and(|handler| handler.query_accepts_text_input());
+                     if !has_focused_handler {
+                         // GPUI installs the focused input handler during paint. IME
+                         // edits bypass dispatch_key_event's dirty-frame refresh, so
+@@ -3418,10 +3416,30 @@ impl OhosWindow {
+                 }
+
+                 let selection = handler.selected_text_range(true);
++                // Only edit through the handler when there is text to delete in that
++                // direction. A terminal reports an empty document (`Some("")`) with a
++                // caret at 0, so deleting `0..0` would silently drop the key; at the
++                // edge of a real editor the key binding is the same no-op.
+                 let has_editable_text = selection.as_ref().is_some_and(|selection| {
+-                    handler
+-                        .text_for_range(selection.range.clone(), &mut None)
+-                        .is_some()
++                    if selection.range.start != selection.range.end {
++                        return handler
++                            .text_for_range(selection.range.clone(), &mut None)
++                            .is_some_and(|text| !text.is_empty());
++                    }
++                    let caret = if selection.reversed {
++                        selection.range.start
++                    } else {
++                        selection.range.end
++                    };
++                    let probe = if forward {
++                        caret..caret.saturating_add(1)
++                    } else {
++                        caret.saturating_sub(1)..caret
++                    };
++                    !probe.is_empty()
++                        && handler
++                            .text_for_range(probe, &mut None)
++                            .is_some_and(|text| !text.is_empty())
+                 });
+                 if !has_editable_text {
+                     // Terminals expose an IME cursor without editable backing text.
+@@ -4062,10 +4080,6 @@ impl PlatformWindow for OhosWindowHandle {
+         self.with_window(|window| window.on_moved(callback))
+     }
+
+-    fn on_display_changed(&self, callback: Box<dyn FnMut()>) {
+-        self.with_window(|window| window.on_display_changed(callback))
+-    }
+-
+     fn on_should_close(&self, callback: Box<dyn FnMut() -> bool>) {
+         self.with_window(|window| window.on_should_close(callback))
+     }
+@@ -4686,10 +4700,6 @@ impl PlatformWindow for OhosWindow {
+         self.callbacks.borrow_mut().moved = Some(callback);
+     }
+
+-    fn on_display_changed(&self, callback: Box<dyn FnMut()>) {
+-        self.callbacks.borrow_mut().display_changed = Some(callback);
+-    }
+-
+     fn on_should_close(&self, callback: Box<dyn FnMut() -> bool>) {
+         self.callbacks.borrow_mut().should_close = Some(callback);
+     }

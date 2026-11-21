@@ -1,0 +1,17 @@
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index 73e2610..9b2fcac 100644
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -62,8 +62,10 @@
+   wheels continue to use GPUI line units with the system scroll-step coefficient;
+   touchpads retain device-pixel scaling. Zero-delta axis updates are ignored
+   except for gesture start and end.
+-- Scroll direction has not been verified on hardware. Mouse-wheel and touchpad
+-  acceptance, including natural scrolling on and off, remains required.
++- Flip the ArkUI axis sign once in `ScrollPacket`: a wheel pushed away from the
++  user and two fingers moving down both arrive negative, while GPUI's positive
++  deltas point up. Wheel and touchpad scrolling now follow the device direction;
++  native `NativeScrollDelta` ticks keep the platform sign.
+ - Empty image-policy atlas metadata skips GPU sprite copies and per-sprite hash
+   lookups. Uploaded tiles retain their policy until removal even after their
+   registration's final owner is dropped.

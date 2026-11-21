@@ -1,0 +1,28 @@
+diff --git a/vendor/gpui-kit/crates/shell/Cargo.toml b/vendor/gpui-kit/crates/shell/Cargo.toml
+index 247b164..212b54f 100644
+--- a/vendor/gpui-kit/crates/shell/Cargo.toml
++++ b/vendor/gpui-kit/crates/shell/Cargo.toml
+@@ -36,7 +36,6 @@ quickjs = [
+ [dependencies]
+ gpui.workspace = true
+ gpui-fast = { workspace = true, optional = true }
+-gpui_platform.workspace = true
+ gpui-fast-platform = { workspace = true, optional = true }
+ gpui-base = { workspace = true, features = ["inspector"] }
+ gpui-fps.workspace = true
+@@ -47,7 +46,7 @@ rquickjs = { package = "quickjs-jit", version = "0.12.11", git = "https://github
+     "loader",
+     "jit-abi",
+ ], optional = true }
+-rquickjs-jit = { package = "quickjs-jit-runtime", version = "0.12.11", git = "https://github.com/longbridge/quickjs-jit", rev = "96593cd7a54440ac060a391b8baea7e9a3cf1393", features = ["compiler"], optional = true }
++rquickjs-jit = { package = "quickjs-jit-runtime", version = "0.12.11", git = "https://github.com/longbridge/quickjs-jit", rev = "96593cd7a54440ac060a391b8baea7e9a3cf1393", optional = true }
+ # The stdlib facade pins LLRT modules and shares our VM through rquickjs-compat.
+ quickjs-jit-stdlib = { version = "0.12.7", git = "https://github.com/longbridge/quickjs-jit", rev = "605da483611a3548edb8c33fdff602e3f5f42076", optional = true }
+ # The date type `gpui_base::Date` is built from, for the calendar binding. Same
+@@ -98,3 +97,6 @@ windows = { workspace = true, features = [
+ 
+ [lints]
+ workspace = true
++
++[target.'cfg(not(all(target_os = "linux", target_env = "ohos")))'.dependencies]
++gpui_platform.workspace = true

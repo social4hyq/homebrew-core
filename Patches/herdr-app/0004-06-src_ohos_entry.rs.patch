@@ -1,0 +1,60 @@
+diff --git a/src/ohos_entry.rs b/src/ohos_entry.rs
+new file mode 100644
+index 0000000..39b4810
+--- /dev/null
++++ b/src/ohos_entry.rs
+@@ -0,0 +1,54 @@
++//! HarmonyOS HAP entry point: the napi module ArkTS loads as `libherdr_app.so`.
++//!
++//! The ArkTS `EntryAbility` calls `init(ability)`, which forwards the ability to
++//! `gpui_ohos::current_platform`; everything after that is the same startup the
++//! desktop binary runs.
++
++use gpui::Application;
++use openharmony_ability::OpenHarmonyApp;
++
++thread_local! {
++    static APPLICATION: std::cell::RefCell<Option<gpui::ApplicationHandle>> = const { std::cell::RefCell::new(None) };
++}
++
++#[openharmony_ability_derive::ability]
++fn openharmony_app(app: OpenHarmonyApp) {
++    ohos_hilog_binding::log::init_once(ohos_hilog_binding::log::Config::default());
++    // `tracing_subscriber::fmt` aborts inside the HAP sandbox (it touches terminal
++    // handling the ArkTS runtime does not provide). Route tracing into hilog instead.
++    let _ = tracing_log::LogTracer::init();
++
++    let fresh = !crate::settings::path().exists();
++    let person = crate::settings::load_person();
++    // The HAP sandbox cannot spawn the host's `hc`, so the core is reached through
++    // a TCP bridge that owns `hc connect` (see herdr-bridge.py on the host).
++    let bridge = std::env::var("HERDR_CORE_TCP").unwrap_or_else(|_| "127.0.0.1:8765".to_string());
++    let core: Result<std::sync::Arc<crate::hc::Core>, crate::setup::Need> =
++        match crate::hc::Core::connect_bridge(&bridge) {
++            Ok(core) => crate::hc::check(&core.hello).map(|()| core).map_err(crate::setup::Need::Fix),
++            Err(error) => {
++                tracing::warn!("herdr-app: {error:#}");
++                Err(crate::setup::Need::Connect(format!(
++                    "Herdr reaches herdr-core through herdr-bridge on the host ({bridge}). Start it there, then press Retry.\n\n{error:#}"
++                )))
++            }
++        };
++
++    crate::update::start();
++    crate::telemetry::start(crate::settings::telemetry_setting(&person));
++    crate::bench::start();
++    // The HAP inherits the host HOME, which is outside the sandbox and read-only.
++    // Point every Herdr config/mod path at the app's own files directory.
++    if std::env::var_os("HERDR_APP_HOME").is_none() {
++        unsafe { std::env::set_var("HERDR_APP_HOME", "/data/storage/el2/base/haps/entry/files/herdr-app") };
++    }
++    if let Err(error) = crate::mods::write_workspace() {
++        tracing::warn!("cannot write {}: {error}", crate::mods::app_dir().display());
++    }
++    let application = Application::with_platform(gpui_ohos::current_platform(app, false))
++        .with_assets(gpui_shell::AppAssets::new(crate::mods::app_dir()).following_links());
++    let handle = application.run_embedded(move |cx| crate::app_started(cx, core, fresh));
++    APPLICATION.with(|slot| {
++        *slot.borrow_mut() = Some(handle);
++    });
++}

@@ -26,6 +26,8 @@ class HerdrApp < Formula
   depends_on "python@3.15"
   depends_on "social4hyq/core/herdr-core"
 
+  patch_root = Pathname(__dir__).parent.parent
+
   # libghostty-vt builds from the ghostty submodule (GitHub archives omit it);
   # simdutf needs PIC for OHOS.
   resource "ghostty" do
@@ -41,8 +43,10 @@ class HerdrApp < Formula
     url "https://static.crates.io/crates/openharmony-ability/openharmony-ability-1.0.0-beta.5.crate"
     sha256 "c3d65db22273d3afdef8fd8eb9411546243aae365236829e67a8deca79eed5f1"
 
-    patch do
-      file "Patches/herdr-app/openharmony-ability/0001-ime-fast-typing.patch"
+    Dir[(patch_root/"Patches/herdr-app/openharmony-ability/*.patch").to_s].each do |path|
+      patch do
+        file Pathname(path).relative_path_from(patch_root).to_s
+      end
     end
   end
 
@@ -50,8 +54,10 @@ class HerdrApp < Formula
     url "https://static.crates.io/crates/gpui-ohos/gpui-ohos-0.0.1-beta.0.crate"
     sha256 "77231f68750da0ae969c9b6d8054a82376ebcc522d0baff57a4a2bd434f331ce"
 
-    patch do
-      file "Patches/herdr-app/gpui-ohos/0001-herdr-renderer.patch"
+    Dir[(patch_root/"Patches/herdr-app/gpui-ohos/*.patch").to_s].each do |path|
+      patch do
+        file Pathname(path).relative_path_from(patch_root).to_s
+      end
     end
   end
 
@@ -69,7 +75,6 @@ class HerdrApp < Formula
     sha256 "39d931489e99f80b496f900f88d67d7aad6b5f25ce83810a408eb42f6af6839e"
   end
 
-  patch_root = Pathname(__dir__).parent.parent
   Dir[(patch_root/"Patches/herdr-app/*.patch").to_s].each do |path|
     patch do
       file Pathname(path).relative_path_from(patch_root).to_s

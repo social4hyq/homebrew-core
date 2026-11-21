@@ -1,0 +1,42 @@
+diff --git a/vendor/gpui-kit/crates/shell/src/host.rs b/vendor/gpui-kit/crates/shell/src/host.rs
+index bd780f6..496f4b7 100644
+--- a/vendor/gpui-kit/crates/shell/src/host.rs
++++ b/vendor/gpui-kit/crates/shell/src/host.rs
+@@ -39,6 +39,7 @@ const ENTRY: &str = "main.js";
+ const EXIT_USAGE: i32 = 2;
+ 
+ #[allow(dead_code)] // Also compiled as the shared `crate::host` module.
++#[cfg(not(all(target_os = "linux", target_env = "ohos")))]
+ fn main() {
+     main_with_components(crate::FrozenComponentRegistry::default());
+ }
+@@ -47,11 +48,13 @@ fn main() {
+ ///
+ /// Embedding binaries use this entry point so command parsing, capabilities,
+ /// assets, theming, checking, and diagnostics stay identical to `gpui-shell`.
++#[cfg(not(all(target_os = "linux", target_env = "ohos")))]
+ pub fn main_with_components(components: crate::FrozenComponentRegistry) {
+     main_with_brand_and_components(HostBrand::gpui_shell(), components);
+ }
+ 
+ /// Runs the shared host under an embedding command's public name and version.
++#[cfg(not(all(target_os = "linux", target_env = "ohos")))]
+ pub fn main_with_brand_and_components(
+     brand: HostBrand,
+     components: crate::FrozenComponentRegistry,
+@@ -324,6 +327,7 @@ fn version(brand: HostBrand) -> String {
+ // The host
+ // ---------------------------------------------------------------------------
+ 
++#[cfg(not(all(target_os = "linux", target_env = "ohos")))]
+ fn run(arguments: Arguments, components: crate::FrozenComponentRegistry, brand: HostBrand) {
+     // Assets are served from the application directory, so the source has to be
+     // installed on the `Application` before the loop starts. Resolving the root
+@@ -450,6 +454,7 @@ fn run(arguments: Arguments, components: crate::FrozenComponentRegistry, brand:
+ 
+ /// Checks the application description and eager native materialization in a
+ /// hidden window. This does not draw or validate a complete frame.
++#[cfg(not(all(target_os = "linux", target_env = "ohos")))]
+ fn check(arguments: CheckArguments, components: crate::FrozenComponentRegistry) -> ! {
+     let directory = arguments.directory.clone();
+ 

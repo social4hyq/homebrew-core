@@ -1,0 +1,16 @@
+diff --git a/src/ohos/fast/mod.rs b/src/ohos/fast/mod.rs
+new file mode 100644
+index 0000000..ddb6bcb
+--- /dev/null
++++ b/src/ohos/fast/mod.rs
+@@ -0,0 +1,10 @@
++//! GPU support for the unmodified gpui-fast scene protocol.
++//!
++//! Scroll tiles are cached per renderer; rounded groups are flattened into
++//! ordered draw steps with analytic clip stacks, including their paths.
++
++mod bind_groups;
++pub(super) mod frame;
++mod layers;
++mod pass_state;
++pub(super) mod rounded_clip;
