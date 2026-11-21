@@ -7,9 +7,9 @@ class Lunasvg < Formula
   revision 1
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/lunasvg-v3.5.0-r3"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "42ddecf72a84130a8d03f37e4b50c616045183b61529fb89e1a568f2967503a4"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/lunasvg-v3.5.0-r4"
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e37291e13922a0937f50405de5ab6de64ddf4a4913ffac68c64b7dd400534abb"
   end
 
   depends_on "cmake" => :build
