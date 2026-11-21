@@ -4,7 +4,7 @@ class HerdrApp < Formula
   url "https://github.com/herdrdev/herdr-app/archive/refs/tags/v0.1.16.tar.gz"
   sha256 "fea3d920607f2199ed330eb3cdcb1fa3626dcea5080c92a97a296d983d6bc681"
   license "Apache-2.0"
-  revision 8
+  revision 9
 
   livecheck do
     url "https://github.com/herdrdev/herdr-app.git"
@@ -207,7 +207,7 @@ class HerdrApp < Formula
 
       The app cannot start the host `hc`, so a loopback bridge is used
       (`herdr-app bridge status|stop|restart`). Install and start run it; the token
-      lives in ${XDG_CONFIG_HOME:-$HOME/.config}/herdr-app/bridge.conf (0600) and is baked into the
+      lives in ~/.config/herdr-app/bridge.conf (0600) and is baked into the
       app (`install --new-token` rotates it). Open with `herdr-app start`.
     EOS
   end
@@ -287,5 +287,17 @@ class HerdrApp < Formula
     ensure
       with_env(env) { quiet_system script, "bridge", "stop" }
     end
+
+    # The state follows the real home and not XDG_CONFIG_HOME (brew's post_install run gets a
+    # throw-away one), and a bridge.conf that earlier versions kept there is adopted once.
+    (testpath/"xdg/herdr-app").mkpath
+    legacy_conf = "addr=127.0.0.1:#{port}\ntoken=#{"a" * 64}\n"
+    (testpath/"xdg/herdr-app/bridge.conf").write legacy_conf
+    home_env = env.except("HERDR_APP_STATE")
+    home_env["HOME"] = (testpath/"home").to_s
+    home_env["XDG_CONFIG_HOME"] = (testpath/"xdg").to_s
+    status = with_env(home_env) { shell_output("#{script} bridge status 2>&1", 1) }
+    assert_match "config:         #{testpath}/home/.config/herdr-app/bridge.conf", status
+    assert_equal legacy_conf, (testpath/"home/.config/herdr-app/bridge.conf").read
   end
 end

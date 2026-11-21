@@ -49,8 +49,7 @@ def log(message):
 
 
 def default_config():
-    base = os.environ.get("XDG_CONFIG_HOME") or os.path.join(os.path.expanduser("~"), ".config")
-    return os.path.join(base, "herdr-app", "bridge.conf")
+    return os.path.join(os.path.expanduser("~"), ".config", "herdr-app", "bridge.conf")
 
 
 def read_config(path):
