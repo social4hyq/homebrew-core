@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import io
 import json
+import os
 import shutil
 import struct
 import tarfile
@@ -11,9 +12,7 @@ import tempfile
 import zipfile
 from pathlib import Path, PurePosixPath
 
-VERSION = "26.1117.31558"
 BUNDLE_ID = "com.social4hyq.chatgpt"
-DEB_SHA256 = "81670501c6b7d784ef2b9a62b32da031e81a0eac0f50ebd933d0a9956d7bec77"
 DEB_ROOT = "usr/lib/chatgpt/resources/"
 OWL_RUNTIME = "usr/lib/chatgpt/owl-shell-runtime.json"
 HAP_ROOT = "resources/resfile/resources/"
@@ -25,6 +24,13 @@ WORK = Path(__file__).resolve().parent
 def sha256(path):
     with path.open("rb") as stream:
         return hashlib.file_digest(stream, "sha256").hexdigest()
+
+
+def vendor_pin():
+    """The pinned package version and sha256, from the formula's vendor.json."""
+    with open(os.environ["CHATGPT_APP_VENDOR_JSON"], encoding="utf-8") as stream:
+        pin = json.load(stream)
+    return pin["version"], pin["sha256"]
 
 
 def asar_entry(archive, name):
@@ -120,8 +126,9 @@ def deb_member(deb, member):
 
 
 def selected_payload(deb, scratch):
-    if sha256(deb) != DEB_SHA256:
-        raise ValueError(f"official ChatGPT {VERSION} package SHA-256 mismatch")
+    version, deb_sha256 = vendor_pin()
+    if sha256(deb) != deb_sha256:
+        raise ValueError(f"official ChatGPT {version} package SHA-256 mismatch")
     selected = {}
     with deb_member(deb, "data.tar.xz") as stream:
         with tarfile.open(fileobj=stream, mode="r|xz") as package:
@@ -164,7 +171,7 @@ def selected_payload(deb, scratch):
         raise ValueError("official ChatGPT icon hash mismatch")
 
     package = json.loads(asar_entry(selected["app.asar"][0], "package.json"))
-    if (package.get("version") != VERSION or package.get("name") != "openai-codex-electron"
+    if (package.get("version") != version or package.get("name") != "openai-codex-electron"
             or package.get("main") != ".vite/build/early-bootstrap.js"):
         raise ValueError("unexpected official ChatGPT ASAR metadata")
     return selected
@@ -198,7 +205,7 @@ def assemble(shell, deb, output):
                 wrapper = {
                     "name": "chatgpt-ohos-shell",
                     "productName": "ChatGPT",
-                    "version": VERSION,
+                    "version": vendor_pin()[0],
                     "main": "chatgpt-bootstrap.cjs",
                 }
                 target.writestr(APP_ROOT + "package.json", json.dumps(wrapper))

@@ -4,6 +4,7 @@ import importlib.util
 import io
 import json
 import lzma
+import os
 import shutil
 import struct
 import tarfile
@@ -11,6 +12,7 @@ import tempfile
 import zipfile
 from pathlib import Path
 
+TEST_VERSION = "99.1.2"
 RESOURCE = Path(__file__).resolve().parent.parent
 ASSEMBLER = RESOURCE / "support/assemble-local-hap.py"
 BOOTSTRAP = RESOURCE / "app/chatgpt-bootstrap.cjs"
@@ -36,6 +38,13 @@ def main():
         for shim in shims:
             shutil.copy2(shim, support / shim.name)
         assembler = load_module(script)
+        vendor_json = root / "vendor.json"
+        os.environ["CHATGPT_APP_VENDOR_JSON"] = str(vendor_json)
+
+        def pin(sha256):
+            vendor_json.write_text(json.dumps({"version": TEST_VERSION, "sha256": sha256}))
+
+        pin("0" * 64)
 
         payload_root = root / "payload"
         payload_root.mkdir()
@@ -49,6 +58,7 @@ def main():
             file = payload_root / str(len(selected))
             file.write_bytes(name.encode())
             selected[name] = (file, 0o644)
+        real_selected_payload = assembler.selected_payload
         assembler.selected_payload = lambda _deb, _scratch: selected
 
         shell = root / "shell.hap"
@@ -73,7 +83,7 @@ def main():
             assert archive.read(assembler.APP_ROOT + "package.json") == json.dumps({
                 "name": "chatgpt-ohos-shell",
                 "productName": "ChatGPT",
-                "version": assembler.VERSION,
+                "version": TEST_VERSION,
                 "main": "chatgpt-bootstrap.cjs",
             }).encode()
             assert archive.read(assembler.HAP_ROOT + "owl-shell-runtime.json") == b"@root/owl-shell-runtime.json"
@@ -117,6 +127,20 @@ def main():
         })
         with assembler.deb_member(fake_deb, "data.tar.xz") as stream:
             assert stream.read() == data_member
+
+        # The package version and sha256 come from vendor.json, not from constants.
+        def refuses(message):
+            try:
+                real_selected_payload(fake_deb, root)
+            except ValueError as error:
+                assert message in str(error), str(error)
+            else:
+                raise AssertionError("selected_payload accepted the package")
+
+        pin("0" * 64)
+        refuses(f"official ChatGPT {TEST_VERSION} package SHA-256 mismatch")
+        pin(assembler.sha256(fake_deb))
+        refuses("missing required app resources")
 
 
 if __name__ == "__main__":

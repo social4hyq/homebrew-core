@@ -17,7 +17,7 @@ const hostConfig = {
   path: '/storage/Users/currentUser/.harmonybrew/bin:/system/bin',
 };
 
-function boot(packageVersion = '26.1117.31558') {
+function boot(packageVersion = '26.1117.41037', shellVersion = packageVersion) {
   const runtimeProcess = { env: {} };
   const state = {
     appPath: null,
@@ -55,6 +55,7 @@ function boot(packageVersion = '26.1117.31558') {
     if (id === 'electron') return { app };
     if (id === './owl-compat.cjs') { state.compatLoaded = true; return {}; }
     if (id === vendor) return {};
+    if (id === path.join(__dirname, 'package.json')) return { version: shellVersion };
     if (id === path.join(vendor, 'package.json')) {
       return { version: packageVersion, main: '.vite/build/early-bootstrap.js' };
     }
@@ -108,5 +109,14 @@ test('does not rewrite unrelated subprocesses', () => {
 });
 
 test('refuses an unexpected official package version', () => {
-  assert.throws(() => boot('0.0.0'), /unexpected official ChatGPT application entry point/);
+  assert.throws(() => boot('0.0.0', '26.1117.41037'), /unexpected official ChatGPT application entry point/);
+});
+
+test('refuses a vendor package that is not the version the shell was assembled for', () => {
+  assert.throws(() => boot('26.1117.31558', '26.1117.41037'), /unexpected official ChatGPT application entry point/);
+});
+
+test('follows the assembled shell version instead of a fixed one', () => {
+  const state = boot('99.1.2');
+  assert.equal(state.loaded, path.join(vendor, '.vite/build/early-bootstrap.js'));
 });

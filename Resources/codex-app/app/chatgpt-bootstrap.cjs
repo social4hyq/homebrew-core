@@ -87,8 +87,11 @@ const vendor = path.join(__dirname, 'vendor.asar');
 app.setName('ChatGPT');
 app.setAppPath(vendor);
 
+// The assembler wrote this wrapper's package.json after checking the vendor
+// package against the formula's pinned version, so compare against that.
+const shellPackage = require(path.join(__dirname, 'package.json'));
 const vendorPackage = require(path.join(vendor, 'package.json'));
-if (vendorPackage.version !== '26.1117.31558' ||
+if (vendorPackage.version !== shellPackage.version ||
     vendorPackage.main !== '.vite/build/early-bootstrap.js') {
   throw new Error('unexpected official ChatGPT application entry point');
 }
