@@ -39,9 +39,7 @@ class SnowShotOpencv < Formula
   end
 
   def install
-    contrib = resource("contrib")
-    odie "opencv_contrib must match OpenCV #{version}" if contrib.version != version
-    contrib.stage buildpath/"opencv_contrib"
+    resource("contrib").stage buildpath/"opencv_contrib"
 
     qr_model_dir = buildpath/"build/downloads/wechat_qrcode"
     mkdir_p qr_model_dir
