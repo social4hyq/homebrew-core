@@ -14,8 +14,9 @@ class OpencodeApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-app-v2.3.2-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "28a5dbfcf3913d696678a1d07a24296a4cf346401a1008b8390907627cd1d79a"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-app-v2.3.2-r2"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0a5429cfa077b2a2f43a95ac44877ca871772772abd15d17e87b6bf610637c26"
   end
 
   depends_on "app-installer"
