@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import io
 import json
+import os
 import shutil
 import struct
 import tarfile
@@ -11,15 +12,20 @@ import tempfile
 import zipfile
 from pathlib import Path, PurePosixPath
 
-VERSION = '5.11492.5'
 APP_BUNDLE_ID = 'com.social4hyq.claudecode'
-DEB_SHA256 = 'fe6cd8a70f96b96eb4e6b647300cfaee6aaff4ce133a0fbbe11c2cdb775f5a6a'
 VENDOR = 'usr/lib/claude-desktop/resources/'
 HAP = 'resources/resfile/resources/'
 ASSETS = {'app.asar', 'ion-dist.asar', 'icon.png', 'TrayIconLinux.png', 'TrayIconLinux-Dark.png'}
 WORK = Path(__file__).resolve().parent
 FUSE_SENTINEL = b'dL7pKGdnNz796PbbjQWNKmHXBZaB9tsX'
 ELECTRON_LIB = 'libs/arm64-v8a/libelectron.so'
+
+
+def vendor_pin():
+    """The pinned vendor version and sha256, from the formula's vendor.json."""
+    with open(os.environ['CLAUDE_CODE_APP_VENDOR_JSON'], encoding='utf-8') as stream:
+        pin = json.load(stream)
+    return pin['version'], pin['sha256']
 
 
 def checked_sha(path):
@@ -102,8 +108,9 @@ def deb_member(deb, member):
 
 
 def selected_payload(deb, stage):
-    if checked_sha(deb) != DEB_SHA256:
-        raise ValueError(f'vendor package SHA-256 mismatch for Claude {VERSION}')
+    version, sha256 = vendor_pin()
+    if checked_sha(deb) != sha256:
+        raise ValueError(f'vendor package SHA-256 mismatch for Claude {version}')
     selected = {}
     with deb_member(deb, 'data.tar.xz') as stream:
         with tarfile.open(fileobj=stream, mode='r|xz') as archive:
@@ -132,7 +139,7 @@ def selected_payload(deb, stage):
     return selected
 
 
-def read_app_package(archive):
+def read_app_package(archive, version):
     with archive.open('rb') as f:
         marker, offset, _, n = struct.unpack('<4I', f.read(16))
         if marker != 4 or not 0 < n <= min(offset, 16 * 1024 * 1024):
@@ -141,7 +148,7 @@ def read_app_package(archive):
         pkg = header['files']['package.json']
         f.seek(8 + offset + int(pkg['offset']))
         data = json.loads(f.read(int(pkg['size'])))
-    if data.get('version') != VERSION or data.get('main') != '.vite/build/index.pre.js':
+    if data.get('version') != version or data.get('main') != '.vite/build/launcher.js':
         raise ValueError('unexpected Claude version or entry')
     data['main'] = 'bootstrap.cjs'
     return data
@@ -168,7 +175,7 @@ def assemble(shell, deb, output):
     require_cookie_encryption(shell)
     with tempfile.TemporaryDirectory(prefix='claude-payload-') as temp:
         selected = selected_payload(deb, Path(temp))
-        package = read_app_package(selected['app.asar'][0])
+        package = read_app_package(selected['app.asar'][0], vendor_pin()[0])
         with zipfile.ZipFile(shell) as src:
             entries = src.namelist()
             if ('module.json' not in entries or len(set(entries)) != len(entries)

@@ -4,10 +4,12 @@ const ORIGINAL_PLATFORM_METHOD =
   'getHostPlatform(){let e=process.arch;if(process.platform==="darwin")return e==="arm64"?"darwin-arm64":"darwin-x64";if(process.platform==="win32")return e==="arm64"?"win32-arm64":"win32-x64";if(process.platform==="linux")return e==="arm64"?"linux-arm64":"linux-x64";throw Error(`Unsupported platform: ${process.platform}-${e}`)}';
 const PATCHED_PLATFORM_METHOD =
   'getHostPlatform(){let e=process.arch;if(process.platform==="darwin")return e==="arm64"?"darwin-arm64":"darwin-x64";if(process.platform==="win32")return e==="arm64"?"win32-arm64":"win32-x64";if(process.platform==="linux"||process.platform==="openharmony")return e==="arm64"?"linux-arm64":"linux-x64";throw Error(`Unsupported platform: ${process.platform}-${e}`)}';
-const ORIGINAL_MAIN_WINDOW_OPTIONS =
-  'titleBarStyle:"hidden",titleBarOverlay:!0,trafficLightPosition:yRa(),show:i&&!0';
-const PATCHED_MAIN_WINDOW_OPTIONS =
-  'titleBarStyle:"default",titleBarOverlay:!1,frame:!0,trafficLightPosition:yRa(),show:i&&!0';
+// The main window options are built in two places: the call site passes the
+// overlay flag and the options helper then forces the hidden title bar.
+const ORIGINAL_WINDOW_STYLE = 'titleBarStyle:"hidden",icon:';
+const PATCHED_WINDOW_STYLE = 'titleBarStyle:"default",frame:!0,icon:';
+const ORIGINAL_WINDOW_OVERLAY = 'titleBarOverlay:!0,trafficLightPosition:';
+const PATCHED_WINDOW_OVERLAY = 'titleBarOverlay:!1,trafficLightPosition:';
 const ORIGINAL_LOCAL_INIT = 'this.localBinaryPath=null,this.localBinaryInitPromise=null,';
 const PATCHED_LOCAL_INIT = 'this.localBinaryPath=null,this.localBinaryInitPromise=process.env.CLAUDE_CODE_LOCAL_BINARY?this.initLocalBinary(process.env.CLAUDE_CODE_LOCAL_BINARY):null,';
 
@@ -20,14 +22,18 @@ function replaceExactlyOnce(source, before, after, label) {
 }
 
 function patchCodeManagerSource(source) {
-  const platformPatched = source.includes(PATCHED_PLATFORM_METHOD);
-  const localPatched = source.includes(PATCHED_LOCAL_INIT);
-  const windowPatched = source.includes(PATCHED_MAIN_WINDOW_OPTIONS);
-  if (platformPatched && localPatched && windowPatched) return source;
-  if (platformPatched || localPatched || windowPatched) throw new Error('Claude Code OHOS patch is only partially applied');
+  const patched = [
+    source.includes(PATCHED_PLATFORM_METHOD),
+    source.includes(PATCHED_LOCAL_INIT),
+    source.includes(PATCHED_WINDOW_STYLE),
+    source.includes(PATCHED_WINDOW_OVERLAY),
+  ];
+  if (patched.every(Boolean)) return source;
+  if (patched.some(Boolean)) throw new Error('Claude Code OHOS patch is only partially applied');
   source = replaceExactlyOnce(source, ORIGINAL_PLATFORM_METHOD, PATCHED_PLATFORM_METHOD, 'host platform');
   source = replaceExactlyOnce(source, ORIGINAL_LOCAL_INIT, PATCHED_LOCAL_INIT, 'local binary initialization');
-  return replaceExactlyOnce(source, ORIGINAL_MAIN_WINDOW_OPTIONS, PATCHED_MAIN_WINDOW_OPTIONS, 'main native title bar');
+  source = replaceExactlyOnce(source, ORIGINAL_WINDOW_STYLE, PATCHED_WINDOW_STYLE, 'main native title bar');
+  return replaceExactlyOnce(source, ORIGINAL_WINDOW_OVERLAY, PATCHED_WINDOW_OVERLAY, 'main title bar overlay');
 }
 
 if (require.main === module) {
