@@ -4,6 +4,7 @@ class AppInstaller < Formula
   url "https://registry.npmjs.org/@deveco/deveco-cli-openharmony-arm64/-/deveco-cli-openharmony-arm64-1.3.12.tgz"
   sha256 "eaa29900d4892e89b2ae6156733ffa97597971b7a26fa1df6c686cc5934a02fb"
   license "MIT"
+  revision 1
 
   livecheck do
     url :stable

@@ -90,16 +90,17 @@ function readJson5(profilePath, cliPath) {
   }
 }
 
-// Extract only the DevEco CLI's Rs class containing static decryptPwd(). The
-// class is an implementation detail: fail closed if its shape changes.
+// Extract only the DevEco CLI class containing static decryptPwd(). The CLI is
+// minified, so the class name changes between releases; the class is an
+// implementation detail: fail closed if its shape changes.
 function extractDecoderClass(source) {
   const method = source.indexOf("static decryptPwd(");
   if (method < 0) fail("DevEco CLI signing decoder is missing; refusing to guess");
-  const assignment = /\b(?:var|let|const)\s+Rs\s*=\s*class\b/g;
+  const assignment = /\b(?:var|let|const)\s+[A-Za-z_$][\w$]*\s*=\s*class\b/g;
   let match;
   let start = -1;
   while ((match = assignment.exec(source)) && match.index < method) start = match.index + match[0].lastIndexOf("class");
-  if (start < 0) fail("DevEco CLI Rs decoder layout changed; refusing to guess");
+  if (start < 0) fail("DevEco CLI decoder layout changed; refusing to guess");
 
   const opening = source.indexOf("{", start);
   if (opening < 0 || opening > method) fail("cannot locate DevEco CLI decoder class body");
@@ -145,13 +146,33 @@ function extractDecoderClass(source) {
     if (c === "{") { depth += 1; regexMayStart = true; continue; }
     if (c === "}") {
       depth -= 1;
-      if (depth === 0) return source.slice(start, i + 1);
+      if (depth === 0) {
+        if (method > i) fail("DevEco CLI decoder class does not contain decryptPwd; refusing to guess");
+        return source.slice(start, i + 1);
+      }
       regexMayStart = false;
       continue;
     }
     if (!/\s/.test(c)) regexMayStart = "=(:,[!&|?;".includes(c);
   }
   fail("DevEco CLI decoder class is incomplete");
+}
+
+// The class reaches path, crypto, fs and a debug logger through minified
+// aliases that also change between releases. Derive each one from how the
+// class uses it, and refuse to run unless every alias is unambiguous.
+function decoderGlobals(decoderClass) {
+  const alias = (label, pattern) => {
+    const names = new Set([...decoderClass.matchAll(pattern)].map((found) => found[1]));
+    if (names.size !== 1) fail(`DevEco CLI decoder ${label} alias is ambiguous; refusing to guess`);
+    return [...names][0];
+  };
+  return {
+    [alias("path", /\b([A-Za-z_$][\w$]*)\.(?:resolve|join)\(/g)]: path,
+    [alias("crypto", /\b([A-Za-z_$][\w$]*)\.(?:pbkdf2Sync|createDecipheriv)\(/g)]: crypto,
+    [alias("fs", /\b([A-Za-z_$][\w$]*)\.(?:readdirSync|statSync|readFileSync)\(/g)]: fs,
+    [alias("logger", /\b([A-Za-z_$][\w$]*)\(`\[DecipherUtil\]/g)]: () => {},
+  };
 }
 
 function resolveTool(explicit) {
@@ -207,7 +228,7 @@ function devecoMaterial(opts) {
 
   const decoderClass = extractDecoderClass(fs.readFileSync(cli, "utf8"));
   const decoder = vm.runInNewContext(`(${decoderClass})`, {
-    Buffer, Int8Array, W: path, Um: crypto, we: fs, m: () => {},
+    Buffer, Int8Array, ...decoderGlobals(decoderClass),
   });
   const configDir = path.resolve(opts.config_dir || path.join(process.env.HOME || "", ".ohos/config"));
   const storePassword = decoder.decryptPwd(configDir, material.storePassword, "storePassword");
@@ -246,4 +267,5 @@ function main() {
   process.stdout.write(`Signed HAP: ${output}\n`);
 }
 
-main();
+if (require.main === module) main();
+module.exports = { extractDecoderClass, decoderGlobals };
