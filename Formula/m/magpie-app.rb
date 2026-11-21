@@ -11,8 +11,8 @@ class MagpieApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/magpie-app-v0.1.4402-r12"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "21a0225796d2c4266404a25ede80fa0c730475cdf151977a2590f889cf6288a6"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/magpie-app-v0.1.4623-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "890d146cb89bea7c6192e92162a4a1e616494bb3c804912db71375efefa7fd83"
   end
 
   depends_on "app-installer"
