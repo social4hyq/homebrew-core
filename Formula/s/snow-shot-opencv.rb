@@ -12,9 +12,9 @@ class SnowShotOpencv < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-opencv-v4.14.0-r4"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cc9ce0e2566db8f2b3872827064f14828741d66f892886f0e3cdb7ddde68f4fd"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-opencv-v4.14.0-r5"
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7a29a82b806b53e3830d568eedbc9ba0ee18ee75e549d441f78bdf02d0c4fcf8"
   end
 
   keg_only :versioned_formula
