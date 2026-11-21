@@ -20,17 +20,17 @@ index 1ade6cc5..d2e7c18b 100644
  
  function isFileExistsError(error: unknown): boolean {
 diff --git a/src/main/daemon/endpoint/publication/daemon-socket-endpoint-path.ts b/src/main/daemon/endpoint/publication/daemon-socket-endpoint-path.ts
-index 1cf86f6b..546f27c3 100644
 --- a/src/main/daemon/endpoint/publication/daemon-socket-endpoint-path.ts
 +++ b/src/main/daemon/endpoint/publication/daemon-socket-endpoint-path.ts
-@@ -2,12 +2,23 @@
+@@ -2,6 +2,7 @@
  import { createHash } from 'node:crypto'
  import { lstatSync, mkdirSync } from 'node:fs'
  import { posix } from 'node:path'
 +import { isOpenHarmony } from '../../../../shared/file-write/publish-staged-file'
- import { unixSocketPathFits } from '../../../../shared/unix-socket-path-limit'
+ import { unixSocketPathFits } from '../../../../shared/network/unix-socket-path-limit'
  import { errnoCodeOrUnknown } from '../../../../shared/errors/errno-code'
  import { PRIVATE_DIR_MODE } from './daemon-private-file-modes'
+@@ -8,7 +9,17 @@
  
  // Keep the fallback path independent of user-directory length.
 -export const SHORT_DAEMON_SOCKET_DIR_PREFIX = '/tmp/.orca-daemon-'
@@ -43,12 +43,13 @@ index 1cf86f6b..546f27c3 100644
 +  const runtimeDir = process.env.TMPDIR ?? process.env.XDG_RUNTIME_DIR ?? '/tmp'
 +  return `${runtimeDir.replace(/\/+$/, '')}/.orca-daemon-`
 +}
-+
-+export const SHORT_DAEMON_SOCKET_DIR_PREFIX = shortDaemonSocketDirPrefix()
  
++export const SHORT_DAEMON_SOCKET_DIR_PREFIX = shortDaemonSocketDirPrefix()
++
  export function shortDaemonSocketDir(runtimeDir: string, uid: number): string {
    const runtimeHash = createHash('sha256').update(runtimeDir).digest('hex').slice(0, 12)
-@@ -21,6 +32,9 @@ export function resolveDaemonUnixSocketPath(
+   return `${SHORT_DAEMON_SOCKET_DIR_PREFIX}${uid}/${runtimeHash}`
+@@ -21,6 +32,9 @@
    uid: number | undefined = process.getuid?.()
  ): string {
    const preferred = posix.join(runtimeDir, socketName)
@@ -59,18 +60,17 @@ index 1cf86f6b..546f27c3 100644
      uid === undefined ||
      unixSocketPathFits(preferred, platform === 'darwin' ? 'darwin' : 'linux')
 diff --git a/src/main/filesystem/atomic-file-publication.ts b/src/main/filesystem/atomic-file-publication.ts
-index 4c5d1b1d..38894cdc 100644
 --- a/src/main/filesystem/atomic-file-publication.ts
 +++ b/src/main/filesystem/atomic-file-publication.ts
-@@ -10,6 +10,7 @@ import { grantDirAcl } from '../windows/windows-directory-acl'
+@@ -11,6 +11,7 @@
  import { isPermissionError } from './permission-errors'
  import { nodeFileContentsEqualSync } from '../../shared/file-content/node-file-content-equality'
  import { renameFileWithWindowsRetry } from '../../shared/file-write/windows-retry-file-operations'
 +import { publishStagedFileExclusively } from '../../shared/file-write/publish-staged-file'
+ import { assertGuardedFileCurrent, recordGuardedPublication } from './concurrent-file-edit-guard'
  
  export function writeFileAtomically(
-   targetPath: string,
-@@ -177,7 +178,7 @@ function assertHardLinkPublicationSupported(sourcePath: string, targetPath: stri
+@@ -190,7 +191,7 @@
  
  export function publishFileWithoutOverwrite(sourcePath: string, targetPath: string): boolean {
    try {

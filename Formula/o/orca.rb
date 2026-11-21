@@ -1,10 +1,9 @@
 class Orca < Formula
   desc "Run coding-agent fleets, each agent in its own git worktree"
   homepage "https://github.com/stablyai/orca"
-  url "https://github.com/stablyai/orca/archive/refs/tags/v1.4.261.tar.gz"
-  sha256 "5b8a21bb9cde62a1dd7ca3c0ffd2f684faf168ea401191068777a8a9e7466909"
+  url "https://github.com/stablyai/orca/archive/refs/tags/v1.4.267.tar.gz"
+  sha256 "161f405b4226bfc0a7b22a4a4213394473190118b5223c24096200d6c3c00b06"
   license "MIT"
-  revision 2
 
   livecheck do
     url :stable
@@ -12,9 +11,8 @@ class Orca < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/orca-v1.4.261-r5"
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c83801d9d4ae65cdaf7bdcfcf3f354bfef7f7f871ce1a7ab89d457ff6297947e"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/orca-v1.4.267-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d9e45f16ecb2e831e3885c455d3c638fa853ddb1dd1d1e4b8820d733984204e7"
   end
 
   depends_on "bun" => :build
