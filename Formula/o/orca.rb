@@ -11,8 +11,9 @@ class Orca < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/orca-v1.4.267-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d9e45f16ecb2e831e3885c455d3c638fa853ddb1dd1d1e4b8820d733984204e7"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/orca-v1.4.267-r2"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a7b42ddb101a13e80ccf01d54cd2cf91c59089e373c80168c2ac8f9a64056b88"
   end
 
   depends_on "bun" => :build
@@ -125,9 +126,8 @@ class Orca < Formula
     resource("lightningcss-wasm").stage do
       (lightningcss_dir/"wasm").install Dir["*"]
     end
-    (lightningcss_dir/"node/index.js").atomic_write <<~JS
-      module.exports = require("../wasm/wasm-node.cjs")
-    JS
+    system "patch", "-p1", "-d", lightningcss_dir,
+           "-i", tap_root/"Patches/orca/0002-lightningcss-wasm-loader.patch"
 
     # The CLI and web builds stamp the source commit (installed skills pin to it),
     # and a release tarball carries no history: give the build one empty commit.
