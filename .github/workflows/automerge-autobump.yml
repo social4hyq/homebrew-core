@@ -6,9 +6,9 @@ name: automerge-autobump
 # automerge.yml — that one handles arbitrary community PRs with an
 # approval/label/mergeable state machine; this only ever looks at
 # bot-authored bump PRs, so the gate is just "both labels present and the
-# head branch matches the same allowlist autobump.yml uses" (keep the
-# BUMP_BRANCH_RE prefixes in sync with autobump.yml's ALLOWLIST, minus the
-# formulae named in BUMP_MANUAL_RE, which a person merges — branch
+# head branch names a formula whose `brew test` can validate a release"
+# (every name here is already in autobump.yml's ALLOWLIST; the rest of that
+# list, plus everything matching BUMP_MANUAL_RE, is a person's merge — branch
 # names are `bump-<formula>-<version>`, matched by prefix since formula/
 # version can both contain '-').
 #
@@ -93,7 +93,15 @@ jobs:
           HEAD_REF: ${{ github.event.pull_request.head.ref || github.event.workflow_run.head_branch }}
           REPO: ${{ github.repository }}
         run: |
-          ALLOWLIST="claude-code claude-code.latest zcode vite-plus magpie multica"
+          # Auto-merge only formulae whose `brew test` really exercises the
+          # release: libraries that compile a probe against the new build,
+          # CLIs that run their own commands. Green CI is then enough evidence
+          # to merge unattended. GUI/HAP apps assert package contents only
+          # (`unzip -Z1`, `--help`), so a person installs the HAP on a device
+          # first — they stay out, and BUMP_MANUAL_RE catches every `-app`
+          # branch anyway. app-installer is out until its test signs a fixture
+          # HAP instead of grepping help text.
+          ALLOWLIST="claude-code claude-code.latest zcode vite-plus magpie multica lunasvg opencv snow-shot-opencv genoffice herdr-core orca"
           BUMP_BRANCH_RE="^bump-($(echo "$ALLOWLIST" | tr ' ' '|'))-"
           # App bumps require real-device review; CLI prefixes also match their app branches.
           BUMP_MANUAL_RE="^bump-([[:alnum:]-]+-app|multica-desktop|deepseek-harness-desktop)-"
