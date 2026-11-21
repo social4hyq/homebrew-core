@@ -47,8 +47,8 @@ class VitePlus < Formula
 
   resource "oxc-node" do
     url "https://github.com/oxc-project/oxc-node.git",
-        revision: "7ff14c3b1d15e2ef12310ee209d0b72b58fa880e"
-    version "7ff14c3b1d15e2ef12310ee209d0b72b58fa880e"
+        revision: "16c0f340aebd927b72d941b693e51dd6f5264f17"
+    version "16c0f340aebd927b72d941b693e51dd6f5264f17"
 
     livecheck do
       url "https://raw.githubusercontent.com/voidzero-dev/vite-plus/refs/tags/v#{LATEST_VERSION}/packages/tools/.upstream-versions.json"
