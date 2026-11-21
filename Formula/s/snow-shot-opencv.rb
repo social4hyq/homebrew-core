@@ -123,8 +123,14 @@ class SnowShotOpencv < Formula
           return detector.detectAndDecode(image).empty() ? 0 : 2;
       }
     CPP
-    system ENV.cxx, "-std=c++17", "runtime.cpp", "-I#{include}/opencv4", "-L#{lib}",
-           "-lopencv_wechat_qrcode", "-lopencv_imgproc", "-lopencv_core", "-o", "runtime"
+    # Homebrew puts HOMEBREW_PREFIX/lib in LD_LIBRARY_PATH for tests. On the OHOS PC the
+    # vendor-signed SDK linker (lld) refuses the self-signed libxml2.so.16 found there
+    # before its own, so the link step fails. Build without it; the test binary below
+    # still needs it to find this formula's libraries.
+    with_env(LD_LIBRARY_PATH: nil) do
+      system ENV.cxx, "-std=c++17", "runtime.cpp", "-I#{include}/opencv4", "-L#{lib}",
+             "-lopencv_wechat_qrcode", "-lopencv_imgproc", "-lopencv_core", "-o", "runtime"
+    end
     system "./runtime"
     version_header = (include/"opencv4/opencv2/core/version.hpp").read
     assert_match "#define CV_VERSION_MAJOR    4", version_header
