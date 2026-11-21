@@ -234,8 +234,8 @@ class ZcodeApp < Formula
 
       State is shared in `~/.config/zcode-desktop`. `zcode-app login
       [zai|bigmodel]` runs the browser OAuth flow. `--no-acl` gives the
-      strong-sandbox variant (no JIT/paste, cannot start the service). 坚盾守护模式
-      disables JIT. The embedded terminal is unavailable (node-pty cannot spawn under
+      strong-sandbox variant (no JIT/paste, cannot start the service).
+      The embedded terminal is unavailable (node-pty cannot spawn under
       bun on HarmonyOS).
     EOS
   end
