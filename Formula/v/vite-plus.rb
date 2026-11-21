@@ -4,6 +4,7 @@ class VitePlus < Formula
   url "https://github.com/voidzero-dev/vite-plus/archive/refs/tags/v1.7.0.tar.gz"
   sha256 "badbb6809618cba01ae311a4cb89591e35d15dfe6fee01efbfff8cc3d1dec04d"
   license "MIT"
+  revision 1
   head "https://github.com/voidzero-dev/vite-plus.git", branch: "main"
 
   bottle do
@@ -77,26 +78,6 @@ class VitePlus < Formula
       end
     end
 
-    resource "wasm-tools-linux-arm64-musl" do
-      url "https://registry.npmjs.org/@napi-rs/wasm-tools-linux-arm64-musl/-/wasm-tools-linux-arm64-musl-1.1.0.tgz"
-      sha256 "ebeb7f019264d53ec50392e8f550c15bf9f9b474687694c62d18119520ce93f4"
-    end
-
-    resource "lzma-linux-arm64-musl" do
-      url "https://registry.npmjs.org/@napi-rs/lzma-linux-arm64-musl/-/lzma-linux-arm64-musl-1.4.5.tgz"
-      sha256 "7b972be94dcada346a868a89fcd4808e93df1587d4f06666005073ffa2f62ebe"
-    end
-
-    resource "tar-linux-arm64-musl" do
-      url "https://registry.npmjs.org/@napi-rs/tar-linux-arm64-musl/-/tar-linux-arm64-musl-1.1.0.tgz"
-      sha256 "824ac914a4ef81cca48e97ddb2037dac318a3e0c563653c60ba2e6dfd7242f87"
-    end
-
-    resource "yuku-core-linux-arm64-musl" do
-      url "https://registry.npmjs.org/@yuku-core/binding-linux-arm64-musl/-/binding-linux-arm64-musl-0.19.0.tgz"
-      sha256 "2c4f5a7a987ee27bae94c6e6559391be9a1c157c2b53cc889ba546a71a436dc3"
-    end
-
     patch :p1 do
       file "Patches/vite-plus/0001-package-manager-ohos-ports.patch"
     end
@@ -150,20 +131,6 @@ class VitePlus < Formula
     (buildpath/"pnpm-workspace.yaml").append_lines "allowUnusedPatches: true"
 
     if OS.ohos?
-      # Shims (patch 0006) around the linux-arm64-musl builds of these packages
-      {
-        "@napi-rs-wasm-tools-1.1.0" => ["wasm-tools.node", "wasm-tools-linux-arm64-musl"],
-        "@napi-rs-lzma-1.4.5"       => ["lzma.node", "lzma-linux-arm64-musl"],
-        "@napi-rs-tar-1.1.0"        => ["tar.node", "tar-linux-arm64-musl"],
-        "@yuku-core-binding-0.19.0" => ["yuku-core.node", "yuku-core-linux-arm64-musl"],
-      }.each do |dir, (node_file, resource_name)|
-        resource(resource_name).stage do
-          node_src = Dir.glob("**/*.node").first
-          odie "no .node in the musl resource #{resource_name}" if node_src.nil?
-          cp node_src, buildpath/"ohos-shims"/dir/node_file
-        end
-      end
-
       # @napi-rs/cli builds the ohos linker/cc/ar paths from this.
       ENV["OHOS_SDK_NATIVE"] = formula_opt_prefix("ohos-sdk-native").to_s
 
