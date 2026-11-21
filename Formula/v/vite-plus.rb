@@ -138,6 +138,7 @@ class VitePlus < Formula
     end
 
     system "just", "build"
+    system "cargo", "test", "-p", "vp_js_runtime", "-p", "vp_pm_cli" if OS.ohos?
     system "cargo", "install", *std_cargo_args(path: "crates/vp_global_cli")
 
     deploy_args = %w[--prod --legacy]
@@ -168,7 +169,8 @@ class VitePlus < Formula
     <<~EOS
       On OpenHarmony, a managed Node.js is downloaded from the community mirror
       ohos-node.com, as nodejs.org has no OpenHarmony builds. Downloads are checked
-      against its SHASUMS256.txt only, not a signature. To use another mirror:
+      against SHASUMS256.txt and its signature when the mirror provides one.
+      To use another mirror:
         export VP_NODE_DIST_MIRROR=https://example.com/dist
     EOS
   end
@@ -183,8 +185,16 @@ class VitePlus < Formula
     system "#{bin}/vp create vite:application --no-interactive --directory test-app < /dev/null"
     assert_path_exists testpath/"test-app/package.json"
 
-    # The scaffolded app installs vite-plus from npm, which has no openharmony binding
-    unless OS.ohos?
+    if OS.ohos?
+      # The scaffolded app installs vite-plus from npm, which has no openharmony binding.
+      (testpath/"format").mkpath
+      (testpath/"format/package.json").write '{"private":true}'
+      (testpath/"format/index.js").write "const answer = 42\n"
+      cd testpath/"format" do
+        output = shell_output("#{bin}/vp fmt index.js < /dev/null")
+        assert_match "Finished", output
+      end
+    else
       cd testpath/"test-app" do
         output = shell_output("#{bin}/vp fmt < /dev/null")
         assert_match "Finished", output
