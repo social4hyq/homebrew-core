@@ -55,6 +55,10 @@ class StageOhosOcrAssetsTests(unittest.TestCase):
                     "url": f"https://example.invalid/{name}",
                 }
             )
+        paragraph_dir = self.model_root / "line2para-1-c8cede9"
+        paragraph_dir.mkdir()
+        self.paragraph_bytes = b"paragraph"
+        (paragraph_dir / "line2para_1.onnx").write_bytes(self.paragraph_bytes)
         model_descriptors = [
             {
                 "type": "extra_small",
@@ -84,8 +88,17 @@ class StageOhosOcrAssetsTests(unittest.TestCase):
         manifest = {
             "schema": 2,
             "default_model": "small",
-            "runtime": {"version": "1.2.2", "platform": "windows-arm64"},
+            "runtime": {"version": "1.3.0", "platform": "windows-arm64"},
             "models": model_descriptors,
+            "paragraph_model": {
+                "id": "line2para-1-c8cede9",
+                "files": [{
+                    "name": "line2para_1.onnx",
+                    "size": len(self.paragraph_bytes),
+                    "sha256": hashlib.sha256(self.paragraph_bytes).hexdigest(),
+                    "url": "https://example.invalid/line2para_1.onnx",
+                }],
+            },
         }
         self.source_manifest.write_text(json.dumps(manifest), encoding="utf-8")
 
@@ -100,10 +113,16 @@ class StageOhosOcrAssetsTests(unittest.TestCase):
         self.assertEqual(staged["runtime"]["platform"], "openharmony-arm64")
         self.assertEqual(staged["runtime"]["delivery"], "bundled")
         self.assertEqual(staged["runtime"]["executable"], "libsnow_ocr_inprocess.so")
+        self.assertEqual(staged["runtime"]["version"], "1.3.0")
+        self.assertEqual(staged["runtime"]["protocol"], 8)
         self.assertEqual(staged["runtime"]["files"][0]["sha256"],
                          hashlib.sha256(self.runtime_bytes).hexdigest())
         for name, content in self.model_bytes.items():
             self.assertEqual((self.output / "models" / self.model_id / name).read_bytes(), content)
+        paragraph = self.output / "models" / "line2para-1-c8cede9" / "line2para_1.onnx"
+        self.assertEqual(paragraph.read_bytes(), self.paragraph_bytes)
+        self.assertEqual(staged["paragraph_model"]["files"][0]["sha256"],
+                         hashlib.sha256(self.paragraph_bytes).hexdigest())
         self.assertFalse((self.output / "models" / self.model_id / ".complete.json").exists())
 
     def test_rejects_model_payload_that_disagrees_with_manifest_hash(self) -> None:

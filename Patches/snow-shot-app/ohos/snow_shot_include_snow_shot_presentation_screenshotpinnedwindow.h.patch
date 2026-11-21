@@ -3,11 +3,10 @@ screenshotpinnedwindow.cpp needs to save a pinned window's image or
 recognition result through the async authorized-URI flow.
 
 diff --git a/snow_shot/include/snow_shot/presentation/screenshotpinnedwindow.h b/snow_shot/include/snow_shot/presentation/screenshotpinnedwindow.h
-index 4e22089..7d99c5a 100644
 --- a/snow_shot/include/snow_shot/presentation/screenshotpinnedwindow.h
 +++ b/snow_shot/include/snow_shot/presentation/screenshotpinnedwindow.h
-@@ -568,7 +568,8 @@ class ScreenshotPinnedWindow final : public QWidget {
-     void quickSave();
+@@ -587,7 +587,8 @@
+     void quickSavePreparedImage(const ScreenshotExportTasks& tasks);
      void invalidatePendingCopy();
      void saveRecognitionSnapshot(ScreenshotRecognitionFileSnapshot snapshot, QString path,
 -                                 QString baseName = {}, bool automatic = false);
@@ -16,11 +15,11 @@ index 4e22089..7d99c5a 100644
      [[nodiscard]] ScreenshotClipboardService::PublicationId beginCopyRequest();
      void copyRenderedImage(std::shared_ptr<ScreenshotExportArtifact> artifact);
      void copyRenderedImage(std::shared_ptr<ScreenshotExportArtifact> artifact,
-@@ -754,6 +755,7 @@ class ScreenshotPinnedWindow final : public QWidget {
+@@ -774,6 +775,7 @@
      bool m_recognitionSavePending = false;
      std::shared_ptr<ScreenshotExportArtifact> m_quickSaveArtifact;
      bool m_quickSavePending = false;
 +    QString m_pendingUserFileSaveUri;
+     std::unique_ptr<QObject> m_exportTaskOwner;
      QPointer<ScreenshotCloudUploadJob> m_cloudUploadJob;
      bool m_cloudUploadPreparing = false;
-     ScreenshotClipboardCommitHandle m_clipboardCommit;

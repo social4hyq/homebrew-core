@@ -1,0 +1,15 @@
+OHOS: the NDK libc++ lacks std::ranges::any_of, so test the member flag with
+std::any_of over the same range.
+diff --git a/snow_shot/src/presentation/ocr/screenshotrecognitionimage.cpp b/snow_shot/src/presentation/ocr/screenshotrecognitionimage.cpp
+--- a/snow_shot/src/presentation/ocr/screenshotrecognitionimage.cpp
++++ b/snow_shot/src/presentation/ocr/screenshotrecognitionimage.cpp
+@@ -90,7 +90,8 @@
+     painter.setClipRect(image.rect());
+     std::optional<ScreenshotRecognitionImageSnapshot> prepared;
+     if ((snapshot.filteredImage.isNull() || !snapshot.filteredCanvasRect.isValid()) &&
+-        std::ranges::any_of(snapshot.lines, &ScreenshotOcrLine::smartMergeTranslation)) {
++        std::any_of(snapshot.lines.cbegin(), snapshot.lines.cend(),
++                    [](const ScreenshotOcrLine& line) { return line.smartMergeTranslation; })) {
+         // An export can capture a streaming delta before the live background has arrived.
+         prepared = snapshot;
+         ScreenshotOcrPresentation presentation;

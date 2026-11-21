@@ -31,19 +31,18 @@ index 359b42f..31000e2 100644
  if(OHOS)
      find_library(SNOW_SHOT_ACE_NAPI_LIBRARY NAMES ace_napi.z REQUIRED)
 diff --git a/snow_shot/include/snow_shot/presentation/screenrecordingcontroller.h b/snow_shot/include/snow_shot/presentation/screenrecordingcontroller.h
-index 5364137..c0599a0 100644
 --- a/snow_shot/include/snow_shot/presentation/screenrecordingcontroller.h
 +++ b/snow_shot/include/snow_shot/presentation/screenrecordingcontroller.h
-@@ -27,6 +27,8 @@ class ScreenRecordingController final : public QObject {
+@@ -30,6 +30,8 @@
      void open(const QRect& recordingRegion);
      using PermissionCheck = std::function<bool(bool microphone, bool input, bool notify)>;
      void setPermissionCheck(PermissionCheck check);
 +    using UserFileExporter = std::function<void(const QString& path)>;
 +    void setUserFileExporter(UserFileExporter exporter);
-     bool isOpen() const;
-     bool isRecording() const;
-     [[nodiscard]] bool blocksMemoryTrimming() const;
-@@ -55,6 +57,7 @@ class ScreenRecordingController final : public QObject {
+ #ifdef Q_OS_MACOS
+     void
+     setPreviewPermissionSnapshot(const snow_shot::presentation::AppPermissionSnapshot& snapshot);
+@@ -62,6 +64,7 @@
      void captureActivityChanged(bool active);
      void finalized();
      void exportNotificationRequested(const QString& path);

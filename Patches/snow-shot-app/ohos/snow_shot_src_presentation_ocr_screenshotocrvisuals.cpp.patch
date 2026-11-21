@@ -1,0 +1,15 @@
+OHOS: the NDK libc++ lacks std::ranges::any_of, so test the member flag with
+std::any_of over the same range.
+diff --git a/snow_shot/src/presentation/ocr/screenshotocrvisuals.cpp b/snow_shot/src/presentation/ocr/screenshotocrvisuals.cpp
+--- a/snow_shot/src/presentation/ocr/screenshotocrvisuals.cpp
++++ b/snow_shot/src/presentation/ocr/screenshotocrvisuals.cpp
+@@ -905,7 +905,8 @@
+     const QRectF normalized = canvasRect.normalized();
+     const bool hasSolidFill =
+         backgroundFill ||
+-        std::ranges::any_of(presentation.lines, &ScreenshotOcrLine::smartMergeTranslation);
++        std::any_of(presentation.lines.cbegin(), presentation.lines.cend(),
++                    [](const ScreenshotOcrLine& line) { return line.smartMergeTranslation; });
+     const bool valid =
+         hasSolidFill && !source.isNull() && normalized.isValid() && !normalized.isEmpty();
+     if (valid && presentation.solidBackgroundFill == backgroundFill &&
