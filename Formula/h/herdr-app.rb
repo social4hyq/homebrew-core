@@ -4,7 +4,7 @@ class HerdrApp < Formula
   url "https://github.com/herdrdev/herdr-app/archive/refs/tags/v0.1.16.tar.gz"
   sha256 "fea3d920607f2199ed330eb3cdcb1fa3626dcea5080c92a97a296d983d6bc681"
   license "Apache-2.0"
-  revision 5
+  revision 6
 
   livecheck do
     url "https://github.com/herdrdev/herdr-app.git"
@@ -27,17 +27,13 @@ class HerdrApp < Formula
   depends_on "social4hyq/core/herdr-core"
 
   # libghostty-vt builds from the ghostty submodule (GitHub archives omit it);
-  # simdutf needs PIC for OHOS, and translate_c is mirrored in a tap release.
+  # simdutf needs PIC for OHOS.
   resource "ghostty" do
     url "https://github.com/ghostty-org/ghostty/archive/291fd050b9e9c293c8adb6a140742649b7e42d3a.tar.gz"
     sha256 "f35b464f1aee22ffda9f6359038b9ad18a784342b4a4fa1cb97a79fb9ade79a4"
 
     patch do
       file "Patches/herdr-app/ghostty/0001-simdutf-pic-ohos.patch"
-    end
-
-    patch do
-      file "Patches/herdr-app/ghostty/0002-translate-c-mirror.patch"
     end
   end
 
