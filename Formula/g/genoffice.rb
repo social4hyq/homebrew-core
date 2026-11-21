@@ -1,10 +1,9 @@
 class Genoffice < Formula
   desc "Command-line for the GenOffice AI office suite (docx, xlsx, pptx, pdf)"
   homepage "https://github.com/genspark-ai/genoffice"
-  url "https://github.com/genspark-ai/genoffice/archive/refs/tags/v0.13.18.tar.gz"
-  sha256 "156528d8fa1e6878d6c61d3576d6d6b093eda4abbef223e7fbc4bd4855c9cb08"
+  url "https://github.com/genspark-ai/genoffice/archive/refs/tags/v0.13.615.tar.gz"
+  sha256 "bd8cbe95dcee05ec20785b2aee015d5a1d69c0552683d808932ee5fa342c7505"
   license "Apache-2.0"
-  revision 1
 
   livecheck do
     url :stable
@@ -12,8 +11,8 @@ class Genoffice < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/genoffice-v0.13.18-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8131f7a36594df76bf024949a7dfaac2c93253c270d9d6535af8cb8f17427fab"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/genoffice-v0.13.615-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "676a37b65c1a8120fe464c3e7f1c9c780b92acaab6fca5bbfb6565621db12f61"
   end
 
   depends_on "node" => :build
