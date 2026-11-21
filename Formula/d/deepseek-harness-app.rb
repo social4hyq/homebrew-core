@@ -4,7 +4,7 @@ class DeepseekHarnessApp < Formula
   url "https://github.com/deepseek-ai/deepseek-harness/archive/refs/tags/dsh-v0.2.2-rc.5.tar.gz"
   sha256 "4e24e132a9fc267d5cdc5724525873db2575680e073fd2db4519b92553614215"
   license :cannot_represent
-  revision 2
+  revision 3
 
   livecheck do
     url "https://github.com/deepseek-ai/deepseek-harness.git"
