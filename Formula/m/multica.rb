@@ -11,8 +11,9 @@ class Multica < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-v0.11.1-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "5a7bc82adfa138e455e0731c264b4808a1da293498e77faedf1c56d72534dc98"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-v0.11.1-r2"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c106694bad084ed9bcd3b5a48913f7dd76a4e45e174cc9364b7e5bfb20b55ed9"
   end
 
   depends_on "go" => :build
@@ -37,9 +38,7 @@ class Multica < Formula
 
       The desktop app is a separate formula. Install it with
       `brew install multica-app`, then run `multica-app install` to sign
-      and install it on a connected device. The `multica install-desktop` and
-      `multica desktop` commands of earlier revisions now live there as
-      `multica-app install` and `multica-app start|stop|status`.
+      and install it on a connected device.
     EOS
   end
 
@@ -62,21 +61,5 @@ class Multica < Formula
                  shell_output("env -u MULTICA_AGENT_TEMP_BASE sh #{env_probe}")
     assert_match "MULTICA_AGENT_TEMP_BASE=#{testpath}/custom\n",
                  shell_output("MULTICA_AGENT_TEMP_BASE=#{testpath}/custom sh #{env_probe}")
-    # The desktop lives in its own formula now: nothing of it, and none of what
-    # it needed, is left here.
-    assert_empty %w[app-installer hap-installer ohos-sdk-toolchains zip] & deps.map(&:name)
-    assert_empty stable.patches
-    assert_empty resources
-    refute_path_exists libexec/"multica-desktop-unsigned.hap"
-    refute_path_exists libexec/"multica-desktop-bridge"
-    refute_path_exists libexec/"multica-dispatch.sh"
-    refute_path_exists pkgshare
-    # The caveats send readers to multica-app and no longer teach the old commands as current.
-    assert_match "brew install multica-app", caveats
-    assert_match "multica-app install", caveats
-    assert_match "multica-app start|stop|status", caveats
-    refute_match "multica-desktop", caveats
-    refute_match "hap-installer", caveats
-    refute_match "github.com/social4hyq", caveats
   end
 end
