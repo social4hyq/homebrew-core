@@ -8,10 +8,9 @@ in-flight-inference engine alive past service teardown rather than forcing
 OCR onto the UI thread.
 
 diff --git a/snow_shot/src/presentation/ocr/screenshotocrrecognitionservice.cpp b/snow_shot/src/presentation/ocr/screenshotocrrecognitionservice.cpp
-index 665f48b..2672c31 100644
 --- a/snow_shot/src/presentation/ocr/screenshotocrrecognitionservice.cpp
 +++ b/snow_shot/src/presentation/ocr/screenshotocrrecognitionservice.cpp
-@@ -10,9 +10,13 @@
+@@ -10,6 +10,9 @@
  
  #include <QCoreApplication>
  #include <QDebug>
@@ -21,21 +20,16 @@ index 665f48b..2672c31 100644
  #include <QDir>
  #include <QElapsedTimer>
  #include <QFileInfo>
+@@ -16,3 +19,4 @@
 +#include <QJsonArray>
  #include <QJsonDocument>
  #include <QMetaObject>
  #include <QProcess>
-@@ -53,6 +57,113 @@ qreal edgeLength(const QPointF& first, const QPointF& second) {
+@@ -53,6 +57,107 @@
      return std::hypot(second.x() - first.x(), second.y() - first.y());
  }
  
 +#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
-+void appendF32(QByteArray& bytes, float value) {
-+    quint32 bits = 0;
-+    std::memcpy(&bits, &value, sizeof(bits));
-+    snow_shot::ocr::protocol::appendU32(bytes, bits);
-+}
-+
 +QByteArray recognizeInProcess(SnowOcrHandle* handle, const QImage& source) {
 +    QByteArray payload;
 +    if (handle == nullptr || source.isNull() ||
@@ -139,7 +133,7 @@ index 665f48b..2672c31 100644
  ScreenshotOcrTextDirection textDirectionForQuad(const QPolygonF& quad) {
      if (quad.size() != 4)
          return ScreenshotOcrTextDirection::Horizontal;
-@@ -123,10 +234,13 @@ class ScreenshotOcrRecognitionService::Impl final {
+@@ -123,10 +228,13 @@
                                              ? QDir(QCoreApplication::applicationDirPath())
                                                    .filePath(QStringLiteral("assets/ocr"))
                                              : options.offlineRoot;
@@ -157,7 +151,7 @@ index 665f48b..2672c31 100644
              connect(m_assetManager.get(), &ScreenshotOcrAssets::statusChanged, owner,
                      [this](const ScreenshotOcrAssetStatus& status) { m_assetStatus = status; });
              connect(m_assetManager.get(), &ScreenshotOcrAssets::ready, owner,
-@@ -279,6 +393,10 @@ class ScreenshotOcrRecognitionService::Impl final {
+@@ -340,6 +448,10 @@
              m_staged.reset();
          }
          if (job->processSubmitted) {
@@ -168,7 +162,7 @@ index 665f48b..2672c31 100644
              sendFrame(makeFrame(kCancel, token));
              if (!m_configuration.residentProcess && !job->residentSubmission && m_pending.empty()) {
                  m_processState = ProcessState::Stopping;
-@@ -289,6 +407,7 @@ class ScreenshotOcrRecognitionService::Impl final {
+@@ -350,6 +462,7 @@
                  job->running = job->processSubmitted = false;
                  stopTransport(true);
              }
@@ -176,7 +170,7 @@ index 665f48b..2672c31 100644
          }
          QObject::disconnect(job->receiverDestroyed);
          if (!job->request.renderOnly) {
-@@ -343,8 +462,10 @@ class ScreenshotOcrRecognitionService::Impl final {
+@@ -410,8 +523,10 @@
              (!configuration.modelHotStart || !configuration.residentProcess))
              m_invalidateWarmSession = true;
          m_configuration = configuration;
@@ -187,17 +181,17 @@ index 665f48b..2672c31 100644
          if (!configuration.hardwareAcceleration)
              m_accelerationReadyPending = false;
          m_modelType = configuration.modelType;
-@@ -434,6 +555,9 @@ class ScreenshotOcrRecognitionService::Impl final {
+@@ -507,6 +622,9 @@
      }
  
      bool ensureProcess() {
 +#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
 +        return ensureInProcessEngine();
 +#else
-         if (!assetsReady() || m_stopping)
+         if ((!assetsReady() && !m_paragraphAssets.valid()) || m_stopping)
              return false;
          if (m_transport != nullptr)
-@@ -535,6 +659,7 @@ class ScreenshotOcrRecognitionService::Impl final {
+@@ -608,6 +726,7 @@
                  processFailed("ready_timeout");
          });
          return true;
@@ -205,7 +199,7 @@ index 665f48b..2672c31 100644
      }
  
      void sendFrame(const QByteArray& frame) {
-@@ -625,6 +750,165 @@ class ScreenshotOcrRecognitionService::Impl final {
+@@ -698,6 +817,165 @@
      bool processStopping() const {
          return m_processState == ProcessState::Stopping;
      }
@@ -371,7 +365,7 @@ index 665f48b..2672c31 100644
      bool residentEffective() const {
          return m_configuration.residentProcess && !m_residentSuspended;
      }
-@@ -738,6 +1022,11 @@ class ScreenshotOcrRecognitionService::Impl final {
+@@ -812,6 +1090,11 @@
                  m_processStopReason = ProcessStopReason::Shutdown;
                  stopTransport(false);
              }
@@ -383,7 +377,7 @@ index 665f48b..2672c31 100644
              return;
          }
          const bool undelivered =
-@@ -757,6 +1046,10 @@ class ScreenshotOcrRecognitionService::Impl final {
+@@ -842,6 +1125,10 @@
          }
          if (!ensureProcess() || !processReady())
              return;
@@ -394,7 +388,7 @@ index 665f48b..2672c31 100644
  
          // Only one transfer may own the mapping, and only one copied image waits ahead.
          std::shared_ptr<Job> nextImage;
-@@ -1194,6 +1487,7 @@ class ScreenshotOcrRecognitionService::Impl final {
+@@ -1377,6 +1664,7 @@
      }
  
      void processFailed(const char* stage = "process_exit", const QString& error = {}) {
@@ -402,7 +396,7 @@ index 665f48b..2672c31 100644
          if (m_transport == nullptr || m_stopping || processStopping())
              return;
          QJsonObject fields{{QStringLiteral("stage"), QString::fromLatin1(stage)},
-@@ -1357,6 +1651,10 @@ class ScreenshotOcrRecognitionService::Impl final {
+@@ -1545,6 +1833,10 @@
      QThread* m_transportThread = nullptr;
      std::vector<QPointer<QThread>> m_transportThreads;
      ScreenshotOcrTransport* m_transport = nullptr;
@@ -412,4 +406,4 @@ index 665f48b..2672c31 100644
 +#endif
      ProcessStopReason m_processStopReason = ProcessStopReason::None;
      qsizetype m_slotBytes = 0;
-     int m_runningCount = 0, m_localRenderingCount = 0;
+     int m_runningCount = 0, m_localRenderingCount = 0, m_processContinuations = 0;

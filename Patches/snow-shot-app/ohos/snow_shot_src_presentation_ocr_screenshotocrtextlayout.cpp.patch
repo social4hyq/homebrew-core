@@ -1,19 +1,54 @@
-OHOS: the SDK's libc++ has no `std::ranges::any_of`; use the equivalent
-iterator-based algorithm and store the temporary `glyphRuns` result in a
-local variable rather than mixing begin/end from two different temporary
-containers.
-
+OHOS: the NDK libc++ has no ranges algorithms (std::__n1::ranges::any_of and
+ranges::min_element are missing), so spell the same predicates with the
+classic iterator forms. Behaviour is unchanged: the min_element comparisons
+apply the same projection the ranges overload used.
 diff --git a/snow_shot/src/presentation/ocr/screenshotocrtextlayout.cpp b/snow_shot/src/presentation/ocr/screenshotocrtextlayout.cpp
-index 956c02a..28a81ee 100644
 --- a/snow_shot/src/presentation/ocr/screenshotocrtextlayout.cpp
 +++ b/snow_shot/src/presentation/ocr/screenshotocrtextlayout.cpp
-@@ -79,7 +79,8 @@ template <typename Layout> QRectF textLayoutInkBounds(const Layout& layout) {
+@@ -89,7 +89,8 @@
  }
- 
+
  bool glyphsUseCffOutlines(const QTextLayout& layout) {
 -    return std::ranges::any_of(layout.glyphRuns(), [](const QGlyphRun& run) {
-+    const auto runs = layout.glyphRuns();
-+    return std::any_of(runs.begin(), runs.end(), [](const QGlyphRun& run) {
++    const QList<QGlyphRun> glyphRuns = layout.glyphRuns();
++    return std::any_of(glyphRuns.cbegin(), glyphRuns.cend(), [](const QGlyphRun& run) {
          const QRawFont font = run.rawFont();
          return !font.fontTable("CFF ").isEmpty() || !font.fontTable("CFF2").isEmpty();
      });
+@@ -242,7 +243,7 @@
+ }
+
+ bool hasVisibleCharacters(QStringView text) {
+-    return std::ranges::any_of(text, [](QChar character) {
++    return std::any_of(text.cbegin(), text.cend(), [](QChar character) {
+         return !character.isSpace() && character.category() != QChar::Other_Format;
+     });
+ }
+@@ -1227,7 +1228,11 @@
+                 const auto rect = verticalCell(static_cast<std::size_t>(column.start));
+                 return std::abs(rect.center().x() - itemPosition.x());
+             };
+-            const auto closest = std::ranges::min_element(m_verticalColumns, {}, distance);
++            const auto closest =
++                std::min_element(m_verticalColumns.cbegin(), m_verticalColumns.cend(),
++                                 [&distance](const VerticalColumn& lhs, const VerticalColumn& rhs) {
++                                     return distance(lhs) < distance(rhs);
++                                 });
+             const auto row =
+                 static_cast<int>(std::clamp(std::round(itemPosition.y() / m_verticalCellAdvance),
+                                             0.0, static_cast<qreal>(closest->length)));
+@@ -1247,8 +1252,12 @@
+             const qreal y = itemPosition.y();
+             return std::abs(std::clamp(y, row.top(), row.bottom()) - y);
+         };
+-        const auto row = std::ranges::min_element(m_reflowRows, {}, distance);
+-        const auto line = m_layout->lineAt(static_cast<int>(row - m_reflowRows.begin()));
++        const auto row =
++            std::min_element(m_reflowRows.cbegin(), m_reflowRows.cend(),
++                             [&distance](const QRectF& lhs, const QRectF& rhs) {
++                                 return distance(lhs) < distance(rhs);
++                             });
++        const auto line = m_layout->lineAt(static_cast<int>(row - m_reflowRows.cbegin()));
+         return qBound(0, line.xToCursor(itemPosition.x(), QTextLine::CursorBetweenCharacters),
+                       static_cast<int>(m_text.size()));
+     }

@@ -7,7 +7,6 @@ completion callback from firing after the window closed or a new save
 started.
 
 diff --git a/snow_shot/src/presentation/pinned/screenshotpinnedwindow.cpp b/snow_shot/src/presentation/pinned/screenshotpinnedwindow.cpp
-index 546a920..e5b71cd 100644
 --- a/snow_shot/src/presentation/pinned/screenshotpinnedwindow.cpp
 +++ b/snow_shot/src/presentation/pinned/screenshotpinnedwindow.cpp
 @@ -59,6 +59,9 @@
@@ -20,7 +19,7 @@ index 546a920..e5b71cd 100644
  #include "snow_shot/presentation/components/icons/snowshoticons.h"
  #include "snow_shot/presentation/screenshotcanvasrenderer.h"
  #include "snow_shot/presentation/screenshotcanvastoolstyles.h"
-@@ -124,6 +127,7 @@
+@@ -125,6 +128,7 @@
  #include <QEnterEvent>
  #include <QFrame>
  #include <QFileDialog>
@@ -28,7 +27,7 @@ index 546a920..e5b71cd 100644
  #include <QFileInfo>
  #include <QGuiApplication>
  #include <QHBoxLayout>
-@@ -149,6 +153,7 @@
+@@ -150,6 +154,7 @@
  #include <QWheelEvent>
  #include <QWindow>
  #include <QUrl>
@@ -36,7 +35,7 @@ index 546a920..e5b71cd 100644
  #include <QUuid>
  
  #include <algorithm>
-@@ -161,6 +166,17 @@
+@@ -162,6 +167,17 @@
  #include <limits>
  
  namespace {
@@ -54,7 +53,7 @@ index 546a920..e5b71cd 100644
  snow_shot::storage::PinnedWindowPlacement
  decorationPlacement(snow_shot::storage::PinnedWindowPlacement placement, QScreen* fallback,
                      bool outward) {
-@@ -7037,30 +7053,151 @@ void ScreenshotPinnedWindow::quickSave() {
+@@ -7284,18 +7300,22 @@
  #if SNOW_SHOT_ENABLE_IMAGE_CONVERSION || SNOW_SHOT_ENABLE_LATEX_RECOGNITION ||                     \
      SNOW_SHOT_ENABLE_QR_RECOGNITION || SNOW_SHOT_ENABLE_TABLE_RECOGNITION
  void ScreenshotPinnedWindow::saveRecognitionSnapshot(ScreenshotRecognitionFileSnapshot snapshot,
@@ -84,6 +83,7 @@ index 546a920..e5b71cd 100644
                  static_cast<void>(
                      snow_shot::storage::ScreenshotSettings().setLastManualSaveDirectory(
                          QFileInfo(result.savedPath).absolutePath()));
+@@ -7302,6 +7322,6 @@
          } else if (result.failureStage != ScreenshotExportFailureStage::Cancelled) {
              showPinnedRecognitionMessage(
 -                this,
@@ -91,10 +91,11 @@ index 546a920..e5b71cd 100644
                  QCoreApplication::translate("ScreenshotController",
                                              "The recognition result could not be saved: %1")
                      .arg(result.error),
+@@ -7308,6 +7328,123 @@
                  true);
          }
      };
-+    auto complete = [lifetime, generation, recognitionKind, userFileUri,
++    auto complete = [lifetime, generation, recognitionKind, userFileUri, snapshot,
 +                     finish](ScreenshotExportTaskResult result) mutable {
 +        if (lifetime.isNull() || generation != lifetime->m_recognitionSaveGeneration) {
 +            if (!userFileUri.isEmpty() && result.succeeded())
@@ -108,7 +109,7 @@ index 546a920..e5b71cd 100644
 +
 +#ifdef Q_OS_HARMONY
 +        auto stagingPaths = std::make_shared<QStringList>(
-+            ScreenshotRecognitionFileExport::outputPaths(result.savedPath, recognitionKind));
++            ScreenshotRecognitionFileExport::outputPaths(result.savedPath, snapshot));
 +        auto finishPublication = [lifetime, generation, stagingPaths, finish](
 +                                     bool succeeded, QString error, QString publishedUri) mutable {
 +            for (const QString& stagingPath : *stagingPaths)
@@ -214,7 +215,7 @@ index 546a920..e5b71cd 100644
      // Table ZIP/XML expansion varies with cell text. Admit it exclusively until streaming
      // workbook serialization provides a tighter bound; text exports have bounded UTF-8 copies.
      const qint64 workingBytes =
-@@ -7928,6 +8065,78 @@ void ScreenshotPinnedWindow::saveAsFile() {
+@@ -8211,8 +8348,82 @@
                  QLatin1Char('.') + ScreenshotRecognitionFileExport::extension(fileSnapshot->kind)));
          const QPointer<ScreenshotPinnedWindow> lifetime(this);
          setProperty("saveDialogOpen", true);
@@ -290,10 +291,14 @@ index 546a920..e5b71cd 100644
 +        saveRecognitionSnapshot(*fileSnapshot, stagingPath, {}, false, std::move(selectedUri));
 +        return;
 +#else
-         const QString selectedPath = QFileDialog::getSaveFileName(
+         QString selectedFilter;
+         QString selectedPath = QFileDialog::getSaveFileName(
++||||||| old_base.cpp
++        const QString selectedPath = QFileDialog::getSaveFileName(
              this, translatePinnedText("Save as file"), initialPath,
-             ScreenshotRecognitionFileExport::dialogFilter(fileSnapshot->kind), nullptr,
-@@ -7945,6 +8154,7 @@ void ScreenshotPinnedWindow::saveAsFile() {
+             ScreenshotRecognitionFileExport::dialogFilter(fileSnapshot->kind), &selectedFilter,
+             QFileDialog::DontConfirmOverwrite);
+@@ -8231,6 +8442,7 @@
              return;
          saveRecognitionSnapshot(*fileSnapshot, primaryPath);
          return;
@@ -301,7 +306,7 @@ index 546a920..e5b71cd 100644
      }
  #endif
      if (m_originalImage.isNull()) {
-@@ -7989,12 +8199,67 @@ void ScreenshotPinnedWindow::saveAsFile() {
+@@ -8287,6 +8499,60 @@
      QString selectedFilter = defaults.selectedFilter;
      const QPointer<ScreenshotPinnedWindow> dialogLifetime(this);
      setProperty("saveDialogOpen", true);
@@ -362,6 +367,7 @@ index 546a920..e5b71cd 100644
      const QString selectedPath = QFileDialog::getSaveFileName(
          this, translatePinnedText("Save as file"), defaults.initialPath,
          ScreenshotImageFileService::saveDialogFilter(), &selectedFilter);
+@@ -8293,6 +8559,7 @@
      if (!dialogLifetime)
          return;
      setProperty("saveDialogOpen", false);
@@ -369,7 +375,7 @@ index 546a920..e5b71cd 100644
      if (m_closing)
          return;
      if (selectedPath.isEmpty()) {
-@@ -8005,21 +8270,86 @@ void ScreenshotPinnedWindow::saveAsFile() {
+@@ -8304,7 +8571,25 @@
          ScreenshotImageFileService::formatForDialogSelection(selectedPath, selectedFilter);
      static_cast<void>(
          outputSettings.setLastManualSaveFormat(ScreenshotImageFileService::formatKey(format)));
@@ -395,12 +401,13 @@ index 546a920..e5b71cd 100644
      invalidatePendingCopy();
      m_fileSaveJob.cancel();
      m_fileSaveJob = {};
+@@ -8311,11 +8596,57 @@
      m_exportArtifact = artifact;
      if (!artifact->requestSaveToPath(
              this, outputPath, format, encoding,
--            [this, artifact](ScreenshotExportTaskResult result) {
+-            [this, artifact, tasks, format](ScreenshotExportTaskResult result) {
 -                if (m_closing || m_exportArtifact != artifact)
-+            [this, artifact
++            [this, artifact, tasks, format
 +#ifdef Q_OS_HARMONY
 +             ,
 +             dialogLifetime, publishToUserFile, stagingPath, userFileUri = selectedPath
@@ -454,11 +461,13 @@ index 546a920..e5b71cd 100644
                      static_cast<void>(
                          snow_shot::storage::ScreenshotSettings().setLastManualSaveDirectory(
                              QFileInfo(result.savedPath).absolutePath()));
+@@ -8322,4 +8653,5 @@
+                     runTasks(tasks, {}, ScreenshotEncodedExport::fromSave(result, format));
 +#endif
                  } else if (result.failureStage != ScreenshotExportFailureStage::Cancelled) {
                      showPinnedRecognitionMessage(
                          this,
-@@ -8033,6 +8363,10 @@ void ScreenshotPinnedWindow::saveAsFile() {
+@@ -8333,6 +8665,10 @@
          if (m_exportArtifact == artifact) {
              m_exportArtifact.reset();
          }

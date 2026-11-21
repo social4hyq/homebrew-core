@@ -1,10 +1,9 @@
 class SnowShotApp < Formula
   desc "Screenshot and annotation utility from Snow Apps, unsigned OHOS HAP"
   homepage "https://github.com/mg-chao/snow-shot"
-  url "https://github.com/mg-chao/snow-shot/archive/refs/tags/v1.5.7_snow-shot.tar.gz"
-  sha256 "6d9de662710ccf406dea312c0322e77a3f473bc6121096ec82df713d30f4273c"
+  url "https://github.com/mg-chao/snow-shot/archive/refs/tags/v1.6.1_snow-shot.tar.gz"
+  sha256 "1fdffd33d03a20696a11386fc2fa114728478c1c3601caa8ed14ed43a34489e8"
   license "GPL-3.0-or-later"
-  revision 24
 
   livecheck do
     url "https://github.com/mg-chao/snow-shot.git"
@@ -13,8 +12,8 @@ class SnowShotApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-app-v1.5.7-r13"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bba292f990ebaba43d0139c3bc718bf63229e530abdbdb44a5a45b8da328608c"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-app-v1.6.1-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e1e45012e9ee5616d736c55ec26fa30afe3386ccd9af260caf359dcf87967844"
   end
 
   depends_on "brotli" => :build
@@ -68,9 +67,16 @@ class SnowShotApp < Formula
     sha256 "b5f2bfe2bdd9448429e3e82b51c789775d9b42f2403d082b00662eb77e401c5d"
   end
 
+  resource "ocr-paragraph-model" do
+    url "https://www.modelscope.cn/models/mgchao/SnowShotOCR/resolve/master/line2para/line2para_1.onnx"
+    sha256 "c8cede9a564d9da10cf72d2ca9fe70d1d83ac947566d8cbc546b1ea36402d922"
+  end
+
   resource "snow-shot-ocr-rs" do
-    url "https://github.com/mg-chao/simd-paddle-ocr-rs/archive/43aba513b661e48eacb04d19f1ff071649116ddf.tar.gz"
-    sha256 "73072343793760861059d363f24596ee72c47e46dcfe2adf8e1004f3a2b4f1f0"
+    # 1.6.1 pins the crate as a git submodule; Cargo needs the `paragraph`
+    # feature that only exists from this commit on.
+    url "https://github.com/mg-chao/simd-paddle-ocr-rs/archive/a2fc7abfec5913618c78a0d2330ae520872c5abf.tar.gz"
+    sha256 "e33a186d63d201560416f8bc215c76198307704975b7f61bb1e9196c9bf25296"
 
     patch do
       file "Patches/snow-shot-app/ocr/src_runtime.rs.patch"
@@ -182,6 +188,12 @@ class SnowShotApp < Formula
         filename = Dir.children(".").first
         cp filename, model_dir/filename
       end
+    end
+    resource("ocr-paragraph-model").stage do
+      model_dir = buildpath/"ocr-models/line2para-1-c8cede9"
+      mkdir_p model_dir
+      filename = Dir.children(".").first
+      cp filename, model_dir/filename
     end
     qt_translation_dir = buildpath/"qt-translations"
     mkdir_p qt_translation_dir
@@ -638,6 +650,7 @@ class SnowShotApp < Formula
       libsnow_shot.so libqohos.so libQt6Widgets.so.6
       rawfile/qrcode/detect.prototxt rawfile/qrcode/detect.caffemodel
       rawfile/qrcode/sr.prototxt rawfile/qrcode/sr.caffemodel
+      rawfile/ocr/models/line2para-1-c8cede9/line2para_1.onnx
     ].each { |name| assert_match name, listing }
     refute_match "libs/arm64-v8a/libsnow_ocr_process.so", listing
     assert_match "libs/arm64-v8a/tls/libqopensslbackend.so", listing
