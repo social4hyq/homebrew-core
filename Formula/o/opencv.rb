@@ -21,7 +21,7 @@ class Opencv < Formula
 
   livecheck do
     url :stable
-    regex(/^v?(5(?:\.\d+)+)$/i)
+    regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
   bottle do
@@ -85,9 +85,7 @@ class Opencv < Formula
   end
 
   def install
-    contrib = resource("contrib")
-    odie "opencv_contrib must match OpenCV #{version}" if !build.head? && contrib.version != version
-    contrib.stage buildpath/"opencv_contrib"
+    resource("contrib").stage buildpath/"opencv_contrib"
 
     # Avoid Accelerate.framework
     ENV["OpenBLAS_HOME"] = formula_opt_prefix("openblas")
@@ -132,7 +130,6 @@ class Opencv < Formula
       -DWITH_GPHOTO2=OFF
       -DWITH_GSTREAMER=OFF
       -DWITH_JASPER=OFF
-      -DWITH_KLEIDICV=OFF
       -DWITH_OPENEXR=ON
       -DWITH_OPENGL=OFF
       -DWITH_OPENVINO=#{OS.ohos? ? "OFF" : "ON"}
@@ -143,6 +140,7 @@ class Opencv < Formula
       -DBUILD_opencv_python3=ON
       -DPYTHON3_EXECUTABLE=#{python3}
     ]
+    args << "-DWITH_KLEIDICV=OFF" if OS.ohos?
 
     args += if OS.mac?
       # Requires closed-source, pre-built Orbbec SDK on macOS
