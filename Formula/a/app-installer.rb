@@ -1,10 +1,9 @@
 class AppInstaller < Formula
   desc "Sign and install OpenHarmony HAP packages"
   homepage "https://www.npmjs.com/package/@deveco/deveco-cli-openharmony-arm64"
-  url "https://registry.npmjs.org/@deveco/deveco-cli-openharmony-arm64/-/deveco-cli-openharmony-arm64-1.3.10.tgz"
-  sha256 "7fdee1bfb7393c151fa09b3714ecc4796e53d9876557e9933c5890319ffb4daa"
+  url "https://registry.npmjs.org/@deveco/deveco-cli-openharmony-arm64/-/deveco-cli-openharmony-arm64-1.3.12.tgz"
+  sha256 "eaa29900d4892e89b2ae6156733ffa97597971b7a26fa1df6c686cc5934a02fb"
   license "MIT"
-  revision 16
 
   livecheck do
     url :stable
@@ -12,8 +11,8 @@ class AppInstaller < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/app-installer-v1.3.10-r13"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1dab329c39c8f621f7b0abeeae86e168557424a00c10fd9602cb1a522d43b9bf"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/app-installer-v1.3.12-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4074f308679043db60716a2716e49b82ae6aa8e8470d304eb48cbcbfce1aa788"
   end
 
   depends_on "bash"
