@@ -11,8 +11,9 @@ class OhosCompatShim < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-compat-shim-v0.8.4-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "625d4e06f208d42f9a8239ecd8d6cf1e390f13fe6820010ff8ee792e0463ac50"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-compat-shim-v0.8.4-r2"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e9f88e4c59fc93537770d8040eb0c200fa5362e2306c6b434a39cb43a5f9fa61"
   end
 
   # HarmonyOS sandbox seccomp-filters close_range/fchmodat2 and returns unexpected
