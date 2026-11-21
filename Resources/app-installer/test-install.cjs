@@ -4,6 +4,7 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
+const vm = require("node:vm");
 const { spawnSync } = require("node:child_process");
 const AdmZip = require("node:module").createRequire(process.env.DEVECO_CLI_JS)("adm-zip");
 const script = process.env.HAP_INSTALLER_SCRIPT || path.join(__dirname, "app-installer.sh");
@@ -516,4 +517,49 @@ test('doctor --network reports an untrusted certificate chain', t => {
   });
   assert.match(r.stdout + r.stderr, /TLS trust probe/);
   assert.match(r.stdout + r.stderr, /tls_ca=/);
+});
+
+// The DevEco CLI is minified: the decoder class name and its path/crypto/fs/log
+// aliases change between releases (Rs/W/Um/we in 1.3.10, Os/V/Jm/ye in 1.3.12).
+const signer = require(path.join(__dirname, 'sign-hap.cjs'));
+const renamed = [
+  { cls: 'Rs', path: 'W', crypto: 'Um', fs: 'we', log: 'm' },
+  { cls: 'Os', path: 'V', crypto: 'Jm', fs: 'ye', log: 'm' },
+  { cls: 'Zq', path: 'a$', crypto: 'Kb', fs: 'Lc', log: 'dbg' },
+];
+function decoderSource(n) {
+  return `import"x";var ${n.cls}=class n{static decryptPwd(e,t,r){${n.log}(\`[DecipherUtil] \${r}\`);` +
+    `return ${n.path}.resolve(e,"material")+"|"+${n.fs}.statSync("/").isDirectory()+"|"+` +
+    `${n.crypto}.pbkdf2Sync("p","s",1,4,"sha256").length}};export{n as x};`;
+}
+function decode(source) {
+  const cls = signer.extractDecoderClass(source);
+  return vm.runInNewContext(`(${cls})`, { Buffer, Int8Array, ...signer.decoderGlobals(cls) })
+    .decryptPwd('/cfg', 'x', 'storePassword');
+}
+function refuses(source, pattern) {
+  const sign = JSON.stringify(path.join(__dirname, 'sign-hap.cjs'));
+  const r = spawnSync(process.execPath, ['-e',
+    `const s=require(${sign});s.decoderGlobals(s.extractDecoderClass(${JSON.stringify(source)}));`], { encoding: 'utf8' });
+  assert.equal(r.status, 1);
+  assert.match(r.stderr, pattern);
+}
+
+test('the signing decoder follows the minified class and alias names', () => {
+  for (const names of renamed) assert.equal(decode(decoderSource(names)), '/cfg/material|true|4', names.cls);
+});
+
+test('the signing decoder refuses a layout it cannot identify', () => {
+  refuses('var a=class n{};', /decoder is missing/);
+  refuses('var a=class n{};var b={};static decryptPwd(', /does not contain decryptPwd/);
+  refuses('var a=class n{static decryptPwd(e){m(`[DecipherUtil]`);return A.resolve(e)+B.join(e)+C.pbkdf2Sync()+D.statSync()}}',
+    /path alias is ambiguous/);
+});
+
+test('the shipped DevEco CLI decoder runs with the derived aliases', { skip: !process.env.DEVECO_CLI_JS }, () => {
+  const cls = signer.extractDecoderClass(fs.readFileSync(process.env.DEVECO_CLI_JS, 'utf8'));
+  const decoder = vm.runInNewContext(`(${cls})`, { Buffer, Int8Array, ...signer.decoderGlobals(cls) });
+  // Reaching the file system proves every alias is bound; a stale alias throws ReferenceError instead.
+  assert.throws(() => decoder.decryptPwd('/nonexistent-deveco-config', 'ab'.repeat(20), 'storePassword'),
+    { code: 'ENOENT' });
 });
