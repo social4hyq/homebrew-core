@@ -56,7 +56,7 @@ permissions:
   pull-requests: write
 
 env:
-  # Keep in sync with automerge-autobump.yml's ALLOWLIST (branch-name gate).
+  # The autobump allowlist opens PRs; automerge has its own narrower allowlist.
   # claude-code re-allowlisted (removed in PR #344 after the 2.1.229 incident,
   # restored now): its wrapper runs the official binary self-signed under
   # ohos-compat-shim, as does claude-code.latest. Both run the binary
@@ -80,7 +80,7 @@ env:
   # deepseek-harness-app follows the upstream dsh tags; autobump.sh also
   # synchronizes the shell package version. Its HAP and CLI pairing are
   # reviewed by a person, so it is excluded from automerge-autobump.yml.
-  ALLOWLIST: "claude-code claude-code.latest zcode vite-plus magpie multica multica-app obsidian-app deepseek-harness-app"
+  ALLOWLIST: "claude-code claude-code.latest zcode vite-plus magpie multica multica-app obsidian-app deepseek-harness-app claude-code-app codex-app genoffice-app herdr-app magpie-app opencode-app orca-app snow-shot-app zcode-app app-installer genoffice herdr-core lunasvg opencv orca snow-image-viewer snow-shot-opencv"
   IMAGE: ${{ vars.OHOS_CI_IMAGE }} # unchanged mirror of the SWR ci-runner — see sync-ci-image.yml
   CONTAINER: ohos
   TAP_IN_CONTAINER: /storage/Users/currentUser/.harmonybrew/Homebrew/Library/Taps/social4hyq/homebrew-core

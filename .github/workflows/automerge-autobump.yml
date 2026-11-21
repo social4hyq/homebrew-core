@@ -93,23 +93,10 @@ jobs:
           HEAD_REF: ${{ github.event.pull_request.head.ref || github.event.workflow_run.head_branch }}
           REPO: ${{ github.repository }}
         run: |
-          # Keep in sync with autobump.yml's ALLOWLIST (claude-code /
-          # claude-code.latest / zcode / vite-plus / magpie / multica, see the note there),
-          # except multica-app: autobump opens its bump PR, but it carries
-          # OHOS patches that a bump can apply with fuzz and still pass CI, so a
-          # person reviews and merges it. It is not in ALLOWLIST below. Because
-          # BUMP_BRANCH_RE matches by prefix and bump-multica-app-<version>
-          # starts with bump-multica-, it is also named in BUMP_MANUAL_RE, which
-          # wins over the allowlist. Its pr-validate run therefore stays parked
-          # action_required until someone approves it by hand. obsidian-app is
-          # the same manual case, one level earlier: it isn't in ALLOWLIST below,
-          # so its bump PR is never auto-approved or auto-merged — brew test
-          # installs from a synthetic --asar, so a person runs
-          #  against the real release before merging. deepseek-harness-app
-          # is also manual: its HAP and CLI version pairing need human review.
           ALLOWLIST="claude-code claude-code.latest zcode vite-plus magpie multica"
           BUMP_BRANCH_RE="^bump-($(echo "$ALLOWLIST" | tr ' ' '|'))-"
-          BUMP_MANUAL_RE="^bump-(multica-(desktop|app)|deepseek-harness-(desktop|app))-"
+          # App bumps require real-device review; CLI prefixes also match their app branches.
+          BUMP_MANUAL_RE="^bump-([[:alnum:]-]+-app|multica-desktop|deepseek-harness-desktop)-"
 
           merge_pr() {
             local ref="$1" PR LABELS
