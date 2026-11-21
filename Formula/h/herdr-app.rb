@@ -4,7 +4,7 @@ class HerdrApp < Formula
   url "https://github.com/herdrdev/herdr-app/archive/refs/tags/v0.1.16.tar.gz"
   sha256 "fea3d920607f2199ed330eb3cdcb1fa3626dcea5080c92a97a296d983d6bc681"
   license "Apache-2.0"
-  revision 7
+  revision 8
 
   livecheck do
     url "https://github.com/herdrdev/herdr-app.git"
@@ -13,8 +13,8 @@ class HerdrApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/herdr-app-v0.1.16-r11"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9f3575e85541c79b130bd8a3f550ae1153139ab5ce3e05b66ed83403406a201d"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/herdr-app-v0.1.16-r12"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "993b8102cae8dd6d4957962180f992cc3173d0a253cd301b923909f12e81e24a"
   end
 
   depends_on "node" => :build
@@ -43,6 +43,15 @@ class HerdrApp < Formula
 
     patch do
       file "Patches/herdr-app/openharmony-ability/0001-ime-fast-typing.patch"
+    end
+  end
+
+  resource "gpui-ohos" do
+    url "https://static.crates.io/crates/gpui-ohos/gpui-ohos-0.0.1-beta.0.crate"
+    sha256 "77231f68750da0ae969c9b6d8054a82376ebcc522d0baff57a4a2bd434f331ce"
+
+    patch do
+      file "Patches/herdr-app/gpui-ohos/0001-herdr-renderer.patch"
     end
   end
 
@@ -123,6 +132,7 @@ class HerdrApp < Formula
 
     resource("ghostty").stage(buildpath/"vendor/ghostty")
     resource("openharmony-ability").stage(buildpath/"vendor/openharmony-ability")
+    resource("gpui-ohos").stage(buildpath/"vendor/gpui-ohos")
     quickjs = buildpath/"vendor/quickjs-jit-src/96593cd"
     resource("quickjs-jit").stage(quickjs)
     resource("quickjs-ng").stage(quickjs/"sys/quickjs")
