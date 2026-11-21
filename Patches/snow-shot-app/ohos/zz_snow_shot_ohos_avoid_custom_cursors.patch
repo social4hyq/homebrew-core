@@ -44,7 +44,7 @@ index 90c65b6..64712ef 100644
  
  QCursor cursorForSnowCursor(SnowCursorStyle style, qreal devicePixelRatio) {
 diff --git a/snow_shot/src/presentation/overlay/screenshotoverlaycanvaspresenter.cpp b/snow_shot/src/presentation/overlay/screenshotoverlaycanvaspresenter.cpp
-index 4cb4d21..f8a5aaa 100644
+index 24e2417..b74311c 100644
 --- a/snow_shot/src/presentation/overlay/screenshotoverlaycanvaspresenter.cpp
 +++ b/snow_shot/src/presentation/overlay/screenshotoverlaycanvaspresenter.cpp
 @@ -568,6 +568,12 @@ void ScreenshotOverlayCanvasPresenter::setOverlayEffectCursor(
@@ -61,7 +61,7 @@ index 4cb4d21..f8a5aaa 100644
          handle == ScreenshotSelectionEffectHandle::Width
              ? adqt::icons::makeCursor(
 @@ -575,6 +581,7 @@ void ScreenshotOverlayCanvasPresenter::setOverlayEffectCursor(
-                   QSize(32, 32), QPoint(3, 3), dpr)
+                   QSize(32, 32), QPoint(14, 10), dpr)
              : snowCanvasCornerRadiusCursor(dpr);
      canvas->setCursorForLayer(SnowCanvasCursorLayer::Host, cursor);
 +#endif
