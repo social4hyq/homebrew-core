@@ -1,8 +1,8 @@
 class SnowShotApp < Formula
   desc "Screenshot and annotation utility from Snow Apps, unsigned OHOS HAP"
   homepage "https://github.com/mg-chao/snow-shot"
-  url "https://github.com/mg-chao/snow-shot/archive/refs/tags/v1.6.1_snow-shot.tar.gz"
-  sha256 "1fdffd33d03a20696a11386fc2fa114728478c1c3601caa8ed14ed43a34489e8"
+  url "https://github.com/mg-chao/snow-shot/archive/refs/tags/v1.6.2_snow-shot.tar.gz"
+  sha256 "ab84c57dfafb13ae9cbcc48af39fde6c27b5804f718b37c4d3d5ca3e157f1549"
   license "GPL-3.0-or-later"
 
   livecheck do
@@ -12,9 +12,8 @@ class SnowShotApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-app-v1.6.1-r4"
-    rebuild 3
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "45db9f1745fd0e0e6d5ad91671cbc3007b905b269e86876ac415880c7adfffc5"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-app-v1.6.2-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2429347c53722e9e96fc850b2fbc17e1f894478b0c215209dbb17a57a161c695"
   end
 
   depends_on "brotli" => :build
