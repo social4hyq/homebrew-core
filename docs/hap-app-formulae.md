@@ -77,8 +77,9 @@ end
 行为：
 
 - 设备已连接、华为开发者已登录：立刻签名安装，装完用 `bm dump` 校验权限。
-  默认每个 app 只打印两行（开始、结果），安装输出写 `~/.cache/hap-app/logs/`；
-  失败时打印原因、下一步和日志路径（`verbose=1` 或 `HAP_APP_VERBOSE=1` 可流式）。
+  默认只打印准备、签名、上传、安装、权限等简洁阶段和最终结果，完整安装输出写
+  `~/.cache/hap-app/logs/`；失败时打印原因、下一步和日志路径
+  （`verbose=1` 或 `HAP_APP_VERBOSE=1` 可流式显示完整输出）。
 - 设备已连接但没登录：默认打开浏览器并最多等 120s，登录成功后继续安装；
   登录未完成时入队，10 分钟内不为后续 app 重复弹登录。
 - 设备没连、多个设备、登录未完成、装机失败、权限未授予：不报错、不阻塞 brew，
@@ -99,7 +100,8 @@ end
 - 失败会带原因（`tls` / `network` / `login` / `device` / `permissions` /
   `install-failed`）入队，并记录 `attempts` 和最近一次失败的 `detail`；
   `hap-app status` 按原因给出下一步和最近失败，`hap-app status --tsv` 保留机器可读的
-  四列输出。损坏的队列条目不会被静默删除，`status` 可见，用 `hap-app forget` 移除。
+  四列输出。新条目写入 `v: 1`；没有版本号的历史条目继续按 v1 处理，未来版本和损坏的
+  队列条目不会被静默删除或覆盖，`status` 可见，用 `hap-app forget` 移除。
 - CI、root、`HAP_APP_AUTO_INSTALL=0`（或配置文件 `~/.config/hap-app/config`
   里 `auto_install=0`）下静默 no-op。
 - 逃生口：`brew install --skip-post-install`；补跑用 `brew postinstall <app>`。
@@ -115,9 +117,15 @@ Homebrew 的 `post_install` 不在用户的 shell 环境里跑：它把 `HOME` �
 （`~/.cache/hap-app`、`~/.config/hap-app`），保证 post_install 与用户 shell 看到同一份。
 
 `hap-app` 子命令：`auto-install`（formula 用）、`install-pending`、`status [--tsv]`、
-`login`、`forget`。`app-installer` 另有 `ready`（无侧作用预检，输出 `ok <device>` /
-`no-device` / `no-login` / `no-hdc` / `multiple-devices`）、`login`、
-`permissions`。
+`logs [app-command]`、`doctor [--network]`、`login`、`forget`。`status` 即使没有待装项也显示
+配置和日志目录；`logs` 不带参数列出保留的日志，带应用名输出最近一次完整日志。
+`app-installer` 另有 `ready`（无侧作用预检，输出 `ok <device>` / `no-device` /
+`no-login` / `no-hdc` / `multiple-devices`）、`login`、`permissions`。
+
+安静模式的阶段反馈使用内部协议：`hap-app` 设 `HAP_APP_PROGRESS=1`，`app-installer` 只在
+此时输出 `HAP_APP_STAGE<TAB><stage>`，阶段限定为 `profile/sign/upload/install`。`hap-app`
+把完整原文写日志，只显示白名单阶段，不解析 curl/DevEco 的人类可读输出；verbose 模式不启用
+该协议。应用安装脚本无需修改，也不要自行打印这个内部前缀。
 
 ### 厂商二进制在安装时下载
 
@@ -159,14 +167,21 @@ tls_ca=/absolute/path/to/proxy-ca.pem     # 首选：信任代理/VPN 的 CA
   该设置也能穿透 brew post_install 清环境，但代价是华为登录 token、签名响应和厂商下载
   在链路上可被读取/伪造；每次运行都会打 WARNING，`doctor` 显示
   `warn TLS config (... disabled)`。证书能装就优先用 `tls_ca`，把它当临时手段并在修好后删掉。
-- `app-installer doctor` 显示当前 TLS 配置；`app-installer doctor --network` 会用
-  同样的 TLS 设置探测 `https://developer.huawei.com`（配了 HTTPS 代理时跳过，因为
-  DevEco 可能走不同路由）；确认证书不被信任时按提示改配置再重试，不用重装 brew 包。
+- `app-installer doctor`（也可运行 `hap-app doctor`）显示当前 TLS 配置；
+  `app-installer doctor --network` 会用同样的 TLS 设置探测
+  `https://developer.huawei.com`（配了 HTTPS 代理时跳过，因为 DevEco 可能走不同路由）；
+  确认证书不被信任时按提示改配置再重试，不用重装 brew 包。
+- doctor 还通过 `app-installer-sign --check-decoder` 预检随包 DevEco CLI 的私有密码解码器，
+  不需要 HAP、profile 或真实密码。压缩代码识别和受限 `vm` 调用独立在
+  `Resources/app-installer/deveco-decoder.cjs`，布局不识别时 fail closed；升级 CLI 时必须保留
+  随包真实 CLI 测试，不能用自有 `--keystore` 路径的通过结果代替。
 - 同一轮 brew 里如果签名已因证书链失败，10 分钟内（且 `~/.app-installer/config`
   没变）后续 app 直接入队、不再重复尝试；`hap-app install-pending` 会清除这个标记，
   所以改完配置手动补装一定能重试。
 - `~/.config/hap-app/config` 管行为：`auto_install=0`、`auto_login=0`、`verbose=1`。
-- 日志在 `~/.cache/hap-app/logs/`（0600，保留最近 20 个），失败时结果里会打印路径。
+- 日志在 `~/.cache/hap-app/logs/`，创建时请求目录 0700、文件 0600（hmdfs 可能强制其他
+  权限模式，以其为准），保留最近 20 个；失败时结果里会打印路径，也可用 `hap-app logs`
+  列出日志或 `hap-app logs <app-command>` 查看最近全文。
 
 ## 共享安装库
 

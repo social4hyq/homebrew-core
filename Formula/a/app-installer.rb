@@ -4,7 +4,7 @@ class AppInstaller < Formula
   url "https://registry.npmjs.org/@deveco/deveco-cli-openharmony-arm64/-/deveco-cli-openharmony-arm64-1.3.12.tgz"
   sha256 "eaa29900d4892e89b2ae6156733ffa97597971b7a26fa1df6c686cc5934a02fb"
   license "MIT"
-  revision 3
+  revision 4
 
   livecheck do
     url :stable
@@ -12,8 +12,8 @@ class AppInstaller < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/app-installer-v1.3.12-r5"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "528ff2935b903760a4c73fb13b960045cfb4d7bb9de04bd9ef2102ecdf983085"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/app-installer-v1.3.12-r6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7c0caae1728b5a60437481cb0a8f55112f53d0cc93fd50f4b7bf4a3a75bcafe7"
   end
 
   depends_on "bash"
@@ -26,10 +26,12 @@ class AppInstaller < Formula
   RESOURCE_FILES = %w[
     Resources/app-installer/app-installer.sh
     Resources/app-installer/check-permissions.cjs
+    Resources/app-installer/deveco-decoder.cjs
     Resources/app-installer/hap-app.sh
     Resources/app-installer/package-lock.json
     Resources/app-installer/prepare-profile.cjs
     Resources/app-installer/sign-hap.cjs
+    Resources/app-installer/test-deveco-decoder.cjs
     Resources/app-installer/test-hap-app.cjs
     Resources/app-installer/test-install.cjs
   ].freeze
@@ -108,8 +110,10 @@ class AppInstaller < Formula
 
     cp res/"app-installer.sh", libexec/"app-installer.sh"
     cp res/"sign-hap.cjs", libexec/"sign-hap.cjs"
+    cp res/"deveco-decoder.cjs", libexec/"deveco-decoder.cjs"
     cp res/"prepare-profile.cjs", libexec/"prepare-profile.cjs"
     cp res/"test-install.cjs", libexec/"test-install.cjs"
+    cp res/"test-deveco-decoder.cjs", libexec/"test-deveco-decoder.cjs"
     cp res/"test-hap-app.cjs", libexec/"test-hap-app.cjs"
     cp res/"check-permissions.cjs", libexec/"check-permissions.cjs"
     cp res/"hap-app.sh", libexec/"hap-app.sh"
@@ -160,9 +164,10 @@ class AppInstaller < Formula
   def caveats
     <<~EOS
       The debug profile app-installer signs with is tied to this device and
-      expires. Run `app-installer doctor` to see how many days are left and
-      whether hdc and the Huawei Developer login are ready; add `--network` to
-      probe the signing endpoint with the configured TLS settings.
+      expires. Run `app-installer doctor` (or `hap-app doctor`) to see how many
+      days are left, whether hdc and the Huawei Developer login are ready, and
+      whether the bundled DevEco CLI password decoder is compatible; add
+      `--network` to probe the signing endpoint with the configured TLS settings.
 
       The first login to the Huawei Developer account opens the login page in
       your default browser through `aa start`; pass `--no-browser` to open the
@@ -187,8 +192,10 @@ class AppInstaller < Formula
       post-install; settings already present in your shell take precedence.
       Homebrew clears shell variables for
       post-install steps, so the file is the persistent configuration channel.
-      Each automatic install prints one start line and one result line and keeps
-      the full output in ~/.cache/hap-app/logs/.
+      Each automatic install prints concise preparation, signing, device and
+      permission stages. The full output is in ~/.cache/hap-app/logs/; use
+      `hap-app logs <app-command>` to read one app's latest log, or set
+      HAP_APP_VERBOSE=1 to stream all output during installation.
     EOS
   end
 
@@ -199,6 +206,10 @@ class AppInstaller < Formula
     assert_match "Usage: app-installer", shell_output("#{bin}/app-installer --help")
     assert_match "--bundle-id", shell_output("#{bin}/app-installer --help")
     assert_match "Usage: sign-hap.cjs", shell_output("#{bin}/app-installer-sign --help")
+    assert_match "DevEco CLI decoder compatible", shell_output("#{bin}/app-installer-sign --check-decoder")
+    %w[logs doctor install-pending].each do |command|
+      assert_match command, shell_output("#{bin}/hap-app --help")
+    end
     assert_match "Authentication commands", shell_output("#{bin}/devecocli auth --help")
     assert_match "COMMAND_LINE_TOOL_PATH=", (bin/"devecocli").read
     assert_match "--profile <path>", shell_output("#{bin}/app-installer --help")
@@ -214,7 +225,8 @@ class AppInstaller < Formula
       assert_path_exists libexec/"app-installer-toolchain/sdk/default/openharmony/toolchains/lib"/name
     end
     ENV["DEVECO_CLI_JS"] = (libexec/"node_modules/@deveco/deveco-cli-openharmony-arm64/dist/cli.js").to_s
-    system formula_opt_bin("node")/"node", "--test", libexec/"test-install.cjs", libexec/"test-hap-app.cjs"
+    system formula_opt_bin("node")/"node", "--test", libexec/"test-install.cjs",
+           libexec/"test-hap-app.cjs", libexec/"test-deveco-decoder.cjs"
     refute_path_exists bin/"hdc"
     assert_match(/else if \(authIsObject\) \{\s+proxyAuth = false;/,
                  (libexec/"node_modules/axios/lib/adapters/http.js").read)

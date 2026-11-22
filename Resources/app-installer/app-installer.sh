@@ -56,10 +56,16 @@ grants at install time (system_grant, the ACL ones) is granted; user_grant
 permissions that the user has not granted yet are reported, not failed. With
 --expect-acl, every permission in that module.json must also be present, which
 proves the ACL variant was the one installed.
+
+Homebrew post-install automation, pending apps and logs are managed with
+`hap-app status`, `hap-app install-pending`, `hap-app logs` and `hap-app doctor`.
 EOF
 }
 
 die() { printf 'app-installer: %s\n' "$1" >&2; exit "${2:-1}"; }
+progress() {
+  if [[ "${HAP_APP_PROGRESS:-0}" == "1" ]]; then printf 'HAP_APP_STAGE\t%s\n' "$1"; fi
+}
 
 result_file="${HAP_INSTALLER_RESULT_FILE:-}"
 record_result() { # stage reason detail
@@ -361,6 +367,7 @@ install_via_hdc() {
   }
   trap cleanup EXIT
   split -b 10000000 "$signed_hap" "$parts/part-"
+  progress upload
   printf 'Uploading %s to %s\n' "$(basename "$signed_hap")" "$device"
   hdc_cmd shell "rm -f /data/local/tmp/$remote-part-*"
   for part in "$parts"/part-*; do
@@ -376,6 +383,7 @@ install_via_hdc() {
      ! printf '%s' "$stop_output" | grep -qiE 'force stop process successfully|not installed|10104002'; then
     printf '%s\n' "$stop_output" >&2
   fi
+  progress install
   printf '%s\n' 'Installing the signed HAP on the device.'
   if ! install_output=$(hdc_cmd shell "bm install -p /data/local/tmp/$remote.hap" 2>&1); then
     record_result install device "$install_output"
@@ -492,6 +500,14 @@ case "$cmd" in
       rc=0; command -v "$tool" >/dev/null 2>&1 || rc=1
       check "$tool available" "$rc" "brew install $tool"
     done
+    decoder_rc=0
+    decoder_out="$("$HAP_INSTALLER_SIGNER" --check-decoder 2>&1)" || decoder_rc=$?
+    if ((decoder_rc == 0)); then
+      check "$decoder_out" 0 ''
+    else
+      check "DevEco CLI decoder ($decoder_out)" 1 \
+        'upgrade app-installer for a matching DevEco CLI adapter, or sign with your own --keystore material'
+    fi
     rc=0; command -v "$hdc_bin" >/dev/null 2>&1 || [[ -x "$hdc_bin" ]] || rc=1
     check "hdc available ($hdc_bin)" "$rc" 'brew reinstall ohos-sdk-toolchains'
     if ((rc == 0)); then
@@ -631,6 +647,7 @@ else
 
   node "$prepare" "$hap" "$bundle_id" "$project_dir"
 
+  progress profile
   printf '%s\n' 'Generating or refreshing the local debug profile for connected devices.'
   profile_rc=0
   profile_output="$(cd "$project_dir" && devecocli signature generate --product default 2>&1)" || profile_rc=$?
@@ -676,6 +693,7 @@ else
   printf '%s\n' 'app-installer: WARN: could not check the HAP for directory entries; signing it as it is.' >&2
 fi
 sign_rc=0
+progress sign
 (umask 077; "$HAP_INSTALLER_SIGNER" --hap "$sign_input" "${sign_args[@]}") || sign_rc=$?
 rm -f "$stripped"
 if ((sign_rc)); then record_result sign sign 'signer failed'; exit "$sign_rc"; fi

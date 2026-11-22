@@ -14,7 +14,7 @@ function fixture(t) {
   fs.mkdirSync(bin);
   const log = path.join(root, "calls.jsonl");
   const prelude = `const fs=require('node:fs');const path=require('node:path');const args=process.argv.slice(2);` +
-    `fs.appendFileSync(process.env.TEST_LOG, JSON.stringify([process.env.HAP_APP_TEST_NAME||path.basename(process.argv[1]),...args,{noStart:process.env.HAP_INSTALLER_NO_START||'',noLogin:process.env.HAP_INSTALLER_NO_LOGIN||'',device:process.env.HAP_INSTALLER_DEVICE||'',httpsProxy:process.env.HTTPS_PROXY||'',noProxy:process.env.NO_PROXY||'',tlsInsecure:process.env.HAP_INSTALLER_TLS_INSECURE||''}])+'\\n');`;
+    `fs.appendFileSync(process.env.TEST_LOG, JSON.stringify([process.env.HAP_APP_TEST_NAME||path.basename(process.argv[1]),...args,{noStart:process.env.HAP_INSTALLER_NO_START||'',noLogin:process.env.HAP_INSTALLER_NO_LOGIN||'',device:process.env.HAP_INSTALLER_DEVICE||'',httpsProxy:process.env.HTTPS_PROXY||'',noProxy:process.env.NO_PROXY||'',tlsInsecure:process.env.HAP_INSTALLER_TLS_INSECURE||'',progress:process.env.HAP_APP_PROGRESS||''}])+'\\n');`;
   const tool = (name, code) => {
     const file = path.join(bin, name);
     fs.writeFileSync(file, `#!${process.execPath}\n${prelude}\n${code}\n`);
@@ -39,6 +39,10 @@ function fixture(t) {
       console.log(process.env.PERMS_OUT || 'permissions: 1 granted, 0 user_grant, 0 missing');
       process.exit(process.env.PERMS_FAIL ? 1 : 0);
     }
+    if (args[0] === 'doctor') {
+      console.log('app-installer doctor');
+      process.exit(process.env.DOCTOR_FAIL ? 1 : 0);
+    }
     process.exit(0);
   `);
 
@@ -49,6 +53,11 @@ function fixture(t) {
           JSON.stringify({ v: 1, reason: process.env.APP_FAIL_REASON, detail: process.env.APP_FAIL_DETAIL || '' }) + String.fromCharCode(10));
       }
       if (process.env.APP_LOG_LINE) console.log(process.env.APP_LOG_LINE);
+      if (process.env.APP_PROGRESS && process.env.HAP_APP_PROGRESS === '1') {
+        console.log('HAP_APP_STAGE\tprofile');
+        console.log('HAP_APP_STAGE\tunknown');
+        console.log('HAP_APP_STAGE\tprofile\tunexpected');
+      }
       process.exit(process.env.APP_INSTALL_FAIL ? 1 : 0);
     }
     process.exit(0);
@@ -188,16 +197,56 @@ test('a structured failure reason drives the queue entry and the hint', t => {
   assert.equal(f.queuedEntry("orca-app").reason, "tls");
 });
 
-test('the default automatic path prints one start line and one result line', t => {
+test('the default automatic path prints concise stages and a result', t => {
   const f = fixture(t);
   const r = f.run(["auto-install", "orca-app", "com.example.desktop"]);
   assert.equal(r.status, 0, r.stdout + r.stderr);
   const lines = (r.stdout + r.stderr).split("\n").filter(Boolean);
-  assert.equal(lines.length, 2, r.stdout + r.stderr);
-  assert.ok(lines.some(line => /installing orca-app/.test(line)), r.stdout + r.stderr);
+  assert.equal(lines.length, 3, r.stdout + r.stderr);
+  assert.ok(lines.some(line => /正在准备应用/.test(line)), r.stdout + r.stderr);
+  assert.ok(lines.some(line => /正在校验应用权限/.test(line)), r.stdout + r.stderr);
   assert.ok(lines.some(line => /已装机 com\.example\.desktop（设备 local）/.test(line)), r.stdout + r.stderr);
   const logs = fs.readdirSync(path.join(f.root, ".cache", "hap-app", "logs"));
-  assert.equal(logs.filter(name => name.endsWith("-orca-app.log")).length, 1);
+  const names = logs.filter(name => name.endsWith("-orca-app.log"));
+  assert.equal(names.length, 1);
+  assert.equal(fs.statSync(path.join(f.root, ".cache", "hap-app", "logs", names[0])).mode & 0o777, 0o600);
+});
+
+test('quiet mode filters structured stages and logs retrieves the full output', t => {
+  const f = fixture(t);
+  const r = f.run(["auto-install", "orca-app", "com.example.desktop"],
+    { APP_PROGRESS: "1", APP_LOG_LINE: "download details" });
+  assert.equal(r.status, 0, r.stdout + r.stderr);
+  const output = r.stdout + r.stderr;
+  assert.match(output, /正在生成或刷新调试签名/);
+  assert.doesNotMatch(output, /unknown|unexpected|download details|HAP_APP_STAGE/);
+  const install = f.calls().find(c => c[0] === "orca-app");
+  assert.equal(install[2].progress, "1");
+  const logDir = path.join(f.root, ".cache", "hap-app", "logs");
+  const name = fs.readdirSync(logDir).find(file => file.endsWith("-orca-app.log"));
+  const full = fs.readFileSync(path.join(logDir, name), "utf8");
+  assert.match(full, /download details/);
+  assert.match(full, /HAP_APP_STAGE\tunknown/);
+  assert.match(full, /HAP_APP_STAGE\tprofile\tunexpected/);
+  const logs = f.run(["logs", "orca-app"]);
+  assert.equal(logs.status, 0, logs.stdout + logs.stderr);
+  assert.equal(logs.stdout, full);
+  const list = f.run(["logs"]);
+  assert.match(list.stdout, new RegExp(name));
+  const missing = f.run(["logs", "zcode-app"]);
+  assert.equal(missing.status, 1);
+  assert.match(missing.stderr, /没有 zcode-app 的日志/);
+});
+
+test('verbose streams the app output without enabling progress events', t => {
+  const f = fixture(t);
+  fs.mkdirSync(f.configDir, { recursive: true });
+  fs.writeFileSync(path.join(f.configDir, "config"), "verbose=1\n");
+  const r = f.run(["auto-install", "orca-app", "com.example.desktop"], { APP_PROGRESS: "1" });
+  assert.equal(r.status, 0, r.stdout + r.stderr);
+  const install = f.calls().find(c => c[0] === "orca-app");
+  assert.equal(install[2].progress, "");
+  assert.doesNotMatch(r.stdout + r.stderr, /HAP_APP_STAGE/);
 });
 
 test('verbose streams the app output and keeps it in the log', t => {
@@ -266,6 +315,25 @@ test('install-pending installs the queued apps and empties the queue', t => {
   assert.match(r.stdout, /已装机 com\.example\.desktop（设备 local）/);
   assert.match(r.stdout, /补装完成：1 个成功/);
   assert.deepEqual(f.queued(), []);
+});
+
+test('empty status still shows configuration and log locations', t => {
+  const f = fixture(t);
+  const r = f.run(["status"]);
+  assert.equal(r.status, 0, r.stdout + r.stderr);
+  assert.match(r.stdout, /没有待装的应用/);
+  assert.match(r.stdout, /配置：.*\.config\/hap-app\/config/);
+  assert.match(r.stdout, /日志：.*\.cache\/hap-app\/logs/);
+});
+
+test('hap-app doctor delegates network diagnostics', t => {
+  const f = fixture(t);
+  const r = f.run(["doctor", "--network"]);
+  assert.equal(r.status, 0, r.stdout + r.stderr);
+  assert.match(r.stdout, /app-installer doctor/);
+  const doctor = f.calls().find(c => c[0] === "app-installer" && c[1] === "doctor");
+  assert.ok(doctor);
+  assert.equal(doctor[2], "--network");
 });
 
 test('status lists the queue and forget removes one entry', t => {
@@ -412,6 +480,7 @@ test('queue entries keep the failure detail and the attempt count', t => {
   assert.equal(f.run(["auto-install", "orca-app", "com.example.desktop"],
     { APP_INSTALL_FAIL: "1", APP_FAIL_REASON: "tls", APP_FAIL_DETAIL: "certificate chain" }).status, 0);
   let entry = f.queuedEntry("orca-app");
+  assert.equal(entry.v, 1);
   assert.equal(entry.detail, "certificate chain");
   assert.equal(entry.attempts, 1);
   fs.rmSync(path.join(f.root, ".cache", "hap-app", "tls-blocked"));
@@ -421,6 +490,38 @@ test('queue entries keep the failure detail and the attempt count', t => {
   assert.equal(entry.attempts, 2);
   const r = f.run(["status"]);
   assert.match(r.stdout, /最近失败：certificate chain/);
+});
+
+test('legacy queue entries remain installable', t => {
+  const f = fixture(t);
+  const dir = path.join(f.root, ".cache", "hap-app", "pending");
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, "orca-app.json"), JSON.stringify({
+    command: "orca-app", bundle: "com.example.desktop", reason: "device", attempts: 1,
+  }));
+  const r = f.run(["install-pending"]);
+  assert.equal(r.status, 0, r.stdout + r.stderr);
+  assert.match(r.stdout, /补装完成：1 个成功/);
+  assert.deepEqual(f.queued(), []);
+});
+
+test('future queue entries are neither overwritten nor installed', t => {
+  const f = fixture(t);
+  const dir = path.join(f.root, ".cache", "hap-app", "pending");
+  const file = path.join(dir, "orca-app.json");
+  fs.mkdirSync(dir, { recursive: true });
+  const original = JSON.stringify({ v: 99, command: "orca-app", bundle: "com.example.desktop" }) + "\n";
+  fs.writeFileSync(file, original);
+  const automatic = f.run(["auto-install", "orca-app", "com.example.desktop"]);
+  assert.equal(automatic.status, 0, automatic.stdout + automatic.stderr);
+  assert.match(automatic.stderr, /待装条目格式来自更新版本/);
+  assert.equal(fs.readFileSync(file, "utf8"), original);
+  const status = f.run(["status"]);
+  assert.match(status.stdout, /待装条目格式来自更新版本/);
+  const pending = f.run(["install-pending"]);
+  assert.notEqual(pending.status, 0);
+  assert.match(pending.stderr, /待装条目格式来自更新版本/);
+  assert.equal(fs.readFileSync(file, "utf8"), original);
 });
 
 test('a broken queue entry is kept and reported for forget', t => {

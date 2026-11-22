@@ -4,7 +4,6 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
-const vm = require("node:vm");
 const { spawnSync } = require("node:child_process");
 const AdmZip = require("node:module").createRequire(process.env.DEVECO_CLI_JS)("adm-zip");
 const script = process.env.HAP_INSTALLER_SCRIPT || path.join(__dirname, "app-installer.sh");
@@ -71,7 +70,13 @@ function fixture(t) {
   `);
   tool("param", `console.log('45678');`);
   tool("aa", prelude + `if (process.env.AA_FAIL) process.exit(1);`);
-  const signer = tool("signer", prelude + `if (process.env.SIGN_FAIL) process.exit(3); fs.copyFileSync(args[args.indexOf('--hap')+1], args[args.indexOf('--output')+1]);`);
+  const signer = tool("signer", prelude + `
+    if (args[0] === '--check-decoder') {
+      if (process.env.DECODER_FAIL) { console.error('DevEco CLI decoder layout changed'); process.exit(1); }
+      console.log('DevEco CLI decoder compatible (version 1.3.12)'); process.exit(0);
+    }
+    if (process.env.SIGN_FAIL) process.exit(3);
+    fs.copyFileSync(args[args.indexOf('--hap')+1], args[args.indexOf('--output')+1]);`);
   const hap = path.join(root, "input.hap");
   function manifest(permissions, id = bundle) {
     const zip = new AdmZip();
@@ -137,6 +142,16 @@ test('an offline target never reaches login or upload', t => {
 test('--no-start installs without launching', t => {
   const f=fixture(t); const r=f.run(['--no-start']); assert.equal(r.status,0,r.stdout+r.stderr);
   assert.ok(!f.calls().some(c=>c.join(' ').includes('aa start')));
+});
+test('progress events are opt-in and cover signing and device installation', t => {
+  const f=fixture(t);
+  let r=f.run([],{HAP_APP_PROGRESS:'1'});
+  assert.equal(r.status,0,r.stdout+r.stderr);
+  const stages=r.stdout.split('\n').filter(line=>line.startsWith('HAP_APP_STAGE\t'));
+  assert.deepEqual(stages,['HAP_APP_STAGE\tprofile','HAP_APP_STAGE\tsign','HAP_APP_STAGE\tupload','HAP_APP_STAGE\tinstall']);
+  r=f.run();
+  assert.equal(r.status,0,r.stdout+r.stderr);
+  assert.doesNotMatch(r.stdout+r.stderr,/HAP_APP_STAGE/);
 });
 test('unconfirmed app startup warns without failing installation', t => {
   const f=fixture(t); const r=f.run([],{START_FAIL:'1'}); assert.equal(r.status,0,r.stdout+r.stderr);
@@ -519,6 +534,17 @@ test('a force-stop of a package that is not installed stays quiet', t => {
   assert.doesNotMatch(r.stdout + r.stderr, /10104002|not installed/);
 });
 
+test('doctor preflights the DevEco decoder and explains incompatibility', t => {
+  const f = fixture(t);
+  let r = spawnSync('bash', [script, 'doctor'], { env: f.env, encoding: 'utf8' });
+  assert.equal(r.status, 0, r.stdout + r.stderr);
+  assert.match(r.stdout, /DevEco CLI decoder compatible \(version 1\.3\.12\)/);
+  r = spawnSync('bash', [script, 'doctor'], { env: { ...f.env, DECODER_FAIL: '1' }, encoding: 'utf8' });
+  assert.equal(r.status, 1);
+  assert.match(r.stdout + r.stderr, /DevEco CLI decoder layout changed/);
+  assert.match(r.stdout + r.stderr, /upgrade app-installer|--keystore/);
+});
+
 test('doctor reports the configured TLS CA', t => {
   const f = fixture(t);
   const ca = path.join(f.root, 'ca.pem');
@@ -552,49 +578,4 @@ test('doctor --network reports an untrusted certificate chain', t => {
   });
   assert.match(r.stdout + r.stderr, /TLS trust probe/);
   assert.match(r.stdout + r.stderr, /tls_ca=/);
-});
-
-// The DevEco CLI is minified: the decoder class name and its path/crypto/fs/log
-// aliases change between releases (Rs/W/Um/we in 1.3.10, Os/V/Jm/ye in 1.3.12).
-const signer = require(path.join(__dirname, 'sign-hap.cjs'));
-const renamed = [
-  { cls: 'Rs', path: 'W', crypto: 'Um', fs: 'we', log: 'm' },
-  { cls: 'Os', path: 'V', crypto: 'Jm', fs: 'ye', log: 'm' },
-  { cls: 'Zq', path: 'a$', crypto: 'Kb', fs: 'Lc', log: 'dbg' },
-];
-function decoderSource(n) {
-  return `import"x";var ${n.cls}=class n{static decryptPwd(e,t,r){${n.log}(\`[DecipherUtil] \${r}\`);` +
-    `return ${n.path}.resolve(e,"material")+"|"+${n.fs}.statSync("/").isDirectory()+"|"+` +
-    `${n.crypto}.pbkdf2Sync("p","s",1,4,"sha256").length}};export{n as x};`;
-}
-function decode(source) {
-  const cls = signer.extractDecoderClass(source);
-  return vm.runInNewContext(`(${cls})`, { Buffer, Int8Array, ...signer.decoderGlobals(cls) })
-    .decryptPwd('/cfg', 'x', 'storePassword');
-}
-function refuses(source, pattern) {
-  const sign = JSON.stringify(path.join(__dirname, 'sign-hap.cjs'));
-  const r = spawnSync(process.execPath, ['-e',
-    `const s=require(${sign});s.decoderGlobals(s.extractDecoderClass(${JSON.stringify(source)}));`], { encoding: 'utf8' });
-  assert.equal(r.status, 1);
-  assert.match(r.stderr, pattern);
-}
-
-test('the signing decoder follows the minified class and alias names', () => {
-  for (const names of renamed) assert.equal(decode(decoderSource(names)), '/cfg/material|true|4', names.cls);
-});
-
-test('the signing decoder refuses a layout it cannot identify', () => {
-  refuses('var a=class n{};', /decoder is missing/);
-  refuses('var a=class n{};var b={};static decryptPwd(', /does not contain decryptPwd/);
-  refuses('var a=class n{static decryptPwd(e){m(`[DecipherUtil]`);return A.resolve(e)+B.join(e)+C.pbkdf2Sync()+D.statSync()}}',
-    /path alias is ambiguous/);
-});
-
-test('the shipped DevEco CLI decoder runs with the derived aliases', { skip: !process.env.DEVECO_CLI_JS }, () => {
-  const cls = signer.extractDecoderClass(fs.readFileSync(process.env.DEVECO_CLI_JS, 'utf8'));
-  const decoder = vm.runInNewContext(`(${cls})`, { Buffer, Int8Array, ...signer.decoderGlobals(cls) });
-  // Reaching the file system proves every alias is bound; a stale alias throws ReferenceError instead.
-  assert.throws(() => decoder.decryptPwd('/nonexistent-deveco-config', 'ab'.repeat(20), 'storePassword'),
-    { code: 'ENOENT' });
 });
