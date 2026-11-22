@@ -53,7 +53,8 @@ Usage: orca-app <command>
                       a pre-written host config, --no-serve only installs,
                       --no-acl installs the strong-sandbox variant, and --keep
                       keeps the signed HAP and prints where).
-  start               Open the installed app; it starts the runtime server
+  start [--device ID]
+                      Open the installed app; it starts the runtime server
                       itself when none is running.
   serve [--port N] [--reclaim]
                       Start a host-side runtime server for browser/CLI use (the
@@ -64,6 +65,9 @@ Usage: orca-app <command>
                       the terminal app was updated (see the failure message).
   status              Show whether the host-side runtime server is healthy.
   stop                Stop the host-side server.
+  uninstall [--device ID] [--purge]
+                      Uninstall the app from the device. The default keeps the
+                      app's data; --purge also deletes it.
   pair                Print the host-side server's browser URL again.
 EOF
 }
@@ -442,11 +446,42 @@ cmd_serve() {
 }
 
 cmd_start() {
+  local device_id=""
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --device)
+        [ $# -ge 2 ] || die "--device needs an id"
+        device_id="$2"; shift 2 ;;
+      *) die "unknown start option: $1" ;;
+    esac
+  done
   device
   # The shell spawns the runtime server on launch; the host-side serve/status
   # commands are only for using Orca from a browser or the CLI.
-  "$HDC" shell aa start -a EntryAbility -b "$BUNDLE_ID" -m electron >/dev/null
+  local target=()
+  [ -n "$device_id" ] && target=(-t "$device_id")
+  "$HDC" "${target[@]}" shell aa start -a EntryAbility -b "$BUNDLE_ID" -m electron >/dev/null
   printf 'orca-app: opened %s\n' "$BUNDLE_ID"
+}
+
+# Uninstall through app-installer so the data-handling matches every other
+# desktop app: `bm uninstall -k` keeps the app's data unless --purge is given.
+cmd_uninstall() {
+  local purge="" device_id=""
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --purge) purge=1; shift ;;
+      --device)
+        [ $# -ge 2 ] || die "--device needs an id"
+        device_id="$2"; shift 2 ;;
+      *) die "unknown uninstall option: $1" ;;
+    esac
+  done
+  device_id="${device_id:-${HDC_TARGET:-}}"
+  local args=(uninstall --bundle-id "$BUNDLE_ID")
+  [ -n "$device_id" ] && args+=(--device "$device_id")
+  [ "$purge" = 1 ] && args+=(--purge)
+  app-installer "${args[@]}"
 }
 
 cmd_status() {
@@ -535,6 +570,7 @@ case "${1:-}" in
   start) shift; cmd_start "$@" ;;
   status) shift; cmd_status "$@" ;;
   stop) shift; cmd_stop "$@" ;;
+  uninstall) shift; cmd_uninstall "$@" ;;
   pair) shift; cmd_pair "$@" ;;
   -h|--help|help) usage ;;
   "") usage >&2; exit 2 ;;
