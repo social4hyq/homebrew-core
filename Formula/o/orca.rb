@@ -11,9 +11,9 @@ class Orca < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/orca-v1.4.267-r3"
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1c3232ae0882f664883b639793fadb9505100e361fe598dc90d43879979a668f"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/orca-v1.4.267-r4"
+    rebuild 3
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d5094d2a20a1134b7403ee34f168be013486f6b99a668b5c35a5c6fac2267aac"
   end
 
   depends_on "bun" => :build
@@ -68,7 +68,7 @@ class Orca < Formula
   # publication and its data-root ownership check. The patches add fallbacks
   # only used on openharmony.
   patch_root = Pathname(__dir__).parent.parent
-  Dir[(patch_root/"Patches/orca/0001-ohos-runtime/*.patch").to_s].each do |path|
+  Dir[(patch_root/"Patches/orca/ohos/*.patch").to_s].each do |path|
     patch do
       file Pathname(path).relative_path_from(patch_root).to_s
     end
@@ -132,7 +132,7 @@ class Orca < Formula
       (lightningcss_dir/"wasm").install Dir["*"]
     end
     system "patch", "-p1", "-d", lightningcss_dir,
-           "-i", tap_root/"Patches/orca/0002-lightningcss-wasm-loader.patch"
+           "-i", tap_root/"Patches/orca/lightningcss/node_index.js.patch"
 
     # The CLI and web builds stamp the source commit (installed skills pin to it),
     # and a release tarball carries no history: give the build one empty commit.
