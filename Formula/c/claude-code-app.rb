@@ -6,7 +6,7 @@ class ClaudeCodeApp < Formula
   version "6.28899.6"
   sha256 "239c20d218456cacc656d48382fd59116325ac679aa4e476377af1456ac85715"
   license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
-  revision 1
+  revision 2
 
   livecheck do
     url "https://downloads.claude.ai/claude-desktop/apt/stable/dists/stable/main/binary-arm64/Packages"
@@ -14,8 +14,8 @@ class ClaudeCodeApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-app-v6.28899.6-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3b96a9f56e78e61042822a6a7a709855c9d23fde6a0723954ffaed9553fc7953"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-app-v6.28899.6-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "422c35cfd001632cc07403528b80a57a6fb51350ee527971733559f6320b5463"
   end
 
   depends_on "app-installer"
@@ -170,7 +170,7 @@ class ClaudeCodeApp < Formula
       "$PATH",
     ].join(":")
     (bin/"claude-code-app").write_env_script libexec/"claude-code-app.sh",
-      CLAUDE_CODE_APP_HDC:            formula_opt_prefix("ohos-sdk-toolchains")/"hdc",
+      CLAUDE_CODE_APP_HDC_DEFAULT:    formula_opt_prefix("ohos-sdk-toolchains")/"hdc",
       CLAUDE_CODE_APP_INSTALL_SCRIPT: pkgshare/"install-desktop.sh",
       CLAUDE_CODE_APP_UNSIGNED_HAP:   libexec/"claude-code-shell-unsigned.hap",
       CLAUDE_CODE_APP_VENDOR_JSON:    libexec/"vendor.json",
@@ -199,6 +199,8 @@ class ClaudeCodeApp < Formula
       The app needs the host `claude-code.latest` CLI installed and logged in;
       install injects the host paths into a private signed HAP, and ACL permissions
       let it spawn the CLI. `claude-code-app start` opens the app.
+      `claude-code-app uninstall` removes the app but keeps its data; only
+      `claude-code-app uninstall --purge` deletes the app data.
     EOS
   end
 
@@ -212,6 +214,53 @@ class ClaudeCodeApp < Formula
     system "python3", pkgshare/"assemble-local-hap.py", "--help"
     assert_match "input_hap output_hap",
                  shell_output("python3 #{pkgshare}/patch-code-runtime-hap.py --help")
+
+    # The CLI matrix: start/stop/status address the device; uninstall goes
+    # through app-installer and keeps the app's data unless --purge is given.
+    fake_bin = testpath/"cli-bin"
+    fake_bin.mkpath
+    hdc_log = testpath/"cli-hdc-log"
+    (fake_bin/"hdc").write <<~SH
+      #!/bin/sh
+      printf '%s\\n' "$*" >> #{hdc_log}
+      if [ "$1" = "shell" ] && [ "$2" = "ps -ef" ]; then
+        [ -n "${FAKE_STOPPED:-}" ] ||
+          printf '%s\\n' "a com.social4hyq.claudecode" "b com.other.app"
+      fi
+    SH
+    chmod 0755, fake_bin/"hdc"
+    installer_args = testpath/"cli-installer-args"
+    (fake_bin/"app-installer").write <<~SH
+      #!/bin/sh
+      printf '%s\\n' "$@" > #{installer_args}
+    SH
+    chmod 0755, fake_bin/"app-installer"
+    cli_env = {
+      "CLAUDE_CODE_APP_HDC"       => fake_bin/"hdc",
+      "CLAUDE_CODE_APP_INSTALLER" => fake_bin/"app-installer",
+      "PATH"                      => "#{fake_bin}:#{ENV.fetch("PATH")}",
+    }
+    with_env(cli_env) do
+      shell_output("#{bin}/claude-code-app start --device tablet-1")
+      assert_match "-t tablet-1 shell aa start", (testpath/"cli-hdc-log").read
+      shell_output("#{bin}/claude-code-app stop")
+      assert_match "shell aa force-stop com.social4hyq.claudecode", (testpath/"cli-hdc-log").read
+      assert_match "running", shell_output("#{bin}/claude-code-app status")
+      with_env("FAKE_STOPPED" => "1") do
+        assert_match "not running", shell_output("#{bin}/claude-code-app status 2>&1", 1)
+      end
+      shell_output("#{bin}/claude-code-app uninstall --purge --device tablet-1")
+      assert_equal %w[uninstall --bundle-id com.social4hyq.claudecode --device tablet-1 --purge],
+                   installer_args.read.lines(chomp: true)
+      shell_output("#{bin}/claude-code-app uninstall")
+      assert_equal %w[uninstall --bundle-id com.social4hyq.claudecode], installer_args.read.lines(chomp: true)
+    end
+    with_env({ "HDC_TARGET" => "env-device" }.merge(cli_env)) do
+      shell_output("#{bin}/claude-code-app uninstall")
+    end
+    assert_equal %w[uninstall --bundle-id com.social4hyq.claudecode --device env-device],
+                 installer_args.read.lines(chomp: true)
+    assert_match "uninstall", shell_output("#{bin}/claude-code-app --help")
 
     test_sources = testpath/"claude-code-app-tests"
     test_sources.mkpath
