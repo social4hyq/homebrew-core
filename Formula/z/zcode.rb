@@ -15,9 +15,9 @@ class Zcode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-v3.18.2-r4"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3542acf7e2c4425d2fef1b6029ffa90acc4bf1f51881f6b8534a050b4256746a"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-v3.18.2-r5"
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8f7881e7d5888a6030bd3cbc2e7eefd3265aa026a792a0ad9994318a2d35fc8a"
   end
 
   depends_on "node" => :build
@@ -25,24 +25,8 @@ class Zcode < Formula
   depends_on "python@3.14" => :build
   depends_on "bun"
 
-  patch do
-    file "Patches/zcode/0001-ohos-sea-targets.patch"
-  end
-
-  patch do
-    file "Patches/zcode/0002-bun-node-sea-guards.patch"
-  end
-
-  patch do
-    file "Patches/zcode/0003-ohos-skip-desktop-electron-runtime.patch"
-  end
-
-  patch do
-    file "Patches/zcode/0004-web-login-server-oauth.patch"
-  end
-
   patch_root = Pathname(__dir__).parent.parent
-  Dir[(patch_root/"Patches/zcode/0005-ohos-frozen-lockfile/*.patch").to_s].each do |path|
+  Dir[(patch_root/"Patches/zcode/*.patch").to_s].each do |path|
     patch do
       file Pathname(path).relative_path_from(patch_root).to_s
     end
