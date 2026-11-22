@@ -9,7 +9,7 @@ class ZcodeApp < Formula
   # Tap-authored shell scripts (MIT) on the CPF-Electron runtime (mixed
   # MIT/BSD/LGPL).
   license :cannot_represent
-  revision 24
+  revision 25
 
   livecheck do
     url "https://raw.githubusercontent.com/zai-org/ZCode/main/package.json"
@@ -19,8 +19,8 @@ class ZcodeApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-app-v3.18.2-r29"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "928a26f936dc22631f098d4d2ef904ea87ece78a5cdf0019b5fea56db9ae0339"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-app-v3.18.2-r30"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4eb978afd5f58b1433f35950a56ff6467069db8216080378c804932b02bbcbe9"
   end
 
   depends_on "app-installer"
@@ -47,6 +47,7 @@ class ZcodeApp < Formula
     Resources/zcode-app/assets/tray-icon.png
     Resources/zcode-app/scripts/install-desktop.sh
     Resources/zcode-app/scripts/zcode-desktop.sh
+    Resources/zcode-app/tests/close-handler.test.cjs
     Resources/zcode-app/tests/lifecycle.test.cjs
     Resources/zcode-app/tests/tray.test.cjs
   ].freeze
@@ -122,8 +123,11 @@ class ZcodeApp < Formula
                     ],
               JSON5
 
-    # windowStageClose hides the ability and cancels the close so the window
-    # goes to the tray; the tray quit calls app.exit() to bypass that handler.
+    # windowStageClose hides the ability and returns true, which tells the system
+    # not to close the window, so the window goes to the tray. Returning false let
+    # the system close it right after the hide: the ability's session was destroyed
+    # and the whole app was killed and relaunched. The tray quit calls app.exit()
+    # to bypass this handler.
     close_handler = [
       "    super.onWindowStageCreate(windowStage);",
       "    try {",
@@ -133,7 +137,7 @@ class ZcodeApp < Formula
       "        }",
       "        const widgetId = Number(this.xcomponentId.substring(ConfigData.WINDOW_PREFIX.length));",
       "        Inject.getOrCreate(AppWindowAdapter).hideWindow(widgetId);",
-      "        return false;",
+      "        return true;",
       "      });",
       "    } catch (exception) {",
       "      LogUtil.error(TAG, 'Failed to register window close handler: ' + JSON.stringify(exception));",
@@ -385,6 +389,7 @@ class ZcodeApp < Formula
     system "node", "--check", tap_root/"Resources/zcode-app/app/main.cjs"
     system "node", "--test", tap_root/"Resources/zcode-app/tests/lifecycle.test.cjs"
     system "node", "--test", tap_root/"Resources/zcode-app/tests/tray.test.cjs"
+    system "node", "--test", tap_root/"Resources/zcode-app/tests/close-handler.test.cjs"
     waiting_source = shell_output("unzip -p #{hap} resources/resfile/resources/app/waiting.html")
     assert_match "zcode-app status", waiting_source
     refute_match "{{", waiting_source
