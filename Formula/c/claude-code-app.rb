@@ -1,12 +1,11 @@
 class ClaudeCodeApp < Formula
   desc "Claude Code Desktop shell for OpenHarmony/HarmonyOS PC"
   homepage "https://code.claude.com/docs/en/desktop-linux"
-  url "https://downloads.claude.ai/claude-desktop/apt/stable/pool/main/c/claude-desktop/claude-desktop_6.28899.2_arm64.deb",
+  url "https://downloads.claude.ai/claude-desktop/apt/stable/pool/main/c/claude-desktop/claude-desktop_6.28899.6_arm64.deb",
       using: :nounzip
-  version "6.28899.2"
-  sha256 "7ec2a354ecb8bafae3e3ccafe620144232b7429b216ab59a05a0d6cc340f1455"
+  version "6.28899.6"
+  sha256 "239c20d218456cacc656d48382fd59116325ac679aa4e476377af1456ac85715"
   license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
-  revision 2
 
   livecheck do
     url "https://downloads.claude.ai/claude-desktop/apt/stable/dists/stable/main/binary-arm64/Packages"
@@ -14,9 +13,8 @@ class ClaudeCodeApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-app-v6.28899.2-r4"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b19eb071604989bc7a1dfcab3097949107f4e07e34c9c0f40cb8a704ed65084d"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-app-v6.28899.6-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "13df7ef14725f330961e34120531644093a3dada5573a377bb68541a2cc8b361"
   end
 
   depends_on "app-installer"
