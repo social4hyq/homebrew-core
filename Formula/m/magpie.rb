@@ -4,6 +4,7 @@ class Magpie < Formula
   url "https://github.com/yetone/magpie/archive/refs/tags/v0.1.4661.tar.gz"
   sha256 "eacabbef905695537e60b7ed41271a2c89c9f83014d4817ab3cf8aba6379dd42"
   license "MIT"
+  revision 1
 
   livecheck do
     url :stable
@@ -22,12 +23,37 @@ class Magpie < Formula
     file "Patches/magpie/0001-open-browser-on-openharmony.patch"
   end
 
+  # The unused-resource audit requires literal tap paths.
+  RESOURCE_FILES = %w[
+    Resources/magpie/magpie-web.js
+    Resources/magpie/magpie.sh
+    Resources/magpie/tests/fake-magpie.js
+    Resources/magpie/tests/web-registry.test.js
+  ].freeze
+
   def install
+    tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
+    RESOURCE_FILES.each { |file| odie "missing tap resource: #{file}" unless (tap_root/file).exist? }
+
     ENV["CGO_ENABLED"] = "0"
     system "go", "build", *std_go_args(output: libexec/"bin/magpie", ldflags: "-s -w -X main.version=#{version}"),
            "-tags=nogui", "."
-    (bin/"magpie").write_env_script libexec/"bin/magpie",
-                                    MAGPIE_BUN: "${MAGPIE_BUN:-#{formula_opt_bin("bun")}/bun}"
+    # `magpie web` runs through magpie-web.js, which records the page's port and key for
+    # the Magpie desktop app; every other command is the binary itself.
+    libexec.install tap_root/"Resources/magpie/magpie.sh", tap_root/"Resources/magpie/magpie-web.js"
+    chmod 0755, libexec/"magpie.sh"
+    (bin/"magpie").write_env_script libexec/"magpie.sh",
+                                    MAGPIE_BUN:  "${MAGPIE_BUN:-#{formula_opt_bin("bun")}/bun}",
+                                    MAGPIE_REAL: libexec/"bin/magpie"
+  end
+
+  def caveats
+    <<~EOS
+      `magpie web` records where its page listens and the key of its link in
+      `~/.config/magpie-app/web.json` and `web-key` (removed when it ends), so the
+      Magpie desktop app (magpie-app) opens the same page instead of starting its own.
+      A second `magpie web` with no options prints that page's link.
+    EOS
   end
 
   test do
@@ -35,6 +61,9 @@ class Magpie < Formula
     ENV["XDG_CACHE_HOME"] = testpath/"cache"
     ENV["XDG_DATA_HOME"] = testpath/"data"
     assert_match "magpie #{version}", shell_output("#{bin}/magpie --version")
+    tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
+    system formula_opt_bin("bun")/"bun", "test", tap_root/"Resources/magpie/tests"
+    assert_path_exists libexec/"magpie-web.js"
     system bin/"magpie", "settings", "set", "lang", "ja"
     assert_equal "ja", shell_output("#{bin}/magpie settings get lang").strip
 
