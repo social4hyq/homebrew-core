@@ -1,156 +1,69 @@
 #!/usr/bin/env bash
-# opencode-desktop: manage the local opencode serve instance backing the
-# OpenCode desktop shell HAP, open the app, and install the HAP.
+# opencode-desktop: manage the opencode background service the OpenCode desktop
+# shell HAP connects to, open the app, and install the HAP.
+#
+# The service is the one `opencode` itself runs for the terminal
+# (`opencode service`): the TUI, `opencode run` and the desktop shell all talk
+# to the same process, so they see the same sessions. The shell reads the
+# address and password from the service's state file; nothing is configured here.
 set -euo pipefail
 
-CONFIG_DIR="${HOME:?HOME must be set}/.config/opencode-desktop"
-# Permissions of this directory. The device keeps $HOME on its shared hmdfs
-# mount, where chmod is a no-op: it returns 0 and changes nothing, so the
-# `chmod 700` calls below only take effect on ordinary file systems. hmdfs also
-# ignores the mode a program asks for: a new directory is 2771 (a file 660)
-# minus the umask, and it takes its owner from the parent directory. Do not try
-# to make this directory private by creating it under `umask 077`. Under a
-# directory owned by the synthetic uid 20001006 (HOME, ~/.config, ~/.tmp) that
-# gives mode 2700 owned by 20001006, and nobody can write to it: not the user
-# who created it and not the app's own uid, so install, serve, the pid file and
-# the log would all fail with EACCES. (Under a directory owned by the creating
-# user's own uid, such as ~/.cache on this device, a 2700 directory is usable by
-# its owner and closed to every other uid.) Files are different: a file created
-# under `umask 077` (mode 600) in the usual 2771 directory is read and written
-# normally by the terminal and by the app.
-CONFIG_FILE="$CONFIG_DIR/config.json"
-PID_FILE="$CONFIG_DIR/serve.pid"
-LOG_FILE="$CONFIG_DIR/serve.log"
-DEFAULT_PORT=14199
 BUNDLE_ID="com.social4hyq.opencodedesktop"
 MODULE="electron"
 ABILITY="EntryAbility"
+# Overridable so tests never touch a real service.
+OPENCODE="${OPENCODE_DESKTOP_OPENCODE:-opencode}"
 
 usage() {
   cat <<'EOF'
 Usage: opencode-app <command>
 
 Commands:
-  start     Open the desktop app (it starts the backend itself when installed
-            with the weak-sandbox ACL; needs hdc and an unlocked device)
-    --serve-only  Only ensure the backend (for shell startup files)
-  serve     Start the backing `opencode serve` instance (background) if needed
-  stop      Stop the CLI-managed backing instance
-  status    Show whether the backing instance is healthy
-  install   Inject config/host env, sign and install the desktop HAP
+  start     Open the desktop app (it starts the background service itself when
+            installed with the weak-sandbox ACL; needs hdc and an unlocked device)
+    --serve-only  Only ensure the background service (for shell startup files)
+  serve     Start the opencode background service if it is not running
+  stop      Stop the opencode background service (the terminal's `opencode`
+            and the desktop app both use it; running sessions end)
+  status    Show whether the background service is healthy
+  install   Inject host env, sign and install the desktop HAP
   -h, --help  Show this help
 EOF
 }
 
-port_busy() {
-  (exec 3<>"/dev/tcp/127.0.0.1/$1") 2>/dev/null && { exec 3>&- 3<&-; return 0; } || return 1
+# The state file `opencode service` writes: {"url", "password", "pid", ...}.
+state_file() {
+  printf '%s/opencode/service.json' "${XDG_STATE_HOME:-${HOME:?HOME must be set}/.local/state}"
 }
 
-ensure_config() {
-  mkdir -p "$CONFIG_DIR"
-  # No-op on hmdfs, see the note above CONFIG_FILE; kept for ordinary file systems.
-  chmod 700 "$CONFIG_DIR" 2>/dev/null || true
-  if [[ ! -f "$CONFIG_FILE" ]]; then
-    local port="$DEFAULT_PORT"
-    local tries=0
-    while port_busy "$port"; do
-      port=$((port + 1))
-      tries=$((tries + 1))
-      if ((tries > 30)); then
-        printf 'opencode-desktop: no free loopback port near %s\n' "$DEFAULT_PORT" >&2
-        exit 1
-      fi
-    done
-    local password
-    password="$(head -c 24 /dev/urandom | od -An -tx1 | tr -d ' \n')"
-    (umask 077; printf '{"port":%s,"password":"%s"}\n' "$port" "$password" > "$CONFIG_FILE")
-    printf 'opencode-desktop: wrote %s (port %s)\n' "$CONFIG_FILE" "$port" >&2
-  fi
-}
-
-read_config() {
-  ensure_config
-  PORT="$(sed -n 's/.*"port":\([0-9][0-9]*\).*/\1/p' "$CONFIG_FILE")"
-  PASSWORD="$(sed -n 's/.*"password":"\([^"]*\)".*/\1/p' "$CONFIG_FILE")"
-  if [[ -z "$PORT" || -z "$PASSWORD" ]]; then
-    printf 'opencode-desktop: cannot parse %s\n' "$CONFIG_FILE" >&2
-    exit 1
-  fi
+json_field() {
+  sed -n "s/.*\"$1\":\"\([^\"]*\)\".*/\1/p" "$(state_file)" 2>/dev/null | head -n 1
 }
 
 healthy() {
-  local auth
-  auth="$(printf 'opencode:%s' "$PASSWORD" | base64)"
-  [[ "$(curl -s -o /dev/null -w '%{http_code}' -m 3 -H "Authorization: Basic $auth" "http://127.0.0.1:$PORT/api/config" 2>/dev/null)" == "200" ]]
+  local url password
+  url="$(json_field url)"
+  password="$(json_field password)"
+  [[ -n "$url" && -n "$password" ]] || return 1
+  [[ "$(curl -s -o /dev/null -w '%{http_code}' -m 3 -u "opencode:$password" "$url/api/config" 2>/dev/null)" == "200" ]]
 }
 
-# Prints the command line of a live pid, empty if the pid is gone.
-# /proc is authoritative on both OHOS and the CI container; ps is only a
-# fallback because busybox/procps flavours differ in flag support.
-proc_args() {
-  local pid="$1"
-  if [[ -r "/proc/$pid/cmdline" ]]; then
-    tr '\0' ' ' < "/proc/$pid/cmdline" 2>/dev/null || true
-    return 0
-  fi
-  ps -eo pid,args 2>/dev/null | awk -v pid="$pid" '$1 == pid { $1 = ""; sub(/^ +/, ""); print; exit }'
-}
-
-# A pidfile may point at a recycled pid; only treat it as ours when the
-# process is alive AND its command line is the serve instance we manage.
-is_managed_serve() {
-  local pid="$1" args
-  [[ -n "$pid" ]] || return 1
-  kill -0 "$pid" 2>/dev/null || return 1
-  args="$(proc_args "$pid")"
-  [[ "$args" == *"opencode serve"* ]]
-}
-
-wait_gone() {
-  local pid="$1" n=0
-  while kill -0 "$pid" 2>/dev/null && ((n < 25)); do
-    sleep 0.2
-    n=$((n + 1))
-  done
-}
-
-# Idempotently bring up the managed serve instance.
 ensure_serve() {
-  read_config
-  if healthy; then
-    printf 'opencode-desktop: server already healthy at http://127.0.0.1:%s\n' "$PORT"
-    return 0
-  fi
-  if [[ -f "$PID_FILE" ]]; then
-    local stale_pid
-    stale_pid="$(cat "$PID_FILE" 2>/dev/null || true)"
-    if is_managed_serve "$stale_pid"; then
-      printf 'opencode-desktop: stale server process (pid %s) is not responding; stopping it\n' "$stale_pid" >&2
-      kill "$stale_pid" 2>/dev/null || true
-      wait_gone "$stale_pid"
-    fi
-    rm -f "$PID_FILE"
-  fi
-  if port_busy "$PORT"; then
-    printf 'opencode-desktop: port %s is in use by another process; edit %s to pick another port\n' "$PORT" "$CONFIG_FILE" >&2
+  if ! command -v "$OPENCODE" >/dev/null 2>&1; then
+    printf 'opencode-desktop: opencode not found\n' >&2
     exit 1
   fi
-  OPENCODE_SERVER_PASSWORD="$PASSWORD" nohup opencode serve --hostname 127.0.0.1 --port "$PORT" >>"$LOG_FILE" 2>&1 &
-  echo $! > "$PID_FILE"
-  local waited=0
-  until healthy; do
-    sleep 1
-    waited=$((waited + 1))
-    if ((waited > 20)); then
-      printf 'opencode-desktop: server did not become healthy; see %s\n' "$LOG_FILE" >&2
-      exit 1
-    fi
-  done
-  printf 'opencode-desktop: serving at http://127.0.0.1:%s (log: %s)\n' "$PORT" "$LOG_FILE"
+  # Idempotent: prints the address when the service is already running.
+  "$OPENCODE" service start >/dev/null
+  if ! healthy; then
+    printf 'opencode-desktop: the background service did not become healthy; run: opencode service status\n' >&2
+    exit 1
+  fi
+  printf 'opencode-desktop: serving at %s\n' "$(json_field url)"
 }
 
-# Bring up the app; the shell starts the backend itself on launch (ACL
-# install). --serve-only keeps a CLI-managed backend for shell startup files.
+# Bring up the app; the shell starts the service itself on launch (ACL
+# install). --serve-only keeps a CLI-started service for shell startup files.
 cmd_start() {
   local serve_only=0
   while (($#)); do
@@ -178,27 +91,17 @@ cmd_start() {
 }
 
 cmd_stop() {
-  local pid=""
-  if [[ -f "$PID_FILE" ]]; then
-    pid="$(cat "$PID_FILE" 2>/dev/null || true)"
-  fi
-  if is_managed_serve "$pid"; then
-    kill "$pid" 2>/dev/null || true
-    wait_gone "$pid"
-    rm -f "$PID_FILE"
-    printf 'opencode-desktop: stopped\n'
-  else
-    rm -f "$PID_FILE"
-    printf 'opencode-desktop: no managed server running\n'
-  fi
+  # The desktop app never stops the service when it quits, so this is the one
+  # place that does.
+  "$OPENCODE" service stop >/dev/null
+  printf 'opencode-desktop: stopped\n'
 }
 
 cmd_status() {
-  read_config
   if healthy; then
-    printf 'opencode-desktop: healthy at http://127.0.0.1:%s\n' "$PORT"
+    printf 'opencode-desktop: healthy at %s\n' "$(json_field url)"
   else
-    printf 'opencode-desktop: server not healthy at http://127.0.0.1:%s\n' "$PORT" >&2
+    printf 'opencode-desktop: background service not healthy; run: opencode-app serve\n' >&2
     exit 1
   fi
 }
@@ -206,12 +109,8 @@ cmd_status() {
 cmd_install() {
   : "${OPENCODE_DESKTOP_UNSIGNED_HAP:?opencode-desktop formula did not set the unsigned HAP path}"
   : "${OPENCODE_DESKTOP_INSTALL_SCRIPT:?opencode-desktop formula did not set the install script path}"
-  # A fresh machine has no config yet; the installer needs port/password and
-  # install no longer starts the backend first.
-  ensure_config
   exec bash "$OPENCODE_DESKTOP_INSTALL_SCRIPT" \
-    --hap "$OPENCODE_DESKTOP_UNSIGNED_HAP" \
-    --config "$CONFIG_FILE" "$@"
+    --hap "$OPENCODE_DESKTOP_UNSIGNED_HAP" "$@"
 }
 
 case "${1:-}" in

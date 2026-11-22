@@ -1,11 +1,12 @@
 class OpencodeApp < Formula
-  desc "Desktop shell for the OpenCode agent (Electron window on local opencode serve)"
+  desc "Desktop shell for the OpenCode agent (Electron window on opencode service)"
   homepage "https://opencode.ai"
   url "https://github.com/anomalyco/opencode/archive/refs/tags/v2.3.2.tar.gz"
   sha256 "de809cbf853ad98374961c525bd124e3e86bd285264b69fae53943a6e2dcdd5d"
   # Tap-authored shell sources (MIT) on the CPF-Electron runtime (mixed
   # MIT/BSD/LGPL).
   license :cannot_represent
+  revision 1
 
   livecheck do
     url :stable
@@ -14,9 +15,8 @@ class OpencodeApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-app-v2.3.2-r2"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0a5429cfa077b2a2f43a95ac44877ca871772772abd15d17e87b6bf610637c26"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-app-v2.3.2-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bc46f22f3e036a17ebeae75a48151f6b58bf57be7eeed53b83d4d9093131c396"
   end
 
   depends_on "app-installer"
@@ -200,11 +200,14 @@ class OpencodeApp < Formula
       `hap-app status`, then run `hap-app install-pending`.
       Manual install: `opencode-app install`. See docs/hap-app-formulae.md.
 
-      The shell starts its own `opencode serve` on launch and shares the TUI
-      sessions; the weak-sandbox ACLs (CUSTOM_SANDBOX, READ_WRITE_USER_FILE) come
-      from the local debug profile. READ_PASTEBOARD enables paste and the kernel ACLs
-      keep WebAssembly/markdown rendering. `--no-acl` installs the strong-sandbox HAP
-      and waits for `opencode-app serve`.
+      The shell connects to the background service that `opencode` runs for the
+      terminal (`opencode service`), so the TUI and the app show the same sessions.
+      It starts that service on launch when it is not running and never stops it:
+      tasks keep running after the app is closed. `opencode-app stop` (or
+      `opencode service stop`) stops it. The weak-sandbox ACLs (CUSTOM_SANDBOX,
+      READ_WRITE_USER_FILE) come from the local debug profile. READ_PASTEBOARD
+      enables paste and the kernel ACLs keep WebAssembly/markdown rendering.
+      `--no-acl` installs the strong-sandbox HAP and waits for `opencode-app serve`.
     EOS
   end
 
@@ -249,17 +252,19 @@ class OpencodeApp < Formula
     ENV.delete("XDG_STATE_HOME")
     assert_match "installed", shell_output("#{bin}/opencode-app install")
     config = JSON.parse(shell_output("unzip -p #{injected_copy} resources/resfile/resources/app/config.json"))
-    assert_operator config.fetch("port"), :>, 0
-    refute_empty config.fetch("password")
     refute_empty config.fetch("opencode")
+    # The service address and password are read from its state file at run
+    # time, never baked into the HAP.
+    refute_includes config.keys, "port"
+    refute_includes config.keys, "password"
     assert_equal Dir.home, config.dig("host", "home")
-    # XDG values reach the shell unchanged, so the spawned server reads the
-    # terminal's config (an unset one is "").
+    # XDG values reach the shell unchanged, so the service it starts and the
+    # state file it reads match the terminal's (an unset one is "").
     assert_equal "/opencode-xdg-test/config", config.dig("host", "xdgConfig")
     assert_equal "/opencode-xdg-test/data", config.dig("host", "xdgData")
     assert_equal "", config.dig("host", "xdgState")
-    # Only this install runs with the test's XDG paths; the service below must
-    # see the test environment.
+    # Only this install runs with the test's XDG paths; the service commands
+    # below must see the test environment.
     saved_xdg.each { |key, value| ENV[key] = value }
     acl_module = JSON.parse(shell_output("unzip -p #{injected_copy} module.json"))
     acl_requested = acl_module.fetch("module").fetch("requestPermissions")
@@ -288,9 +293,51 @@ class OpencodeApp < Formula
     assert_match "signed HAP kept", kept_output
     assert_path_exists keep_tmp/"opencode-app-signed.hap"
 
-    assert_match "serving at", shell_output("#{bin}/opencode-app serve")
-    assert_match "healthy", shell_output("#{bin}/opencode-app status")
-    assert_match "stopped", shell_output("#{bin}/opencode-app stop")
+    # The service commands run against a fake `opencode` that only records its
+    # arguments and a small server that answers like the real service, so the
+    # test never touches (or collides with) a service running on this machine.
+    calls = testpath/"opencode-calls"
+    (fake_bin/"opencode").write <<~SH
+      #!/bin/sh
+      printf '%s\\n' "$*" >> #{calls}
+    SH
+    chmod 0755, fake_bin/"opencode"
+    ENV["OPENCODE_DESKTOP_OPENCODE"] = (fake_bin/"opencode").to_s
+    state_dir = Pathname.new(Dir.home)/".local/state/opencode"
+    state_dir.mkpath
+    state_file = state_dir/"service.json"
+    assert_match "not healthy", shell_output("#{bin}/opencode-app status 2>&1", 1)
+
+    service_port = free_port
+    (testpath/"fake-service.js").write <<~JS
+      const http = require("node:http");
+      const [port, password] = process.argv.slice(2);
+      const expected = "Basic " + Buffer.from("opencode:" + password).toString("base64");
+      http.createServer((req, res) => {
+        res.statusCode = req.url === "/api/config" && req.headers.authorization === expected ? 200 : 401;
+        res.end("{}");
+      }).listen(Number(port), "127.0.0.1");
+    JS
+    state_file.write JSON.generate(id: "test", version: "2.2.7", url: "http://127.0.0.1:#{service_port}",
+                                   pid: 1, password: "test-password")
+    service_pid = spawn "node", (testpath/"fake-service.js").to_s, service_port.to_s, "test-password"
+    begin
+      20.times do
+        break if quiet_system "curl", "-s", "-o", File::NULL, "http://127.0.0.1:#{service_port}/"
+
+        sleep 0.25
+      end
+      assert_match "serving at http://127.0.0.1:#{service_port}", shell_output("#{bin}/opencode-app serve")
+      assert_match "healthy at http://127.0.0.1:#{service_port}", shell_output("#{bin}/opencode-app status")
+      state_file.atomic_write JSON.generate(url: "http://127.0.0.1:#{service_port}", password: "wrong")
+      assert_match "not healthy", shell_output("#{bin}/opencode-app status 2>&1", 1)
+      state_file.atomic_write JSON.generate(url: "http://127.0.0.1:#{service_port}", password: "test-password")
+      assert_match "stopped", shell_output("#{bin}/opencode-app stop")
+      assert_equal ["service start", "service stop"], calls.read.lines(chomp: true)
+    ensure
+      Process.kill "TERM", service_pid
+      Process.wait service_pid
+    end
 
     serve_only_args = testpath/"hdc-start-args"
     fake_hdc.delete if fake_hdc.exist?
@@ -299,11 +346,9 @@ class OpencodeApp < Formula
       printf '%s\\n' "$@" > #{serve_only_args}
     SH
     chmod 0755, fake_hdc
-    assert_match "serving at", shell_output("#{bin}/opencode-app start --serve-only")
     assert_match "opened", shell_output("#{bin}/opencode-app start")
     assert_equal %w[shell aa start -a EntryAbility -b com.social4hyq.opencodedesktop -m electron],
                  serve_only_args.read.lines(chomp: true)
-    assert_match "stopped", shell_output("#{bin}/opencode-app stop")
 
     hap = libexec/"opencode-desktop-unsigned.hap"
     assert_match "libs/arm64-v8a/libelectron.so", shell_output("unzip -Z1 #{hap}")
@@ -311,7 +356,7 @@ class OpencodeApp < Formula
     assert_match "opencode-app status", waiting_source
     refute_match "{{", waiting_source
     placeholder = JSON.parse(shell_output("unzip -p #{hap} resources/resfile/resources/app/config.json"))
-    assert_equal 0, placeholder.fetch("port")
+    assert_empty placeholder
     package = JSON.parse(shell_output("unzip -p #{hap} resources/resfile/resources/app/package.json"))
     assert_equal version.to_s, package.fetch("version")
     profile = JSON.parse(shell_output("unzip -p #{hap} module.json"))
