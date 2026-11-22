@@ -4,7 +4,7 @@ class MagpieApp < Formula
   url "https://github.com/yetone/magpie/archive/refs/tags/v0.1.4661.tar.gz"
   sha256 "eacabbef905695537e60b7ed41271a2c89c9f83014d4817ab3cf8aba6379dd42"
   license :cannot_represent
-  revision 2
+  revision 3
 
   livecheck do
     url :stable
@@ -12,8 +12,8 @@ class MagpieApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/magpie-app-v0.1.4661-r4"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "04bc5f322a0b1922e3521cba547c6747d62547b9bbdd1c3325465f08f623190a"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/magpie-app-v0.1.4661-r6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2c158504a2d3a63a00911d152c3196ece9c49242f8ce6dd646dad7a27fc6286b"
   end
 
   depends_on "app-installer"
@@ -213,8 +213,10 @@ class MagpieApp < Formula
       #!/bin/sh
       printf '%s\\n' "$*" >> #{hdc_log}
       if [ "$1" = "shell" ] && [ "$2" = "ps -ef" ]; then
-        [ -n "${FAKE_STOPPED:-}" ] ||
-          printf '%s\\n' "a com.social4hyq.magpiedesktop" "b com.other.app"
+        if [ -z "${FAKE_STOPPED:-}" ]; then
+          printf '%s\\n' "u 1 1 1 1 ? 00:00:00 com.social4hyq.magpiedesktop"
+        fi
+        printf '%s\\n' "u 1 1 1 1 ? 00:00:00 sh -c echo com.social4hyq.magpiedesktop"
       fi
     SH
     chmod 0755, fake_bin/"hdc"
