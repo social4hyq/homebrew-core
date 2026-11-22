@@ -68,7 +68,7 @@ class Orca < Formula
   # publication and its data-root ownership check. The patches add fallbacks
   # only used on openharmony.
   patch_root = Pathname(__dir__).parent.parent
-  Dir[(patch_root/"Patches/orca/0001-ohos-runtime/*.patch").to_s].each do |path|
+  Dir[(patch_root/"Patches/orca/ohos/*.patch").to_s].each do |path|
     patch do
       file Pathname(path).relative_path_from(patch_root).to_s
     end
@@ -132,7 +132,7 @@ class Orca < Formula
       (lightningcss_dir/"wasm").install Dir["*"]
     end
     system "patch", "-p1", "-d", lightningcss_dir,
-           "-i", tap_root/"Patches/orca/0002-lightningcss-wasm-loader.patch"
+           "-i", tap_root/"Patches/orca/lightningcss/node_index.js.patch"
 
     # The CLI and web builds stamp the source commit (installed skills pin to it),
     # and a release tarball carries no history: give the build one empty commit.
