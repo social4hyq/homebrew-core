@@ -6,6 +6,7 @@ class ClaudeCodeApp < Formula
   version "6.28899.6"
   sha256 "239c20d218456cacc656d48382fd59116325ac679aa4e476377af1456ac85715"
   license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
+  revision 1
 
   livecheck do
     url "https://downloads.claude.ai/claude-desktop/apt/stable/dists/stable/main/binary-arm64/Packages"
@@ -13,8 +14,8 @@ class ClaudeCodeApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-app-v6.28899.6-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "13df7ef14725f330961e34120531644093a3dada5573a377bb68541a2cc8b361"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-app-v6.28899.6-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3b96a9f56e78e61042822a6a7a709855c9d23fde6a0723954ffaed9553fc7953"
   end
 
   depends_on "app-installer"
@@ -243,5 +244,44 @@ class ClaudeCodeApp < Formula
     refute_match "claude-host-config.json", listing
     refute_match "claude-code-probe.bin", listing
     system "unzip", "-tq", hap
+
+    fake_bin = testpath/"download-bin"
+    fake_bin.mkpath
+    curl_log = testpath/"curl-args"
+    fake_curl = fake_bin/"curl"
+    fake_curl.write <<~SH
+      #!/bin/sh
+      printf '%s\\n' "$@" > #{curl_log}
+      while [ "$#" -gt 0 ]; do
+        if [ "$1" = "-o" ]; then
+          printf 'not a deb' > "$2"
+          exit 0
+        fi
+        shift
+      done
+      exit 2
+    SH
+    chmod 0755, fake_curl
+    download_env = {
+      "PATH"                        => "#{fake_bin}:#{ENV.fetch("PATH")}",
+      "XDG_CACHE_HOME"              => (testpath/"cache").to_s,
+      "TMPDIR"                      => testpath.to_s,
+      "CLAUDE_CODE_APP_VENDOR_JSON" => (libexec/"vendor.json").to_s,
+      "CLAUDE_CODE_APP_ASSEMBLER"   => (pkgshare/"assemble-local-hap.py").to_s,
+    }
+    %w[0 1].each do |tls_insecure|
+      curl_log.unlink if curl_log.exist?
+      output = with_env(download_env.merge("HAP_INSTALLER_TLS_INSECURE" => tls_insecure)) do
+        shell_output("bash #{pkgshare}/install-desktop.sh #{hap} #{testpath}/out --build-only 2>&1", 1)
+      end
+      assert_match "sha256 check", output
+      curl_args = curl_log.read.lines(chomp: true)
+      if tls_insecure == "1"
+        assert_includes curl_args, "--insecure"
+        assert_match "TLS certificate verification is disabled", output
+      else
+        refute_includes curl_args, "--insecure"
+      end
+    end
   end
 end

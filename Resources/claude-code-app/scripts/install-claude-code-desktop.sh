@@ -65,7 +65,12 @@ prepare_vendor_hap() {
     else
       rm -f "$deb" "$deb.part"
       echo "downloading Claude Desktop $version from Anthropic..." >&2
-      curl -fL --retry 3 --retry-delay 2 -C - -o "$deb.part" "$url" ||
+      curl_tls_args=()
+      if [ "${HAP_INSTALLER_TLS_INSECURE:-0}" = "1" ]; then
+        curl_tls_args=(--insecure)
+        echo "warning: TLS certificate verification is disabled for the vendor download" >&2
+      fi
+      curl "${curl_tls_args[@]}" -fL --retry 3 --retry-delay 2 -C - -o "$deb.part" "$url" ||
         { record_vendor_failure download network "download failed: $url"; echo "download failed: $url" >&2; exit 1; }
       mv "$deb.part" "$deb"
       if [ "$(deb_sha256 "$deb")" != "$sha" ]; then
