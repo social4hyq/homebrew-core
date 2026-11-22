@@ -69,6 +69,12 @@ Usage: orca-app <command>
                       Uninstall the app from the device. The default keeps the
                       app's data; --purge also deletes it.
   pair                Print the host-side server's browser URL again.
+  cli [ARGS...]       Run the orca CLI against the runtime in use: the one the
+                      app started when it is running, else the one `serve`
+                      started (see env).
+  env                 Print the ORCA_USER_DATA_PATH setting that makes a plain
+                      `orca` command reach that runtime, e.g.
+                      eval "$(orca-app env)".
 EOF
 }
 
@@ -139,6 +145,43 @@ for (const line of text.split("\n")) {
 }
 process.exit(1);
 ' "$READY_FILE"
+}
+
+# The runtime the app started itself keeps its data in the app's sandbox, which a
+# terminal cannot read; the app publishes the runtime's orca-runtime.json here so
+# the orca CLI can still reach it. Trusted only while the process it names runs
+# (a force-stopped app leaves the file behind). The pid belongs to another user,
+# so look for its /proc entry instead of signalling it.
+APP_PROFILE="$CONFIG_DIR/app-runtime"
+
+app_runtime_live() {
+  [ -f "$APP_PROFILE/orca-runtime.json" ] || return 1
+  local pid
+  pid="$("$NODE_BIN" -e '
+try {
+  const pid = JSON.parse(require("node:fs").readFileSync(process.argv[1], "utf8")).pid;
+  if (Number.isInteger(pid) && pid > 0) process.stdout.write(String(pid));
+} catch {}
+' "$APP_PROFILE/orca-runtime.json")"
+  [ -n "$pid" ] && [ -e "$PROC_ROOT/$pid" ]
+}
+
+# The profile directory the orca CLI should use.
+cli_profile() {
+  if app_runtime_live; then
+    printf '%s' "$APP_PROFILE"
+  else
+    printf '%s' "$DATA_ROOT"
+  fi
+}
+
+cmd_env() {
+  printf 'export ORCA_USER_DATA_PATH=%q\n' "$(cli_profile)"
+}
+
+cmd_cli() {
+  [ -n "$ORCA_BIN" ] || die "the orca CLI is not installed"
+  ORCA_USER_DATA_PATH="$(cli_profile)" exec "$ORCA_BIN" "$@"
 }
 
 # Free port near the default: the shell's runtime binds it on this same host.
@@ -301,6 +344,9 @@ ensure_serve() {
   read_config
   if healthy; then
     printf 'orca-app: server already healthy at http://127.0.0.1:%s\n' "$PORT"
+    if app_runtime_live; then
+      printf 'orca-app: it was started by the app and ends with it; use `orca-app cli <command>` for the CLI\n'
+    fi
     return 0
   fi
   if [ -f "$PID_FILE" ]; then
@@ -490,6 +536,9 @@ cmd_status() {
     local url=""
     url="$(read_web_client_url || true)"
     printf 'orca-app: healthy at http://127.0.0.1:%s\n' "$PORT"
+    if app_runtime_live; then
+      printf 'orca-app: started by the app (CLI: orca-app cli <command>)\n'
+    fi
     # A healthy server without a pairing file (the one the shell starts has
     # none) is still healthy: do not let a failed test end the function with 1.
     if [ -n "$url" ]; then
@@ -572,6 +621,8 @@ case "${1:-}" in
   stop) shift; cmd_stop "$@" ;;
   uninstall) shift; cmd_uninstall "$@" ;;
   pair) shift; cmd_pair "$@" ;;
+  cli) shift; cmd_cli "$@" ;;
+  env) shift; cmd_env "$@" ;;
   -h|--help|help) usage ;;
   "") usage >&2; exit 2 ;;
   *) printf 'orca-app: unknown command: %s\n' "$1" >&2; usage >&2; exit 2 ;;
