@@ -1,8 +1,8 @@
 class MagpieApp < Formula
   desc "Desktop shell for the Magpie model gateway"
   homepage "https://github.com/yetone/magpie"
-  url "https://github.com/yetone/magpie/archive/refs/tags/v0.1.4624.tar.gz"
-  sha256 "6f4933d73bb7975f4b567dce71b03cb7f394e9ddc9eeccbf47854bd71686724d"
+  url "https://github.com/yetone/magpie/archive/refs/tags/v0.1.4661.tar.gz"
+  sha256 "eacabbef905695537e60b7ed41271a2c89c9f83014d4817ab3cf8aba6379dd42"
   license :cannot_represent
 
   livecheck do
