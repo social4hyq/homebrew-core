@@ -1,0 +1,21 @@
+diff --git a/src/setup.rs b/src/setup.rs
+index 1ae9ed5..b877c97 100644
+--- a/src/setup.rs
++++ b/src/setup.rs
+@@ -104,7 +104,15 @@ impl Setup {
+                 }
+             },
+             Err(e) => {
+-                self.need = Need::connection(e);
++                // On OHOS a failed connection is the bridge being down: never offer to install a core.
++                #[cfg(all(target_os = "linux", target_env = "ohos"))]
++                {
++                    self.need = Need::Connect(crate::ohos_exec::unreachable_message(&e));
++                }
++                #[cfg(not(all(target_os = "linux", target_env = "ohos")))]
++                {
++                    self.need = Need::connection(e);
++                }
+                 self.state = State::Ready;
+             }
+         }

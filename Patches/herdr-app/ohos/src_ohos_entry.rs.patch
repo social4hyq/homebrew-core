@@ -1,0 +1,136 @@
+diff --git a/src/ohos_entry.rs b/src/ohos_entry.rs
+new file mode 100644
+index 0000000..4bdedac
+--- /dev/null
++++ b/src/ohos_entry.rs
+@@ -0,0 +1,130 @@
++//! HarmonyOS HAP entry point: the napi module ArkTS loads as `libherdr_app.so`.
++//!
++//! The ArkTS `EntryAbility` calls `init(ability)`, which forwards the ability to
++//! `gpui_ohos::current_platform`; everything after that is the same startup the
++//! desktop binary runs.
++
++use gpui::Application;
++use openharmony_ability::OpenHarmonyApp;
++
++thread_local! {
++    static APPLICATION: std::cell::RefCell<Option<gpui::ApplicationHandle>> = const { std::cell::RefCell::new(None) };
++}
++
++/// The app sandbox's seccomp filter traps some syscalls (`openat2`, used by
++/// cap-std through rustix) with `SECCOMP_RET_TRAP`: SIGSYS, which kills the
++/// process unless handled.
++mod sigsys {
++    use std::os::raw::{c_int, c_void};
++
++    extern "C" fn handler(_sig: c_int, _info: *mut libc::siginfo_t, uc: *mut c_void) {
++        // SECCOMP_RET_TRAP skips the syscall but does NOT set a return value: on
++        // aarch64 x0 still holds the first argument. For `openat2(dirfd, ...)` the
++        // caller would see `dirfd` as the "new" fd, own it twice and close it twice
++        // (std's IO-safety check aborts). Return -ENOSYS so rustix/cap-std fall back
++        // to plain `openat`. Nothing else here: logging is not async-signal-safe.
++        if !uc.is_null() {
++            let uc = uc.cast::<libc::ucontext_t>();
++            unsafe { (*uc).uc_mcontext.regs[0] = (-(libc::ENOSYS as i64)) as libc::c_ulong };
++        }
++    }
++
++    pub fn install() {
++        unsafe {
++            // SA_SIGINFO so the handler gets a ucontext to patch x0.
++            let mut sa: libc::sigaction = std::mem::zeroed();
++            sa.sa_sigaction = handler as *const () as usize;
++            sa.sa_flags = libc::SA_SIGINFO;
++            libc::sigemptyset(&mut sa.sa_mask);
++            libc::sigaction(libc::SIGSYS, &sa, std::ptr::null_mut());
++        }
++    }
++}
++
++
++/// A panic in the entry crosses the napi boundary and aborts the app, and stderr goes nowhere in a
++/// HAP, so write the panic message to hilog. Straight to OH_LOG_Print: the `log` crate's default
++/// level hides errors in this build.
++mod panic_log {
++    use std::os::raw::{c_char, c_int};
++    unsafe extern "C" {
++        fn OH_LOG_Print(ty: i32, level: i32, domain: u32, tag: *const c_char, fmt: *const c_char, ...) -> c_int;
++    }
++    pub fn install() {
++        std::panic::set_hook(Box::new(|info| {
++            if let Ok(text) = std::ffi::CString::new(format!("herdr-app panic: {info}")) {
++                unsafe { OH_LOG_Print(0, 6, 0, c"herdr-panic".as_ptr(), c"%{public}s".as_ptr(), text.as_ptr()) };
++            }
++        }));
++    }
++}
++
++#[openharmony_ability_derive::ability]
++fn openharmony_app(app: OpenHarmonyApp) {
++    sigsys::install();
++    ohos_hilog_binding::log::init_once(ohos_hilog_binding::log::Config::default());
++    panic_log::install();
++    // `tracing_subscriber::fmt` aborts inside the HAP sandbox (it touches terminal
++    // handling the ArkTS runtime does not provide). Route tracing into hilog instead.
++    let _ = tracing_log::LogTracer::init();
++
++    // The HAP inherits the host HOME, which is outside the sandbox and read-only.
++    // Point every Herdr config/mod path at the app's own files directory. First,
++    // before anything reads settings (their path is under it) or starts a thread.
++    if std::env::var_os("HERDR_APP_HOME").is_none() {
++        unsafe { std::env::set_var("HERDR_APP_HOME", "/data/storage/el2/base/haps/entry/files/herdr-app") };
++    }
++
++    let fresh = !crate::settings::path().exists();
++    let person = crate::settings::load_person();
++    // This runs inside ArkTS's onCreate: the window and the XComponent come only after it
++    // returns. Reaching the core and writing the mods workspace (~50 ms) are needed only
++    // when the first window opens, ~100 ms later, so they run beside ArkTS instead of before it.
++    // The HAP sandbox cannot spawn the host's `hc`, so the core is reached through
++    // a TCP bridge that owns `hc connect` (see herdr-bridge.py on the host).
++    let connecting = std::thread::Builder::new().name("hc-connect".into()).spawn(|| {
++        let bridge = crate::ohos_exec::endpoint();
++        match crate::hc::Core::connect_bridge(&bridge) {
++            Ok(core) => crate::hc::check(&core.hello).map(|()| core).map_err(crate::setup::Need::Fix),
++            Err(error) => {
++                tracing::warn!("herdr-app: {error:#}");
++                Err(crate::setup::Need::Connect(crate::ohos_exec::unreachable_message(&error)))
++            }
++        }
++    });
++    let writing = std::thread::Builder::new().name("mods-workspace".into()).spawn(|| {
++        if let Err(error) = crate::mods::write_workspace() {
++            tracing::warn!("cannot write {}: {error}", crate::mods::app_dir().display());
++        }
++    });
++
++    crate::update::start();
++    crate::telemetry::start(crate::settings::telemetry_setting(&person));
++    crate::bench::start();
++    let application = Application::with_platform(gpui_ohos::current_platform(app, false))
++        .with_assets(gpui_shell::AppAssets::new(crate::mods::app_dir()).following_links());
++    let handle = application.run_embedded(move |cx| {
++        // Mods load from the workspace, and the first window needs the core.
++        match writing {
++            Ok(writing) => {
++                let _ = writing.join();
++            }
++            Err(error) => {
++                tracing::warn!("cannot start the mods workspace thread: {error}; writing it here");
++                if let Err(error) = crate::mods::write_workspace() {
++                    tracing::warn!("cannot write {}: {error}", crate::mods::app_dir().display());
++                }
++            }
++        }
++        let core = match connecting.map_err(|e| anyhow::anyhow!("cannot start the core connection: {e}")) {
++            Ok(connecting) => connecting
++                .join()
++                .unwrap_or_else(|_| Err(crate::setup::Need::Connect(crate::ohos_exec::unreachable_message(&anyhow::anyhow!("the core connection panicked"))))),
++            Err(error) => Err(crate::setup::Need::Connect(crate::ohos_exec::unreachable_message(&error))),
++        };
++        crate::app_started(cx, core, fresh)
++    });
++    APPLICATION.with(|slot| {
++        *slot.borrow_mut() = Some(handle);
++    });
++}

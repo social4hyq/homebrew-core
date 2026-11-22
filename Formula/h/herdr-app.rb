@@ -13,9 +13,9 @@ class HerdrApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/herdr-app-v0.1.16-r14"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2e080ada1fd000336e710c2e3d8c44a616d7246c65967b59061c8cfa2d6a2c05"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/herdr-app-v0.1.16-r15"
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ca5ddd6ffab1353e8be3506b61375b4034da0f18f306103dc333f784165dae8e"
   end
 
   depends_on "node" => :build
@@ -35,8 +35,10 @@ class HerdrApp < Formula
     url "https://github.com/ghostty-org/ghostty/archive/291fd050b9e9c293c8adb6a140742649b7e42d3a.tar.gz"
     sha256 "f35b464f1aee22ffda9f6359038b9ad18a784342b4a4fa1cb97a79fb9ade79a4"
 
-    patch do
-      file "Patches/herdr-app/ghostty/0001-simdutf-pic-ohos.patch"
+    Dir[(patch_root/"Patches/herdr-app/ghostty/*.patch").to_s].each do |path|
+      patch do
+        file Pathname(path).relative_path_from(patch_root).to_s
+      end
     end
   end
 
@@ -76,7 +78,7 @@ class HerdrApp < Formula
     sha256 "39d931489e99f80b496f900f88d67d7aad6b5f25ce83810a408eb42f6af6839e"
   end
 
-  Dir[(patch_root/"Patches/herdr-app/*.patch").to_s].each do |path|
+  Dir[(patch_root/"Patches/herdr-app/ohos/*.patch").to_s].each do |path|
     patch do
       file Pathname(path).relative_path_from(patch_root).to_s
     end

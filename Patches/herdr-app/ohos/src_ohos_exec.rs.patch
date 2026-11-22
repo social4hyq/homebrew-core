@@ -1,40 +1,9 @@
-diff --git a/src/lib.rs b/src/lib.rs
-index 7ab4aef..fb06582 100644
---- a/src/lib.rs
-+++ b/src/lib.rs
-@@ -42,6 +42,8 @@ pub mod win32_keys;
- pub mod window;
- #[cfg(all(target_os = "linux", target_env = "ohos"))]
- pub mod ohos_entry;
-+#[cfg(all(target_os = "linux", target_env = "ohos"))]
-+pub mod ohos_exec;
- 
- use gpui::*;
- 
-diff --git a/src/mods.rs b/src/mods.rs
-index 03a518c..a35ae53 100644
---- a/src/mods.rs
-+++ b/src/mods.rs
-@@ -845,6 +845,13 @@ fn exec_limit(options: Option<&HostValue>) -> Result<Duration, HostError> {
- }
- 
- pub(crate) fn run_blocking(command: &str, args: &[String], cwd: Option<String>, limit: Duration) -> Result<(i32, String, String), String> {
-+    // The HAP sandbox may not spawn processes: run it on the host through the core.
-+    #[cfg(all(target_os = "linux", target_env = "ohos"))]
-+    {
-+        let cwd = Some(cwd.unwrap_or_else(|| home().to_string_lossy().into_owned()));
-+        return crate::ohos_exec::exec(command, args, cwd, limit)
-+            .map(|(code, out, err)| (code, String::from_utf8_lossy(&out).into_owned(), String::from_utf8_lossy(&err).into_owned()));
-+    }
-     use std::io::Read;
-     // The core may have no `hc` link beside it (a Windows zip has only herdr-core.exe).
-     let program = if command == "hc" { crate::core_bin::path() } else { PathBuf::from(command) };
 diff --git a/src/ohos_exec.rs b/src/ohos_exec.rs
 new file mode 100644
-index 0000000..d6e12b3
+index 0000000..c85c1a3
 --- /dev/null
 +++ b/src/ohos_exec.rs
-@@ -0,0 +1,63 @@
+@@ -0,0 +1,71 @@
 +//! Running programs from inside the HarmonyOS HAP.
 +//!
 +//! The app sandbox may not spawn processes (`cannot run sh: Permission denied`),
@@ -55,8 +24,16 @@ index 0000000..d6e12b3
 +
 +static CORE: Mutex<Option<Arc<Core>>> = Mutex::new(None);
 +
-+fn endpoint() -> String {
-+    std::env::var("HERDR_CORE_TCP").unwrap_or_else(|_| "127.0.0.1:8765".to_string())
++/// The core bridge on the host: `HERDR_CORE_TCP`, else the address `herdr-app install` put in the HAP
++/// (`bridge.conf` in the app's files directory), else the default the bridge listens on.
++pub(crate) fn endpoint() -> String {
++    crate::bridge_auth::address(&crate::mods::app_dir())
++}
++
++/// What the setup page says when the bridge cannot be reached. There is no installing a core from
++/// inside a HAP, so this is always a "start the bridge, then Retry" page, never "Install it for me".
++pub(crate) fn unreachable_message(error: &anyhow::Error) -> String {
++    format!("Herdr reaches herdr-core through herdr-bridge on the host ({}). Run `herdr-app bridge start` there, then press Retry.\n\n{error:#}", endpoint())
 +}
 +
 +fn core(fresh: bool) -> Result<Arc<Core>, String> {

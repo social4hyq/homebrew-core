@@ -1,13 +1,14 @@
 diff --git a/src/lib.rs b/src/lib.rs
 new file mode 100644
-index 0000000..7ab4aef
+index 0000000..b113ab0
 --- /dev/null
 +++ b/src/lib.rs
-@@ -0,0 +1,266 @@
+@@ -0,0 +1,269 @@
 +// Windows: a window app, but tests inherit Cargo's console for their child processes.
 +#![cfg_attr(all(windows, not(test)), windows_subsystem = "windows")]
 +
 +pub mod badge;
++pub mod bridge_auth;
 +pub mod bench;
 +pub mod commands;
 +pub mod control;
@@ -48,6 +49,8 @@ index 0000000..7ab4aef
 +pub mod window;
 +#[cfg(all(target_os = "linux", target_env = "ohos"))]
 +pub mod ohos_entry;
++#[cfg(all(target_os = "linux", target_env = "ohos"))]
++pub mod ohos_exec;
 +
 +use gpui::*;
 +
