@@ -105,6 +105,8 @@ test('auto-install signs, installs and verifies permissions without starting the
   const permissions = f.calls().find(c => c[0] === "app-installer" && c[1] === "permissions");
   assert.ok(permissions, "permissions must be checked after installing");
   assert.equal(permissions[2], "--bundle-id");
+  assert.ok(!f.calls().some(c => c[0] === "app-installer" && c[1] === "login"),
+    "an existing login must not start another login");
   assert.deepEqual(f.queued(), []);
 });
 
@@ -118,24 +120,46 @@ test('a missing device queues the app instead of failing', t => {
   assert.ok(!f.calls().some(c => c[0] === "orca-app"));
 });
 
-test('a missing login queues the app without starting the browser by default', t => {
+test('a missing login opens the browser once by default and then installs', t => {
   const f = fixture(t);
-  const r = f.run(["auto-install", "orca-app", "com.example.desktop"], { READY: "no-login" });
+  const r = f.run(["auto-install", "orca-app", "com.example.desktop"],
+    { READY_BEFORE: "no-login", READY_AFTER: "ok local" });
+  assert.equal(r.status, 0, r.stdout + r.stderr);
+  assert.match(r.stdout, /已装机/);
+  assert.equal(f.calls().filter(c => c[0] === "app-installer" && c[1] === "login").length, 1);
+  assert.deepEqual(f.queued(), []);
+});
+
+test('HAP_APP_AUTO_LOGIN=0 queues without opening the browser', t => {
+  const f = fixture(t);
+  const r = f.run(["auto-install", "orca-app", "com.example.desktop"],
+    { READY: "no-login", HAP_APP_AUTO_LOGIN: "0" });
   assert.equal(r.status, 0, r.stdout + r.stderr);
   assert.match(r.stdout, /未登录华为开发者/);
   assert.equal(f.queuedEntry("orca-app").reason, "login");
-  assert.ok(!f.calls().some(c => c[0] === "app-installer" && c[1] === "login"),
-    "auto-install must not open the login unless HAP_APP_AUTO_LOGIN=1");
+  assert.ok(!f.calls().some(c => c[0] === "app-installer" && c[1] === "login"));
 });
 
-test('HAP_APP_AUTO_LOGIN=1 logs in once and then installs', t => {
+test('auto_login=0 in the config file disables the browser login', t => {
   const f = fixture(t);
-  const r = f.run(["auto-install", "orca-app", "com.example.desktop"],
-    { READY_BEFORE: "no-login", READY_AFTER: "ok local", HAP_APP_AUTO_LOGIN: "1" });
+  fs.mkdirSync(f.configDir, { recursive: true });
+  fs.writeFileSync(path.join(f.configDir, "config"), "auto_login=0\n");
+  const r = f.run(["auto-install", "orca-app", "com.example.desktop"], { READY: "no-login" });
   assert.equal(r.status, 0, r.stdout + r.stderr);
-  assert.match(r.stdout, /已装机/);
-  assert.ok(f.calls().some(c => c[0] === "app-installer" && c[1] === "login"));
-  assert.deepEqual(f.queued(), []);
+  assert.equal(f.queuedEntry("orca-app").reason, "login");
+  assert.ok(!f.calls().some(c => c[0] === "app-installer" && c[1] === "login"));
+});
+
+test('an incomplete login is queued and not retried for the next app', t => {
+  const f = fixture(t);
+  const options = { READY: "no-login", LOGIN_FAIL: "1" };
+  const first = f.run(["auto-install", "orca-app", "com.example.desktop"], options);
+  assert.equal(first.status, 0, first.stdout + first.stderr);
+  assert.equal(f.queuedEntry("orca-app").reason, "login");
+  const second = f.run(["auto-install", "zcode-app", "com.example.zcode"], options);
+  assert.equal(second.status, 0, second.stdout + second.stderr);
+  assert.equal(f.queuedEntry("zcode-app").reason, "login");
+  assert.equal(f.calls().filter(c => c[0] === "app-installer" && c[1] === "login").length, 1);
 });
 
 test('an install failure queues the app and keeps brew install successful', t => {

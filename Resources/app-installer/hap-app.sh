@@ -5,9 +5,10 @@
 # Developer login is missing, the app is queued instead and
 # `hap-app install-pending` finishes it later.
 #
-# The auto path never starts the app, never fails the brew install and never
-# waits for a login unless HAP_APP_AUTO_LOGIN=1. Configuration lives in
-# $XDG_CONFIG_HOME/hap-app/config (`auto_install=0`, `auto_login=1`).
+# The auto path never starts the app or fails the brew install. It waits for
+# one bounded Huawei Developer login by default; HAP_APP_AUTO_LOGIN=0 disables
+# that. Configuration lives in $XDG_CONFIG_HOME/hap-app/config
+# (`auto_install=0`, `auto_login=0`).
 
 set -uo pipefail
 
@@ -156,9 +157,9 @@ Usage: hap-app <command> [options]
 Environment:
   HAP_APP_AUTO_INSTALL=0   Do not install or queue automatically (config file:
                            ~/.config/hap-app/config, auto_install=0)
-  HAP_APP_AUTO_LOGIN=1     Let auto-install open the Huawei Developer login
-                           and wait up to HAP_APP_LOGIN_TIMEOUT seconds (120)
-                           (config file: auto_login=1)
+  HAP_APP_AUTO_LOGIN=0     Do not open the Huawei Developer login automatically
+                           (default: open it and wait HAP_APP_LOGIN_TIMEOUT
+                           seconds, 120 by default; config: auto_login=0)
   HAP_APP_VERBOSE=1        Stream the app install output instead of one line
                            per app (config file: verbose=1)
   HAP_APP_INSTALL_TIMEOUT  Overall install timeout in seconds (900)
@@ -180,7 +181,7 @@ auto_install_setting() {
 
 auto_login_setting() {
   local value="${HAP_APP_AUTO_LOGIN:-$(conf_get auto_login)}"
-  printf '%s' "${value:-0}"
+  printf '%s' "${value:-1}"
 }
 
 enabled() {
