@@ -1,0 +1,21 @@
+OHOS: make fspy_preload_unix build (no statx/execveat in libc, c_variadic needs RUSTC_BOOTSTRAP).
+
+OHOS: run static programs untracked (no seccomp user-notification) and keep their task out of the cache.
+
+diff --git a/crates/fspy_preload_unix/src/lib.rs b/crates/fspy_preload_unix/src/lib.rs
+index 6c4e10b..416995a 100644
+--- a/crates/fspy_preload_unix/src/lib.rs
++++ b/crates/fspy_preload_unix/src/lib.rs
+@@ -1,8 +1,12 @@
+ // Compile as an empty crate on non-unix targets and on musl (where seccomp
+ // alone handles access tracking).
+ 
++#![cfg_attr(target_env = "ohos", feature(c_variadic))]
++
+ #[cfg(all(unix, not(target_env = "musl")))]
+ mod client;
++#[cfg(target_env = "ohos")]
++mod untracked;
+ #[cfg(all(unix, not(target_env = "musl")))]
+ mod interceptions;
+ #[cfg(all(unix, not(target_env = "musl")))]

@@ -64,42 +64,24 @@ class VitePlus < Formula
     # @napi-rs/cli cross-compiles the bundled bindings against the SDK.
     depends_on "ohos-sdk-native" => :build
 
+    patch_root = Pathname(__dir__).parent.parent
+
     resource "vite-task-src" do
       url "https://github.com/voidzero-dev/vite-task.git",
           revision: "cb1ea8d214b26a0f3ca2b2ef3b6bc471b18ffacb"
       version "cb1ea8d214b26a0f3ca2b2ef3b6bc471b18ffacb"
 
-      patch :p1 do
-        file "Patches/vite-plus/0003-vite-task-preload-ohos-build.patch"
-      end
-
-      patch :p1 do
-        file "Patches/vite-plus/0004-vite-task-static-children-untracked.patch"
+      Dir[(patch_root/"Patches/vite-plus/vite-task/*.patch").to_s].each do |path|
+        patch :p1 do
+          file Pathname(path).relative_path_from(patch_root).to_s
+        end
       end
     end
 
-    patch :p1 do
-      file "Patches/vite-plus/0001-package-manager-ohos-ports.patch"
-    end
-
-    patch :p1 do
-      file "Patches/vite-plus/0002-managed-node-ohos.patch"
-    end
-
-    patch :p1 do
-      file "Patches/vite-plus/0005-vite-task-patch-fspy.patch"
-    end
-
-    patch :p1 do
-      file "Patches/vite-plus/0006-ohos-ports-overrides.patch"
-    end
-
-    patch :p1 do
-      file "Patches/vite-plus/0007-ohos-default-tmpdir.patch"
-    end
-
-    patch :p1 do
-      file "Patches/vite-plus/0008-ohos-typescript-catalog-ports.patch"
+    Dir[(patch_root/"Patches/vite-plus/ohos/*.patch").to_s].each do |path|
+      patch :p1 do
+        file Pathname(path).relative_path_from(patch_root).to_s
+      end
     end
   end
 

@@ -1,0 +1,24 @@
+OHOS: make fspy_preload_unix build (no statx/execveat in libc, c_variadic needs RUSTC_BOOTSTRAP).
+
+diff --git a/crates/fspy_preload_unix/src/interceptions/stat.rs b/crates/fspy_preload_unix/src/interceptions/stat.rs
+index a386de6..18f4bf4 100644
+--- a/crates/fspy_preload_unix/src/interceptions/stat.rs
++++ b/crates/fspy_preload_unix/src/interceptions/stat.rs
+@@ -44,7 +44,7 @@ unsafe extern "C" fn fstatat(
+     unsafe { fstatat::original()(dirfd, pathname, buf, flags) }
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(all(target_os = "linux", not(target_env = "ohos")))]
+ intercept!(statx: unsafe extern "C" fn(
+     dirfd: c_int,
+     pathname: *const c_char,
+@@ -52,7 +52,7 @@ intercept!(statx: unsafe extern "C" fn(
+     mask: libc::c_uint,
+     statxbuf: *mut libc::statx,
+ ) -> c_int);
+-#[cfg(target_os = "linux")]
++#[cfg(all(target_os = "linux", not(target_env = "ohos")))]
+ unsafe extern "C" fn statx(
+     dirfd: c_int,
+     pathname: *const c_char,

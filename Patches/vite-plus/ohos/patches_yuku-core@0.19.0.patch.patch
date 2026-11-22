@@ -1,0 +1,34 @@
+OHOS: use native OpenHarmony ports and the upstream yuku WebAssembly core; re-check on version bumps.
+
+diff --git a/patches/yuku-core@0.19.0.patch b/patches/yuku-core@0.19.0.patch
+new file mode 100644
+index 0000000..70d1707
+--- /dev/null
++++ b/patches/yuku-core@0.19.0.patch
+@@ -0,0 +1,26 @@
++OHOS: use the upstream WebAssembly core on OpenHarmony.
++
++diff --git a/binding.js b/binding.js
++index c702d74..a224dec 100644
++--- a/binding.js
+++++ b/binding.js
++@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
++ import { execSync } from 'node:child_process';
++ import { fileURLToPath } from 'node:url';
++ import { dirname, join } from 'node:path';
+++import { loadSync as loadWasmSync } from '@yuku-core/wasm';
++ 
++ const require = createRequire(import.meta.url);
++ const __dirname = dirname(fileURLToPath(import.meta.url));
++@@ -63,6 +64,10 @@ function loadBinding() {
++ let binding;
++ 
++ export function load() {
++-  if (binding === undefined) binding = loadBinding();
+++  if (binding === undefined) {
+++    binding = platform === 'openharmony'
+++      ? loadWasmSync(readFileSync(require.resolve('@yuku-core/wasm/yuku-core.wasm')))
+++      : loadBinding();
+++  }
++   return binding;
++ }

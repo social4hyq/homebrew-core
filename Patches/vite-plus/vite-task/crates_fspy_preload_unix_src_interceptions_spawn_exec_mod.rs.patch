@@ -1,0 +1,49 @@
+OHOS: make fspy_preload_unix build (no statx/execveat in libc, c_variadic needs RUSTC_BOOTSTRAP).
+
+OHOS: run static programs untracked (no seccomp user-notification) and keep their task out of the cache.
+
+diff --git a/crates/fspy_preload_unix/src/interceptions/spawn/exec/mod.rs b/crates/fspy_preload_unix/src/interceptions/spawn/exec/mod.rs
+index 08c8c20..9c9c676 100644
+--- a/crates/fspy_preload_unix/src/interceptions/spawn/exec/mod.rs
++++ b/crates/fspy_preload_unix/src/interceptions/spawn/exec/mod.rs
+@@ -68,11 +68,19 @@ fn handle_exec(
+             return -1;
+         }
+     };
+-    if let Some(pre_exec) = pre_exec
+-        && let Err(errno) = pre_exec.run()
+-    {
+-        errno.set();
+-        return -1;
++    if let Some(pre_exec) = pre_exec {
++        // OHOS has no seccomp user-notification: a statically linked child cannot be
++        // tracked, so record the missing trace and execute it untracked instead.
++        #[cfg(target_env = "ohos")]
++        {
++            let _ = pre_exec;
++            crate::untracked::mark_tracking_lost();
++        }
++        #[cfg(not(target_env = "ohos"))]
++        if let Err(errno) = pre_exec.run() {
++            errno.set();
++            return -1;
++        }
+     }
+     // SAFETY: raw_command's strings and arrays live in `allocator`, which outlives the call
+     unsafe { execve::original()(raw_command.prog, raw_command.argv, raw_command.envp) }
+@@ -221,6 +229,7 @@ mod linux_only {
+             envp,
+         )
+     }
++    #[cfg(not(target_env = "ohos"))]
+     intercept!(execveat(64): unsafe extern "C" fn(
+         dirfd: c_int,
+         prog: *const libc::c_char,
+@@ -228,6 +237,7 @@ mod linux_only {
+         envp: *const *mut libc::c_char,
+         flags: c_int
+     ) -> libc::c_int);
++    #[cfg(not(target_env = "ohos"))]
+     unsafe extern "C" fn execveat(
+         dirfd: c_int,
+         pathname: *const libc::c_char,

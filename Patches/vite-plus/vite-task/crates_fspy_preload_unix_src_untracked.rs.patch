@@ -1,0 +1,46 @@
+OHOS: run static programs untracked (no seccomp user-notification) and keep their task out of the cache.
+
+diff --git a/crates/fspy_preload_unix/src/untracked.rs b/crates/fspy_preload_unix/src/untracked.rs
+new file mode 100644
+index 0000000..93863ea
+--- /dev/null
++++ b/crates/fspy_preload_unix/src/untracked.rs
+@@ -0,0 +1,38 @@
++//! A statically linked child is exec'd untracked (OHOS has no seccomp
++//! user-notification), so its file accesses are missing from the trace.
++//! A record too large for any frame makes the channel refuse the claim and
++//! set its CLOSED gate, which the receiver reports as lost records, so the
++//! task is not cached.
++
++use fspy_nostd::env;
++use fspy_shared_unix::payload::decode_payload_from_env;
++use wincode::{SchemaWrite, config::DefaultConfig, error::WriteResult, io::Writer};
++
++struct Oversized;
++
++// SAFETY: the channel refuses a claim this large before `write` can run.
++unsafe impl SchemaWrite<DefaultConfig> for Oversized {
++    type Src = Self;
++
++    fn size_of(_src: &Self::Src) -> WriteResult<usize> {
++        Ok(u32::MAX as usize + 1)
++    }
++
++    fn write(_writer: impl Writer, _src: &Self::Src) -> WriteResult<()> {
++        Ok(())
++    }
++}
++
++pub fn mark_tracking_lost() {
++    // SAFETY: only reads the process environment while decoding.
++    let Ok(current) = (unsafe { env::current() }) else {
++        return;
++    };
++    let allocator = fspy_nostd_alloc::pooled_bump();
++    let Ok(payload) = decode_payload_from_env(current.envs(), &allocator) else {
++        return;
++    };
++    if let Some(sender) = payload.payload.ipc_channel_conf.sender(&allocator) {
++        sender.send(&Oversized);
++    }
++}
