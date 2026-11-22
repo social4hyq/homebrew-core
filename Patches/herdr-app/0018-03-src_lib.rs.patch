@@ -1,0 +1,12 @@
+diff --git a/src/lib.rs b/src/lib.rs
+index fb06582..b113ab0 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -2,6 +2,7 @@
+ #![cfg_attr(all(windows, not(test)), windows_subsystem = "windows")]
+ 
+ pub mod badge;
++pub mod bridge_auth;
+ pub mod bench;
+ pub mod commands;
+ pub mod control;

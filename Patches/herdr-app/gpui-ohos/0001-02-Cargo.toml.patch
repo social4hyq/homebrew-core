@@ -1,0 +1,22 @@
+diff --git a/Cargo.toml b/Cargo.toml
+index b3e2bd2..c17410f 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -33,6 +33,7 @@ api-26 = [
+ ]
+ audio = ["dep:openharmony-ability-plugin-audio"]
+ default = ["gles"]
++fast = []
+ gles = ["wgpu/gles"]
+ grid = ["dep:harfrust"]
+ native-input = []
+@@ -72,7 +73,8 @@ package = "zed-font-kit"
+ version = "0.3.34"
+
+ [dependencies.gpui]
+-version = "0.3.11"
++version = "=0.3.8"
++path = "../gpui-pre"
+ default-features = false
+ package = "gpui-pre"
+

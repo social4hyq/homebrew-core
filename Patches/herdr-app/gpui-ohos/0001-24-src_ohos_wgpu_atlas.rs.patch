@@ -1,0 +1,39 @@
+diff --git a/src/ohos/wgpu_atlas.rs b/src/ohos/wgpu_atlas.rs
+index 13f2a39..84729e0 100644
+--- a/src/ohos/wgpu_atlas.rs
++++ b/src/ohos/wgpu_atlas.rs
+@@ -1,5 +1,5 @@
+ use anyhow::Result;
+-use etagere::{BucketedAtlasAllocator, size2};
++use etagere::{size2, BucketedAtlasAllocator};
+ use gpui::{
+     AtlasKey, AtlasTextureId, AtlasTextureKind, AtlasTextureList, AtlasTile, Bounds, DevicePixels,
+     PlatformAtlas, Point, Size,
+@@ -120,6 +120,27 @@ impl PlatformAtlas for WgpuAtlas {
+         }
+     }
+
++    fn remove_svg(&self, path: &str) {
++        let keys: Vec<AtlasKey> = {
++            let lock = self.0.lock();
++            let prefix = format!("{}/", path.trim_end_matches('/'));
++            lock.tiles_by_key
++                .keys()
++                .filter(|key| match key {
++                    AtlasKey::Svg(params) => {
++                        let asset: &str = params.path.as_ref();
++                        asset == path || asset.starts_with(&prefix)
++                    }
++                    _ => false,
++                })
++                .cloned()
++                .collect()
++        };
++        for key in keys {
++            self.remove(&key);
++        }
++    }
++
+     fn remove(&self, key: &AtlasKey) {
+         let mut lock = self.0.lock();
+

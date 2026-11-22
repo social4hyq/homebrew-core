@@ -1,0 +1,19 @@
+diff --git a/src/gpui_ohos.rs b/src/gpui_ohos.rs
+index 47c62c6..8479130 100644
+--- a/src/gpui_ohos.rs
++++ b/src/gpui_ohos.rs
+@@ -4,10 +4,13 @@
+ //! [`gpui::Application::with_platform`], matching the architecture used by
+ //! `gpui-mobile` for Android and iOS.
+
++#[cfg(feature = "fast")]
++extern crate gpui_fast as gpui;
++
+ mod ohos;
+
+ pub use gpui::*;
+-pub use ohos::{PlatformOptions, current_platform, try_current_platform};
++pub use ohos::{current_platform, try_current_platform, PlatformOptions};
+
+ pub use ohos::{
+     FontCatalog, FontDesignCoordinate, FontFaceData, PlatformServices, SyntheticFontStyle,

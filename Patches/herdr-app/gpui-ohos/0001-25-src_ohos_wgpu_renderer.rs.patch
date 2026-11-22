@@ -1,0 +1,633 @@
+diff --git a/src/ohos/wgpu_renderer.rs b/src/ohos/wgpu_renderer.rs
+index c8faa3a..b80bf1a 100644
+--- a/src/ohos/wgpu_renderer.rs
++++ b/src/ohos/wgpu_renderer.rs
+@@ -2,15 +2,22 @@ use super::{
+     path_targets::PathTargets, presentation::Presentation, wgpu_atlas::WgpuAtlas,
+     wgpu_context::WgpuContext,
+ };
++#[cfg(feature = "fast")]
++#[path = "fast/mod.rs"]
++mod fast;
++
+ use bytemuck::{Pod, Zeroable};
+ use gpui::{
+-    AtlasTextureId, Background, Bounds, DevicePixels, GpuSpecs, MonochromeSprite, Path, Point,
+-    PolychromeSprite, PrimitiveBatch, Quad, ScaledPixels, Scene, Shadow, Size, Underline,
+-    get_gamma_correction_ratios,
++    get_gamma_correction_ratios, Background, Bounds, DevicePixels, GpuSpecs, MonochromeSprite,
++    Point, PolychromeSprite, Quad, ScaledPixels, Scene, Shadow, Size, Underline,
+ };
++#[cfg(not(feature = "fast"))]
++use gpui::{AtlasTextureId, Path, PrimitiveBatch};
+ use raw_window_handle::{HasDisplayHandle, HasWindowHandle};
++#[cfg(not(feature = "fast"))]
+ use std::cell::RefCell;
+ use std::num::NonZeroU64;
++#[cfg(not(feature = "fast"))]
+ use std::ops::Range;
+ use std::sync::Arc;
+
+@@ -92,6 +99,8 @@ pub(super) struct WgpuPipelines {
+ pub(super) struct WgpuBindGroupLayouts {
+     globals: wgpu::BindGroupLayout,
+     textures: wgpu::BindGroupLayout,
++    #[cfg(feature = "fast")]
++    rounded_clip: fast::rounded_clip::Bindings,
+ }
+
+ #[derive(Clone, Copy)]
+@@ -100,6 +109,7 @@ struct InstanceBinding {
+     stride: u64,
+ }
+
++#[cfg(not(feature = "fast"))]
+ struct SceneInstanceBindings {
+     quads: InstanceBinding,
+     shadows: InstanceBinding,
+@@ -109,6 +119,174 @@ struct SceneInstanceBindings {
+     polychrome_sprites: InstanceBinding,
+ }
+
++/// Vertex layout the poly-sprite pipeline expects (order, tile first), packed from
++/// whatever order `gpui::PolychromeSprite` happens to use.
++#[repr(C)]
++#[derive(Clone, Copy, bytemuck::Pod, bytemuck::Zeroable)]
++struct PolySpriteInstance {
++    order: u32,
++    pad: u32,
++    texture_id: u32,
++    texture_kind: u32,
++    tile_id: u32,
++    tile_padding: u32,
++    tile_origin_x: i32,
++    tile_origin_y: i32,
++    tile_size_w: i32,
++    tile_size_h: i32,
++    grayscale: u32,
++    opacity: f32,
++    bounds_x: f32,
++    bounds_y: f32,
++    bounds_w: f32,
++    bounds_h: f32,
++    mask_x: f32,
++    mask_y: f32,
++    mask_w: f32,
++    mask_h: f32,
++    corner_tl: f32,
++    corner_tr: f32,
++    corner_br: f32,
++    corner_bl: f32,
++}
++
++impl From<&PolychromeSprite> for PolySpriteInstance {
++    fn from(sprite: &PolychromeSprite) -> Self {
++        let bounds = sprite.bounds;
++        let mask = sprite.content_mask.bounds;
++        PolySpriteInstance {
++            order: sprite.order,
++            pad: sprite.pad,
++            texture_id: sprite.tile.texture_id.index,
++            texture_kind: sprite.tile.texture_id.kind as u32,
++            tile_id: sprite.tile.tile_id.0,
++            tile_padding: sprite.tile.padding,
++            tile_origin_x: sprite.tile.bounds.origin.x.0,
++            tile_origin_y: sprite.tile.bounds.origin.y.0,
++            tile_size_w: sprite.tile.bounds.size.width.0,
++            tile_size_h: sprite.tile.bounds.size.height.0,
++            grayscale: u32::from(sprite.grayscale == true.into()),
++            opacity: sprite.opacity,
++            bounds_x: bounds.origin.x.0,
++            bounds_y: bounds.origin.y.0,
++            bounds_w: bounds.size.width.0,
++            bounds_h: bounds.size.height.0,
++            mask_x: mask.origin.x.0,
++            mask_y: mask.origin.y.0,
++            mask_w: mask.size.width.0,
++            mask_h: mask.size.height.0,
++            corner_tl: sprite.corner_radii.top_left.0,
++            corner_tr: sprite.corner_radii.top_right.0,
++            corner_br: sprite.corner_radii.bottom_right.0,
++            corner_bl: sprite.corner_radii.bottom_left.0,
++        }
++    }
++}
++
++/// Vertex layout the monochrome/subpixel pipelines expect, packed from
++/// `gpui::MonochromeSprite`/`SubpixelSprite` field orders.
++#[repr(C)]
++#[derive(Clone, Copy, bytemuck::Pod, bytemuck::Zeroable)]
++struct MonoSpriteInstance {
++    order: u32,
++    pad: u32,
++    texture_id: u32,
++    texture_kind: u32,
++    tile_id: u32,
++    tile_padding: u32,
++    tile_origin_x: i32,
++    tile_origin_y: i32,
++    tile_size_w: i32,
++    tile_size_h: i32,
++    bounds_x: f32,
++    bounds_y: f32,
++    bounds_w: f32,
++    bounds_h: f32,
++    mask_x: f32,
++    mask_y: f32,
++    mask_w: f32,
++    mask_h: f32,
++    color_r: f32,
++    color_g: f32,
++    color_b: f32,
++    color_a: f32,
++    transform_00: f32,
++    transform_01: f32,
++    transform_10: f32,
++    transform_11: f32,
++    translate_x: f32,
++    translate_y: f32,
++}
++
++fn mono_instance(
++    order: u32,
++    pad: u32,
++    tile: &gpui::AtlasTile,
++    bounds: gpui::Bounds<gpui::ScaledPixels>,
++    content_mask: gpui::ContentMask<gpui::ScaledPixels>,
++    color: gpui::Hsla,
++    transformation: &gpui::TransformationMatrix,
++) -> MonoSpriteInstance {
++    MonoSpriteInstance {
++        order,
++        pad,
++        texture_id: tile.texture_id.index,
++        texture_kind: tile.texture_id.kind as u32,
++        tile_id: tile.tile_id.0,
++        tile_padding: tile.padding,
++        tile_origin_x: tile.bounds.origin.x.0,
++        tile_origin_y: tile.bounds.origin.y.0,
++        tile_size_w: tile.bounds.size.width.0,
++        tile_size_h: tile.bounds.size.height.0,
++        bounds_x: bounds.origin.x.0,
++        bounds_y: bounds.origin.y.0,
++        bounds_w: bounds.size.width.0,
++        bounds_h: bounds.size.height.0,
++        mask_x: content_mask.bounds.origin.x.0,
++        mask_y: content_mask.bounds.origin.y.0,
++        mask_w: content_mask.bounds.size.width.0,
++        mask_h: content_mask.bounds.size.height.0,
++        color_r: color.to_rgb().r,
++        color_g: color.to_rgb().g,
++        color_b: color.to_rgb().b,
++        color_a: color.to_rgb().a,
++        transform_00: transformation.rotation_scale[0][0],
++        transform_01: transformation.rotation_scale[0][1],
++        transform_10: transformation.rotation_scale[1][0],
++        transform_11: transformation.rotation_scale[1][1],
++        translate_x: transformation.translation[0],
++        translate_y: transformation.translation[1],
++    }
++}
++
++impl From<&MonochromeSprite> for MonoSpriteInstance {
++    fn from(sprite: &MonochromeSprite) -> Self {
++        mono_instance(
++            sprite.order,
++            sprite.pad,
++            &sprite.tile,
++            sprite.bounds,
++            sprite.content_mask,
++            sprite.color,
++            &sprite.transformation,
++        )
++    }
++}
++
++impl From<&gpui::SubpixelSprite> for MonoSpriteInstance {
++    fn from(sprite: &gpui::SubpixelSprite) -> Self {
++        mono_instance(
++            sprite.order,
++            sprite.pad,
++            &sprite.tile,
++            sprite.bounds,
++            sprite.content_mask,
++            sprite.color,
++            &sprite.transformation,
++        )
++    }
++}
++
+ pub struct WgpuRenderer {
+     device: Arc<wgpu::Device>,
+     queue: Arc<wgpu::Queue>,
+@@ -125,14 +303,27 @@ pub struct WgpuRenderer {
+     path_globals_bind_group: wgpu::BindGroup,
+     instance_buffer: wgpu::Buffer,
+     instance_buffer_capacity: u64,
++    #[cfg(not(feature = "fast"))]
+     instance_buffer_alignment: u64,
+     path_targets: Option<PathTargets>,
+     rendering_params: RenderingParameters,
+     adapter_info: wgpu::AdapterInfo,
++    #[cfg(feature = "fast")]
++    fast_frame: fast::frame::FrameState,
++    #[cfg(not(feature = "fast"))]
+     path_vertices: RefCell<Vec<PathRasterizationVertex>>,
++    #[cfg(not(feature = "fast"))]
+     path_sprites: RefCell<Vec<PathSprite>>,
++    #[cfg(not(feature = "fast"))]
+     path_batch_bounds: RefCell<Vec<Bounds<ScaledPixels>>>,
++    #[cfg(not(feature = "fast"))]
+     polychrome_sprites: RefCell<Vec<PolychromeSprite>>,
++    #[cfg(not(feature = "fast"))]
++    polychrome_instances: RefCell<Vec<PolySpriteInstance>>,
++    #[cfg(not(feature = "fast"))]
++    mono_instances: RefCell<Vec<MonoSpriteInstance>>,
++    #[cfg(not(feature = "fast"))]
++    subpixel_instances: RefCell<Vec<MonoSpriteInstance>>,
+ }
+
+ impl WgpuRenderer {
+@@ -191,13 +382,7 @@ impl WgpuRenderer {
+             .iter()
+             .find(|f| surface_caps.formats.contains(f))
+             .copied()
+-            .or_else(|| {
+-                surface_caps
+-                    .formats
+-                    .iter()
+-                    .find(|f| !f.is_srgb())
+-                    .copied()
+-            })
++            .or_else(|| surface_caps.formats.iter().find(|f| !f.is_srgb()).copied())
+             .unwrap_or(surface_caps.formats[0]);
+
+         let pick_alpha_mode =
+@@ -256,7 +441,16 @@ impl WgpuRenderer {
+         let shader = context.render_shader.get_or_init(|| {
+             device.create_shader_module(wgpu::ShaderModuleDescriptor {
+                 label: Some("gpui_shaders"),
+-                source: wgpu::ShaderSource::Wgsl(include_str!("shaders.wgsl").into()),
++                source: {
++                    #[cfg(feature = "fast")]
++                    {
++                        fast::rounded_clip::shader_source(include_str!("shaders.wgsl"))
++                    }
++                    #[cfg(not(feature = "fast"))]
++                    {
++                        wgpu::ShaderSource::Wgsl(include_str!("shaders.wgsl").into())
++                    }
++                },
+             })
+         });
+         let pipelines = context.render_pipelines.get_or_insert_with(key, || {
+@@ -303,6 +497,7 @@ impl WgpuRenderer {
+             mapped_at_creation: false,
+         });
+
++        #[cfg(not(feature = "fast"))]
+         let instance_buffer_alignment = 4;
+         let initial_instance_buffer_capacity = 2 * 1024 * 1024;
+         let instance_buffer = device.create_buffer(&wgpu::BufferDescriptor {
+@@ -376,14 +571,27 @@ impl WgpuRenderer {
+             path_globals_bind_group,
+             instance_buffer,
+             instance_buffer_capacity: initial_instance_buffer_capacity,
++            #[cfg(not(feature = "fast"))]
+             instance_buffer_alignment,
+             path_targets: None,
+             rendering_params,
+             adapter_info,
++            #[cfg(feature = "fast")]
++            fast_frame: fast::frame::FrameState::default(),
++            #[cfg(not(feature = "fast"))]
+             path_vertices: RefCell::new(Vec::new()),
++            #[cfg(not(feature = "fast"))]
+             path_sprites: RefCell::new(Vec::new()),
++            #[cfg(not(feature = "fast"))]
+             path_batch_bounds: RefCell::new(Vec::new()),
++            #[cfg(not(feature = "fast"))]
+             polychrome_sprites: RefCell::new(Vec::new()),
++            #[cfg(not(feature = "fast"))]
++            polychrome_instances: RefCell::new(Vec::new()),
++            #[cfg(not(feature = "fast"))]
++            mono_instances: RefCell::new(Vec::new()),
++            #[cfg(not(feature = "fast"))]
++            subpixel_instances: RefCell::new(Vec::new()),
+         };
+         renderer.write_global_params(true);
+         Ok(renderer)
+@@ -443,7 +651,12 @@ impl WgpuRenderer {
+             ],
+         });
+
+-        WgpuBindGroupLayouts { globals, textures }
++        WgpuBindGroupLayouts {
++            globals,
++            textures,
++            #[cfg(feature = "fast")]
++            rounded_clip: fast::rounded_clip::Bindings::new(device),
++        }
+     }
+
+     fn quad_vertex_layout() -> wgpu::VertexBufferLayout<'static> {
+@@ -723,20 +936,18 @@ impl WgpuRenderer {
+
+     fn mono_sprite_vertex_layout() -> wgpu::VertexBufferLayout<'static> {
+         const {
+-            assert!(std::mem::offset_of!(MonochromeSprite, order) == 0);
+-            assert!(std::mem::offset_of!(MonochromeSprite, pad) == 4);
+-            assert!(std::mem::offset_of!(MonochromeSprite, tile) == 8);
+-            assert!(std::mem::offset_of!(MonochromeSprite, bounds) == 40);
+-            assert!(std::mem::offset_of!(MonochromeSprite, content_mask) == 56);
+-            assert!(std::mem::offset_of!(MonochromeSprite, color) == 72);
+-            assert!(std::mem::offset_of!(MonochromeSprite, transformation) == 88);
+-            assert!(std::mem::offset_of!(gpui::SubpixelSprite, order) == 0);
+-            assert!(std::mem::offset_of!(gpui::SubpixelSprite, pad) == 4);
+-            assert!(std::mem::offset_of!(gpui::SubpixelSprite, tile) == 8);
+-            assert!(std::mem::offset_of!(gpui::SubpixelSprite, bounds) == 40);
+-            assert!(std::mem::offset_of!(gpui::SubpixelSprite, content_mask) == 56);
+-            assert!(std::mem::offset_of!(gpui::SubpixelSprite, color) == 72);
+-            assert!(std::mem::offset_of!(gpui::SubpixelSprite, transformation) == 88);
++            assert!(std::mem::offset_of!(MonoSpriteInstance, order) == 0);
++            assert!(std::mem::offset_of!(MonoSpriteInstance, pad) == 4);
++            assert!(std::mem::offset_of!(MonoSpriteInstance, texture_id) == 8);
++            assert!(std::mem::offset_of!(MonoSpriteInstance, tile_id) == 16);
++            assert!(std::mem::offset_of!(MonoSpriteInstance, tile_origin_x) == 24);
++            assert!(std::mem::offset_of!(MonoSpriteInstance, tile_size_w) == 32);
++            assert!(std::mem::offset_of!(MonoSpriteInstance, bounds_x) == 40);
++            assert!(std::mem::offset_of!(MonoSpriteInstance, mask_x) == 56);
++            assert!(std::mem::offset_of!(MonoSpriteInstance, color_r) == 72);
++            assert!(std::mem::offset_of!(MonoSpriteInstance, transform_00) == 88);
++            assert!(std::mem::offset_of!(MonoSpriteInstance, translate_x) == 104);
++            assert!(std::mem::size_of::<MonoSpriteInstance>() == 112);
+         }
+         const ATTRIBUTES: [wgpu::VertexAttribute; 13] = [
+             wgpu::VertexAttribute {
+@@ -806,7 +1017,7 @@ impl WgpuRenderer {
+             },
+         ];
+         wgpu::VertexBufferLayout {
+-            array_stride: std::mem::size_of::<MonochromeSprite>() as u64,
++            array_stride: std::mem::size_of::<MonoSpriteInstance>() as u64,
+             step_mode: wgpu::VertexStepMode::Instance,
+             attributes: &ATTRIBUTES,
+         }
+@@ -814,14 +1025,18 @@ impl WgpuRenderer {
+
+     fn poly_sprite_vertex_layout() -> wgpu::VertexBufferLayout<'static> {
+         const {
+-            assert!(std::mem::offset_of!(PolychromeSprite, order) == 0);
+-            assert!(std::mem::offset_of!(PolychromeSprite, pad) == 4);
+-            assert!(std::mem::offset_of!(PolychromeSprite, tile) == 8);
+-            assert!(std::mem::offset_of!(PolychromeSprite, grayscale) == 40);
+-            assert!(std::mem::offset_of!(PolychromeSprite, opacity) == 44);
+-            assert!(std::mem::offset_of!(PolychromeSprite, bounds) == 48);
+-            assert!(std::mem::offset_of!(PolychromeSprite, content_mask) == 64);
+-            assert!(std::mem::offset_of!(PolychromeSprite, corner_radii) == 80);
++            assert!(std::mem::offset_of!(PolySpriteInstance, order) == 0);
++            assert!(std::mem::offset_of!(PolySpriteInstance, pad) == 4);
++            assert!(std::mem::offset_of!(PolySpriteInstance, texture_id) == 8);
++            assert!(std::mem::offset_of!(PolySpriteInstance, tile_id) == 16);
++            assert!(std::mem::offset_of!(PolySpriteInstance, tile_origin_x) == 24);
++            assert!(std::mem::offset_of!(PolySpriteInstance, tile_size_w) == 32);
++            assert!(std::mem::offset_of!(PolySpriteInstance, grayscale) == 40);
++            assert!(std::mem::offset_of!(PolySpriteInstance, opacity) == 44);
++            assert!(std::mem::offset_of!(PolySpriteInstance, bounds_x) == 48);
++            assert!(std::mem::offset_of!(PolySpriteInstance, mask_x) == 64);
++            assert!(std::mem::offset_of!(PolySpriteInstance, corner_tl) == 80);
++            assert!(std::mem::size_of::<PolySpriteInstance>() == 96);
+         }
+         const ATTRIBUTES: [wgpu::VertexAttribute; 12] = [
+             wgpu::VertexAttribute {
+@@ -886,7 +1101,7 @@ impl WgpuRenderer {
+             },
+         ];
+         wgpu::VertexBufferLayout {
+-            array_stride: std::mem::size_of::<PolychromeSprite>() as u64,
++            array_stride: std::mem::size_of::<PolySpriteInstance>() as u64,
+             step_mode: wgpu::VertexStepMode::Instance,
+             attributes: &ATTRIBUTES,
+         }
+@@ -929,6 +1144,13 @@ impl WgpuRenderer {
+                 .copied()
+                 .map(Some)
+                 .collect::<Vec<_>>();
++            #[cfg(feature = "fast")]
++            let bind_group_layouts = {
++                let mut layouts_with_clip = bind_group_layouts;
++                layouts_with_clip.resize(3, None);
++                layouts_with_clip.push(Some(&layouts.rounded_clip.layout));
++                layouts_with_clip
++            };
+             let pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
+                 label: Some(&format!("{name}_layout")),
+                 bind_group_layouts: &bind_group_layouts,
+@@ -1159,6 +1381,10 @@ impl WgpuRenderer {
+             self.surface.configure(&self.device, &self.surface_config);
+
+             self.path_targets = None;
++            #[cfg(feature = "fast")]
++            {
++                self.fast_frame = fast::frame::FrameState::default();
++            }
+             self.write_global_params(false);
+         }
+     }
+@@ -1256,6 +1482,30 @@ impl WgpuRenderer {
+             .texture
+             .create_view(&wgpu::TextureViewDescriptor::default());
+
++        #[cfg(feature = "fast")]
++        {
++            let result =
++                fast::frame::record_into(self, scene, &frame_view, wgpu::Color::TRANSPARENT);
++            self.queue.present(frame);
++            match result {
++                Ok(_) => Presentation::Presented,
++                Err(error) => {
++                    log::error!("Failed to record gpui-fast scene: {error:#}");
++                    Presentation::Unavailable
++                }
++            }
++        }
++        #[cfg(not(feature = "fast"))]
++        self.draw_pre_scene(scene, &frame_view, frame)
++    }
++
++    #[cfg(not(feature = "fast"))]
++    fn draw_pre_scene(
++        &mut self,
++        scene: &Scene,
++        frame_view: &wgpu::TextureView,
++        frame: wgpu::SurfaceTexture,
++    ) -> Presentation {
+         // Retain targets across path frames, but allocate nothing for windows that
+         // never draw paths. Resize invalidates them before the next path frame.
+         if !scene.paths.is_empty() && self.path_targets.is_none() {
+@@ -1310,7 +1560,7 @@ impl WgpuRenderer {
+                 let mut pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+                     label: Some("main_pass"),
+                     color_attachments: &[Some(wgpu::RenderPassColorAttachment {
+-                        view: &frame_view,
++                        view: frame_view,
+                         resolve_target: None,
+                         ops: wgpu::Operations {
+                             load: wgpu::LoadOp::Clear(wgpu::Color::TRANSPARENT),
+@@ -1354,7 +1604,7 @@ impl WgpuRenderer {
+                                 pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+                                     label: Some("main_pass_continued"),
+                                     color_attachments: &[Some(wgpu::RenderPassColorAttachment {
+-                                        view: &frame_view,
++                                        view: frame_view,
+                                         resolve_target: None,
+                                         ops: wgpu::Operations {
+                                             load: wgpu::LoadOp::Load,
+@@ -1439,6 +1689,7 @@ impl WgpuRenderer {
+         }
+     }
+
++    #[cfg(not(feature = "fast"))]
+     fn draw_monochrome_sprites(
+         &self,
+         range: Range<usize>,
+@@ -1456,6 +1707,7 @@ impl WgpuRenderer {
+         )
+     }
+
++    #[cfg(not(feature = "fast"))]
+     fn draw_subpixel_sprites(
+         &self,
+         range: Range<usize>,
+@@ -1472,6 +1724,7 @@ impl WgpuRenderer {
+         self.draw_instances_with_texture(range, binding, &tex_info.bind_group, pipeline, pass)
+     }
+
++    #[cfg(not(feature = "fast"))]
+     fn draw_polychrome_sprites(
+         &self,
+         range: Range<usize>,
+@@ -1489,6 +1742,7 @@ impl WgpuRenderer {
+         )
+     }
+
++    #[cfg(not(feature = "fast"))]
+     fn draw_quads(
+         &self,
+         range: Range<usize>,
+@@ -1520,6 +1774,7 @@ impl WgpuRenderer {
+         true
+     }
+
++    #[cfg(not(feature = "fast"))]
+     fn draw_instances(
+         &self,
+         range: Range<usize>,
+@@ -1539,6 +1794,7 @@ impl WgpuRenderer {
+         true
+     }
+
++    #[cfg(not(feature = "fast"))]
+     fn draw_instances_with_texture(
+         &self,
+         range: Range<usize>,
+@@ -1560,6 +1816,7 @@ impl WgpuRenderer {
+         true
+     }
+
++    #[cfg(not(feature = "fast"))]
+     fn write_scene_instances(
+         &self,
+         scene: &Scene,
+@@ -1569,15 +1826,29 @@ impl WgpuRenderer {
+         let polychrome = self
+             .atlas
+             .encode_image_alpha(&scene.polychrome_sprites, &mut polychrome);
++        let mut instances = self.polychrome_instances.borrow_mut();
++        instances.clear();
++        instances.extend(polychrome.iter().map(PolySpriteInstance::from));
+         // One staging allocation and one queued copy for all instance kinds.
++        let mut mono = self.mono_instances.borrow_mut();
++        mono.clear();
++        mono.extend(
++            scene
++                .monochrome_sprites
++                .iter()
++                .map(MonoSpriteInstance::from),
++        );
++        let mut subpixel = self.subpixel_instances.borrow_mut();
++        subpixel.clear();
++        subpixel.extend(scene.subpixel_sprites.iter().map(MonoSpriteInstance::from));
+         let data = unsafe {
+             [
+                 Self::instance_bytes(&scene.quads),
+                 Self::instance_bytes(&scene.shadows),
+                 Self::instance_bytes(&scene.underlines),
+-                Self::instance_bytes(&scene.monochrome_sprites),
+-                Self::instance_bytes(&scene.subpixel_sprites),
+-                Self::instance_bytes(polychrome),
++                Self::instance_bytes(&mono),
++                Self::instance_bytes(&subpixel),
++                Self::instance_bytes(&instances),
+             ]
+         };
+         let start = (*instance_offset).next_multiple_of(self.instance_buffer_alignment);
+@@ -1628,15 +1899,15 @@ impl WgpuRenderer {
+             },
+             monochrome_sprites: InstanceBinding {
+                 offset: offsets[3],
+-                stride: std::mem::size_of::<MonochromeSprite>() as u64,
++                stride: std::mem::size_of::<MonoSpriteInstance>() as u64,
+             },
+             subpixel_sprites: InstanceBinding {
+                 offset: offsets[4],
+-                stride: std::mem::size_of::<gpui::SubpixelSprite>() as u64,
++                stride: std::mem::size_of::<MonoSpriteInstance>() as u64,
+             },
+             polychrome_sprites: InstanceBinding {
+                 offset: offsets[5],
+-                stride: std::mem::size_of::<PolychromeSprite>() as u64,
++                stride: std::mem::size_of::<PolySpriteInstance>() as u64,
+             },
+         })
+     }
+@@ -1650,6 +1921,7 @@ impl WgpuRenderer {
+         }
+     }
+
++    #[cfg(not(feature = "fast"))]
+     fn padded_path_batch_bounds(paths: &[Path<ScaledPixels>]) -> Bounds<ScaledPixels> {
+         let mut bounds = paths[0].clipped_bounds();
+         for path in paths.iter().skip(1) {
+@@ -1668,6 +1940,7 @@ impl WgpuRenderer {
+         }
+     }
+
++    #[cfg(not(feature = "fast"))]
+     fn next_coalesced_path_range(&self, scene: &Scene, start_path_index: usize) -> Range<usize> {
+         let mut group_bounds = self.path_batch_bounds.borrow_mut();
+         group_bounds.clear();
+@@ -1697,6 +1970,7 @@ impl WgpuRenderer {
+         start_path_index..group_end
+     }
+
++    #[cfg(not(feature = "fast"))]
+     fn draw_paths_from_intermediate(
+         &self,
+         paths: &[Path<ScaledPixels>],
+@@ -1742,6 +2016,7 @@ impl WgpuRenderer {
+         )
+     }
+
++    #[cfg(not(feature = "fast"))]
+     fn draw_paths_to_intermediate(
+         &self,
+         encoder: &mut wgpu::CommandEncoder,
+@@ -1824,6 +2099,7 @@ impl WgpuRenderer {
+         self.instance_buffer_capacity = new_capacity;
+     }
+
++    #[cfg(not(feature = "fast"))]
+     fn write_to_instance_buffer(
+         &self,
+         instance_offset: &mut u64,

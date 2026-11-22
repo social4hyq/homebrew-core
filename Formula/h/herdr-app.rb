@@ -13,8 +13,9 @@ class HerdrApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/herdr-app-v0.1.16-r13"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "42dfe6865d67647843dcd006bb77f35d79d9848b20e47ed7e2445ed8596c3d42"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/herdr-app-v0.1.16-r14"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2e080ada1fd000336e710c2e3d8c44a616d7246c65967b59061c8cfa2d6a2c05"
   end
 
   depends_on "node" => :build
@@ -25,6 +26,8 @@ class HerdrApp < Formula
   depends_on "ohos-sdk-toolchains"
   depends_on "python@3.15"
   depends_on "social4hyq/core/herdr-core"
+
+  patch_root = Pathname(__dir__).parent.parent
 
   # libghostty-vt builds from the ghostty submodule (GitHub archives omit it);
   # simdutf needs PIC for OHOS.
@@ -41,8 +44,10 @@ class HerdrApp < Formula
     url "https://static.crates.io/crates/openharmony-ability/openharmony-ability-1.0.0-beta.5.crate"
     sha256 "c3d65db22273d3afdef8fd8eb9411546243aae365236829e67a8deca79eed5f1"
 
-    patch do
-      file "Patches/herdr-app/openharmony-ability/0001-ime-fast-typing.patch"
+    Dir[(patch_root/"Patches/herdr-app/openharmony-ability/*.patch").to_s].each do |path|
+      patch do
+        file Pathname(path).relative_path_from(patch_root).to_s
+      end
     end
   end
 
@@ -50,8 +55,10 @@ class HerdrApp < Formula
     url "https://static.crates.io/crates/gpui-ohos/gpui-ohos-0.0.1-beta.0.crate"
     sha256 "77231f68750da0ae969c9b6d8054a82376ebcc522d0baff57a4a2bd434f331ce"
 
-    patch do
-      file "Patches/herdr-app/gpui-ohos/0001-herdr-renderer.patch"
+    Dir[(patch_root/"Patches/herdr-app/gpui-ohos/*.patch").to_s].each do |path|
+      patch do
+        file Pathname(path).relative_path_from(patch_root).to_s
+      end
     end
   end
 
@@ -69,7 +76,6 @@ class HerdrApp < Formula
     sha256 "39d931489e99f80b496f900f88d67d7aad6b5f25ce83810a408eb42f6af6839e"
   end
 
-  patch_root = Pathname(__dir__).parent.parent
   Dir[(patch_root/"Patches/herdr-app/*.patch").to_s].each do |path|
     patch do
       file Pathname(path).relative_path_from(patch_root).to_s

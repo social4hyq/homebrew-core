@@ -1,0 +1,25 @@
+diff --git a/src/input/ime.rs b/src/input/ime.rs
+index fe4a63c..8d4a9f6 100644
+--- a/src/input/ime.rs
++++ b/src/input/ime.rs
+@@ -55,16 +55,17 @@ impl InputCallback {
+     }
+
+     #[cfg(feature = "keyboard")]
+-    pub(crate) fn key(&self, event: crate::KeyboardEventData) {
++    pub(crate) fn key(&self, id: super::queue::KeyId, event: crate::KeyboardEventData) {
+         self.enqueue(self.queue.push_key(
+             &self.owner,
++            id,
+             InputEvent::ArkUi(crate::ArkUiInputEvent::Key(event)),
+         ));
+     }
+
+     #[cfg(feature = "keyboard")]
+-    pub(crate) fn after_ime(&self) {
+-        if let Err(error) = self.queue.after_ime(&self.owner) {
++    pub(crate) fn after_ime(&self, id: super::queue::KeyId) {
++        if let Err(error) = self.queue.after_ime(&self.owner, id) {
+             crate::warn!("{error}");
+         }
+     }

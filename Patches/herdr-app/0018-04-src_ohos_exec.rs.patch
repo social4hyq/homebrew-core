@@ -1,0 +1,24 @@
+diff --git a/src/ohos_exec.rs b/src/ohos_exec.rs
+index 6309d77..c85c1a3 100644
+--- a/src/ohos_exec.rs
++++ b/src/ohos_exec.rs
+@@ -18,15 +18,16 @@ use crate::hc::Core;
+ 
+ static CORE: Mutex<Option<Arc<Core>>> = Mutex::new(None);
+ 
+-/// The core bridge on the host: `HERDR_CORE_TCP`, else the default `herdr-bridge.py` listens on.
++/// The core bridge on the host: `HERDR_CORE_TCP`, else the address `herdr-app install` put in the HAP
++/// (`bridge.conf` in the app's files directory), else the default the bridge listens on.
+ pub(crate) fn endpoint() -> String {
+-    std::env::var("HERDR_CORE_TCP").unwrap_or_else(|_| "127.0.0.1:8765".to_string())
++    crate::bridge_auth::address(&crate::mods::app_dir())
+ }
+ 
+ /// What the setup page says when the bridge cannot be reached. There is no installing a core from
+ /// inside a HAP, so this is always a "start the bridge, then Retry" page, never "Install it for me".
+ pub(crate) fn unreachable_message(error: &anyhow::Error) -> String {
+-    format!("Herdr reaches herdr-core through herdr-bridge on the host ({}). Start it there, then press Retry.\n\n{error:#}", endpoint())
++    format!("Herdr reaches herdr-core through herdr-bridge on the host ({}). Run `herdr-app bridge start` there, then press Retry.\n\n{error:#}", endpoint())
+ }
+ 
+ fn core(fresh: bool) -> Result<Arc<Core>, String> {

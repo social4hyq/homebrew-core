@@ -1,0 +1,68 @@
+diff --git a/src/ohos/scroll_packet.rs b/src/ohos/scroll_packet.rs
+index 4f9af46..6bbbfa2 100644
+--- a/src/ohos/scroll_packet.rs
++++ b/src/ohos/scroll_packet.rs
+@@ -29,9 +29,14 @@ impl ScrollPacket {
+     }
+
+     /// Keep the system scroll-step coefficient in ordinary widget line deltas.
++    ///
++    /// ArkUI reports a wheel pushed away from the user as a negative axis value,
++    /// while GPUI keeps positive deltas pointing up; the platform sign is flipped
++    /// once here so widgets and the terminal follow the wheel. Native consumers
++    /// still see the unwrapped platform ticks.
+     pub(super) fn wheel(degrees: Point<f64>, _scroll_step: i32) -> Option<Self> {
+         let lines = degrees.map(|value| value / WHEEL_DEGREES);
+-        let logical = lines.map(|value| value as f32);
++        let logical = lines.map(|value| -(value as f32));
+         if !logical.x.is_finite() || !logical.y.is_finite() {
+             return None;
+         }
+@@ -48,7 +53,8 @@ impl ScrollPacket {
+         if !scale.is_finite() || scale <= 0. {
+             return None;
+         }
+-        let logical = device.map(|value| px(value as f32 / scale));
++        // Same platform sign as the wheel: two fingers moving down arrive negative.
++        let logical = device.map(|value| px(-(value as f32) / scale));
+         if !logical.x.as_f32().is_finite() || !logical.y.as_f32().is_finite() {
+             return None;
+         }
+@@ -64,3 +70,37 @@ impl ScrollPacket {
+         NativeScrollScope::bind(window, self.delta, scale, self.native)
+     }
+ }
++
++#[cfg(test)]
++mod tests {
++    use gpui::point;
++
++    use super::*;
++
++    fn lines(packet: Option<ScrollPacket>) -> (f32, f32) {
++        match packet.expect("finite delta").delta {
++            ScrollDelta::Lines(delta) => (delta.x, delta.y),
++            ScrollDelta::Pixels(_) => panic!("a wheel delta stays in lines"),
++        }
++    }
++
++    fn pixels(packet: Option<ScrollPacket>) -> (f32, f32) {
++        match packet.expect("finite delta").delta {
++            ScrollDelta::Pixels(delta) => (delta.x.as_f32(), delta.y.as_f32()),
++            ScrollDelta::Lines(_) => panic!("a touchpad delta stays in pixels"),
++        }
++    }
++
++    #[test]
++    fn platform_sign_is_flipped_once_for_wheel_and_touchpad() {
++        // ArkUI sends a wheel pushed away from the user (scroll up) as -15 degrees.
++        assert_eq!(lines(ScrollPacket::wheel(point(0., -15.), 1)), (0., 1.));
++        assert_eq!(lines(ScrollPacket::wheel(point(0., 15.), 1)), (0., -1.));
++        // Two fingers moving down (scroll up) arrive as negative device pixels.
++        assert_eq!(pixels(ScrollPacket::pixels(point(0., -40.), 2.)), (0., 20.));
++        assert_eq!(
++            pixels(ScrollPacket::pixels(point(40., 40.), 2.)),
++            (-20., -20.)
++        );
++    }
++}

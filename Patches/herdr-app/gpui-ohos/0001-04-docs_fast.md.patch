@@ -1,0 +1,83 @@
+diff --git a/docs/fast.md b/docs/fast.md
+new file mode 100644
+index 0000000..383ee26
+--- /dev/null
++++ b/docs/fast.md
+@@ -0,0 +1,77 @@
++# Fast core and rendering
++
++The optional `fast` Cargo feature selects the unmodified crates.io
++`gpui-fast 0.1.13` release. The default build uses `gpui-pre 0.3.11`.
++The Fast release itself uses GPUI Pre support crates from snapshot 0.3.11.
++No core patch, Git dependency, or environment-variable fallback is required.
++
++```toml
++[dependencies]
++gpui-fast = { package = "gpui-fast", version = "=0.1.13", default-features = false }
++gpui-ohos = { version = "0.0.1-beta.0", features = ["fast"] }
++```
++
++This feature is currently available in this source branch; the published
++`gpui-ohos 0.0.1-beta.0` package does not yet contain it. Use a local checkout
++or a source override until a backend release includes the feature.
++
++Every crate exchanging GPUI values must select the same core: the application,
++OHOS backend, GPUI Kit, router, and optional diagnostics. GPUI Kit exposes
++`gpui-fast`; router 0.7.0 requires a backend-selection patch. Enabling only the
++platform feature while the application remains on GPUI Pre yields incompatible
++types. An application can keep Pre as its default and select Fast with:
++
++```rust
++#[cfg(feature = "fast")]
++extern crate gpui_fast as gpui;
++```
++
++## Scene support
++
++The OHOS WGPU renderer understands Fast's two additional scene formats:
++
++- Scroll-layer sprites select per-window tile textures rather than the image
++  atlas. Dirty generations invalidate affected tiles; cached tiles are reused
++  while scrolling. The cache has a 64 MiB budget, evicts inactive tiles, and is
++  reset with the renderer on resize or native-surface recreation.
++- Rounded overflow groups draw their children in order with analytic padding-
++  edge clip stacks. Nested groups, unequal radii, and paths use the same clip
++  coverage. Rasterized path batches keep separate scene ranges.
++
++The implementation adapts the official `gpui-fast-wgpu 0.1.13` frame graph,
++clip protocol, and tile cache to the OHOS vertex-buffer renderer. It retains
++OHOS native-surface handles, GLES adapter corrections, shared pipeline caches,
++existing sprite atlases, and registered image-alpha/sampling flags. This does
++not add a dependency on the desktop WGPU platform or modify gpui-fast.
++Source attribution and the Apache license are in `src/ohos/fast/`.
++The exact Fast version is pinned because these scene formats are private.
++
++## Validation
++
++Cross-compile both selections with the OHOS Rust toolchain:
++
++```sh
++ohrs cargo --disable-target -- check --release --target aarch64-unknown-linux-ohos
++ohrs cargo --disable-target -- clippy --release --target aarch64-unknown-linux-ohos --features fast -- -D warnings
++```
++
++The host GPU harness compiles the production renderer, shader, atlas and frame
++recording modules without OHOS N-API. It compares direct and tiled pixels for
++quads, images, glyphs and paths; verifies cache invalidation/eviction; and draws
++real GPUI rounded-overflow elements, including rounded clips inside tiles.
++A working Metal or Vulkan adapter is needed for the pixel tests.
++
++```sh
++cargo test --manifest-path tests/renderer/Cargo.toml
++```
++
++The included example selects the backend's core through `gpui-ohos` and
++supports the same optional feature. Check either selection with:
++
++```sh
++ohrs cargo --disable-target -- check --release --target aarch64-unknown-linux-ohos --manifest-path example/Cargo.toml
++ohrs cargo --disable-target -- check --release --target aarch64-unknown-linux-ohos --manifest-path example/Cargo.toml --features fast
++```
++
++Native-surface lifetime and GLES behavior must also be checked on an OHOS
++application. The example can be packaged with or without its `fast` feature.

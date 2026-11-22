@@ -1,0 +1,58 @@
+diff --git a/src/ohos/fast/pass_state.rs b/src/ohos/fast/pass_state.rs
+new file mode 100644
+index 0000000..247657b
+--- /dev/null
++++ b/src/ohos/fast/pass_state.rs
+@@ -0,0 +1,52 @@
++// Copyright 2022-2025 Zed Industries, Inc.; Copyright 2026 Longbridge.
++// SPDX-License-Identifier: Apache-2.0
++// Adapted from gpui-fast-wgpu 0.1.13 for the OHOS vertex-buffer renderer.
++//! Render pass state set only when it changes.
++//!
++//! Upstream sets the pipeline and every bind group before each batch's draw.
++//! wgpu-core doesn't skip a repeated `set_pipeline`: it records it, validates
++//! it, re-derives the bind group state and emits it to the driver again, and
++//! the same for each `set_bind_group`. Consecutive batches share the globals
++//! bind group always, and often the pipeline, the instance bind group and the
++//! atlas texture, so most of those calls were no-ops that still cost CPU.
++//!
++//! Bind groups stay bound across `set_pipeline` in WebGPU, so skipping a call
++//! whose bind group is already bound draws the same image.
++
++/// What the current render pass has bound.
++#[derive(Default)]
++pub(crate) struct PassState {
++    pipeline: Option<wgpu::RenderPipeline>,
++    bind_groups: [Option<wgpu::BindGroup>; 4],
++}
++
++impl PassState {
++    /// Forgets what is bound, for a pass that starts with nothing bound.
++    pub(crate) fn forget(&mut self) {
++        *self = Self::default();
++    }
++
++    pub(crate) fn set_pipeline(
++        &mut self,
++        pass: &mut wgpu::RenderPass<'_>,
++        pipeline: &wgpu::RenderPipeline,
++    ) {
++        if self.pipeline.as_ref() != Some(pipeline) {
++            pass.set_pipeline(pipeline);
++            self.pipeline = Some(pipeline.clone());
++        }
++    }
++
++    pub(crate) fn set_bind_group(
++        &mut self,
++        pass: &mut wgpu::RenderPass<'_>,
++        index: u32,
++        bind_group: &wgpu::BindGroup,
++    ) {
++        let slot = &mut self.bind_groups[index as usize];
++        if slot.as_ref() != Some(bind_group) {
++            pass.set_bind_group(index, bind_group, &[]);
++            *slot = Some(bind_group.clone());
++        }
++    }
++}

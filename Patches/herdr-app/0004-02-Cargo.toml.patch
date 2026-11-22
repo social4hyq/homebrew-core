@@ -1,0 +1,111 @@
+diff --git a/Cargo.toml b/Cargo.toml
+index ae5281a..fe7a11d 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -15,10 +15,13 @@ edition.workspace = true
+ license.workspace = true
+ publish.workspace = true
+ 
++[lib]
++name = "herdr_app"
++crate-type = ["cdylib"]
++
+ [dependencies]
+ ghostty-sys = { path = "crates/ghostty-sys" }
+ gpui = { package = "gpui-pre", version = "=0.3.8", features = ["render-to-image"] }
+-gpui_platform = { package = "gpui-pre-platform", version = "=0.3.8", features = ["font-kit", "x11", "wayland", "runtime_shaders"] }
+ gpui-shell = { path = "vendor/gpui-kit/crates/shell" }
+ gpui-base = { path = "vendor/gpui-kit/crates/base" }
+ anyhow = "1"
+@@ -52,9 +55,22 @@ skrifa = "=0.44.0"
+ swash = "=0.2.10"
+ tiny-skia = { version = "=0.11.4", default-features = false, features = ["std", "simd"] }
+ 
+-[target.'cfg(target_os = "linux")'.dependencies]
++[target.'cfg(all(target_os = "linux", not(target_env = "ohos")))'.dependencies]
++gpui_platform = { package = "gpui-pre-platform", version = "=0.3.8", features = ["font-kit", "x11", "wayland", "runtime_shaders"] }
+ gpui_linux = { package = "gpui-pre-linux", version = "=0.3.8", features = ["render-to-image"] }
+ 
++[target.'cfg(all(target_os = "linux", target_env = "ohos"))'.dependencies]
++gpui_ohos = { package = "gpui-ohos", path = "../gpui-ohos-038", default-features = false, features = ["gles", "api-26"] }
++openharmony-ability = "1.0.0-beta.5"
++openharmony-ability-derive = "1.0.0-beta.5"
++napi-ohos = "=1.2.0"
++napi-derive-ohos = "=1.2.0"
++ohos-hilog-binding = { version = "0.2.5", features = ["log"] }
++log = "0.4"
++libc = "0.2"
++tracing-log = "0.2"
++ctor = "0.2"
++
+ [target.'cfg(target_os = "macos")'.dependencies]
+ gpui_macos = { package = "gpui-pre-macos", version = "=0.3.8", features = ["render-to-image"] }
+ libc = "0.2"
+@@ -94,7 +110,12 @@ taffy = { path = "vendor/taffy" }
+ # threw it away, ~40% of the main thread with a mod of many small
+ # object-returning functions (longbridge/quickjs-jit#38, HERDR:).
+ [patch."https://github.com/longbridge/quickjs-jit"]
++quickjs-jit = { path = "vendor/quickjs-jit-src/96593cd" }
++quickjs-jit-core = { path = "vendor/quickjs-jit-src/96593cd/core" }
++quickjs-jit-macro = { path = "vendor/quickjs-jit-src/96593cd/macro" }
++quickjs-jit-sys = { path = "vendor/quickjs-jit-src/96593cd/sys" }
+ quickjs-jit-runtime = { path = "vendor/quickjs-jit-runtime" }
++quickjs-jit-stdlib = { path = "vendor/quickjs-jit-src/605da48/stdlib" }
+ 
+ # With --target (CI builds Intel Macs on Apple Silicon), stripping a macOS
+ # proc-macro loses what rustc loads from it: "can't find crate". Build-time
+@@ -104,3 +125,54 @@ strip = "none"
+ 
+ [profile.dev.package."*"]
+ opt-level = 2
++
++[build-dependencies]
++napi-build-ohos = "=1.2.0"
++
++[patch."https://github.com/awslabs/llrt"]
++llrt = { path = "vendor/llrt/llrt" }
++llrt_abort = { path = "vendor/llrt/modules/llrt_abort" }
++llrt_assert = { path = "vendor/llrt/modules/llrt_assert" }
++llrt_async_hooks = { path = "vendor/llrt/modules/llrt_async_hooks" }
++llrt_buffer = { path = "vendor/llrt/modules/llrt_buffer" }
++llrt_build = { path = "vendor/llrt/libs/llrt_build" }
++llrt_child_process = { path = "vendor/llrt/modules/llrt_child_process" }
++llrt_compression = { path = "vendor/llrt/libs/llrt_compression" }
++llrt_console = { path = "vendor/llrt/modules/llrt_console" }
++llrt_context = { path = "vendor/llrt/libs/llrt_context" }
++llrt_core = { path = "vendor/llrt/llrt_core" }
++llrt_crypto = { path = "vendor/llrt/modules/llrt_crypto" }
++llrt_dgram = { path = "vendor/llrt/modules/llrt_dgram" }
++llrt_dns = { path = "vendor/llrt/modules/llrt_dns" }
++llrt_dns_cache = { path = "vendor/llrt/libs/llrt_dns_cache" }
++llrt_encoding = { path = "vendor/llrt/libs/llrt_encoding" }
++llrt_events = { path = "vendor/llrt/modules/llrt_events" }
++llrt_exceptions = { path = "vendor/llrt/modules/llrt_exceptions" }
++llrt_fetch = { path = "vendor/llrt/modules/llrt_fetch" }
++llrt_fs = { path = "vendor/llrt/modules/llrt_fs" }
++llrt_hooking = { path = "vendor/llrt/libs/llrt_hooking" }
++llrt_http = { path = "vendor/llrt/modules/llrt_http" }
++llrt_intl = { path = "vendor/llrt/modules/llrt_intl" }
++llrt_json = { path = "vendor/llrt/libs/llrt_json" }
++llrt_logging = { path = "vendor/llrt/libs/llrt_logging" }
++llrt_modules = { path = "vendor/llrt/llrt_modules" }
++llrt_navigator = { path = "vendor/llrt/modules/llrt_navigator" }
++llrt_net = { path = "vendor/llrt/modules/llrt_net" }
++llrt_numbers = { path = "vendor/llrt/libs/llrt_numbers" }
++llrt_os = { path = "vendor/llrt/modules/llrt_os" }
++llrt_path = { path = "vendor/llrt/modules/llrt_path" }
++llrt_perf_hooks = { path = "vendor/llrt/modules/llrt_perf_hooks" }
++llrt_process = { path = "vendor/llrt/modules/llrt_process" }
++llrt_stream = { path = "vendor/llrt/modules/llrt_stream" }
++llrt_stream_web = { path = "vendor/llrt/modules/llrt_stream_web" }
++llrt_string_decoder = { path = "vendor/llrt/modules/llrt_string_decoder" }
++llrt_temporal = { path = "vendor/llrt/modules/llrt_temporal" }
++llrt_test = { path = "vendor/llrt/libs/llrt_test" }
++llrt_test_tls = { path = "vendor/llrt/libs/llrt_test_tls" }
++llrt_timers = { path = "vendor/llrt/modules/llrt_timers" }
++llrt_tls = { path = "vendor/llrt/modules/llrt_tls" }
++llrt_tty = { path = "vendor/llrt/modules/llrt_tty" }
++llrt_url = { path = "vendor/llrt/modules/llrt_url" }
++llrt_util = { path = "vendor/llrt/modules/llrt_util" }
++llrt_utils = { path = "vendor/llrt/libs/llrt_utils" }
++llrt_zlib = { path = "vendor/llrt/modules/llrt_zlib" }

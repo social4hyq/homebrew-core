@@ -1,0 +1,90 @@
+diff --git a/src/ohos/platform.rs b/src/ohos/platform.rs
+index 7ad844f..b391144 100644
+--- a/src/ohos/platform.rs
++++ b/src/ohos/platform.rs
+@@ -12,8 +12,8 @@ use std::{
+ use anyhow::{Context as _, Result};
+ use futures::channel::oneshot;
+ use openharmony_ability::{
+-    ColorMode, Event, OpenHarmonyApp, TouchInputDelivery, WindowCreateParams, create_os_window,
+-    drain_pending_window_closes, drain_pending_window_status,
++    create_os_window, drain_pending_window_closes, drain_pending_window_status, ColorMode, Event,
++    OpenHarmonyApp, TouchInputDelivery, WindowCreateParams,
+ };
+ use openharmony_ability_plugin_app_control::{
+     AppControlBridgePlugin, RestartRequest, RestartResponse, SetColorModeRequest,
+@@ -21,13 +21,13 @@ use openharmony_ability_plugin_app_control::{
+ };
+ use openharmony_ability_plugin_clipboard::ClipboardBridgePlugin;
+ use openharmony_ability_plugin_files::{
+-    FileDialogOptions, FilesBridgePlugin, FilesExt as _, dialog_type,
++    dialog_type, FileDialogOptions, FilesBridgePlugin, FilesExt as _,
+ };
+ use openharmony_ability_plugin_menu as menu_plugin;
+
+ use menu_plugin::{
+-    MenuBridgePlugin, MenuClient, MenuItemData, MenuSetMenubarRequest, register_menu_event_sender,
+-    register_menu_open_event_sender,
++    register_menu_event_sender, register_menu_open_event_sender, MenuBridgePlugin, MenuClient,
++    MenuItemData, MenuSetMenubarRequest,
+ };
+ use openharmony_ability_plugin_notification as notification_plugin;
+
+@@ -42,18 +42,17 @@ use rustc_hash::FxHashMap;
+ use sha2::{Digest, Sha256};
+ use smallvec::SmallVec;
+ use system_state_plugin::{
+-    SystemStateBridgePlugin, SystemStateChangedEvent, SystemStateClient,
+-    register_system_state_event_sender,
++    register_system_state_event_sender, SystemStateBridgePlugin, SystemStateChangedEvent,
++    SystemStateClient,
+ };
+ use url::Url;
+
+ use crate::{
+     Action, ActivityGuard, AnyWindowHandle, AppLifecyclePhase, BackgroundExecutor, ClipboardItem,
+     ClipboardReadError, CursorStyle, ForegroundExecutor, GestureKinds, GestureTuning, KeyContext,
+-    Keymap, Menu, MenuItem, OperatingSystem, OwnedMenu, OwnedMenuItem, PathPromptOptions, Platform,
+-    PlatformDisplay, PlatformGestures, PlatformInfo, PlatformKeyboardLayout,
+-    PlatformKeyboardMapper, PlatformTarget, PlatformTextSystem, PlatformWindow,
+-    PriorityQueueReceiver, Result as GpuiResult, RunnableVariant, ScrollPhysics,
++    Keymap, Menu, MenuItem, OwnedMenu, OwnedMenuItem, PathPromptOptions, Platform, PlatformDisplay,
++    PlatformGestures, PlatformKeyboardLayout, PlatformKeyboardMapper, PlatformTextSystem,
++    PlatformWindow, PriorityQueueReceiver, Result as GpuiResult, RunnableVariant, ScrollPhysics,
+     SystemNotification, SystemNotificationResponse, Task, ThermalState, WindowAppearance,
+     WindowParams, WindowVisibility,
+ };
+@@ -284,7 +283,7 @@ fn menu_items(
+                     // showing a shortcut that belongs only to an auxiliary window.
+                     static DEFAULT_CONTEXT: OnceLock<Vec<KeyContext>> = OnceLock::new();
+                     let context = DEFAULT_CONTEXT.get_or_init(|| {
+-                        let mut context = KeyContext::new_with_defaults(OperatingSystem::Linux);
++                        let mut context = KeyContext::new_with_defaults();
+                         context.add("Workspace");
+                         context.add("Pane");
+                         context.add("Editor");
+@@ -1883,13 +1882,6 @@ impl Platform for OhosPlatform {
+         *self.memory_warning.borrow_mut() = Some(callback);
+     }
+
+-    fn platform_info(&self) -> PlatformInfo {
+-        PlatformInfo {
+-            os: OperatingSystem::Linux,
+-            target: PlatformTarget::Native,
+-        }
+-    }
+-
+     fn gestures(&self) -> Option<Rc<dyn PlatformGestures>> {
+         Some(Rc::new(OhosGestures))
+     }
+@@ -2054,10 +2046,6 @@ impl Platform for OhosPlatform {
+         displays
+     }
+
+-    fn on_displays_changed(&self, callback: Box<dyn FnMut()>) {
+-        *self.displays_changed.borrow_mut() = Some(callback);
+-    }
+-
+     fn primary_display(&self) -> Option<Rc<dyn PlatformDisplay>> {
+         self.primary_display
+             .borrow()

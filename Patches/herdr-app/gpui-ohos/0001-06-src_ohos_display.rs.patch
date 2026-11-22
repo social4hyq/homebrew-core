@@ -1,0 +1,38 @@
+diff --git a/src/ohos/display.rs b/src/ohos/display.rs
+index b74ee25..363efaa 100644
+--- a/src/ohos/display.rs
++++ b/src/ohos/display.rs
+@@ -6,9 +6,9 @@ use std::{
+ use uuid::Uuid;
+
+ use super::platform::system_state_plugin::{AvailableArea, DisplaySnapshot};
+-use openharmony_ability::{OpenHarmonyApp, display::DisplayInfo as NativeDisplayInfo};
++use openharmony_ability::{display::DisplayInfo as NativeDisplayInfo, OpenHarmonyApp};
+
+-use crate::{Bounds, DisplayId, Pixels, PlatformDisplay, Result, point, px, size};
++use crate::{point, px, size, Bounds, DisplayId, Pixels, PlatformDisplay, Result};
+
+ #[derive(Clone)]
+ pub(crate) struct OhosDisplay {
+@@ -135,21 +135,6 @@ impl PlatformDisplay for OhosDisplay {
+         }
+     }
+
+-    fn refresh_interval(&self) -> Option<Duration> {
+-        let snapshot = match self.snapshot.lock() {
+-            Ok(snapshot) => snapshot,
+-            Err(error) => {
+-                log::error!("Failed to read OHOS display refresh rate: {error}");
+-                return None;
+-            }
+-        };
+-        let hertz = match snapshot.as_ref() {
+-            Some(snapshot) => snapshot.refresh_rate?,
+-            None => f64::from(self.app.refresh_rate()),
+-        };
+-        crate::refresh_interval_from_hz(hertz)
+-    }
+-
+     fn visible_bounds(&self) -> Bounds<Pixels> {
+         self.available_area
+             .lock()

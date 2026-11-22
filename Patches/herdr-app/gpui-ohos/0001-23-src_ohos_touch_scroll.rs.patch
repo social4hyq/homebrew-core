@@ -1,0 +1,30 @@
+diff --git a/src/ohos/touch_scroll.rs b/src/ohos/touch_scroll.rs
+index 5a40136..54a9a2c 100644
+--- a/src/ohos/touch_scroll.rs
++++ b/src/ohos/touch_scroll.rs
+@@ -7,9 +7,9 @@
+ use std::time::{Duration, Instant};
+
+ use gpui::{
+-    DispatchEventResult, GestureTuning, LongPressEvent, Modifiers, MouseButton, MouseDownEvent,
+-    MouseMoveEvent, MouseUpEvent, Pixels, PlatformInput, Point, ScrollDelta, ScrollEvent,
+-    ScrollSource, TouchEvent, TouchId, TouchPhase, point, px,
++    point, px, DispatchEventResult, GestureTuning, LongPressEvent, Modifiers, MouseButton,
++    MouseDownEvent, MouseMoveEvent, MouseUpEvent, Pixels, PlatformInput, Point, ScrollDelta,
++    ScrollWheelEvent, TouchEvent, TouchId, TouchPhase,
+ };
+
+ const MAX_FLING_SPEED: f32 = 8000.;
+@@ -545,11 +545,10 @@ fn release_window_control(
+ }
+
+ fn scroll(position: Point<Pixels>, delta: Point<Pixels>, touch_phase: TouchPhase) -> PlatformInput {
+-    PlatformInput::Scroll(ScrollEvent {
++    PlatformInput::ScrollWheel(ScrollWheelEvent {
+         position,
+         delta: ScrollDelta::Pixels(delta),
+         modifiers: Modifiers::default(),
+         touch_phase,
+-        source: ScrollSource::Touch,
+     })
+ }
