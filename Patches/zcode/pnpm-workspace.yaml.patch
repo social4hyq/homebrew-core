@@ -1,14 +1,14 @@
 diff --git a/pnpm-workspace.yaml b/pnpm-workspace.yaml
-index 81b18c76..c3514fad 100644
+index 81b18c7..663e255 100644
 --- a/pnpm-workspace.yaml
 +++ b/pnpm-workspace.yaml
-@@ -4,6 +4,32 @@ packages:
+@@ -4,6 +4,34 @@ packages:
    - apps/zcode-cli
    - apps/zcode-cli/packages/*
    - apps/zcode-cli/tools/*
 +nodeLinker: hoisted
 +overrides:
-+  node-pty: npm:@ohos-ports/node-pty@1.1.0-beta.4
++  node-pty: npm:@ohos-npm-ports/node-pty@1.1.0-1
 +  '@mbears/opentui-core': npm:@ohos-npm-ports/opentui-core@0.5.8-2
 +  '@mbears/opentui-react': npm:@opentui/react@0.5.8
 +  '@opentui/core': npm:@ohos-npm-ports/opentui-core@0.5.8-2
@@ -32,14 +32,16 @@ index 81b18c76..c3514fad 100644
 +  '@extend-ai/react-xlsx@0.16.0': patches/@extend-ai__react-xlsx@0.16.0.patch
 +  '@radix-ui/react-menu@2.1.16': patches/@radix-ui__react-menu@2.1.16.patch
 +  '@esbuild/openharmony-arm64@0.28.2': patches/@esbuild__openharmony-arm64@0.28.2.patch
++minimumReleaseAgeExclude:
++  - '@ohos-npm-ports/node-pty@1.1.0-1'
  supportedArchitectures:
    os:
      - current
-@@ -18,13 +44,15 @@ supportedArchitectures:
+@@ -18,13 +46,15 @@ supportedArchitectures:
      - current
      - glibc
  allowBuilds:
-+  '@ohos-ports/node-pty': true
++  '@ohos-npm-ports/node-pty': true
 +  core-js: false
    cpu-features: true
    edgedriver: true
