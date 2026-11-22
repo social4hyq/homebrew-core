@@ -65,10 +65,12 @@ cmd_stop() {
 
 cmd_status() {
   parse_device "$@"
-  # hdc shell does not reliably pass the remote exit status through, so
-  # grep the process list instead of trusting an exit code.
+  # Match only app command names; unrelated shell arguments may mention the bundle.
   processes="$("${HDC}" "${device_args[@]}" shell "ps -ef" 2>/dev/null || true)"
-  if printf '%s\n' "$processes" | grep -q "$BUNDLE_ID"; then
+  if printf '%s\n' "$processes" | awk -v bundle="$BUNDLE_ID" '
+    $8 == bundle || index($8, bundle ":") == 1 { found = 1 }
+    END { exit !found }
+  '; then
     printf 'genoffice-app: running (%s)\n' "$BUNDLE_ID"
   else
     printf 'genoffice-app: not running (%s)\n' "$BUNDLE_ID" >&2
