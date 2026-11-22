@@ -49,8 +49,11 @@ class SnowImageViewer < Formula
   patch :p1 do
     file "Patches/snow-image-viewer/0001-qt-toolchain-6.13.0.patch"
   end
-  patch :p1 do
-    file "Patches/snow-image-viewer/0002-ohos-libcxx-polyfill.patch"
+  patch_root = Pathname(__dir__).parent.parent
+  Dir[(patch_root/"Patches/snow-image-viewer/0002-ohos-libcxx-polyfill/*.patch").to_s].each do |path|
+    patch :p1 do
+      file Pathname(path).relative_path_from(patch_root).to_s
+    end
   end
   patch :p1 do
     file "Patches/snow-image-viewer/0003-port-warnings.patch"

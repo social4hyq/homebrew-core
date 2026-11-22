@@ -1,0 +1,13 @@
+diff --git a/snow_shot/src/image/snowimagecodecbackend.cpp b/snow_shot/src/image/snowimagecodecbackend.cpp
+index 0bf7b82..10a5b4f 100644
+--- a/snow_shot/src/image/snowimagecodecbackend.cpp
++++ b/snow_shot/src/image/snowimagecodecbackend.cpp
+@@ -18,7 +18,7 @@
+ #include <memory>
+ #include <new>
+ #include <span>
+-#include <stop_token>
++#include "stop_token.hpp"
+ #include <string>
+ #include <string_view>
+ #include <vector>
