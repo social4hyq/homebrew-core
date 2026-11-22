@@ -11,7 +11,7 @@
 // this shell still ends when the app process ends (`aa force-stop`, tray quit):
 // measured on the device, detaching does not keep it alive. Only a service
 // started from a terminal outlives the app.
-const { app, BrowserWindow, Menu, dialog } = require('electron');
+const { app, BrowserWindow, dialog } = require('electron');
 const { spawn } = require('node:child_process');
 const fs = require('node:fs');
 const http = require('node:http');
@@ -264,19 +264,15 @@ app.whenReady().then(() => {
   // the process alive while the item exists.
   if (useTray) {
     try {
-      const trayItem = tray.create({
+      // The menu is set once, inside create(), with a quit that can ask first:
+      // a second setContextMenu() right after create() was often refused.
+      tray.create({
         tooltip: 'OpenCode',
         iconPath: path.join(__dirname, 'tray-icon.png'),
         restartLabel: '重新连接后端',
         onRestartBackend: startDrive,
+        onQuitRequest: confirmQuit,
       });
-      // Same menu as tray.cjs builds, with a quit that can ask first.
-      trayItem.setContextMenu(Menu.buildFromTemplate([
-        { label: '显示窗口', click: tray.showWindow },
-        { label: '重新连接后端', click: startDrive },
-        { type: 'separator' },
-        { label: '退出应用', click: confirmQuit },
-      ]));
       trayReady = true;
     } catch (error) {
       console.error('OPENCODE_DESKTOP tray unavailable: ' + String(error));

@@ -6,7 +6,7 @@ class OpencodeApp < Formula
   # Tap-authored shell sources (MIT) on the CPF-Electron runtime (mixed
   # MIT/BSD/LGPL).
   license :cannot_represent
-  revision 3
+  revision 4
 
   livecheck do
     url :stable
@@ -15,8 +15,8 @@ class OpencodeApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-app-v2.3.2-r5"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fe9dff7bbbe55374fe839f5cd6977251091e2163e6f8de7bd0bc85b470717f79"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-app-v2.3.2-r6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "780ed810b9b4425b061ddc651386c631adc60226655fa2bfd86eee0815372501"
   end
 
   depends_on "app-installer"
@@ -29,18 +29,19 @@ class OpencodeApp < Formula
 
   # The unused-resource audit requires literal tap paths.
   RESOURCE_FILES = %w[
-    Resources/_shared/electron-shell/tray.cjs
     Resources/_shared/hap-app/install-lib.sh
     Resources/_shared/waiting-page/render-waiting.cjs
     Resources/_shared/waiting-page/waiting.html.in
     Resources/opencode-app/app/config.json
     Resources/opencode-app/app/main.cjs
     Resources/opencode-app/app/package.json
+    Resources/opencode-app/app/tray.cjs
     Resources/opencode-app/app/waiting.json
     Resources/opencode-app/assets/icon.png
     Resources/opencode-app/assets/tray-icon.png
     Resources/opencode-app/scripts/install-desktop.sh
     Resources/opencode-app/scripts/opencode-desktop.sh
+    Resources/opencode-app/tests/tray.test.cjs
   ].freeze
 
   resource "electron-ohos" do
@@ -61,12 +62,11 @@ class OpencodeApp < Formula
     app = shell/"web_engine/src/main/resources/resfile/resources/app"
     rm_r app if app.exist?
     app.mkpath
-    %w[main.cjs config.json].each do |name|
+    %w[main.cjs tray.cjs config.json].each do |name|
       cp res/"app"/name, app/name
     end
     package = JSON.parse((res/"app/package.json").read)
     (app/"package.json").write JSON.generate(package.merge("version" => version.to_s))
-    cp tap_root/"Resources/_shared/electron-shell/tray.cjs", app/"tray.cjs"
     system "node", tap_root/"Resources/_shared/waiting-page/render-waiting.cjs",
            tap_root/"Resources/_shared/waiting-page/waiting.html.in",
            res/"app/waiting.json", app/"waiting.html"
@@ -356,6 +356,10 @@ class OpencodeApp < Formula
 
     hap = libexec/"opencode-desktop-unsigned.hap"
     assert_match "libs/arm64-v8a/libelectron.so", shell_output("unzip -Z1 #{hap}")
+    assert_match "onQuitRequest", shell_output("unzip -p #{hap} resources/resfile/resources/app/tray.cjs")
+    tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
+    system "node", "--check", tap_root/"Resources/opencode-app/app/main.cjs"
+    system "node", "--test", tap_root/"Resources/opencode-app/tests/tray.test.cjs"
     waiting_source = shell_output("unzip -p #{hap} resources/resfile/resources/app/waiting.html")
     assert_match "opencode-app status", waiting_source
     refute_match "{{", waiting_source
