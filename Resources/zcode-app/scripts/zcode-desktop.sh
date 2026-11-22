@@ -57,6 +57,9 @@ Usage: zcode-app <command>
                       (--no-serve skips that).
   status              Show whether the backing service is healthy.
   stop                Stop the CLI-managed backing service.
+  uninstall [--device ID] [--purge]
+                      Remove the app from the device. The default keeps the
+                      app's data; --purge also deletes it.
   login [zai|bigmodel]
                       Sign in through the browser (server-side OAuth, the same
                       flow `zcode login` uses). The account is stored in the
@@ -436,6 +439,27 @@ cmd_stop() {
   fi
 }
 
+# Uninstall through app-installer so the data-handling matches every other
+# desktop app: `bm uninstall -k` keeps the app's data unless --purge is given.
+cmd_uninstall() {
+  local purge="" device_id=""
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --purge) purge=1; shift ;;
+      --device)
+        [ $# -ge 2 ] || die "--device needs an id"
+        device_id="$2"; shift 2 ;;
+      -h|--help) usage; exit 0 ;;
+      *) die "unknown uninstall option: $1" ;;
+    esac
+  done
+  device_id="${device_id:-${HDC_TARGET:-}}"
+  local args=(uninstall --bundle-id "$BUNDLE_ID")
+  [ -z "$device_id" ] || args+=(--device "$device_id")
+  [ "$purge" != 1 ] || args+=(--purge)
+  "${ZCODE_DESKTOP_INSTALLER:-app-installer}" "${args[@]}"
+}
+
 case "${1:-}" in
   -h|--help|help|"") ;;
   *) migrate_legacy_config ;;
@@ -447,6 +471,7 @@ case "${1:-}" in
   start) shift; cmd_start "$@" ;;
   status) shift; cmd_status "$@" ;;
   stop) shift; cmd_stop "$@" ;;
+  uninstall) shift; cmd_uninstall "$@" ;;
   login) shift; cmd_login "$@" ;;
   -h|--help|help) usage ;;
   "") usage >&2; exit 2 ;;
