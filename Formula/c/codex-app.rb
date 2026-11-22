@@ -6,7 +6,7 @@ class CodexApp < Formula
   version "26.1117.41037"
   sha256 "714146e9c667b26a1bd4e57633c544334a9ed47c399989bfd98cf764140bdc53"
   license :cannot_represent # OpenAI service and software terms
-  revision 4
+  revision 5
 
   livecheck do
     url "https://persistent.oaistatic.com/codex-app-prod/linux/deb/dists/stable/main/binary-arm64/Packages"
@@ -14,8 +14,8 @@ class CodexApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codex-app-v26.1117.41037-r7"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e0f214ac280e5a5cdf48f035fb2c96e8205a54f955df84e2142ded35b26908c0"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codex-app-v26.1117.41037-r8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "eeac0939704b59283ae562fa06ebb5597b3b43f03f81f02d2f4346849aa09639"
   end
 
   depends_on "app-installer"
@@ -42,10 +42,12 @@ class CodexApp < Formula
   RESOURCE_FILES = %w[
     Resources/codex-app/assets/icon.png
     Resources/codex-app/app/chatgpt-bootstrap.cjs
+    Resources/codex-app/app/owl-codex-bridge.cjs
     Resources/codex-app/app/owl-compat.cjs
     Resources/codex-app/app/owl-host-shim.cjs
     Resources/codex-app/app/owl-pty-host.cjs
     Resources/codex-app/app/owl-pty-shim.cjs
+    Resources/codex-app/app/owl-share.cjs
     Resources/codex-app/app/owl-sqlite-shim.cjs
     Resources/codex-app/app/owl-utility-entry.cjs
     Resources/codex-app/scripts/codex-app.sh
@@ -54,6 +56,9 @@ class CodexApp < Formula
     Resources/codex-app/support/assemble-local-hap.py
     Resources/_shared/hap-app/enable-cookie-encryption.py
     Resources/codex-app/tests/chatgpt-bootstrap.test.cjs
+    Resources/codex-app/tests/fake-codex.cjs
+    Resources/codex-app/tests/owl-share.test.cjs
+    Resources/codex-app/tests/share-flow.test.cjs
     Resources/codex-app/tests/assemble-local-hap.test.py
     Resources/_shared/hap-app/install-lib.sh
   ].freeze
@@ -213,6 +218,14 @@ class CodexApp < Formula
       `[desktop] projectlessWorkspaceRoot` in `$CODEX_HOME/config.toml` (original
       saved as `config.toml.pre-owl`) and, when missing, writes the shell's proxy
       variables to `~/.config/codex-app/env.json` (never overwritten).
+
+      By default the app runs its own codex app-server, which ends with the app.
+      To share one with the terminal, run `codex-app serve`: it starts
+      `codex app-server` on a loopback WebSocket (default port 14288, capability
+      token in `~/.config/codex-app/ws-token`) that keeps running after the app
+      exits. While it runs, the app attaches to it instead of starting its own, and
+      `codex-app tui` opens the Codex terminal UI on the same server. Stop it with
+      `codex-app serve --stop`; if it is not running the app starts its own as before.
     EOS
   end
 
@@ -275,7 +288,8 @@ class CodexApp < Formula
     assert_match "shell deb output", shell_output("python3 #{pkgshare}/assemble/assemble-local-hap.py --help")
     assert_match "source output", shell_output("python3 #{pkgshare}/enable-cookie-encryption.py --help")
     system "node", "--check", tap_root/"Resources/codex-app/app/chatgpt-bootstrap.cjs"
-    owl_shims = %w[owl-compat owl-host-shim owl-pty-host owl-pty-shim owl-sqlite-shim owl-utility-entry]
+    owl_shims = %w[owl-codex-bridge owl-compat owl-host-shim owl-pty-host owl-pty-shim owl-share owl-sqlite-shim
+                   owl-utility-entry]
     owl_shims.each do |name|
       system "node", "--check", tap_root/"Resources/codex-app/app/#{name}.cjs"
     end
@@ -283,6 +297,8 @@ class CodexApp < Formula
     assert_path_exists libexec/"node_modules/node-pty/prebuilds/openharmony-arm64/pty.node"
     refute_path_exists libexec/"node_modules/node-pty/prebuilds/darwin-arm64"
     system "node", "--test", tap_root/"Resources/codex-app/tests/chatgpt-bootstrap.test.cjs"
+    system "node", "--test", tap_root/"Resources/codex-app/tests/owl-share.test.cjs"
+    system "node", "--test", tap_root/"Resources/codex-app/tests/share-flow.test.cjs"
     system "python3", tap_root/"Resources/codex-app/tests/assemble-local-hap.test.py"
 
     module_json = JSON.parse(shell_output("unzip -p #{hap} module.json"))

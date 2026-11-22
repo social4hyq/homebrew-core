@@ -6,6 +6,7 @@
 const path = require('node:path');
 const fs = require('node:fs');
 const childProcess = require('node:child_process');
+const share = require('./owl-share.cjs');
 
 // Diagnostics go to the app log; a file copy is written only when the user
 // creates ~/.cache/codex-app/owl-debug.log (the file's existence is the switch).
@@ -39,6 +40,11 @@ if (!childProcess.spawn.__owlHostShim) {
     const hostPath = typeof cfg.path === 'string' && cfg.path.length
       ? cfg.path
       : '/system/bin:/system/xbin:/usr/bin:/bin:/vendor/bin';
+    // The bridge to a shared app-server (see owl-share.cjs) runs under the host Node.
+    const hostNode = [cfg.nodeCli, path.join(hostHome, '.harmonybrew/opt/node/bin/node')]
+      .find((candidate) => typeof candidate === 'string' && path.isAbsolute(candidate) && fs.existsSync(candidate)) || null;
+    const bridge = path.join(__dirname, 'owl-codex-bridge.cjs');
+    const endpoint = share.endpointFile(hostHome);
     process.env.CODEX_CLI_PATH = codexCli;
     for (const name of ['spawn', 'spawnSync', 'execFile', 'execFileSync']) {
       const original = childProcess[name];
@@ -72,7 +78,15 @@ if (!childProcess.spawn.__owlHostShim) {
         forwarded[oi] = { ...options, cwd, env };
         let result;
         try {
-          result = original.call(this, codexCli, ...forwarded);
+          const plan = share.planRedirect({
+            name, args: forwarded[0], hostNode, bridge, endpoint, codexCli, fs,
+          });
+          if (plan) {
+            log('OWL_SHARE app-server spawn goes through the bridge endpoint=' + endpoint);
+            result = original.call(this, plan.command, plan.args, ...forwarded.slice(1));
+          } else {
+            result = original.call(this, codexCli, ...forwarded);
+          }
         } catch (e) {
           log('OWL_HOST ' + name + ' threw ' + (e && e.code) + ' ' + (e && e.message));
           throw e;
