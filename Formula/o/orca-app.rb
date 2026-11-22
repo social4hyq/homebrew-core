@@ -8,7 +8,7 @@ class OrcaApp < Formula
   # Tap-authored shell scripts (MIT) on the CPF-Electron runtime (mixed
   # MIT/BSD/LGPL).
   license :cannot_represent
-  revision 4
+  revision 5
 
   livecheck do
     url :stable
@@ -16,8 +16,8 @@ class OrcaApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/orca-app-v1.4.269-r6"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a0172e06ab3305115d25caa48d22990d95fdb40f1fc347f70cf7bdf1b95721c0"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/orca-app-v1.4.269-r8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "322d4dc687e19faef03faf9b46970963d94b4a81ada98876baf3dc36adcab9df"
   end
 
   depends_on "openjdk" => :build
@@ -226,6 +226,7 @@ class OrcaApp < Formula
         orca-app start      # open the app
         orca-app status     # host-side runtime
         orca-app stop
+        orca-app uninstall  # keeps the app's data; --purge also deletes it
 
       The `orca` CLI finds a runtime through the profile named by ORCA_USER_DATA_PATH
       (default $XDG_CONFIG_HOME/orca), not through ~/.orca. To see the same projects
@@ -363,6 +364,26 @@ class OrcaApp < Formula
       shell_output("#{bin}/orca-app install --hap #{fake_hap} --config #{host_config}")
     end
     refute_match(/aa start/, (testpath/"hdc-log").read)
+
+    # uninstall goes through app-installer and keeps the app's data by default;
+    # --purge deletes it, --device/HDC_TARGET pick the hdc target.
+    shell_output("#{bin}/orca-app uninstall")
+    assert_equal %w[uninstall --bundle-id com.social4hyq.orca], installer_args.read.lines(chomp: true)
+    shell_output("#{bin}/orca-app uninstall --purge --device tablet-1")
+    assert_equal %w[uninstall --bundle-id com.social4hyq.orca --device tablet-1 --purge],
+                 installer_args.read.lines(chomp: true)
+    with_env("HDC_TARGET" => "env-device") do
+      shell_output("#{bin}/orca-app uninstall")
+    end
+    assert_equal %w[uninstall --bundle-id com.social4hyq.orca --device env-device],
+                 installer_args.read.lines(chomp: true)
+    assert_match "uninstall", shell_output("#{bin}/orca-app --help")
+
+    # start takes --device and addresses the hdc target.
+    ENV["ORCA_DESKTOP_HDC"] = "hdc"
+    File.write(testpath/"hdc-log", "")
+    shell_output("#{bin}/orca-app start --device tablet-1")
+    assert_match(/-t tablet-1 shell aa start .*-b com\.social4hyq\.orca/, (testpath/"hdc-log").read)
 
     (testpath/"home/.config/orca-app").mkpath
     (testpath/"home/.config/orca-app/config.json").write JSON.generate("port" => free_port)
