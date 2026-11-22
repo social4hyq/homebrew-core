@@ -4,7 +4,7 @@ class DeepseekHarnessApp < Formula
   url "https://github.com/deepseek-ai/deepseek-harness/archive/refs/tags/dsh-v0.2.2-rc.5.tar.gz"
   sha256 "4e24e132a9fc267d5cdc5724525873db2575680e073fd2db4519b92553614215"
   license :cannot_represent
-  revision 3
+  revision 4
 
   livecheck do
     url "https://github.com/deepseek-ai/deepseek-harness.git"
@@ -48,6 +48,7 @@ class DeepseekHarnessApp < Formula
     Resources/deepseek-harness-app/assets/tray-icon.png
     Resources/deepseek-harness-app/scripts/deepseek-harness-desktop.sh
     Resources/deepseek-harness-app/scripts/install-desktop.sh
+    Resources/deepseek-harness-app/tests/close-handler.test.cjs
     Resources/deepseek-harness-app/tests/test-proxy.cjs
     Resources/deepseek-harness-app/tests/test-server-detach.rb
     Resources/deepseek-harness-app/tests/test-startup.cjs
@@ -108,9 +109,11 @@ class DeepseekHarnessApp < Formula
                     ],
               JSON5
 
-    # hideAbility() must run synchronously before the window teardown: the
-    # platform recreates the shell as a hidden instance, and hiding afterwards
-    # makes the app exit. The tray quit item calls app.exit() for the same reason.
+    # windowStageClose hides the ability and returns true, which tells the system
+    # not to close the window, so the window goes to the tray. Returning false let
+    # the system close it right after the hide: the ability's session was destroyed
+    # and the whole app was killed and relaunched. The tray quit calls app.exit()
+    # to bypass this handler.
     close_handler = [
       "    super.onWindowStageCreate(windowStage);",
       "    try {",
@@ -120,7 +123,7 @@ class DeepseekHarnessApp < Formula
       "        }",
       "        const widgetId = Number(this.xcomponentId.substring(ConfigData.WINDOW_PREFIX.length));",
       "        Inject.getOrCreate(AppWindowAdapter).hideWindow(widgetId);",
-      "        return false;",
+      "        return true;",
       "      });",
       "    } catch (exception) {",
       "      LogUtil.error(TAG, 'Failed to register window close handler: ' + JSON.stringify(exception));",
@@ -300,6 +303,8 @@ class DeepseekHarnessApp < Formula
 
     hap = libexec/"deepseek-harness-desktop-unsigned.hap"
     assert_match "libs/arm64-v8a/libelectron.so", shell_output("unzip -Z1 #{hap}")
+    tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
+    system "node", "--test", tap_root/"Resources/deepseek-harness-app/tests/close-handler.test.cjs"
     waiting_source = shell_output("unzip -p #{hap} resources/resfile/resources/app/waiting.html")
     assert_match "dsh-app status", waiting_source
     refute_match "{{", waiting_source
