@@ -8,7 +8,7 @@ class OrcaApp < Formula
   # Tap-authored shell scripts (MIT) on the CPF-Electron runtime (mixed
   # MIT/BSD/LGPL).
   license :cannot_represent
-  revision 3
+  revision 4
 
   livecheck do
     url :stable
@@ -16,8 +16,8 @@ class OrcaApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/orca-app-v1.4.269-r5"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "afd110b210209299eb6a6b98cc7aebb93773d44da443799fe634a1cfc026765d"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/orca-app-v1.4.269-r6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a0172e06ab3305115d25caa48d22990d95fdb40f1fc347f70cf7bdf1b95721c0"
   end
 
   depends_on "openjdk" => :build
@@ -42,6 +42,7 @@ class OrcaApp < Formula
     Resources/orca-app/scripts/install-desktop.sh
     Resources/orca-app/scripts/orca-desktop.sh
     Resources/orca-app/tests/attach.test.cjs
+    Resources/orca-app/tests/close-handler.test.cjs
   ].freeze
 
   resource "electron-ohos" do
@@ -113,8 +114,11 @@ class OrcaApp < Formula
                     ],
               JSON5
 
-    # windowStageClose hides the ability and cancels the close so the window
-    # goes to the tray; the tray quit calls app.exit() to bypass that handler.
+    # windowStageClose hides the ability and returns true, which tells the
+    # system not to close the window, so the window goes to the tray. Returning
+    # false let the system close it right after the hide: the ability's session
+    # was destroyed and the whole app was killed and relaunched. The tray quit
+    # calls app.exit() to bypass that handler.
     close_handler = [
       "    super.onWindowStageCreate(windowStage);",
       "    try {",
@@ -124,7 +128,7 @@ class OrcaApp < Formula
       "        }",
       "        const widgetId = Number(this.xcomponentId.substring(ConfigData.WINDOW_PREFIX.length));",
       "        Inject.getOrCreate(AppWindowAdapter).hideWindow(widgetId);",
-      "        return false;",
+      "        return true;",
       "      });",
       "    } catch (exception) {",
       "      LogUtil.error(TAG, 'Failed to register window close handler: ' + JSON.stringify(exception));",
@@ -535,6 +539,7 @@ class OrcaApp < Formula
     tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
     system "node", "--check", tap_root/"Resources/orca-app/app/main.cjs"
     system "node", "--test", tap_root/"Resources/orca-app/tests/attach.test.cjs"
+    system "node", "--test", tap_root/"Resources/orca-app/tests/close-handler.test.cjs"
     placeholder = JSON.parse(shell_output("unzip -p #{hap} resources/resfile/resources/app/config.json"))
     assert_equal 0, placeholder.fetch("port")
     refute placeholder.key?("url")
