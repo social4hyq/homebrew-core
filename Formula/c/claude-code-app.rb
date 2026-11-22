@@ -6,7 +6,7 @@ class ClaudeCodeApp < Formula
   version "6.28899.6"
   sha256 "239c20d218456cacc656d48382fd59116325ac679aa4e476377af1456ac85715"
   license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
-  revision 2
+  revision 3
 
   livecheck do
     url "https://downloads.claude.ai/claude-desktop/apt/stable/dists/stable/main/binary-arm64/Packages"
@@ -52,6 +52,7 @@ class ClaudeCodeApp < Formula
     Resources/_shared/hap-app/enable-cookie-encryption.py
     Resources/claude-code-app/support/patch-code-runtime-hap.py
     Resources/claude-code-app/tests/claude-bootstrap.test.cjs
+    Resources/claude-code-app/tests/close-handler.test.cjs
     Resources/claude-code-app/tests/claude-code-platform-patch.test.cjs
     Resources/claude-code-app/tests/claude-launch-bridge.test.cjs
     Resources/claude-code-app/tests/claude-ohos-config.test.cjs
@@ -199,6 +200,15 @@ class ClaudeCodeApp < Formula
       The app needs the host `claude-code.latest` CLI installed and logged in;
       install injects the host paths into a private signed HAP, and ACL permissions
       let it spawn the CLI. `claude-code-app start` opens the app.
+
+      The app and a terminal `claude` share what is on disk: the sessions the app
+      starts are transcripts under ~/.claude/projects (so `claude --resume` finds them
+      and the app's own session list and delete use the same folder), and its CLI
+      child now uses the config a terminal `claude` uses without any variable,
+      including ~/.claude.json (user-scope MCP servers, workspace trust). It does not
+      share a live process: the official app talks to its own `claude` child over
+      stdio, which has nothing to attach to. Closing the window hides the app (the
+      official app's tray); reinstall with `claude-code-app install` after upgrading.
       `claude-code-app uninstall` removes the app but keeps its data; only
       `claude-code-app uninstall --purge` deletes the app data.
     EOS
@@ -267,7 +277,10 @@ class ClaudeCodeApp < Formula
     RESOURCE_FILES.grep(%r{/app/|/tests/}).each do |file|
       cp tap_root/file, test_sources/File.basename(file)
     end
-    system "node", "--test", *test_sources.glob("*.test.cjs")
+    # The tests are copied flat; the close handler test needs the staging script itself.
+    with_env("CLAUDE_STAGE_SCRIPT" => (tap_root/"Resources/claude-code-app/scripts/stage-ohos-shell.sh").to_s) do
+      system "node", "--test", *test_sources.glob("*.test.cjs")
+    end
 
     module_json = JSON.parse(shell_output("unzip -p #{hap} module.json"))
     assert_equal "com.social4hyq.claudecode", module_json.dig("app", "bundleName")

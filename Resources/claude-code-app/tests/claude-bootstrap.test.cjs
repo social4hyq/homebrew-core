@@ -14,6 +14,7 @@ const HOST_CLAUDE = `${BREW_PREFIX}/opt/claude-code.latest/bin/claude`;
 function runLaunch(api = 'spawn', {
   exitCode = 0, stderrText = '', denyWorkspace = false, keepOpen = false,
   preflightCli = false, secondChildActive = false,
+  claudeConfigDir = `${HOST_HOME}/.claude`, childEnv = { KEEP_ME: 'yes' },
 } = {}) {
   const userData = fs.mkdtempSync(path.join(os.tmpdir(), 'claude-bootstrap-test-'));
   const workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'claude-host-workspace-'));
@@ -30,6 +31,7 @@ function runLaunch(api = 'spawn', {
   const warnings = [];
   const diagnostics = [];
   const calls = [];
+  const configCalls = [];
   const app = new EventEmitter();
   app.getPath = key => key === 'userData' ? userData : path.join(userData, 'tmp');
   app.setAppPath = () => {};
@@ -67,7 +69,7 @@ function runLaunch(api = 'spawn', {
     home: HOST_HOME,
     brewPrefix: BREW_PREFIX,
     claude: HOST_CLAUDE,
-    claudeConfigDir: `${HOST_HOME}/.claude`,
+    claudeConfigDir,
     path: `${BREW_PREFIX}/bin:${BREW_PREFIX}/sbin:/system/bin:/usr/bin`,
     xdg: {}, preflightCli,
   };
@@ -77,7 +79,10 @@ function runLaunch(api = 'spawn', {
     if (name === 'node:fs') return fakeFs;
     if (name === 'node:child_process') return childProcess;
     if (name === './claude-ohos-config.cjs') return {
-      configureClaudeConfigDir(target) {
+      configureClaudeConfigDir(target, env, options) {
+        configCalls.push({ env, options });
+        // What the real module does for the main process when the host folder is usable.
+        env.CLAUDE_CONFIG_DIR = options.hostConfigDir;
         const tempDir = path.join(target.getPath('userData'), 'tmp');
         fs.mkdirSync(tempDir, { recursive: true });
         return { userData: target.getPath('userData'), tempDir };
@@ -87,7 +92,7 @@ function runLaunch(api = 'spawn', {
     if (name === './claude-launch-bridge.cjs') return { startClaudeLaunchBridge() {} };
     if (name === path.join('/app/vendor.asar', 'package.json')) return { main: 'main.cjs' };
     if (name === path.join('/app/vendor.asar', 'main.cjs')) {
-      childProcess[api](HOST_CLAUDE, ['--print', 'NEVER_LOG_THIS_PROMPT'], { cwd: workspace, env: { KEEP_ME: 'yes' } });
+      childProcess[api](HOST_CLAUDE, ['--print', 'NEVER_LOG_THIS_PROMPT'], { cwd: workspace, env: { ...childEnv } });
       if (secondChildActive) {
         childProcess[api](HOST_CLAUDE, ['--print', 'SECOND_PROMPT'], { cwd: workspace });
       }
@@ -111,7 +116,7 @@ function runLaunch(api = 'spawn', {
     setTimeout,
     clearTimeout,
   }, { filename: 'claude-bootstrap.cjs' });
-  return { userData, workspace, warnings, diagnostics, calls, processStub, app, child, secondChild };
+  return { userData, workspace, warnings, diagnostics, calls, configCalls, processStub, app, child, secondChild };
 }
 
 for (const api of ['spawn', 'execFile', 'fork']) {
@@ -127,7 +132,7 @@ for (const api of ['spawn', 'execFile', 'fork']) {
     assert.equal(options.env.HOME, HOST_HOME);
     assert.equal(options.env.HOMEBREW_PREFIX, BREW_PREFIX);
     assert.equal(options.env.PATH, `${BREW_PREFIX}/bin:${BREW_PREFIX}/sbin:/system/bin:/usr/bin`);
-    assert.equal(options.env.CLAUDE_CONFIG_DIR, `${HOST_HOME}/.claude`);
+    assert.equal('CLAUDE_CONFIG_DIR' in options.env, false, 'the default folder needs no variable');
     assert.equal(options.env.TMPDIR, path.join(userData, 'tmp'));
     assert.equal(options.env.CLAUDE_CODE_TMPDIR, path.join(userData, 'tmp'));
     assert.equal(options.env.KEEP_ME, 'yes');
@@ -186,4 +191,38 @@ test('runs an optional side-effect-free host CLI version preflight and redacts o
   assert.doesNotMatch(log, /NEVER_LOG_THIS_PROMPT|\.claude\/|storage\/Users/);
   fs.rmSync(state.userData, { recursive: true, force: true });
   fs.rmSync(state.workspace, { recursive: true, force: true });
+});
+
+test('the child uses the terminal\'s own config: no CLAUDE_CONFIG_DIR for the default ~/.claude, even when the main process has one', () => {
+  const state = runLaunch('spawn', { childEnv: { KEEP_ME: 'yes', CLAUDE_CONFIG_DIR: '/app/private/userData' } });
+  const options = state.calls[0].args[1];
+  assert.equal('CLAUDE_CONFIG_DIR' in options.env, false);
+  assert.equal(options.env.HOME, HOST_HOME);
+  fs.rmSync(state.userData, { recursive: true, force: true });
+});
+
+test('a config folder that is not the default is still passed to the child', () => {
+  const state = runLaunch('spawn', { claudeConfigDir: `${HOST_HOME}/work/claude-config` });
+  assert.equal(state.calls[0].args[1].env.CLAUDE_CONFIG_DIR, `${HOST_HOME}/work/claude-config`);
+  fs.rmSync(state.userData, { recursive: true, force: true });
+});
+
+test('the main process is given the host config folder to use when it can', () => {
+  const state = runLaunch('spawn');
+  assert.equal(state.configCalls.length, 1);
+  assert.deepEqual({ ...state.configCalls[0].options }, { hostConfigDir: `${HOST_HOME}/.claude` });
+  assert.equal(state.configCalls[0].env, state.processStub.env);
+  const custom = runLaunch('spawn', { claudeConfigDir: `${HOST_HOME}/work/claude-config` });
+  assert.equal(custom.configCalls[0].options.hostConfigDir, `${HOST_HOME}/work/claude-config`);
+  fs.rmSync(state.userData, { recursive: true, force: true });
+  fs.rmSync(custom.userData, { recursive: true, force: true });
+});
+
+test('the version probe gets the same environment as the sessions', () => {
+  const state = runLaunch('spawn', { preflightCli: true });
+  const probe = state.calls.find((call) => call.probe);
+  assert.ok(probe);
+  assert.equal(probe.args[1].env.HOME, HOST_HOME);
+  assert.equal('CLAUDE_CONFIG_DIR' in probe.args[1].env, false);
+  fs.rmSync(state.userData, { recursive: true, force: true });
 });

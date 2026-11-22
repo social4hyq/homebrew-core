@@ -9,7 +9,6 @@ const path = require('node:path');
 const fs = require('node:fs');
 const vendor = path.join(__dirname, 'vendor.asar');
 const claudeConfig = require('./claude-ohos-config.cjs');
-const appPaths = claudeConfig.configureClaudeConfigDir(app);
 const hostConfig = require('./claude-host-config.json');
 
 function requireAbsolute(value, label) {
@@ -29,6 +28,13 @@ const hostXdg = hostConfig.xdg && typeof hostConfig.xdg === 'object' ? hostConfi
 const hostConfigDir = typeof hostConfig.claudeConfigDir === 'string' && path.isAbsolute(hostConfig.claudeConfigDir)
   ? hostConfig.claudeConfigDir
   : path.join(hostHome, '.claude');
+// The default folder is the one a terminal's `claude` uses without any variable, and
+// then its global state (user-scope MCP servers, workspace trust) is ~/.claude.json,
+// not ~/.claude/.claude.json, which the CLI uses once CLAUDE_CONFIG_DIR is set.
+// So the child gets the variable only for a folder that is not the default.
+const hostDefaultConfigDir = path.join(hostHome, '.claude');
+// The main process uses the same folder when the app may (see claude-ohos-config.cjs).
+const appPaths = claudeConfig.configureClaudeConfigDir(app, process.env, { hostConfigDir });
 
 // Code Desktop's manager consumes this override when resolving its local CLI.
 // Only the spawned CLI receives host HOME/PATH/config: Electron itself keeps
@@ -73,7 +79,8 @@ function hostEnvironment(inherited = process.env) {
   env.HOME = hostHome;
   env.HOMEBREW_PREFIX = brewPrefix;
   env.PATH = hostPath;
-  env.CLAUDE_CONFIG_DIR = hostConfigDir;
+  if (hostConfigDir === hostDefaultConfigDir) delete env.CLAUDE_CONFIG_DIR;
+  else env.CLAUDE_CONFIG_DIR = hostConfigDir;
   // Keep temporary state on the app's local filesystem; do not inherit the
   // host terminal's sandbox-local XDG/TMPDIR values.
   env.TMPDIR = appPaths.tempDir;

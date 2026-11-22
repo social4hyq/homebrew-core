@@ -74,6 +74,27 @@ for top in ('AppScope', 'electron/src/main'):
                 changed = True
         if changed:
             p.write_text(json.dumps(data))
+# windowStageClose hides the ability and returns true, which tells the system not to
+# close the window, so the app stays resident behind the official app's own tray
+# (its close handler hides the main window while the tray is enabled). Returning
+# false lets the system close the window right after the hide: the ability's session
+# is destroyed and the whole app ends, which is what the X button did.
+CLOSE_HANDLER = """    super.onWindowStageCreate(windowStage);
+    try {
+      windowStage.on('windowStageClose', () => {
+        if (CheckEmptyUtils.isEmpty(this.xcomponentId)) {
+          return false;
+        }
+        const widgetId = Number(this.xcomponentId.substring(ConfigData.WINDOW_PREFIX.length));
+        Inject.getOrCreate(AppWindowAdapter).hideWindow(widgetId);
+        return true;
+      });
+    } catch (exception) {
+      LogUtil.error(TAG, 'Failed to register window close handler: ' + JSON.stringify(exception));
+    }
+"""
+edit('web_engine/src/main/ets/ability/WebAbility.ets',
+     lambda s: replace_one(s, '    super.onWindowStageCreate(windowStage);\n', CLOSE_HANDLER))
 app = root/'web_engine/src/main/resources/resfile/resources/app'
 if app.exists():
     shutil.rmtree(app)
