@@ -4,7 +4,7 @@ class MulticaApp < Formula
   url "https://github.com/multica-ai/multica/archive/refs/tags/v0.11.1.tar.gz"
   sha256 "8a8f2149447dfd0c178fca332f88b539560fa57a5075d67c6e440958de8d49fc"
   license :cannot_represent # Multica License (Apache-2.0 plus additional conditions)
-  revision 6
+  revision 7
 
   livecheck do
     url :stable
@@ -248,7 +248,8 @@ class MulticaApp < Formula
       which the locally generated debug profile grants; `install --no-acl` installs
       the basic variant that asks only for INTERNET and GET_NETWORK_INFO. The bundle
       is `com.social4hyq.multica`; older `com.huawei.ohos_electron` copies are left
-      in place.
+      in place. `multica-app uninstall` removes the app but keeps its data; only
+      `multica-app uninstall --purge` deletes the app data.
     EOS
   end
 
@@ -319,6 +320,7 @@ class MulticaApp < Formula
       shell_output("#{libexec}/multica-desktop-dispatch.sh install --help 2>&1")
     end
     refute_match "warning", matching
+
     installer_args = testpath/"hap-installer-args"
     injected_hap = testpath/"injected.hap"
     fake_installer = fake_bin/"app-installer"
@@ -357,6 +359,21 @@ class MulticaApp < Formula
       cp "$hap_in" "$hap_out"
     SH
     chmod 0755, fake_signer
+
+    # uninstall is routed through app-installer and keeps the app's data
+    # unless --purge is given; --device/HDC_TARGET pick the hdc target.
+    shell_output("#{libexec}/multica-desktop-dispatch.sh uninstall --purge --device tablet-1")
+    assert_equal %w[uninstall --bundle-id com.social4hyq.multica --device tablet-1 --purge],
+                 installer_args.read.lines(chomp: true)
+    shell_output("#{libexec}/multica-desktop-dispatch.sh uninstall")
+    assert_equal %w[uninstall --bundle-id com.social4hyq.multica], installer_args.read.lines(chomp: true)
+    with_env("HDC_TARGET" => "env-device") do
+      shell_output("#{libexec}/multica-desktop-dispatch.sh uninstall")
+    end
+    assert_equal %w[uninstall --bundle-id com.social4hyq.multica --device env-device],
+                 installer_args.read.lines(chomp: true)
+    assert_match "uninstall", shell_output("#{bin}/multica-app --help")
+
     begin
       # --no-acl installs the basic variant: no module.json is swapped in.
       shell_output("#{desktop_installer} --no-acl")
