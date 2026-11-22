@@ -1,0 +1,30 @@
+OHOS: run static programs untracked (no seccomp user-notification) and keep their task out of the cache.
+
+diff --git a/crates/fspy/src/unix/mod.rs b/crates/fspy/src/unix/mod.rs
+index e0e8500..cb7f6c7 100644
+--- a/crates/fspy/src/unix/mod.rs
++++ b/crates/fspy/src/unix/mod.rs
+@@ -8,6 +8,9 @@ use std::io;
+ #[cfg(target_os = "linux")]
+ use std::sync::Arc;
+ 
++#[cfg(target_env = "ohos")]
++mod untracked;
++
+ #[cfg(target_os = "linux")]
+ use fspy_seccomp_unotify::supervisor::supervise;
+ #[cfg(not(target_env = "musl"))]
+@@ -135,6 +138,13 @@ impl SpyImpl {
+             },
+         )
+         .map_err(|err| SpawnError::Injection(err.into()))?;
++        #[cfg(target_env = "ohos")]
++        let pre_exec = if pre_exec.is_some() {
++            untracked::mark_tracking_lost(ipc_receiver.conf());
++            None
++        } else {
++            pre_exec
++        };
+         command.set_exec(exec);
+         command.env("FSPY", "1");
+ 

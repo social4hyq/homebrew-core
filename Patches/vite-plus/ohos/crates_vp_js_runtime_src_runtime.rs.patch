@@ -1,0 +1,12 @@
+diff --git a/crates/vp_js_runtime/src/runtime.rs b/crates/vp_js_runtime/src/runtime.rs
+index b3c488b..df613e6 100644
+--- a/crates/vp_js_runtime/src/runtime.rs
++++ b/crates/vp_js_runtime/src/runtime.rs
+@@ -1053,6 +1053,7 @@ mod tests {
+
+     /// Downloads a real Node.js release: only the published archive proves that its
+     /// signed checksums, top-level directory, and binary path match what the provider expects.
++    #[ignore = "requires a live OHOS Node mirror"]
+     #[tokio::test]
+     async fn test_download_node_integration() {
+         // Share immutable runtime installs with the global CLI integration tests.

@@ -1,0 +1,14 @@
+OHOS: run static programs untracked (no seccomp user-notification) and keep their task out of the cache.
+
+diff --git a/crates/fspy_preload_unix/Cargo.toml b/crates/fspy_preload_unix/Cargo.toml
+index 8c9a1dc..a218801 100644
+--- a/crates/fspy_preload_unix/Cargo.toml
++++ b/crates/fspy_preload_unix/Cargo.toml
+@@ -18,6 +18,7 @@ fspy_nostd = { workspace = true }
+ allocator-api2 = { workspace = true }
+ fspy_nostd_alloc = { workspace = true }
+ static_cell = { workspace = true }
++wincode = { workspace = true }
+ 
+ [target.'cfg(target_os = "linux")'.dependencies]
+ syscalls = { workspace = true }
