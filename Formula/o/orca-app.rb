@@ -8,7 +8,7 @@ class OrcaApp < Formula
   # Tap-authored shell scripts (MIT) on the CPF-Electron runtime (mixed
   # MIT/BSD/LGPL).
   license :cannot_represent
-  revision 5
+  revision 6
 
   livecheck do
     url :stable
@@ -30,19 +30,23 @@ class OrcaApp < Formula
 
   # The unused-resource audit requires literal tap paths.
   RESOURCE_FILES = %w[
-    Resources/_shared/electron-shell/tray.cjs
     Resources/_shared/hap-app/install-lib.sh
     Resources/orca-app/app/attach.cjs
     Resources/orca-app/app/config.json
     Resources/orca-app/app/main.cjs
     Resources/orca-app/app/package.json
+    Resources/orca-app/app/tray.cjs
     Resources/orca-app/app/waiting.html
     Resources/orca-app/assets/icon.png
     Resources/orca-app/assets/tray-icon.png
     Resources/orca-app/scripts/install-desktop.sh
     Resources/orca-app/scripts/orca-desktop.sh
     Resources/orca-app/tests/attach.test.cjs
+    Resources/orca-app/tests/cli-env.test.cjs
     Resources/orca-app/tests/close-handler.test.cjs
+    Resources/orca-app/tests/fake-orca.cjs
+    Resources/orca-app/tests/shell-flow.test.cjs
+    Resources/orca-app/tests/shell-harness.cjs
   ].freeze
 
   resource "electron-ohos" do
@@ -63,10 +67,9 @@ class OrcaApp < Formula
     app = shell/"web_engine/src/main/resources/resfile/resources/app"
     rm_r app if app.exist?
     app.mkpath
-    %w[main.cjs attach.cjs package.json config.json waiting.html].each do |name|
+    %w[main.cjs attach.cjs tray.cjs package.json config.json waiting.html].each do |name|
       cp res/"app"/name, app/name
     end
-    cp tap_root/"Resources/_shared/electron-shell/tray.cjs", app/"tray.cjs"
 
     cp res/"assets/icon.png", app/"app-icon.png"
     cp res/"assets/tray-icon.png", app/"tray-icon.png"
@@ -234,15 +237,22 @@ class OrcaApp < Formula
 
         export ORCA_USER_DATA_PATH=$HOME/.orca
 
-      The runtime the app starts itself keeps a separate profile in the app sandbox;
-      the CLI cannot see it.
+      The runtime the app starts itself keeps its data in the app sandbox, which the
+      terminal cannot read, so the app publishes that runtime's orca-runtime.json
+      (port and auth token) to ~/.config/orca-app/app-runtime while it runs.
+      `orca-app cli <command>` runs the orca CLI against the runtime in use (the
+      app's while it is running, else the one `orca-app serve` started), and
+      `eval "$(orca-app env)"` sets ORCA_USER_DATA_PATH for plain `orca` commands.
+      `orca-app serve` and `status` report that runtime instead of starting a
+      second one.
 
       When a runtime is already serving on the app's port (for example one started
       with `orca-app serve`), the app connects to it, using the pairing link in
-      ~/.config/orca-app/server.ready.json, and never stops it. Switching between
-      that runtime and the app's own makes the web client ask to confirm a
-      different server: click Connect. With no runtime serving, the app starts its
-      own, which ends when the app exits.
+      ~/.config/orca-app/server.ready.json, and never stops it; switching between
+      that runtime and the app's own needs no confirmation (the app drops the web
+      client's saved server first). With no runtime serving, the app starts its
+      own, which ends when the app exits: quitting from the tray asks first when it
+      holds terminals.
 
       A runtime killed instead of stopped with `orca-app stop`, or left behind when the
       terminal app was updated (its uid changes), leaves ~/.orca/orcad.lock and the
@@ -559,8 +569,9 @@ class OrcaApp < Formula
     assert_match "resources/resfile/resources/app/attach.cjs", shell_output("unzip -Z1 #{hap}")
     tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
     system "node", "--check", tap_root/"Resources/orca-app/app/main.cjs"
-    system "node", "--test", tap_root/"Resources/orca-app/tests/attach.test.cjs"
-    system "node", "--test", tap_root/"Resources/orca-app/tests/close-handler.test.cjs"
+    tests = tap_root/"Resources/orca-app/tests"
+    system "node", "--test", tests/"attach.test.cjs", tests/"close-handler.test.cjs", tests/"cli-env.test.cjs",
+           tests/"shell-flow.test.cjs"
     placeholder = JSON.parse(shell_output("unzip -p #{hap} resources/resfile/resources/app/config.json"))
     assert_equal 0, placeholder.fetch("port")
     refute placeholder.key?("url")
