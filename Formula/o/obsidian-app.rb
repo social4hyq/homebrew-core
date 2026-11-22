@@ -7,7 +7,7 @@ class ObsidianApp < Formula
   # host payload in Resources/obsidian-app is version-independent. The asar is
   # fetched at install time and never put in the bottle.
   license :cannot_represent
-  revision 9
+  revision 10
 
   # desktop-releases.json carries the latest desktop version, asar URL and
   # sha256.
@@ -369,5 +369,42 @@ class ObsidianApp < Formula
     assert_equal %w[ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET],
                  strong.fetch("module").fetch("requestPermissions").map { |entry| entry.fetch("name") }.sort
     system "unzip", "-tq", injected
+
+    curl_log = testpath/"curl-args"
+    fake_curl = fake_bin/"curl"
+    fake_curl.write <<~SH
+      #!/bin/sh
+      printf '%s\\n' "$@" > #{curl_log}
+      while [ "$#" -gt 0 ]; do
+        if [ "$1" = "-o" ]; then
+          printf 'not an asar' > "$2"
+          exit 0
+        fi
+        shift
+      done
+      exit 2
+    SH
+    chmod 0755, fake_curl
+    download_env = {
+      "OBSIDIAN_DESKTOP_UNSIGNED_HAP" => hap.to_s,
+      "OBSIDIAN_ASAR_URL"             => stable.url.to_s,
+      "OBSIDIAN_ASAR_SHA256"          => stable.checksum.hexdigest,
+      "OBSIDIAN_ASAR_CACHE"           => (testpath/"download-cache").to_s,
+    }
+    %w[0 1].each do |tls_insecure|
+      rm_r testpath/"download-cache" if (testpath/"download-cache").exist?
+      curl_log.unlink if curl_log.exist?
+      output = with_env(download_env.merge("HAP_INSTALLER_TLS_INSECURE" => tls_insecure)) do
+        shell_output("bash #{pkgshare}/install-desktop.sh 2>&1", 1)
+      end
+      assert_match "sha256 mismatch", output
+      curl_args = curl_log.read.lines(chomp: true)
+      if tls_insecure == "1"
+        assert_includes curl_args, "--insecure"
+        assert_match "TLS certificate verification is disabled", output
+      else
+        refute_includes curl_args, "--insecure"
+      end
+    end
   end
 end
