@@ -40,27 +40,17 @@ class SnowImageViewer < Formula
     sha256 "d3a20e0c1b2758c4545b0a97490afa2986e39c8b4387c3dba2007def742cbeb0"
   end
 
-  # 0001: accept the 6.13.0 kit (upstream pins 6.12.0 EXACT for their audits).
-  # 0002: OHOS NDK libc++ lacks C++20 <stop_token>/jthread: route the includes
-  #      to the vendored jthread polyfill (formula resource).
-  # 0003: the strict-warning set is tuned for MSVC/Xcode clangs; do not fail
-  #      the OHOS clang-15 build on warnings.
-  # 0004: HarmonyOS hosts load Qt apps as a shared library via the qohos
-  #      platform plugin, not as a spawned executable.
-  patch :p1 do
-    file "Patches/snow-image-viewer/0001-qt-toolchain-6.13.0.patch"
-  end
+  # Accept the 6.13.0 kit (upstream pins 6.12.0 EXACT for their audits).
+  # OHOS NDK libc++ lacks C++20 <stop_token>/jthread: route the includes to the
+  # vendored jthread polyfill (formula resource). The strict-warning set is
+  # tuned for MSVC/Xcode clangs; do not fail the OHOS clang-15 build on warnings.
+  # HarmonyOS hosts load Qt apps as a shared library via the qohos platform
+  # plugin, not as a spawned executable.
   patch_root = Pathname(__dir__).parent.parent
-  Dir[(patch_root/"Patches/snow-image-viewer/0002-ohos-libcxx-polyfill/*.patch").to_s].each do |path|
+  Dir[(patch_root/"Patches/snow-image-viewer/*.patch").to_s].each do |path|
     patch :p1 do
       file Pathname(path).relative_path_from(patch_root).to_s
     end
-  end
-  patch :p1 do
-    file "Patches/snow-image-viewer/0003-port-warnings.patch"
-  end
-  patch :p1 do
-    file "Patches/snow-image-viewer/0004-ohos-app-library.patch"
   end
 
   def install
