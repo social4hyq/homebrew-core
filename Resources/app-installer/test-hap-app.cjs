@@ -14,7 +14,7 @@ function fixture(t) {
   fs.mkdirSync(bin);
   const log = path.join(root, "calls.jsonl");
   const prelude = `const fs=require('node:fs');const path=require('node:path');const args=process.argv.slice(2);` +
-    `fs.appendFileSync(process.env.TEST_LOG, JSON.stringify([process.env.HAP_APP_TEST_NAME||path.basename(process.argv[1]),...args,{noStart:process.env.HAP_INSTALLER_NO_START||'',noLogin:process.env.HAP_INSTALLER_NO_LOGIN||'',device:process.env.HAP_INSTALLER_DEVICE||''}])+'\\n');`;
+    `fs.appendFileSync(process.env.TEST_LOG, JSON.stringify([process.env.HAP_APP_TEST_NAME||path.basename(process.argv[1]),...args,{noStart:process.env.HAP_INSTALLER_NO_START||'',noLogin:process.env.HAP_INSTALLER_NO_LOGIN||'',device:process.env.HAP_INSTALLER_DEVICE||'',httpsProxy:process.env.HTTPS_PROXY||'',noProxy:process.env.NO_PROXY||'',tlsInsecure:process.env.HAP_INSTALLER_TLS_INSECURE||''}])+'\\n');`;
   const tool = (name, code) => {
     const file = path.join(bin, name);
     fs.writeFileSync(file, `#!${process.execPath}\n${prelude}\n${code}\n`);
@@ -79,6 +79,12 @@ function fixture(t) {
     GITHUB_ACTIONS: "",
     HOMEBREW_GITHUB_ACTIONS: "",
     HAP_APP_AUTO_LOGIN: "",
+    HTTPS_PROXY: "",
+    https_proxy: "",
+    HTTP_PROXY: "",
+    http_proxy: "",
+    NO_PROXY: "",
+    no_proxy: "",
   };
   function run(args, overrides = {}) {
     return spawnSync("bash", [script, ...args], { env: { ...env, ...overrides }, encoding: "utf8" });
@@ -291,6 +297,53 @@ test('recovers the real home from HOMEBREW_PREFIX when brew isolates HOME', t =>
   assert.equal(r.status, 0, r.stdout + r.stderr);
   assert.match(r.stdout, /已装机/);
   assert.deepEqual(f.queued(), [], "the queue must use the recovered home");
+});
+
+test('postinstall app installs inherit https_proxy from the recovered home', t => {
+  const f = fixture(t);
+  const isolated = path.join(f.root, "proxy-postinstall-isolated");
+  fs.mkdirSync(isolated);
+  fs.mkdirSync(path.join(f.root, ".app-installer"), { recursive: true });
+  fs.writeFileSync(path.join(f.root, ".app-installer/config"),
+    "https_proxy=http://127.0.0.1:7890\nno_proxy=localhost,127.0.0.1,.internal\ntls_insecure=1\n");
+  const r = f.run(["auto-install", "orca-app", "com.example.desktop"], {
+    HOME: isolated,
+    HOMEBREW_PREFIX: path.join(f.root, ".harmonybrew"),
+  });
+  assert.equal(r.status, 0, r.stdout + r.stderr);
+  const install = f.calls().find(c => c[0] === "orca-app");
+  assert.equal(install[2].httpsProxy, "http://127.0.0.1:7890");
+  assert.equal(install[2].noProxy, "localhost,127.0.0.1,.internal");
+  assert.equal(install[2].tlsInsecure, "1");
+});
+
+test('a proxy already present in the shell takes precedence over the config file', t => {
+  const f = fixture(t);
+  fs.mkdirSync(path.join(f.root, ".app-installer"), { recursive: true });
+  fs.writeFileSync(path.join(f.root, ".app-installer/config"),
+    "https_proxy=http://127.0.0.1:7890\nno_proxy=localhost,127.0.0.1,.internal\ntls_insecure=1\n");
+  const r = f.run(["auto-install", "orca-app", "com.example.desktop"], {
+    HTTPS_PROXY: "http://127.0.0.1:9999",
+  });
+  assert.equal(r.status, 0, r.stdout + r.stderr);
+  const install = f.calls().find(c => c[0] === "orca-app");
+  assert.equal(install[2].httpsProxy, "http://127.0.0.1:9999");
+  assert.equal(install[2].noProxy, "localhost,127.0.0.1,.internal",
+    "a shell HTTPS_PROXY must not suppress the configured no_proxy");
+});
+
+test('NO_PROXY already present in the shell takes precedence over the config file', t => {
+  const f = fixture(t);
+  fs.mkdirSync(path.join(f.root, ".app-installer"), { recursive: true });
+  fs.writeFileSync(path.join(f.root, ".app-installer/config"), "no_proxy=config.internal\ntls_insecure=1\n");
+  const r = f.run(["auto-install", "orca-app", "com.example.desktop"], {
+    NO_PROXY: "shell.internal",
+    HAP_INSTALLER_TLS_INSECURE: "0",
+  });
+  assert.equal(r.status, 0, r.stdout + r.stderr);
+  const install = f.calls().find(c => c[0] === "orca-app");
+  assert.equal(install[2].noProxy, "shell.internal");
+  assert.equal(install[2].tlsInsecure, "0");
 });
 
 test('the config file can switch automatic installs off', t => {
