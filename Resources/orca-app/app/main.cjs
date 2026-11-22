@@ -1,12 +1,16 @@
 'use strict';
 // Orca desktop shell for OpenHarmony.
-// Starts the host `orca` runtime server itself when it is not already running
-// and loads its browser client (loopback HTTP) in an Electron window, the way
-// the other desktop shells in this tap do.
+// Loads the host `orca` runtime's browser client (loopback HTTP) in an Electron
+// window, the way the other desktop shells in this tap do. When nothing is
+// serving it starts its own runtime; when a runtime is already serving on the
+// port (for example one started from a terminal with `orca-app serve`) it
+// connects to that one and never stops it.
 //
 // The runtime mints a single-use pairing link on every start, so no URL is
 // baked into the HAP: `orca serve --json` prints a ready record with the
-// current link, which this shell tails from the server log. `orca-app install`
+// current link. For its own runtime the shell tails that record from its server
+// log; for a runtime started by `orca-app serve` it reads the record from
+// ~/.config/orca-app/server.ready.json (see attach.cjs). `orca-app install`
 // only writes the port, the runtime binary path and the host environment.
 // Spawning host binaries and reading the host home directory need the
 // CUSTOM_SANDBOX / READ_WRITE_USER_FILE ACLs.
@@ -15,6 +19,7 @@ const { spawn } = require('node:child_process');
 const fs = require('node:fs');
 const http = require('node:http');
 const path = require('node:path');
+const attach = require('./attach.cjs');
 const tray = require('./tray.cjs');
 
 let config = { port: 0 };
@@ -27,6 +32,12 @@ const configured = Number.isInteger(config.port) && config.port > 0;
 const origin = configured ? `http://127.0.0.1:${config.port}` : null;
 const host = config.host && typeof config.host === 'object' ? config.host : {};
 const canAutoStart = configured && typeof config.orca === 'string' && config.orca.length > 0;
+
+// Where `orca-app serve` leaves the runtime's stdout (ready record first), and
+// what this shell remembers about the runtimes it has paired with.
+const hostHome = typeof host.home === 'string' && host.home.length > 0 ? host.home : null;
+const readyFile = hostHome ? path.join(hostHome, '.config', 'orca-app', 'server.ready.json') : null;
+const attachStateFile = hostHome ? path.join(hostHome, '.cache', 'orca-desktop', 'attach.json') : null;
 
 let serveChild = null;
 let serveFailure = '';
@@ -179,6 +190,49 @@ async function waitForPairingUrl(timeoutMs) {
   }
 }
 
+// Which URL to open for the runtime on the port. A runtime this shell started
+// itself keeps using the link from the shell's own log. Any other runtime is a
+// terminal-started one: use the link from its ready file, once, and afterwards
+// the plain client, which reconnects with the identity the web client saved.
+async function connectTarget() {
+  if (serveChild) {
+    const url = (await waitForPairingUrl(6000)) || origin + '/web-index.html';
+    return { kind: 'own', url, runtimeId: null, reason: 'own-runtime' };
+  }
+  const ready = readyFile ? attach.parseReadyRecord(attach.readHead(readyFile)) : null;
+  const state = attachStateFile ? attach.readState(attachStateFile) : {};
+  return attach.chooseTarget({ origin, ready, state });
+}
+
+// The shell cannot see whether the web client accepted the link, but the
+// runtime logs every connection to the same file. Remember the runtime as
+// paired only once a new connection shows up; until then it counts as "tried",
+// so a spent or stale link is not offered again.
+function trackPairing(runtimeId, sinceIso) {
+  if (!readyFile || !attachStateFile || !runtimeId) return;
+  const before = attach.readState(attachStateFile);
+  attach.writeState(attachStateFile, {
+    lastPairedRuntimeId: before.lastPairedRuntimeId,
+    lastTriedRuntimeId: runtimeId,
+  });
+  const sources = [readyFile, path.join(path.dirname(readyFile), 'server.log')];
+  // The web client may first ask the user to confirm a different server, so
+  // allow for a human-sized delay.
+  const deadline = Date.now() + 10 * 60 * 1000;
+  const timer = setInterval(() => {
+    for (const source of sources) {
+      const connectedAt = attach.lastClientConnectedAt(attach.readTail(source));
+      if (connectedAt && connectedAt > sinceIso) {
+        attach.writeState(attachStateFile, { lastPairedRuntimeId: runtimeId, lastTriedRuntimeId: null });
+        clearInterval(timer);
+        return;
+      }
+    }
+    if (Date.now() > deadline) clearInterval(timer);
+  }, 1000);
+  timer.unref();
+}
+
 function showWaiting(win, state) {
   return win.loadFile(path.join(__dirname, 'waiting.html'), {
     query: { state, origin: origin || '' },
@@ -197,8 +251,15 @@ async function drive(win) {
   for (;;) {
     if (win.isDestroyed()) return;
     if (await serverUp(2000)) {
-      const url = (await waitForPairingUrl(6000)) || origin + '/web-index.html';
-      await win.loadURL(url);
+      const target = await connectTarget();
+      const sinceIso = new Date().toISOString();
+      // Not a "[shell]" line: those mark a spawn and scope the ready record.
+      try {
+        fs.appendFileSync(serveLogPath(), `[attach] ${sinceIso} kind=${target.kind} reason=${target.reason}` +
+          `${target.runtimeId ? ' runtime=' + target.runtimeId : ''}\n`);
+      } catch {}
+      await win.loadURL(target.url);
+      if (target.kind === 'link') trackPairing(target.runtimeId, sinceIso);
       return;
     }
     const now = Date.now();

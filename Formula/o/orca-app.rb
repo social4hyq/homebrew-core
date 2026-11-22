@@ -8,6 +8,7 @@ class OrcaApp < Formula
   # Tap-authored shell scripts (MIT) on the CPF-Electron runtime (mixed
   # MIT/BSD/LGPL).
   license :cannot_represent
+  revision 1
 
   livecheck do
     url :stable
@@ -31,6 +32,7 @@ class OrcaApp < Formula
   RESOURCE_FILES = %w[
     Resources/_shared/electron-shell/tray.cjs
     Resources/_shared/hap-app/install-lib.sh
+    Resources/orca-app/app/attach.cjs
     Resources/orca-app/app/config.json
     Resources/orca-app/app/main.cjs
     Resources/orca-app/app/package.json
@@ -39,6 +41,7 @@ class OrcaApp < Formula
     Resources/orca-app/assets/tray-icon.png
     Resources/orca-app/scripts/install-desktop.sh
     Resources/orca-app/scripts/orca-desktop.sh
+    Resources/orca-app/tests/attach.test.cjs
   ].freeze
 
   resource "electron-ohos" do
@@ -59,7 +62,7 @@ class OrcaApp < Formula
     app = shell/"web_engine/src/main/resources/resfile/resources/app"
     rm_r app if app.exist?
     app.mkpath
-    %w[main.cjs package.json config.json waiting.html].each do |name|
+    %w[main.cjs attach.cjs package.json config.json waiting.html].each do |name|
       cp res/"app"/name, app/name
     end
     cp tap_root/"Resources/_shared/electron-shell/tray.cjs", app/"tray.cjs"
@@ -229,6 +232,13 @@ class OrcaApp < Formula
       The runtime the app starts itself keeps a separate profile in the app sandbox;
       the CLI cannot see it.
 
+      When a runtime is already serving on the app's port (for example one started
+      with `orca-app serve`), the app connects to it, using the pairing link in
+      ~/.config/orca-app/server.ready.json, and never stops it. Switching between
+      that runtime and the app's own makes the web client ask to confirm a
+      different server: click Connect. With no runtime serving, the app starts its
+      own, which ends when the app exits.
+
       `install --no-acl` installs the strong-sandbox variant (no JIT/paste; it waits
       for `orca-app serve` instead of spawning the runtime).
     EOS
@@ -368,9 +378,26 @@ class OrcaApp < Formula
         sleep 0.25
       end
       assert_match "healthy at http://127.0.0.1:#{up_port}", shell_output("#{bin}/orca-app status 2>&1")
+
+      # Installing while `orca-app serve` is running keeps its port, so the shell
+      # attaches to that runtime instead of starting a second one next to it.
+      state_dir = testpath/"home/.config/orca-app"
+      (state_dir/"server.pid").write "#{web}\n"
+      ready_record = { "type" => "orca_server_ready", "endpoint" => "ws://127.0.0.1:#{up_port}" }
+      (state_dir/"server.ready.json").write JSON.generate(ready_record)
+      assert_match "installed", shell_output("#{bin}/orca-app install --hap #{fake_hap} --no-serve")
+      baked = JSON.parse(shell_output("unzip -p #{injected_copy} resources/resfile/resources/app/config.json"))
+      assert_equal up_port, baked.fetch("port")
+
+      # A pid file that points at a dead process does not pin the port.
+      (state_dir/"server.pid").write "2147483646\n"
+      assert_match "installed", shell_output("#{bin}/orca-app install --hap #{fake_hap} --no-serve")
+      baked = JSON.parse(shell_output("unzip -p #{injected_copy} resources/resfile/resources/app/config.json"))
+      refute_equal up_port, baked.fetch("port")
     ensure
       Process.kill("TERM", web)
       Process.wait(web)
+      rm_f [testpath/"home/.config/orca-app/server.pid", testpath/"home/.config/orca-app/server.ready.json"]
     end
 
     saved_home = Dir.home
@@ -405,6 +432,10 @@ class OrcaApp < Formula
 
     hap = libexec/"orca-app-unsigned.hap"
     assert_match "libs/arm64-v8a/libelectron.so", shell_output("unzip -Z1 #{hap}")
+    assert_match "resources/resfile/resources/app/attach.cjs", shell_output("unzip -Z1 #{hap}")
+    tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
+    system "node", "--check", tap_root/"Resources/orca-app/app/main.cjs"
+    system "node", "--test", tap_root/"Resources/orca-app/tests/attach.test.cjs"
     placeholder = JSON.parse(shell_output("unzip -p #{hap} resources/resfile/resources/app/config.json"))
     assert_equal 0, placeholder.fetch("port")
     refute placeholder.key?("url")
