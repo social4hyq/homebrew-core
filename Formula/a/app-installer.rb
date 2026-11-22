@@ -4,7 +4,7 @@ class AppInstaller < Formula
   url "https://registry.npmjs.org/@deveco/deveco-cli-openharmony-arm64/-/deveco-cli-openharmony-arm64-1.3.12.tgz"
   sha256 "eaa29900d4892e89b2ae6156733ffa97597971b7a26fa1df6c686cc5934a02fb"
   license "MIT"
-  revision 1
+  revision 2
 
   livecheck do
     url :stable
@@ -173,8 +173,12 @@ class AppInstaller < Formula
       System sideloading is not used yet: installs go through hdc.
 
       The tap's desktop apps install themselves after `brew install` through
-      `hap-app`. When the device or the login is not ready they are queued:
-      `hap-app status` lists them and `hap-app install-pending` finishes them.
+      `hap-app`. A missing Huawei Developer login opens the browser and waits
+      up to 120 seconds by default; set HAP_APP_AUTO_LOGIN=0 or auto_login=0 in
+      ~/.config/hap-app/config to disable that. If the device is not ready or
+      login is not completed, apps are queued: `hap-app status` lists them and
+      `hap-app install-pending` finishes them. Each install refreshes the local
+      debug profile before signing; a refresh failure also queues the app.
 
       Behind a proxy or VPN that intercepts HTTPS, signing needs the proxy CA:
       put `tls_ca=/path/to/ca.pem` (or `https_proxy=...`) in

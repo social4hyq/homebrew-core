@@ -45,6 +45,12 @@ function fixture(t) {
     if (args[0] === 'signature') {
       if (process.env.CAPTURE_NET_ENV) fs.writeFileSync(process.env.CAPTURE_NET_ENV, JSON.stringify({ca: process.env.NODE_EXTRA_CA_CERTS || '', proxy: process.env.HTTPS_PROXY || '', insecure: process.env.NODE_TLS_REJECT_UNAUTHORIZED || ''}));
       if (process.env.FAIL_TLS) { console.error('Network connection failed (SELF_SIGNED_CERT_IN_CHAIN)'); process.exit(1); }
+      if (process.env.FAIL_PROFILE_REFRESH) { console.error('profile refresh rejected'); process.exit(1); }
+      if (process.env.REFRESH_PROFILE) {
+        const now = Math.floor(Date.now() / 1000);
+        const validity = JSON.stringify({validity:{'not-before':now-86400,'not-after':now+30*86400}});
+        fs.writeFileSync(process.env.REFRESH_PROFILE, Buffer.concat([Buffer.from('binary'), Buffer.from([0]), Buffer.from(validity), Buffer.from([0]), Buffer.from('tail')]));
+      }
       const p = JSON.parse(fs.readFileSync('entry/src/main/module.json5', 'utf8'));
       fs.writeFileSync(process.env.TEST_PERMISSIONS, JSON.stringify(p.module.requestPermissions));
     }
@@ -218,6 +224,35 @@ test('profile expiry is read from the p7b and warned about before signing', t =>
   fs.writeFileSync(path.join(dir,'build-profile.json5'),'{}');
   const unknown=spawnSync(process.execPath,[path.join(__dirname,'prepare-profile.cjs'),'--expiry',path.join(dir,'build-profile.json5')],{env:f.env,encoding:'utf8'});
   assert.equal(unknown.status,0); assert.equal(unknown.stdout,'');
+});
+
+test('an expired automatic profile is refreshed before signing and installing', t => {
+  const f=fixture(t); const dir=path.join(f.root,'.app-installer/projects',bundle);
+  fs.mkdirSync(path.join(dir,'AppScope'),{recursive:true});
+  fs.mkdirSync(path.join(dir,'entry/src/main'),{recursive:true});
+  fs.writeFileSync(path.join(dir,'AppScope/app.json5'),'{}');
+  fs.writeFileSync(path.join(dir,'entry/src/main/module.json5'),'{module:{name:"entry",requestPermissions:[]}}');
+  const p7b=path.join(dir,'debug.p7b');
+  const now=Math.floor(Date.now()/1000);
+  fs.writeFileSync(p7b,`binary\x00{"validity":{"not-before":${now-86400},"not-after":${now-3600}}}\x00more`);
+  const buildProfile=path.join(dir,'build-profile.json5');
+  fs.writeFileSync(buildProfile,JSON.stringify({app:{signingConfigs:[{name:'default',material:{profile:'debug.p7b'}}]}}));
+  const expiry=()=>spawnSync(process.execPath,[path.join(__dirname,'prepare-profile.cjs'),'--expiry',buildProfile],{env:f.env,encoding:'utf8'});
+  assert(Number(expiry().stdout)<0);
+  const r=f.run([],{REFRESH_PROFILE:p7b}); assert.equal(r.status,0,r.stdout+r.stderr);
+  assert(Number(expiry().stdout)>0);
+  const generate=f.calls().findIndex(c=>c[0]==='devecocli'&&c[1]==='signature'&&c[2]==='generate');
+  const signer=f.calls().findIndex(c=>c[0]==='signer');
+  assert(generate>=0&&signer>generate,'signature generate must refresh the profile before the signer runs');
+});
+
+test('a failed profile refresh records sign and stops before signing or upload', t => {
+  const f=fixture(t); const result=path.join(f.root,'result.json');
+  const r=f.run([],{FAIL_PROFILE_REFRESH:'1',HAP_INSTALLER_RESULT_FILE:result});
+  assert.notEqual(r.status,0,r.stdout+r.stderr);
+  const recorded=JSON.parse(fs.readFileSync(result,'utf8'));
+  assert.equal(recorded.stage,'profile-generate'); assert.equal(recorded.reason,'sign');
+  assert.ok(!f.calls().some(c=>c[0]==='signer'||c.includes('send')));
 });
 
 test('first login opens the login URL in the browser through aa start', t => {
