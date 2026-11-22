@@ -1,0 +1,30 @@
+diff --git a/src/main/orcad/instance-lock/orcad-instance-lock.ts b/src/main/orcad/instance-lock/orcad-instance-lock.ts
+index fb377439..3ce6dd69 100644
+--- a/src/main/orcad/instance-lock/orcad-instance-lock.ts
++++ b/src/main/orcad/instance-lock/orcad-instance-lock.ts
+@@ -1,7 +1,7 @@
+ // Lock before profile load to prevent concurrent writers; terminal daemons own separate endpoints
+ // and deliberately survive runtime lock release and restart.
+ import { randomUUID } from 'node:crypto'
+-import { linkSync, mkdirSync, statSync, writeFileSync } from 'node:fs'
++import { mkdirSync, statSync, writeFileSync } from 'node:fs'
+ import { hostname, userInfo } from 'node:os'
+ import { join } from 'node:path'
+ import process from 'node:process'
+@@ -26,6 +26,7 @@ import { profileStateAccessMachineIdentity } from '../../persistence/profile-sta
+ import { orcadDataRootIsOnLocalDisk } from './orcad-data-root-locality'
+ import type { OrcadReclaimHintRuntime } from '../../../shared/remote-runtime/orcad-lifecycle/orcad-stale-lock-reclaim'
+ import { reclaimedUnexpectedExit } from '../host-lifecycle/orcad-unexpected-exit'
++import { publishStagedFileExclusively } from '../../../shared/file-write/publish-staged-file'
+ import type { OrcadUnexpectedExit } from '../../../shared/remote-runtime/orcad-lifecycle/orcad-unexpected-exit'
+ import {
+   orcadLockHolderLocality,
+@@ -143,7 +144,7 @@ export function acquireOrcadInstanceLock(
+     const staged = `${lockPath}.staged-${process.pid}-${randomUUID()}`
+     try {
+       writeFileSync(staged, contents, { flag: 'wx', mode: 0o600 })
+-      linkSync(staged, lockPath)
++      publishStagedFileExclusively(staged, lockPath)
+       return true
+     } catch (error) {
+       if (hasErrorCode(error, 'EEXIST')) {

@@ -1,0 +1,43 @@
+diff --git a/src/shared/file-write/publish-staged-file.ts b/src/shared/file-write/publish-staged-file.ts
+new file mode 100644
+index 00000000..b4f88e96
+--- /dev/null
++++ b/src/shared/file-write/publish-staged-file.ts
+@@ -0,0 +1,37 @@
++import { constants, copyFileSync, linkSync } from 'node:fs'
++
++/** Node on OpenHarmony reports a platform string the NodeJS.Platform union lacks. */
++export function isOpenHarmony(): boolean {
++  return (process.platform as string) === 'openharmony'
++}
++
++/** A hard link is the atomic "publish unless already present" primitive. FUSE-style
++ * userdata filesystems — OpenHarmony's hmfs among them — support sockets and rename
++ * but reject hard links, and hmfs reports that as EACCES rather than EPERM. */
++export function linkIsUnsupported(error: unknown): boolean {
++  if (typeof error !== 'object' || error === null || !('code' in error)) {
++    return false
++  }
++  const code = (error as NodeJS.ErrnoException).code
++  if (code === 'EPERM' || code === 'EOPNOTSUPP' || code === 'ENOTSUP' || code === 'ENOSYS') {
++    return true
++  }
++  return isOpenHarmony() && code === 'EACCES'
++}
++
++/** Publish a staged file at `targetPath` without replacing an entry that already
++ * exists. Callers keep treating EEXIST as "someone else published first". Without
++ * hard links the exclusive copy is not atomic, so a crash can leave a damaged
++ * target; readers already reject those records and reclaim them.
++ */
++export function publishStagedFileExclusively(stagingPath: string, targetPath: string): void {
++  try {
++    linkSync(stagingPath, targetPath)
++    return
++  } catch (error) {
++    if (!linkIsUnsupported(error)) {
++      throw error
++    }
++  }
++  copyFileSync(stagingPath, targetPath, constants.COPYFILE_EXCL)
++}
