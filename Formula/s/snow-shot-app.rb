@@ -1,8 +1,8 @@
 class SnowShotApp < Formula
   desc "Screenshot and annotation utility from Snow Apps, unsigned OHOS HAP"
   homepage "https://github.com/mg-chao/snow-shot"
-  url "https://github.com/mg-chao/snow-shot/archive/refs/tags/v1.6.1_snow-shot.tar.gz"
-  sha256 "1fdffd33d03a20696a11386fc2fa114728478c1c3601caa8ed14ed43a34489e8"
+  url "https://github.com/mg-chao/snow-shot/archive/refs/tags/v1.6.2_snow-shot.tar.gz"
+  sha256 "ab84c57dfafb13ae9cbcc48af39fde6c27b5804f718b37c4d3d5ca3e157f1549"
   license "GPL-3.0-or-later"
 
   livecheck do
