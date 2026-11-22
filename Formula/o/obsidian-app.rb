@@ -7,7 +7,7 @@ class ObsidianApp < Formula
   # host payload in Resources/obsidian-app is version-independent. The asar is
   # fetched at install time and never put in the bottle.
   license :cannot_represent
-  revision 10
+  revision 11
 
   # desktop-releases.json carries the latest desktop version, asar URL and
   # sha256.
@@ -284,6 +284,9 @@ class ObsidianApp < Formula
       CLI: enable Settings -> General -> Command line interface, then
       `obsidian-app cli <command>` (try `cli help`). Desktop self-update is disabled;
       upgrade with `brew upgrade`.
+
+      `obsidian-app uninstall` removes the app but keeps its data; only
+      `obsidian-app uninstall --purge` deletes the app data.
     EOS
   end
 
@@ -322,6 +325,7 @@ class ObsidianApp < Formula
     fake_installer.write <<~SH
       #!/bin/sh
       printf '%s\n' "$@" > #{installer_args}
+      [ "$1" != uninstall ] || exit 0
       out=""
       while [ $# -gt 0 ]; do
         case "$1" in
@@ -344,6 +348,7 @@ class ObsidianApp < Formula
     SH
     chmod 0755, fake_hdc
     ENV["OBSIDIAN_DESKTOP_HDC"] = fake_hdc.to_s
+    ENV["OBSIDIAN_DESKTOP_INSTALLER"] = fake_installer.to_s
 
     (fake_bin/"devecocli").write "#!/bin/sh\nexit 99\n"
     chmod 0755, fake_bin/"devecocli"
@@ -405,5 +410,36 @@ class ObsidianApp < Formula
         refute_includes curl_args, "--insecure"
       end
     end
+
+    # The CLI matrix: start/stop address the device; uninstall goes through
+    # app-installer and keeps the app's data unless --purge is given.
+    hdc_log = testpath/"cli-hdc-log"
+    fake_hdc.delete if fake_hdc.exist?
+    fake_hdc.write <<~SH
+      #!/bin/sh
+      printf '%s\\n' "$*" >> #{hdc_log}
+      case "$*" in
+        *"list targets"*) printf '127.0.0.1:34561\\n' ;;
+        *"ps -ef | grep -q"*) exit 0 ;;
+        *) exit 0 ;;
+      esac
+    SH
+    chmod 0755, fake_hdc
+    shell_output("#{bin}/obsidian-app start --device tablet-1")
+    assert_match "-t tablet-1 shell aa start", (testpath/"cli-hdc-log").read
+    shell_output("#{bin}/obsidian-app stop")
+    assert_match "shell aa force-stop com.social4hyq.obsidiandesktop", (testpath/"cli-hdc-log").read
+    assert_equal "running\n", shell_output("#{bin}/obsidian-app status")
+    shell_output("#{bin}/obsidian-app uninstall --purge --device tablet-1")
+    assert_equal %w[uninstall --bundle-id com.social4hyq.obsidiandesktop --device tablet-1 --purge],
+                 installer_args.read.lines(chomp: true)
+    shell_output("#{bin}/obsidian-app uninstall")
+    assert_equal %w[uninstall --bundle-id com.social4hyq.obsidiandesktop], installer_args.read.lines(chomp: true)
+    with_env("HDC_TARGET" => "env-device") do
+      shell_output("#{bin}/obsidian-app uninstall")
+    end
+    assert_equal %w[uninstall --bundle-id com.social4hyq.obsidiandesktop --device env-device],
+                 installer_args.read.lines(chomp: true)
+    assert_match "uninstall", shell_output("#{bin}/obsidian-app --help")
   end
 end
