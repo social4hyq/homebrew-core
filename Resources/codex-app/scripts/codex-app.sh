@@ -52,7 +52,8 @@ share_field() {
 }
 
 share_ready() {
-  [[ "$(curl -s -o /dev/null -m 2 -w '%{http_code}' "http://127.0.0.1:$1/readyz" 2>/dev/null || true)" == 200 ]]
+  # Asked through Node, which this script needs anyway, so a stand-in curl on PATH cannot answer for it.
+  "$NODE" -e 'const request = require("node:http").get({ host: "127.0.0.1", port: Number(process.argv[1]), path: "/readyz", timeout: 2000 }, (response) => { response.resume(); process.exit(response.statusCode === 200 ? 0 : 1); }); request.on("timeout", () => request.destroy()); request.on("error", () => process.exit(1));' "$1" >/dev/null 2>&1
 }
 
 share_serve() {

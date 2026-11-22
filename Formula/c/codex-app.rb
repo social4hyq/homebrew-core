@@ -20,7 +20,6 @@ class CodexApp < Formula
 
   depends_on "app-installer"
   depends_on "codex"
-  depends_on "curl"
   depends_on "node"
   depends_on "ohos-sdk-toolchains"
   depends_on "python@3.15"
