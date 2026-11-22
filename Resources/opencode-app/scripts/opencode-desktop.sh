@@ -20,9 +20,12 @@ Usage: opencode-app <command>
 
 Commands:
   start     Open the desktop app (it starts the background service itself when
-            installed with the weak-sandbox ACL; needs hdc and an unlocked device)
+            installed with the weak-sandbox ACL; needs hdc and an unlocked device).
+            A service the app starts ends when the app exits (quit or force-stop);
+            to keep tasks running after that, run `opencode-app serve` first.
     --serve-only  Only ensure the background service (for shell startup files)
-  serve     Start the opencode background service if it is not running
+  serve     Start the opencode background service if it is not running; a
+            service started here keeps running after the app exits
   stop      Stop the opencode background service (the terminal's `opencode`
             and the desktop app both use it; running sessions end)
   status    Show whether the background service is healthy
@@ -91,8 +94,8 @@ cmd_start() {
 }
 
 cmd_stop() {
-  # The desktop app never stops the service when it quits, so this is the one
-  # place that does.
+  # The app does not stop the service explicitly, but a service it started ends
+  # with it; this stops one that was started from a terminal.
   "$OPENCODE" service stop >/dev/null
   printf 'opencode-desktop: stopped\n'
 }

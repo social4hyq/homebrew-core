@@ -6,7 +6,7 @@ class OpencodeApp < Formula
   # Tap-authored shell sources (MIT) on the CPF-Electron runtime (mixed
   # MIT/BSD/LGPL).
   license :cannot_represent
-  revision 1
+  revision 2
 
   livecheck do
     url :stable
@@ -15,8 +15,8 @@ class OpencodeApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-app-v2.3.2-r3"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "bc46f22f3e036a17ebeae75a48151f6b58bf57be7eeed53b83d4d9093131c396"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-app-v2.3.2-r4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "aa7d59f95cb0470929a91e3bce8e9bdef6b925714aa94adcc6ab081576f05670"
   end
 
   depends_on "app-installer"
@@ -202,9 +202,12 @@ class OpencodeApp < Formula
 
       The shell connects to the background service that `opencode` runs for the
       terminal (`opencode service`), so the TUI and the app show the same sessions.
-      It starts that service on launch when it is not running and never stops it:
-      tasks keep running after the app is closed. `opencode-app stop` (or
-      `opencode service stop`) stops it. The weak-sandbox ACLs (CUSTOM_SANDBOX,
+      It starts that service on launch when it is not running, but a service the
+      app starts ends when the app exits (quit or `aa force-stop`). To keep tasks
+      running after the app is closed, start the service from a terminal first:
+      `opencode-app serve` (or `opencode service start`; `opencode-app start
+      --serve-only` in a shell startup file). A service started there survives
+      the app, and `opencode-app stop` stops it. The weak-sandbox ACLs (CUSTOM_SANDBOX,
       READ_WRITE_USER_FILE) come from the local debug profile. READ_PASTEBOARD
       enables paste and the kernel ACLs keep WebAssembly/markdown rendering.
       `--no-acl` installs the strong-sandbox HAP and waits for `opencode-app serve`.

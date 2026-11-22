@@ -7,8 +7,10 @@
 // host `opencode` binary and the host environment it needs are baked into
 // config.json by `opencode-app install` before HAP signing. On launch the shell
 // starts the service when it is not running (requires the CUSTOM_SANDBOX /
-// READ_WRITE_USER_FILE ACLs) and never stops it: tasks keep running after the
-// window or the app is closed.
+// READ_WRITE_USER_FILE ACLs) and never stops it itself. A service started by
+// this shell still ends when the app process ends (`aa force-stop`, tray quit):
+// measured on the device, detaching does not keep it alive. Only a service
+// started from a terminal outlives the app.
 const { app, BrowserWindow } = require('electron');
 const { spawn } = require('node:child_process');
 const fs = require('node:fs');
@@ -117,7 +119,8 @@ function startService() {
   }
   const stdio = ['ignore', logFd === undefined ? 'ignore' : logFd, logFd === undefined ? 'ignore' : logFd];
   try {
-    // detached + unref: the service must outlive this shell.
+    // detached + unref so the shell does not wait for it. This does not keep
+    // the service alive after the app process ends (see the header).
     const child = spawn(config.opencode, ['service', 'start'], { env, cwd: host.home, stdio, detached: true });
     child.on('error', (error) => {
       serveSpawnError = String(error);
@@ -228,8 +231,8 @@ app.on('before-quit', (event) => {
 
 app.on('window-all-closed', () => {
   // With a tray the window is only hidden, never closed; keep the process
-  // alive. Without a tray, keep the old behaviour. The background service is
-  // never stopped here: `opencode-app stop` (or `opencode service stop`) does.
+  // alive. Without a tray, keep the old behaviour. The shell never stops the
+  // service explicitly: `opencode-app stop` (or `opencode service stop`) does.
   if (trayReady) return;
   app.quit();
 });
