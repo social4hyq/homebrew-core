@@ -6,7 +6,7 @@ class CodexApp < Formula
   version "26.1117.41037"
   sha256 "714146e9c667b26a1bd4e57633c544334a9ed47c399989bfd98cf764140bdc53"
   license :cannot_represent # OpenAI service and software terms
-  revision 2
+  revision 3
 
   livecheck do
     url "https://persistent.oaistatic.com/codex-app-prod/linux/deb/dists/stable/main/binary-arm64/Packages"
@@ -14,9 +14,8 @@ class CodexApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codex-app-v26.1117.41037-r5"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "fe847cbdfc32af98578e2167d772583bacc78beeaf88e46a4fa266d2ad42fd2e"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codex-app-v26.1117.41037-r6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2a85b402ca79bed5e755c04e3a335a79815cf51633a77aaf69f810c57ae425b3"
   end
 
   depends_on "app-installer"
@@ -354,5 +353,49 @@ class CodexApp < Formula
     strong_sandbox = JSON.parse(shell_output("unzip -p #{injected} module.json"))
     strong_permissions = strong_sandbox.dig("module", "requestPermissions").map { |item| item.fetch("name") }
     assert_empty strong_permissions.grep(/CUSTOM_SANDBOX|READ_WRITE_USER_FILE/)
+
+    download_bin = testpath/"download-bin"
+    download_bin.mkpath
+    curl_log = testpath/"curl-args"
+    fake_curl = download_bin/"curl"
+    fake_curl.write <<~SH
+      #!/bin/sh
+      printf '%s\\n' "$@" > #{curl_log}
+      while [ "$#" -gt 0 ]; do
+        if [ "$1" = "-o" ]; then
+          printf 'not a deb' > "$2"
+          exit 0
+        fi
+        shift
+      done
+      exit 2
+    SH
+    chmod 0755, fake_curl
+    download_env = {
+      "PATH"                     => "#{download_bin}:#{ENV.fetch("PATH")}",
+      "HOME"                     => (testpath/"download-home").to_s,
+      "XDG_CACHE_HOME"           => (testpath/"download-cache").to_s,
+      "CHATGPT_APP_UNSIGNED_HAP" => hap.to_s,
+      "CHATGPT_APP_VENDOR_JSON"  => (libexec/"vendor.json").to_s,
+      "CHATGPT_APP_ASSEMBLE_DIR" => (pkgshare/"assemble").to_s,
+      "CHATGPT_APP_HOST_HOME"    => (testpath/"download-home").to_s,
+      "CHATGPT_APP_CODEX_CLI"    => (formula_opt_bin("codex")/"codex").to_s,
+      "CHATGPT_APP_BREW_PREFIX"  => formula_opt_prefix("codex").parent.parent.to_s,
+    }
+    mkdir_p testpath/"download-home"
+    %w[0 1].each do |tls_insecure|
+      curl_log.unlink if curl_log.exist?
+      output = with_env(download_env.merge("HAP_INSTALLER_TLS_INSECURE" => tls_insecure)) do
+        shell_output("bash #{pkgshare}/install-desktop.sh 2>&1", 1)
+      end
+      assert_match "sha256 check", output
+      curl_args = curl_log.read.lines(chomp: true)
+      if tls_insecure == "1"
+        assert_includes curl_args, "--insecure"
+        assert_match "TLS certificate verification is disabled", output
+      else
+        refute_includes curl_args, "--insecure"
+      end
+    end
   end
 end

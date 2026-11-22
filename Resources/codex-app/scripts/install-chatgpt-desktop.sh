@@ -88,7 +88,12 @@ process.stdout.write([value.url, value.sha256, value.version, value.file || "cha
     else
       rm -f "$deb" "$deb.part"
       log "downloading ChatGPT $version from OpenAI (~519 MB)..."
-      curl -fL --retry 3 --retry-delay 2 -C - -o "$deb.part" "$url" ||
+      curl_tls_args=()
+      if [ "${HAP_INSTALLER_TLS_INSECURE:-0}" = "1" ]; then
+        curl_tls_args=(--insecure)
+        log "warning: TLS certificate verification is disabled for the vendor download"
+      fi
+      curl "${curl_tls_args[@]}" -fL --retry 3 --retry-delay 2 -C - -o "$deb.part" "$url" ||
         { record_vendor_failure download network "download failed: $url"; echo "download failed: $url" >&2; exit 1; }
       mv "$deb.part" "$deb"
       if ! sha256_matches "$deb" "$sha"; then
