@@ -25,9 +25,9 @@ class Opencv < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencv-v5.1.0-r4"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "13f80b9f7563890683069de1751f33c3656e09f4f28b570cdb0d4a7fe3505621"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencv-v5.1.0-r5"
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "39be136825d73ef28e03336dd6c0a3cf865e88084e5f9600e86a905eb87966aa"
   end
 
   head do
@@ -203,8 +203,14 @@ class Opencv < Formula
         return 0;
       }
     CPP
-    system ENV.cxx, "-std=c++17", "test.cpp", "-I#{include}/opencv#{version.major}", "-o", "test",
-                    "-L#{lib}", "-lopencv_core", "-lopencv_imgcodecs"
+    # Homebrew puts HOMEBREW_PREFIX/lib in LD_LIBRARY_PATH for tests. On the OHOS PC the
+    # vendor-signed SDK linker (lld) refuses the self-signed libxml2.so.16 found there
+    # before its own, so the link step fails. Build without it; the test binary below
+    # still needs it to find this formula's libraries.
+    with_env(LD_LIBRARY_PATH: nil) do
+      system ENV.cxx, "-std=c++17", "test.cpp", "-I#{include}/opencv#{version.major}", "-o", "test",
+                      "-L#{lib}", "-lopencv_core", "-lopencv_imgcodecs"
+    end
     assert_equal version.to_s, shell_output("./test").strip
 
     # The test below seems to time out on Intel macOS.
