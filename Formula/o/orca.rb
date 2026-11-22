@@ -11,9 +11,8 @@ class Orca < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/orca-v1.4.267-r4"
-    rebuild 3
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d5094d2a20a1134b7403ee34f168be013486f6b99a668b5c35a5c6fac2267aac"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/orca-v1.4.269-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ea8fed57f3e139bad39bebf127928fc223f6b9c395e539be3aa419ca06fa5059"
   end
 
   depends_on "bun" => :build
