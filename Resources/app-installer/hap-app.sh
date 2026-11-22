@@ -114,6 +114,24 @@ reason_hint() {
   esac
 }
 
+stage_label() {
+  case "$1" in
+    prepare) printf '%s' '正在准备应用（可能需要下载厂商包）' ;;
+    profile) printf '%s' '正在生成或刷新调试签名' ;;
+    sign) printf '%s' '正在签名 HAP' ;;
+    upload) printf '%s' '正在上传 HAP 到设备' ;;
+    install) printf '%s' '正在安装到设备' ;;
+    permissions) printf '%s' '正在校验应用权限' ;;
+    *) return 1 ;;
+  esac
+}
+
+report_stage() {
+  local label
+  label="$(stage_label "$1")" || return 0
+  log "$label"
+}
+
 result_reason() {
   local file="$1"
   [ -f "$file" ] || return 0
@@ -171,11 +189,17 @@ Usage: hap-app <command> [options]
   install-pending [--start] [--device <id>]
                 Install every queued app, logging in once if needed.
   status [--tsv]  Show the queued apps with the reason and the next step.
+  logs [app-command]
+                List retained logs, or print one app's latest full log.
+  doctor [--network]
+                Check device, login, signing and DevEco CLI compatibility.
   login [--timeout <s>]
                 Huawei Developer login (what install-pending does when needed).
   forget <app-command>
                 Remove one app from the queue.
   help          Show this help.
+
+Generic HAP signing and installation are provided by app-installer.
 
 Environment:
   HAP_APP_AUTO_INSTALL=0   Do not install or queue automatically (config file:
@@ -183,8 +207,8 @@ Environment:
   HAP_APP_AUTO_LOGIN=0     Do not open the Huawei Developer login automatically
                            (default: open it and wait HAP_APP_LOGIN_TIMEOUT
                            seconds, 120 by default; config: auto_login=0)
-  HAP_APP_VERBOSE=1        Stream the app install output instead of one line
-                           per app (config file: verbose=1)
+  HAP_APP_VERBOSE=1        Stream the full app install output instead of concise
+                           stages (config file: verbose=1)
   HAP_APP_INSTALL_TIMEOUT  Overall install timeout in seconds (900)
   HAP_APP_USER_HOME        Override the home directory recovered from
                            HOMEBREW_PREFIX (for tests or unusual layouts)
@@ -230,6 +254,21 @@ queue_file() {
   printf '%s/%s.json' "$queue_dir" "$1"
 }
 
+queue_entry_state() {
+  local file
+  file="$(queue_file "$1")"
+  [ -f "$file" ] || { printf 'ok'; return; }
+  "$node_bin" -e '
+const fs = require("node:fs");
+try {
+  const value = JSON.parse(fs.readFileSync(process.argv[1], "utf8"));
+  process.stdout.write(value.v === undefined || value.v === 1 ? "ok" : "future");
+} catch {
+  process.stdout.write("broken");
+}
+' "$file" 2>/dev/null
+}
+
 queue_add() {
   local command="$1" bundle="$2" reason="$3" detail="${4:-}"
   valid_command "$command" || { log "invalid app command: $command"; return 1; }
@@ -245,7 +284,7 @@ queue_add() {
   "$node_bin" -e '
 const fs = require("node:fs");
 const [file, command, bundle, reason, detail, attempts] = process.argv.slice(1);
-const value = { command, bundle, reason, detail, attempts: Number(attempts) || 1, updated: new Date().toISOString() };
+const value = { v: 1, command, bundle, reason, detail, attempts: Number(attempts) || 1, updated: new Date().toISOString() };
 const temporary = `${file}.${process.pid}.tmp`;
 fs.writeFileSync(temporary, JSON.stringify(value) + "\n", { mode: 0o600 });
 fs.chmodSync(temporary, 0o600);
@@ -262,6 +301,7 @@ queue_field() {
   "$node_bin" -e '
 const fs = require("node:fs");
 const value = JSON.parse(fs.readFileSync(process.argv[1], "utf8"));
+if (value.v !== undefined && value.v !== 1) process.exit(2);
 process.stdout.write(String(value[process.argv[2]] ?? ""));
 ' "$1" "$2" 2>/dev/null
 }
@@ -322,18 +362,34 @@ install_one() {
   chmod 700 "$log_dir" 2>/dev/null || true
   local log_file result_file
   log_file="$log_dir/$(date -u +%Y%m%dT%H%M%SZ)-$command.log"
+  : >"$log_file"
+  chmod 600 "$log_file" 2>/dev/null || true
   result_file="$log_dir/result-$command.json"
   rm -f "$result_file" 2>/dev/null || true
   env_args+=(HAP_INSTALLER_RESULT_FILE="$result_file")
 
   install_status=queued
-  log "installing $command${device:+（设备 $device）}…"
-  local rc=0
+  if ((stream)); then
+    log "installing $command${device:+（设备 $device）}…"
+  else
+    report_stage prepare
+  fi
+  local rc=0 line stage
   if ((stream)); then
     env "${env_args[@]}" "${timeout_args[@]}" "$command" install 2>&1 | tee "$log_file" >&2
     rc="${PIPESTATUS[0]}"
   else
-    env "${env_args[@]}" "${timeout_args[@]}" "$command" install >"$log_file" 2>&1 || rc=$?
+    env "${env_args[@]}" HAP_APP_PROGRESS=1 "${timeout_args[@]}" "$command" install 2>&1 |
+      while IFS= read -r line; do
+        printf '%s\n' "$line" >>"$log_file"
+        case "$line" in
+          $'HAP_APP_STAGE\t'*)
+            stage="${line#$'HAP_APP_STAGE\t'}"
+            [[ "$stage" =~ ^[a-z]+$ ]] && report_stage "$stage"
+            ;;
+        esac
+      done
+    rc="${PIPESTATUS[0]}"
   fi
   if ((rc != 0)); then
     local reason
@@ -351,6 +407,7 @@ install_one() {
   fi
   rm -f "$result_file" 2>/dev/null || true
 
+  ((stream)) || report_stage permissions
   local -a perms_args=(permissions --bundle-id "$bundle")
   [ -n "$acl_file" ] && perms_args+=(--expect-acl "$acl_file")
   local perms_rc=0 perms_out
@@ -419,6 +476,17 @@ cmd_auto_install() {
     die "usage: hap-app auto-install <app-command> <bundle-id> [--start] [--device <id>]"
 
   auto_install_guarded "$command" || exit 0
+
+  local queue_state
+  queue_state="$(queue_entry_state "$command")"
+  if [ "$queue_state" != ok ]; then
+    if [ "$queue_state" = future ]; then
+      log "待装条目格式来自更新版本：$command（未覆盖；运行 hap-app forget $command 移除）"
+    else
+      log "队列条目损坏：$command（运行 hap-app forget $command 移除）"
+    fi
+    exit 0
+  fi
 
   if tls_blocked_recently; then
     # Keep the original entry (and its detail): skipping is not a new attempt.
@@ -497,7 +565,17 @@ cmd_install_pending() {
 
   local failed=0 installed=0
   for name in "${names[@]}"; do
-    local bundle=""
+    local bundle="" queue_state
+    queue_state="$(queue_entry_state "$name")"
+    if [ "$queue_state" != ok ]; then
+      if [ "$queue_state" = future ]; then
+        log "待装条目格式来自更新版本：$name（运行 hap-app forget $name 移除）"
+      else
+        log "队列条目损坏：$name（运行 hap-app forget $name 移除）"
+      fi
+      failed=$((failed + 1))
+      continue
+    fi
     bundle="$(queue_field "$(queue_file "$name")" bundle)"
     if ! valid_command "$name" || ! valid_bundle "$bundle"; then
       log "队列条目损坏：$name（运行 hap-app forget $name 移除）"
@@ -522,12 +600,15 @@ cmd_status() {
   done < <(queue_names)
   if ((${#names[@]} == 0)); then
     say "没有待装的应用"
-    return 0
-  fi
-  if ((tsv)); then
+  elif ((tsv)); then
     for name in "${names[@]}"; do
-      local file
+      local file queue_state
       file="$(queue_file "$name")"
+      queue_state="$(queue_entry_state "$name")"
+      if [ "$queue_state" != ok ]; then
+        printf '%s\t\t%s\t\n' "$name" "$([ "$queue_state" = future ] && printf 'unsupported-version' || printf 'broken')"
+        continue
+      fi
       printf '%s\t%s\t%s\t%s\n' \
         "$name" \
         "$(queue_field "$file" bundle)" \
@@ -535,21 +616,56 @@ cmd_status() {
         "$(queue_field "$file" updated)"
     done
     return 0
+  else
+    say "待装 ${#names[@]} 个"
+    for name in "${names[@]}"; do
+      local file reason detail queue_state
+      file="$(queue_file "$name")"
+      queue_state="$(queue_entry_state "$name")"
+      if [ "$queue_state" != ok ]; then
+        printf '  %s  %s\n' "$name" "$([ "$queue_state" = future ] && printf '待装条目格式来自更新版本' || printf '队列条目损坏')"
+        printf '    → 运行 hap-app forget %s 移除\n' "$name"
+        continue
+      fi
+      reason="$(queue_field "$file" reason)"
+      printf '  %s  %s  %s  %s\n' \
+        "$name" "$(queue_field "$file" bundle)" "${reason:-unknown}" "$(queue_field "$file" updated)"
+      printf '    → %s\n' "$(reason_hint "$reason")"
+      detail="$(queue_field "$file" detail)"
+      [ -n "$detail" ] && printf '    最近失败：%s\n' "$detail"
+    done
   fi
-  say "待装 ${#names[@]} 个"
-  for name in "${names[@]}"; do
-    local file reason
-    file="$(queue_file "$name")"
-    reason="$(queue_field "$file" reason)"
-    printf '  %s  %s  %s  %s\n' \
-      "$name" "$(queue_field "$file" bundle)" "${reason:-unknown}" "$(queue_field "$file" updated)"
-    printf '    → %s\n' "$(reason_hint "$reason")"
-    detail="$(queue_field "$file" detail)"
-    [ -n "$detail" ] && printf '    最近失败：%s\n' "$detail"
-  done
+  ((tsv)) && return 0
   printf 'hap-app: 配置：%s（verbose）、%s/.app-installer/config（tls_ca/https_proxy）\n' \
     "$config_dir/config" "$HOME"
-  printf 'hap-app: 日志：%s\n' "$log_dir"
+  printf 'hap-app: 日志：%s（hap-app logs [app-command]）\n' "$log_dir"
+}
+
+cmd_logs() {
+  (($# <= 1)) || die "usage: hap-app logs [app-command]"
+  local name="${1:-}" file latest=""
+  if [ -z "$name" ]; then
+    for file in "$log_dir"/*.log; do
+      [ -f "$file" ] || continue
+      printf '%s\n' "$file"
+      latest="$file"
+    done
+    [ -n "$latest" ] || say "没有保留的安装日志（目录：$log_dir）"
+    return 0
+  fi
+  valid_command "$name" || die "invalid app command: $name"
+  for file in "$log_dir"/*-"$name".log; do
+    [ -f "$file" ] || continue
+    latest="$file"
+    break
+  done
+  [ -n "$latest" ] || die "没有 $name 的日志（目录：$log_dir）"
+  cat "$latest"
+}
+
+cmd_doctor() {
+  command -v "$app_installer" >/dev/null 2>&1 || die "找不到 $app_installer"
+  exec "$app_installer" doctor "$@"
 }
 
 cmd_login() {
@@ -571,6 +687,8 @@ case "$command_name" in
   auto-install) cmd_auto_install "$@" ;;
   install-pending) cmd_install_pending "$@" ;;
   status) cmd_status "$@" ;;
+  logs) cmd_logs "$@" ;;
+  doctor) cmd_doctor "$@" ;;
   login) cmd_login "$@" ;;
   forget) cmd_forget "$@" ;;
   -h|--help|help|"") usage; exit 0 ;;
