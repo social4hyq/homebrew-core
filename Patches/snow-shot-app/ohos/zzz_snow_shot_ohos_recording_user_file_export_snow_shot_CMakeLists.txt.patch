@@ -1,0 +1,32 @@
+OHOS: recordings are staged in the app sandbox, and the system-tray
+notification used by other platforms is never shown on OHOS (the tray is
+intentionally disabled there), so the existing OpenRecording notification
+action is unreachable. Offer the DocumentViewPicker as soon as a recording
+is finalized, except for copy-only finishes, reusing the existing
+RecordingFileExport path. Trim/recovery exports also offer the picker.
+On OHOS, write trim-save output to the app sandbox first: the Qt file
+dialog returns a document URI that QSaveFile cannot write. The sandbox
+destination is chosen at publish time so it cannot collide with staging.
+Keep the recording area a Qt::Tool window (capture-friendly) and focus the
+recording toolbar for keyboard shortcuts. Leave trim mode and show the main
+window before presenting the picker, and replace a stuck picker request.
+Suppress the unsupported global-mouse startup popup on OHOS when the ACL
+permission is absent, and add the OHOS input-monitor backend for HAPs signed
+with the INPUT_MONITORING ACL.
+
+diff --git a/snow_shot/CMakeLists.txt b/snow_shot/CMakeLists.txt
+index 2ce3351..43dee5b 100644
+--- a/snow_shot/CMakeLists.txt
++++ b/snow_shot/CMakeLists.txt
+@@ -1351,6 +1351,11 @@ if(APPLE)
+         "${SNOW_SHOT_APPKIT_FRAMEWORK}"
+         "${SNOW_SHOT_CORE_GRAPHICS_FRAMEWORK}")
+ endif()
++if(OHOS)
++    target_sources(snow_shot_global_mouse PRIVATE
++        src/platform/ohos/globalmousebackend.cpp)
++    target_link_libraries(snow_shot_global_mouse PRIVATE ohinput)
++endif()
+ target_link_libraries(snow_shot_settings PRIVATE snow_shot_global_mouse)
+ if(OHOS)
+     find_library(SNOW_SHOT_ACE_NAPI_LIBRARY NAMES ace_napi.z REQUIRED)

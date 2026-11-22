@@ -1,0 +1,48 @@
+diff --git a/snow_shot/src/presentation/capture/screenshotscrollingthumbnailwidget.cpp b/snow_shot/src/presentation/capture/screenshotscrollingthumbnailwidget.cpp
+index 196fe43..6f51270 100644
+--- a/snow_shot/src/presentation/capture/screenshotscrollingthumbnailwidget.cpp
++++ b/snow_shot/src/presentation/capture/screenshotscrollingthumbnailwidget.cpp
+@@ -14,8 +14,10 @@
+ #include <QResizeEvent>
+ #include <QScrollBar>
+ #include <QScopedValueRollback>
++#include <QShowEvent>
+ #include <QSignalBlocker>
+ #include <QWheelEvent>
++#include <QWindow>
+ #include <QtMath>
+ 
+ #include <algorithm>
+@@ -63,8 +65,16 @@ void copyPreviewSpan(const QImage& source, int sourceStart, QImage& destination,
+ }
+ } // namespace
+ 
++ScreenshotScrollingThumbnailWidget::ScreenshotScrollingThumbnailWidget() : QWidget(nullptr) {
++    initialize();
++}
++
+ ScreenshotScrollingThumbnailWidget::ScreenshotScrollingThumbnailWidget(QWidget& parent)
+     : QWidget(&parent) {
++    initialize();
++}
++
++void ScreenshotScrollingThumbnailWidget::initialize() {
+     setObjectName(QStringLiteral("screenshot-scrolling-thumbnail"));
+ #ifdef Q_OS_WIN
+     snow_shot::platform::windows::detail::enableCaptureExclusionCompositionFallback(this);
+@@ -122,6 +132,15 @@ void ScreenshotScrollingThumbnailWidget::reset() {
+     update();
+ }
+ 
++void ScreenshotScrollingThumbnailWidget::showEvent(QShowEvent* event) {
++    QWidget::showEvent(event);
++#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++    qInfo() << "SNOW_OHOS_PREVIEW_SHOWN" << isVisible()
++            << (windowHandle() != nullptr && windowHandle()->isExposed());
++#endif
++    emit previewShown();
++}
++
+ void ScreenshotScrollingThumbnailWidget::cancelDrag() {
+     if (m_dragHandle != DragHandle::None) {
+         m_dragHandle = DragHandle::None;

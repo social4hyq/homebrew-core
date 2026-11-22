@@ -1,0 +1,18 @@
+diff --git a/snow_shot/src/presentation/tools/screenshotfloatingtoolpalettenative.cpp b/snow_shot/src/presentation/tools/screenshotfloatingtoolpalettenative.cpp
+index 59f3104..7835b94 100644
+--- a/snow_shot/src/presentation/tools/screenshotfloatingtoolpalettenative.cpp
++++ b/snow_shot/src/presentation/tools/screenshotfloatingtoolpalettenative.cpp
+@@ -15,7 +15,12 @@ HWND toNativeHwnd(WId windowId) {
+ #endif
+ 
+ Qt::WindowFlags screenshot_floating_palette_native::windowFlags() {
+-    Qt::WindowFlags flags = Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint |
++#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++    const auto windowType = Qt::Window;
++#else
++    const auto windowType = Qt::Tool;
++#endif
++    Qt::WindowFlags flags = windowType | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint |
+                             Qt::WindowDoesNotAcceptFocus;
+ #if !defined(Q_OS_MACOS)
+     flags |= Qt::NoDropShadowWindowHint;

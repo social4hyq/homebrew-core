@@ -1,0 +1,13 @@
+diff --git a/snow_shot/CMakeLists.txt b/snow_shot/CMakeLists.txt
+index da5d012..2ce3351 100644
+--- a/snow_shot/CMakeLists.txt
++++ b/snow_shot/CMakeLists.txt
+@@ -1354,7 +1354,7 @@ endif()
+ target_link_libraries(snow_shot_settings PRIVATE snow_shot_global_mouse)
+ if(OHOS)
+     find_library(SNOW_SHOT_ACE_NAPI_LIBRARY NAMES ace_napi.z REQUIRED)
+-    target_link_libraries(snow_shot_settings PRIVATE "${SNOW_SHOT_ACE_NAPI_LIBRARY}")
++    target_link_libraries(snow_shot_settings PRIVATE "${SNOW_SHOT_ACE_NAPI_LIBRARY}" pasteboard)
+ endif()
+ snow_enable_unity_build(snow_shot_settings)
+ set_source_files_properties(

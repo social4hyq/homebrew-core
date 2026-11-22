@@ -1,0 +1,55 @@
+diff --git a/snow_shot/tests/ohos_selector_tests.cpp b/snow_shot/tests/ohos_selector_tests.cpp
+new file mode 100644
+index 0000000..1790338
+--- /dev/null
++++ b/snow_shot/tests/ohos_selector_tests.cpp
+@@ -0,0 +1,49 @@
++#include "screenshotselectorohos.h"
++
++#include <cstdlib>
++#include <iostream>
++
++namespace {
++using namespace snow_shot::presentation::ohos_selector_detail;
++
++void require(bool condition, const char* message) {
++    if (!condition) {
++        std::cerr << message << '\n';
++        std::exit(1);
++    }
++}
++
++void zeroIsAValidDefaultDisplayId() {
++    require(displayIdsForLookup({}, 0) == QVector<qint64>{0},
++            "default display zero must still be enumerated");
++}
++
++void capturedDisplayZeroIsNotDiscarded() {
++    CapturedDisplayModel display;
++    display.nativeDisplayId = 0;
++    require(displayIdsForLookup({display}, 7) == QVector<qint64>{0},
++            "a captured display with native id zero must be enumerated");
++}
++
++void ownWindowsAreConsumedOnceInStackingOrder() {
++    const QRect fullScreen(0, 0, 3120, 2080);
++    const QRect toolbar(100, 100, 600, 80);
++    const QRect browser(40, 60, 1200, 900);
++    const auto filtered = withoutOwnWindows({fullScreen, fullScreen, toolbar, browser},
++                                            {fullScreen, toolbar});
++    require(filtered == QVector<QRect>({fullScreen, browser}),
++            "only the overlay and toolbar instances may be removed, not a maximized app");
++    const auto hit = windowAtPoint(QPoint(500, 500), filtered);
++    require(hit == fullScreen, "the topmost remaining window under the pointer must be selected");
++    require(windowAtPoint(QPoint(10, 10), {browser}) == std::nullopt,
++            "a point outside every candidate must not produce a selection");
++}
++} // namespace
++
++int main() {
++    zeroIsAValidDefaultDisplayId();
++    capturedDisplayZeroIsNotDiscarded();
++    ownWindowsAreConsumedOnceInStackingOrder();
++    std::cout << "OHOS selector tests passed\n";
++    return 0;
++}

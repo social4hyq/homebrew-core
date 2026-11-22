@@ -1,0 +1,52 @@
+diff --git a/snow_shot/src/presentation/services/screenshotcontroller.cpp b/snow_shot/src/presentation/services/screenshotcontroller.cpp
+index 5bae152..e569c30 100644
+--- a/snow_shot/src/presentation/services/screenshotcontroller.cpp
++++ b/snow_shot/src/presentation/services/screenshotcontroller.cpp
+@@ -1526,6 +1526,13 @@ bool ScreenshotController::Impl::ensureRecordingFeature() {
+     QObject::connect(m_screenRecordingController.get(),
+                      &ScreenRecordingController::exportNotificationRequested, &owner,
+                      &ScreenshotController::recordingExportNotificationRequested);
++    QObject::connect(m_screenRecordingController.get(),
++                     &ScreenRecordingController::showMainWindowRequested, &owner,
++                     &ScreenshotController::showMainWindowRequested);
++#ifdef Q_OS_HARMONY
++    m_screenRecordingController->setUserFileExporter(
++        [this](const QString& path) { owner.exportScreenRecordingToUserFile(path); });
++#endif
+     QObject::connect(m_screenRecordingController.get(),
+                      &ScreenRecordingController::captureActivityChanged, &owner,
+                      [this](bool active) {
+@@ -7555,15 +7562,21 @@ void ScreenshotController::openScreenRecordingFolder() {
+ 
+ #ifdef Q_OS_HARMONY
+ void ScreenshotController::exportScreenRecordingToUserFile(const QString& path) {
+-    if (path.isEmpty() ||
+-        (m_impl->m_recordingFileExport && m_impl->m_recordingFileExport->active()))
++    if (path.isEmpty())
+         return;
++    if (m_impl->m_recordingFileExport && m_impl->m_recordingFileExport->active()) {
++        qWarning() << "SNOW_RECORDING_USER_FILE_EXPORT_REPLACE";
++        delete m_impl->m_recordingFileExport;
++        m_impl->m_recordingFileExport = nullptr;
++    }
+ 
+     auto* exportSession = new snow_shot::platform::ohos::RecordingFileExport(this);
+     m_impl->m_recordingFileExport = exportSession;
+     const QPointer<ScreenshotController> receiver(this);
++    const QPointer<snow_shot::platform::ohos::RecordingFileExport> session(exportSession);
+     exportSession->setCompletion(
+-        [receiver](snow_shot::platform::ohos::RecordingFileExport::Result result, QString error) {
++        [receiver, session](snow_shot::platform::ohos::RecordingFileExport::Result result,
++                            QString error) {
+             if (!receiver || receiver->m_impl == nullptr)
+                 return;
+             if (result == snow_shot::platform::ohos::RecordingFileExport::Result::Failed) {
+@@ -7573,7 +7586,7 @@ void ScreenshotController::exportScreenRecordingToUserFile(const QString& path)
+                     QCoreApplication::translate("ScreenshotController",
+                                                 "Could not write the selected user file"));
+             }
+-            if (receiver->m_impl->m_recordingFileExport)
++            if (session && receiver->m_impl->m_recordingFileExport == session)
+                 receiver->m_impl->m_recordingFileExport->deleteLater();
+         });
+     static_cast<void>(exportSession->start(path));

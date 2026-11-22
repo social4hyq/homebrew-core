@@ -1,0 +1,25 @@
+diff --git a/snow_shot/src/presentation/selector/screenshotselectorserviceclient.h b/snow_shot/src/presentation/selector/screenshotselectorserviceclient.h
+index e5b83f7..a97fb07 100644
+--- a/snow_shot/src/presentation/selector/screenshotselectorserviceclient.h
++++ b/snow_shot/src/presentation/selector/screenshotselectorserviceclient.h
+@@ -8,6 +8,7 @@
+ #include <QObject>
+ #include <QHash>
+ #include <QPoint>
++#include <QRect>
+ #include <QRectF>
+ #include <QVector>
+ 
+@@ -60,6 +61,12 @@ class ScreenshotSelectorServiceClient final : public QObject {
+     QVector<std::uintptr_t> m_excludedWindowIds;
+     QVector<CapturedDisplayModel> m_displays;
+ #endif
++#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++    // The OHOS selector is in-process: the window layout snapshot taken at
++    // refresh time is reused for every pointer hit test until the next refresh.
++    QVector<QRect> m_ohosWindowRects;
++    QVector<CapturedDisplayModel> m_ohosDisplays;
++#endif
+ };
+ 
+ #endif // SNOW_SHOT_PRESENTATION_SCREENSHOTSELECTORSERVICECLIENT_H

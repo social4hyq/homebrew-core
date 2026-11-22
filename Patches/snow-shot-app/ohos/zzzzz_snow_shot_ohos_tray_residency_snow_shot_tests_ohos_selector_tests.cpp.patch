@@ -1,0 +1,29 @@
+--- a/snow_shot/tests/ohos_selector_tests.cpp
++++ b/snow_shot/tests/ohos_selector_tests.cpp
+@@ -38,12 +38,26 @@ void ownWindowsAreConsumedOnceInStackingOrder() {
+     require(windowAtPoint(QPoint(10, 10), {browser}) == std::nullopt,
+             "a point outside every candidate must not produce a selection");
+ }
++
++void independentSubwindowSurfaceIsSelectedBeforeItsParent() {
++    // WindowManager's list is front-to-back. An independently surfaced dialog
++    // or popup must be the hover target over its parent, while the exposed parent
++    // remains selectable outside the subwindow bounds.
++    const QRect parent(100, 100, 800, 600);
++    const QRect popup(300, 250, 240, 180);
++    const QVector<QRect> frontToBack{popup, parent};
++    require(windowAtPoint(QPoint(320, 270), frontToBack) == popup,
++            "the topmost independent subwindow must win within its bounds");
++    require(windowAtPoint(QPoint(150, 150), frontToBack) == parent,
++            "the parent window must remain selectable outside the subwindow");
++}
+ } // namespace
+ 
+ int main() {
+     zeroIsAValidDefaultDisplayId();
+     capturedDisplayZeroIsNotDiscarded();
+     ownWindowsAreConsumedOnceInStackingOrder();
++    independentSubwindowSurfaceIsSelectedBeforeItsParent();
+     std::cout << "OHOS selector tests passed\n";
+     return 0;
+ }

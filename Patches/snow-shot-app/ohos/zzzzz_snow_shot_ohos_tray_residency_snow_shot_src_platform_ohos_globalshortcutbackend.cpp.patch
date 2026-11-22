@@ -1,0 +1,120 @@
+--- a/snow_shot/src/platform/ohos/globalshortcutbackend.cpp
++++ b/snow_shot/src/platform/ohos/globalshortcutbackend.cpp
+@@ -1,10 +1,16 @@
+ #include "snow_shot/presentation/globalshortcutmanager.h"
+ #include "snow_shot/platform/ohos/userfileexportqueue.h"
+ 
++#include "traystate_p.h"
++#include "windowregistry_p.h"
++
+ #include <QCoreApplication>
++#include <QPointer>
++#include <QVariant>
+ #include <QDebug>
+ #include <QKeySequence>
+ #include <QMetaObject>
++#include <QThread>
+ #include <node_api.h>
+ #include <multimodalinput/oh_key_code.h>
+ #include <map>
+@@ -471,6 +477,87 @@ napi_value getRegisteredHotkeys(napi_env env, napi_callback_info) {
+     return array;
+ }
+ 
++napi_value registerNativeWindow(napi_env env, napi_callback_info info) {
++    size_t argc = 2;
++    napi_value argv[2] = {nullptr, nullptr};
++    int32_t id = 0;
++    bool present = false;
++    if (napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr) != napi_ok || argc != 2 ||
++        napi_get_value_int32(env, argv[0], &id) != napi_ok || id <= 0 ||
++        napi_get_value_bool(env, argv[1], &present) != napi_ok) {
++        napi_throw_type_error(env, nullptr, "registerNativeWindow expects a positive id and boolean");
++        return nullptr;
++    }
++    platform::ohos::registerOwnedWindow(id, present);
++    napi_value result = nullptr;
++    napi_get_undefined(env, &result);
++    return result;
++}
++
++napi_value getTrayEnabled(napi_env env, napi_callback_info) {
++    napi_value result = nullptr;
++    napi_get_boolean(env, platform::ohos::trayEnabled.load(), &result);
++    return result;
++}
++
++napi_value setTrayAvailable(napi_env env, napi_callback_info info) {
++    size_t argc = 1;
++    napi_value argv[1] = {nullptr};
++    bool available = false;
++    if (napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr) != napi_ok || argc != 1 ||
++        napi_get_value_bool(env, argv[0], &available) != napi_ok) {
++        napi_throw_type_error(env, nullptr, "setTrayAvailable expects a boolean");
++        return nullptr;
++    }
++    platform::ohos::trayAvailable.store(available);
++    napi_value result = nullptr;
++    napi_get_undefined(env, &result);
++    return result;
++}
++
++napi_value quitFromTray(napi_env env, napi_callback_info) {
++    if (auto* app = QCoreApplication::instance())
++        QMetaObject::invokeMethod(app, [] { QCoreApplication::quit(); }, Qt::QueuedConnection);
++    napi_value result = nullptr;
++    napi_get_undefined(env, &result);
++    return result;
++}
++
++napi_value restoreMainWindow(napi_env env, napi_callback_info) {
++    if (auto* app = QCoreApplication::instance()) {
++        QMetaObject::invokeMethod(app, [app] {
++            const auto window = app->property("snowOhosMainWindow").value<QPointer<QObject>>();
++            if (window) {
++                app->setProperty("snowOhosTrayHidden", false);
++                QMetaObject::invokeMethod(window.data(), "showAndActivate", Qt::DirectConnection);
++            }
++        }, Qt::QueuedConnection);
++    }
++    napi_value result = nullptr;
++    napi_get_undefined(env, &result);
++    return result;
++}
++
++napi_value hideMainWindowForHotkey(napi_env env, napi_callback_info) {
++    if (auto* app = QCoreApplication::instance()) {
++        const auto hideWindow = [app] {
++            if (!app->property("snowOhosTrayHidden").toBool())
++                return;
++            const auto window = app->property("snowOhosMainWindow").value<QPointer<QObject>>();
++            if (window)
++                QMetaObject::invokeMethod(window.data(), "hide", Qt::DirectConnection);
++        };
++        const Qt::ConnectionType connection = QThread::currentThread() == app->thread()
++                                                  ? Qt::DirectConnection
++                                                  : Qt::QueuedConnection;
++        if (!QMetaObject::invokeMethod(app, hideWindow, connection))
++            qWarning() << "SNOW_OHOS_HOTKEY_HIDE_DISPATCH_FAILED";
++    }
++    napi_value result = nullptr;
++    napi_get_undefined(env, &result);
++    return result;
++}
++
+ napi_value activateRegisteredHotkey(napi_env env, napi_callback_info info) {
+     size_t argc = 1;
+     napi_value argv[1] = {nullptr};
+@@ -512,6 +599,12 @@ napi_value initializeNativeHotkeys(napi_env env, napi_value exports) {
+     napi_property_descriptor properties[] = {
+         {"getRegisteredHotkeys", nullptr, getRegisteredHotkeys, nullptr, nullptr, nullptr,
+          napi_default, nullptr},
++        {"registerNativeWindow", nullptr, registerNativeWindow, nullptr, nullptr, nullptr, napi_default, nullptr},
++        {"getTrayEnabled", nullptr, getTrayEnabled, nullptr, nullptr, nullptr, napi_default, nullptr},
++        {"setTrayAvailable", nullptr, setTrayAvailable, nullptr, nullptr, nullptr, napi_default, nullptr},
++        {"quitFromTray", nullptr, quitFromTray, nullptr, nullptr, nullptr, napi_default, nullptr},
++        {"restoreMainWindow", nullptr, restoreMainWindow, nullptr, nullptr, nullptr, napi_default, nullptr},
++        {"hideMainWindowForHotkey", nullptr, hideMainWindowForHotkey, nullptr, nullptr, nullptr, napi_default, nullptr},
+         {"activateHotkey", nullptr, activateRegisteredHotkey, nullptr, nullptr, nullptr,
+          napi_default, nullptr},
+         {"parseShortcut", nullptr, parseShortcutForArkTs, nullptr, nullptr, nullptr, napi_default,

@@ -1,0 +1,66 @@
+diff --git a/snow_shot/src/presentation/overlay/screenshotoverlaywindow.cpp b/snow_shot/src/presentation/overlay/screenshotoverlaywindow.cpp
+index 9657522..32dcfa7 100644
+--- a/snow_shot/src/presentation/overlay/screenshotoverlaywindow.cpp
++++ b/snow_shot/src/presentation/overlay/screenshotoverlaywindow.cpp
+@@ -444,17 +444,47 @@ void ScreenshotOverlayWindow::setScrollingCaptureMode(bool enabled) {
+     }
+ }
+ 
++void ScreenshotOverlayWindow::setScrollingCaptureOverlayHidden(bool hidden) {
++#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++    if (m_scrollingCaptureOverlayHidden == hidden)
++        return;
++    m_scrollingCaptureOverlayHidden = hidden;
++    if (hidden) {
++        // The frozen overlay is opaque on OHOS: leaving it on screen would hide
++        // the application being captured and make the captured frames a copy of
++        // the overlay itself. Hiding it exposes the live window to both the user
++        // and the capture pipeline while the toolbar and thumbnail keep running.
++        hide();
++        return;
++    }
++    show();
++    raise();
++#else
++    Q_UNUSED(hidden);
++#endif
++}
++
+ void ScreenshotOverlayWindow::beginScrollingThumbnail(const QRect& localSelection,
+                                                       ScreenshotScrollingRecognitionMode mode,
+                                                       const QSize& captureViewportSize) {
+     clearScrollingResultPreview();
+     if (m_scrollingThumbnail == nullptr) {
++#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++        // The scrolling overlay hides itself on OHOS, so the preview cannot be a
++        // child window of it. Use a top-level frameless window instead: the OHOS
++        // QPA promotes it to its own top-most window that survives the overlay.
++        m_scrollingThumbnail = new ScreenshotScrollingThumbnailWidget();
++        m_scrollingThumbnail->setWindowFlags(Qt::Window | Qt::FramelessWindowHint |
++                                             Qt::WindowStaysOnTopHint |
++                                             Qt::WindowDoesNotAcceptFocus);
++#else
+         m_scrollingThumbnail = new ScreenshotScrollingThumbnailWidget(*this);
+         // Configure once, before creating the native surface. Reparenting or changing
+         // QWidget window flags during capture would hide/recreate visible windows.
+         m_scrollingThumbnail->setWindowFlags(Qt::Tool | Qt::FramelessWindowHint |
+                                              Qt::WindowStaysOnTopHint |
+                                              Qt::WindowDoesNotAcceptFocus);
++#endif
+         m_scrollingThumbnail->setAttribute(Qt::WA_ShowWithoutActivating);
+         m_scrollingThumbnail->setAttribute(Qt::WA_TranslucentBackground);
+         m_scrollingThumbnail->hide();
+@@ -483,7 +513,12 @@ void ScreenshotOverlayWindow::updateScrollingThumbnail(const QImage& previewImag
+     m_scrollingThumbnail->setStitchedImage(previewImage, sourceSize, change, addedRows,
+                                            replacePreview, replacedPreviewRows);
+     layoutScrollingThumbnail();
+-    if (isVisible() && !m_scrollingThumbnail->isVisible()) {
++#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++    const bool canPresentThumbnail = m_scrollingCaptureOverlayHidden || isVisible();
++#else
++    const bool canPresentThumbnail = isVisible();
++#endif
++    if (canPresentThumbnail && !m_scrollingThumbnail->isVisible()) {
+ #ifdef Q_OS_MACOS
+         snow_shot::platform::configureScreenshotToolbarWindow(m_scrollingThumbnail);
+ #endif

@@ -1,0 +1,30 @@
+--- /dev/null
++++ b/snow_shot/src/platform/ohos/windowregistry_p.h
+@@ -0,0 +1,27 @@
++#ifndef SNOW_SHOT_PLATFORM_OHOS_WINDOWREGISTRY_P_H
++#define SNOW_SHOT_PLATFORM_OHOS_WINDOWREGISTRY_P_H
++
++#include <cstdint>
++#include <mutex>
++#include <set>
++#include <vector>
++
++namespace snow_shot::platform::ohos {
++inline std::mutex windowRegistryMutex;
++inline std::set<int32_t> ownedWindowIds;
++
++inline void registerOwnedWindow(int32_t id, bool present) {
++    const std::lock_guard lock(windowRegistryMutex);
++    if (present)
++        ownedWindowIds.insert(id);
++    else
++        ownedWindowIds.erase(id);
++}
++
++inline std::vector<int32_t> ownedWindowSnapshot() {
++    const std::lock_guard lock(windowRegistryMutex);
++    return {ownedWindowIds.begin(), ownedWindowIds.end()};
++}
++} // namespace snow_shot::platform::ohos
++
++#endif

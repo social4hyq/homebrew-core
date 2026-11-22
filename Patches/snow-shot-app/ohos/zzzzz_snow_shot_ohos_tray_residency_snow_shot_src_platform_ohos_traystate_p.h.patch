@@ -1,0 +1,16 @@
+--- /dev/null
++++ b/snow_shot/src/platform/ohos/traystate_p.h
+@@ -0,0 +1,13 @@
++#ifndef SNOW_SHOT_PLATFORM_OHOS_TRAYSTATE_P_H
++#define SNOW_SHOT_PLATFORM_OHOS_TRAYSTATE_P_H
++
++#include <atomic>
++
++namespace snow_shot::platform::ohos {
++// ArkTS and the Qt event loop run on different threads. Keep the bridge state
++// independent of QApplication construction and never block either event loop.
++inline std::atomic_bool trayEnabled{true};
++inline std::atomic_bool trayAvailable{false};
++} // namespace snow_shot::platform::ohos
++
++#endif

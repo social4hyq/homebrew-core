@@ -1,0 +1,21 @@
+diff --git a/snow_shot/include/snow_shot/presentation/screenrecordingcontroller.h b/snow_shot/include/snow_shot/presentation/screenrecordingcontroller.h
+index b1e1b2d..2329a34 100644
+--- a/snow_shot/include/snow_shot/presentation/screenrecordingcontroller.h
++++ b/snow_shot/include/snow_shot/presentation/screenrecordingcontroller.h
+@@ -30,6 +30,8 @@ class ScreenRecordingController final : public QObject {
+     void open(const QRect& recordingRegion);
+     using PermissionCheck = std::function<bool(bool microphone, bool input, bool notify)>;
+     void setPermissionCheck(PermissionCheck check);
++    using UserFileExporter = std::function<void(const QString& path)>;
++    void setUserFileExporter(UserFileExporter exporter);
+ #ifdef Q_OS_MACOS
+     void
+     setPreviewPermissionSnapshot(const snow_shot::presentation::AppPermissionSnapshot& snapshot);
+@@ -62,6 +64,7 @@ class ScreenRecordingController final : public QObject {
+     void captureActivityChanged(bool active);
+     void finalized();
+     void exportNotificationRequested(const QString& path);
++    void showMainWindowRequested();
+ 
+   private:
+     struct Impl;

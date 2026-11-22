@@ -1,0 +1,20 @@
+diff --git a/snow_shot/include/snow_shot/presentation/screenshottoolbarwindow.h b/snow_shot/include/snow_shot/presentation/screenshottoolbarwindow.h
+index f3ec6be..0ec7e64 100644
+--- a/snow_shot/include/snow_shot/presentation/screenshottoolbarwindow.h
++++ b/snow_shot/include/snow_shot/presentation/screenshottoolbarwindow.h
+@@ -23,6 +23,7 @@ class ScreenshotToolbarWindow final : public ScreenshotFloatingToolPaletteWindow
+     void setToolbarLayout(const snow_shot::storage::ScreenshotToolbarLayout& layout);
+     void setActionToolsLayout(const snow_shot::storage::ScreenshotToolbarLayout& layout);
+     void setScrollingScreenshotMode(bool enabled);
++    void presentForScrollingCapture(QWidget* previewOwner);
+     void setActiveTool(ScreenshotToolPalette::Tool tool);
+     void setScreenshotRegionType(ScreenshotRegionType type);
+     void setSelectionBackgroundOpacityState(int percent, bool available);
+@@ -83,6 +84,7 @@ class ScreenshotToolbarWindow final : public ScreenshotFloatingToolPaletteWindow
+     QScreen* m_placementScreen = nullptr;
+     bool m_manuallyDragged = false;
+     bool m_rememberedDrawingToolRestorePending = true;
++    bool m_scrollingPresentationActive = false;
+ };
+ 
+ #endif // SNOW_SHOT_PRESENTATION_SCREENSHOTTOOLBARWINDOW_H

@@ -1,0 +1,37 @@
+diff --git a/snow_shot/src/platform/globalmousebackend.cpp b/snow_shot/src/platform/globalmousebackend.cpp
+index 8912c8c..9e60c47 100644
+--- a/snow_shot/src/platform/globalmousebackend.cpp
++++ b/snow_shot/src/platform/globalmousebackend.cpp
+@@ -8,14 +8,23 @@ std::unique_ptr<GlobalMouseBackend> createWindowsGlobalMouseBackend();
+ #ifdef Q_OS_MACOS
+ std::unique_ptr<GlobalMouseBackend> createMacOSGlobalMouseBackend();
+ #endif
++#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++std::unique_ptr<GlobalMouseBackend> createOhosGlobalMouseBackend();
++#endif
+ 
+ namespace {
+ class UnsupportedGlobalMouseBackend final : public GlobalMouseBackend {
+   public:
+     void start(Handler, FailureHandler failure) override {
++#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++        // Global mouse gestures are intentionally unsupported on OHOS. Keep
++        // the backend unavailable without showing a startup failure popup.
++        Q_UNUSED(failure);
++#else
+         if (failure) {
+             failure(0);
+         }
++#endif
+     }
+     void stop() override {}
+     void configure(const GlobalMouseConfiguration&) override {}
+@@ -32,6 +41,8 @@ std::unique_ptr<GlobalMouseBackend> createGlobalMouseBackend() {
+     return createWindowsGlobalMouseBackend();
+ #elif defined(Q_OS_MACOS)
+     return createMacOSGlobalMouseBackend();
++#elif defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++    return createOhosGlobalMouseBackend();
+ #else
+     return std::make_unique<UnsupportedGlobalMouseBackend>();
+ #endif

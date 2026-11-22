@@ -1,0 +1,62 @@
+diff --git a/snow_shot/src/presentation/toolbar/screenshottoolbarwindow.cpp b/snow_shot/src/presentation/toolbar/screenshottoolbarwindow.cpp
+index d2bc891..18d7ca2 100644
+--- a/snow_shot/src/presentation/toolbar/screenshottoolbarwindow.cpp
++++ b/snow_shot/src/presentation/toolbar/screenshottoolbarwindow.cpp
+@@ -16,8 +16,12 @@
+ #include <QJsonValue>
+ #include <QScreen>
+ #include <QSignalBlocker>
++#include <QTimer>
++#include <QWindow>
+ 
+ namespace {
++constexpr int kScrollingToolbarRaiseDelayMs = 120;
++
+ ScreenshotToolPalette::Options screenshotToolbarOptions() {
+     ScreenshotToolPalette::Options options;
+     options.showDragHandle = true;
+@@ -581,6 +585,9 @@ void ScreenshotToolbarWindow::resetForNewCapture() {
+ }
+ 
+ void ScreenshotToolbarWindow::setScrollingScreenshotMode(bool enabled) {
++    if (!enabled) {
++        m_scrollingPresentationActive = false;
++    }
+     ScreenshotToolPaletteHost* host = paletteHost();
+     if (host == nullptr || host->palette() == nullptr) {
+         return;
+@@ -599,6 +606,34 @@ void ScreenshotToolbarWindow::setScrollingScreenshotMode(bool enabled) {
+     }
+ }
+ 
++void ScreenshotToolbarWindow::presentForScrollingCapture(QWidget* previewOwner) {
++    m_scrollingPresentationActive = true;
++#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++    setOwnerWindow(previewOwner);
++#else
++    Q_UNUSED(previewOwner);
++#endif
++    const auto present = [this] {
++        if (!m_scrollingPresentationActive) {
++            return;
++        }
++#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++        qInfo() << "SNOW_OHOS_TOOLBAR_BEFORE" << isVisible()
++                << (windowHandle() != nullptr && windowHandle()->isExposed())
++                << (parentWidget() != nullptr && parentWidget()->isVisible());
++#endif
++        show();
++        raise();
++#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++        qInfo() << "SNOW_OHOS_TOOLBAR_AFTER" << isVisible()
++                << (windowHandle() != nullptr && windowHandle()->isExposed())
++                << (parentWidget() != nullptr && parentWidget()->isVisible());
++#endif
++    };
++    present();
++    QTimer::singleShot(kScrollingToolbarRaiseDelayMs, this, present);
++}
++
+ void ScreenshotToolbarWindow::setScreenshotRegionType(ScreenshotRegionType type) {
+     if (auto* toolPalette = palette()) {
+         toolPalette->setScreenshotRegionType(type);

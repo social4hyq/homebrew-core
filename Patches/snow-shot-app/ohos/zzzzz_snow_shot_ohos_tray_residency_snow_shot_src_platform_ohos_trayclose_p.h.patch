@@ -1,0 +1,17 @@
+--- /dev/null
++++ b/snow_shot/src/platform/ohos/trayclose_p.h
+@@ -0,0 +1,14 @@
++#ifndef SNOW_SHOT_PLATFORM_OHOS_TRAYCLOSE_P_H
++#define SNOW_SHOT_PLATFORM_OHOS_TRAYCLOSE_P_H
++#include <QCloseEvent>
++#include <QWidget>
++namespace snow_shot::platform::ohos {
++inline bool closeToTray(QWidget& window, QCloseEvent& event, bool trayEnabled) {
++    if (!trayEnabled)
++        return false;
++    event.ignore();
++    window.hide();
++    return true;
++}
++} // namespace snow_shot::platform::ohos
++#endif
