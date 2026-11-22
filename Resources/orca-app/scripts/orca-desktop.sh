@@ -37,6 +37,10 @@ ORCA_BIN="${ORCA_DESKTOP_ORCA_BIN:-$(command -v orca || true)}"
 NODE_BIN="${ORCA_DESKTOP_NODE:-node}"
 HDC="${ORCA_DESKTOP_HDC:-${ORCA_DESKTOP_HDC_DEFAULT:-hdc}}"
 DATA_ROOT="${ORCA_DESKTOP_DATA:-$HOME/.orca}"
+# Where to look for a live pid and how to list processes; tests point these at
+# fakes so they never depend on the host's real processes.
+PROC_ROOT="${ORCA_DESKTOP_PROC_ROOT:-/proc}"
+PS_BIN="${ORCA_DESKTOP_PS:-ps}"
 
 usage() {
   cat <<'EOF'
@@ -51,8 +55,13 @@ Usage: orca-app <command>
                       keeps the signed HAP and prints where).
   start               Open the installed app; it starts the runtime server
                       itself when none is running.
-  serve [--port N]    Start a host-side runtime server for browser/CLI use (the
+  serve [--port N] [--reclaim]
+                      Start a host-side runtime server for browser/CLI use (the
                       app does not need it) and print its browser URL.
+                      --reclaim first removes a stale orcad.lock in the data
+                      directory, only when the pid it names is gone and no orcad
+                      process is running; use it after the runtime was killed or
+                      the terminal app was updated (see the failure message).
   status              Show whether the host-side runtime server is healthy.
   stop                Stop the host-side server.
   pair                Print the host-side server's browser URL again.
@@ -204,7 +213,78 @@ start_server() {
   )
 }
 
+# "pid identity" from the data root's orcad.lock, or nothing.
+read_lock() {
+  [ -f "$DATA_ROOT/orcad.lock" ] || return 1
+  "$NODE_BIN" -e '
+const fs = require("node:fs");
+try {
+  const lock = JSON.parse(fs.readFileSync(process.argv[1], "utf8"));
+  if (!Number.isInteger(lock.pid) || lock.pid < 1) process.exit(1);
+  process.stdout.write(lock.pid + " " + lock.identity);
+} catch {
+  process.exit(1);
+}
+' "$DATA_ROOT/orcad.lock"
+}
+
+# No pipe into `grep -q`: under pipefail the early exit of grep kills the lister
+# with SIGPIPE and the whole check would report "not running".
+orcad_running() {
+  local procs
+  procs="$("$PS_BIN" -eo args 2>/dev/null || true)"
+  case "$procs" in
+    *orcad-server*) return 0 ;;
+  esac
+  return 1
+}
+
+# Remove the data root's orcad.lock when its holder is provably gone: the pid it
+# names does not exist and no orcad process is running at all. orcad itself
+# refuses to take such a lock over on this device, because the home mount may be
+# shared with other machines, so this is an explicit, narrow override.
+reclaim_lock() {
+  local info pid identity
+  if ! info="$(read_lock)"; then
+    log "no readable lock in $DATA_ROOT; nothing to reclaim"
+    return 0
+  fi
+  pid="${info%% *}"
+  identity="${info#* }"
+  if [ -e "$PROC_ROOT/$pid" ]; then
+    die "the lock in $DATA_ROOT belongs to pid $pid, which is still running; stop it with 'orca-app stop' first"
+  fi
+  if orcad_running; then
+    die "an orcad process is running; not removing the lock of pid $pid. Stop it with 'orca-app stop' first"
+  fi
+  rm -f "$DATA_ROOT/orcad.lock"
+  log "removed the stale lock of pid $pid (identity $identity) from $DATA_ROOT"
+}
+
+# Explain a startup failure caused by the data root's lock. Returns 1 for any
+# other failure, so the caller falls back to dumping the log.
+explain_lock_failure() {
+  local info="" pid="?" identity="?"
+  if info="$(read_lock)"; then
+    pid="${info%% *}"
+    identity="${info#* }"
+  fi
+  if grep -q 'orcad_instance_lock_foreign_identity' "$LOG_FILE" 2>/dev/null; then
+    log "the data root $DATA_ROOT is locked by another identity (uid $identity, pid $pid)."
+    log "That lock was left by an earlier run, typically after the terminal app was reinstalled or"
+    log "updated and its uid changed; orcad never takes such a lock over."
+  elif grep -q 'orcad_instance_lock_holder_unverifiable' "$LOG_FILE" 2>/dev/null; then
+    log "the data root $DATA_ROOT is locked by an earlier run (pid $pid) that is gone."
+    log "orcad cannot prove that here, because the home mount may be shared with other machines."
+    log "This happens when the runtime was killed instead of stopped with 'orca-app stop'."
+  else
+    return 1
+  fi
+  log "If no Orca runtime is running anywhere that uses this data root, run: orca-app serve --reclaim"
+}
+
 ensure_serve() {
+  local reclaim="${1:-0}"
   read_config
   if healthy; then
     printf 'orca-app: server already healthy at http://127.0.0.1:%s\n' "$PORT"
@@ -222,6 +302,7 @@ ensure_serve() {
   if port_busy "$PORT"; then
     die "port $PORT is in use by another process; pass --port N or stop the other Orca"
   fi
+  [ "$reclaim" = 1 ] && reclaim_lock
   start_server "$PORT"
   local waited=0 url=""
   while :; do
@@ -229,6 +310,9 @@ ensure_serve() {
       break
     fi
     if ! proc_alive "$(cat "$PID_FILE" 2>/dev/null || true)"; then
+      if explain_lock_failure; then
+        die "the local server did not start; see $LOG_FILE"
+      fi
       sed -n '1,40p' "$LOG_FILE" >&2 || true
       die "the local server exited during startup; see $LOG_FILE"
     fi
@@ -323,12 +407,13 @@ cmd_install() {
 }
 
 cmd_serve() {
-  local port=""
+  local port="" reclaim=0
   while [ $# -gt 0 ]; do
     case "$1" in
       --port)
         [ $# -ge 2 ] || die "--port needs a number"
         port="$2"; shift 2 ;;
+      --reclaim) reclaim=1; shift ;;
       *) die "unknown serve option: $1" ;;
     esac
   done
@@ -344,7 +429,7 @@ cmd_serve() {
       DEFAULT_PORT="$port"
     fi
   fi
-  ensure_serve
+  ensure_serve "$reclaim"
 }
 
 cmd_start() {
