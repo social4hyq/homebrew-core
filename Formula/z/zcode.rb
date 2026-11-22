@@ -15,8 +15,9 @@ class Zcode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-v3.18.2-r3"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "834716091370edf098619da1f7f8cc1a4b9a091c766f456b46d71ef191d712d5"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-v3.18.2-r4"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3542acf7e2c4425d2fef1b6029ffa90acc4bf1f51881f6b8534a050b4256746a"
   end
 
   depends_on "node" => :build
@@ -40,8 +41,11 @@ class Zcode < Formula
     file "Patches/zcode/0004-web-login-server-oauth.patch"
   end
 
-  patch do
-    file "Patches/zcode/0005-ohos-frozen-lockfile.patch"
+  patch_root = Pathname(__dir__).parent.parent
+  Dir[(patch_root/"Patches/zcode/0005-ohos-frozen-lockfile/*.patch").to_s].each do |path|
+    patch do
+      file Pathname(path).relative_path_from(patch_root).to_s
+    end
   end
 
   deny_network_access! :test
