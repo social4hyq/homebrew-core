@@ -6,7 +6,7 @@ class Zcode < Formula
       revision: "fec975905a2abd4c07e35c40d51fa097a2258ec9"
   version "3.18.2"
   license "Apache-2.0"
-  revision 2
+  revision 3
   livecheck do
     url "https://raw.githubusercontent.com/zai-org/ZCode/main/package.json"
     strategy :json do |json|
@@ -62,6 +62,9 @@ class Zcode < Formula
     rm_r app/"agent/node_modules/@opentui/core"
     (app/"agent/node_modules/@opentui/core").make_symlink "../@mbears/opentui-core"
 
+    # The cross-platform release scripts restore other native prebuilds; ship only OHOS.
+    rm_r Dir[app/"node_modules/node-pty/prebuilds/{darwin-*,linux-*,win32-*}"]
+
     libexec.install app
     (bin/"zcode").write_env_script formula_opt_bin("bun")/"bun", libexec/"zcode/bin/zcode.mjs", {}
   end
@@ -86,5 +89,7 @@ class Zcode < Formula
     doctor = shell_output("#{bin}/zcode doctor")
     assert_match "platform: openharmony/arm64", doctor
     assert_match "default artifact: node-bundle", doctor
+    assert_path_exists libexec/"zcode/node_modules/node-pty/prebuilds/openharmony-arm64/pty.node"
+    refute_path_exists libexec/"zcode/node_modules/node-pty/prebuilds/linux-x64/pty.node"
   end
 end
