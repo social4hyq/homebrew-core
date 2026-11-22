@@ -8,6 +8,7 @@ class OrcaApp < Formula
   # Tap-authored shell scripts (MIT) on the CPF-Electron runtime (mixed
   # MIT/BSD/LGPL).
   license :cannot_represent
+  revision 1
 
   livecheck do
     url :stable
@@ -220,6 +221,15 @@ class OrcaApp < Formula
         orca-app start      # open the app
         orca-app status     # host-side runtime
         orca-app stop
+
+      The `orca` CLI finds a runtime through the profile named by ORCA_USER_DATA_PATH
+      (default $XDG_CONFIG_HOME/orca), not through ~/.orca. To see the same projects
+      and terminals from the CLI as in `orca-app serve`, set it in that shell:
+
+        export ORCA_USER_DATA_PATH=$HOME/.orca
+
+      The runtime the app starts itself keeps a separate profile in the app sandbox;
+      the CLI cannot see it.
 
       `install --no-acl` installs the strong-sandbox variant (no JIT/paste; it waits
       for `orca-app serve` instead of spawning the runtime).
