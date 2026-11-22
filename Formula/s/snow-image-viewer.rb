@@ -12,8 +12,9 @@ class SnowImageViewer < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-image-viewer-v1.6.1-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2b21abfe1ef911561ff2916794ecb6c470904dd4b1ccf88ad85b3313aa159742"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-image-viewer-v1.6.1-r2"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b12176eed3be503e69c5de16612ea55ae05edf50828520c3b879f8e0495b2181"
   end
 
   # These libraries are copied into the HAP after their ELF dependency graph
@@ -49,8 +50,11 @@ class SnowImageViewer < Formula
   patch :p1 do
     file "Patches/snow-image-viewer/0001-qt-toolchain-6.13.0.patch"
   end
-  patch :p1 do
-    file "Patches/snow-image-viewer/0002-ohos-libcxx-polyfill.patch"
+  patch_root = Pathname(__dir__).parent.parent
+  Dir[(patch_root/"Patches/snow-image-viewer/0002-ohos-libcxx-polyfill/*.patch").to_s].each do |path|
+    patch :p1 do
+      file Pathname(path).relative_path_from(patch_root).to_s
+    end
   end
   patch :p1 do
     file "Patches/snow-image-viewer/0003-port-warnings.patch"

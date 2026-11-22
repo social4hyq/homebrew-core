@@ -1,0 +1,13 @@
+diff --git a/snow_image/include/snow/image/raster_conversion.h b/snow_image/include/snow/image/raster_conversion.h
+index 080215a..243af64 100644
+--- a/snow_image/include/snow/image/raster_conversion.h
++++ b/snow_image/include/snow/image/raster_conversion.h
+@@ -4,7 +4,7 @@
+ #include "snow/image/raster.h"
+ 
+ #include <cstdint>
+-#include <stop_token>
++#include "stop_token.hpp"
+ 
+ namespace snow::image {
+ 

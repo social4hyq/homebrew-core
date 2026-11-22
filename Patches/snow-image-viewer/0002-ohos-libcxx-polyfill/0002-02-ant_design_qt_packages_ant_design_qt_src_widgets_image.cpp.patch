@@ -1,0 +1,13 @@
+diff --git a/ant_design_qt/packages/ant_design_qt/src/widgets/image.cpp b/ant_design_qt/packages/ant_design_qt/src/widgets/image.cpp
+index 8725098..179b0d0 100644
+--- a/ant_design_qt/packages/ant_design_qt/src/widgets/image.cpp
++++ b/ant_design_qt/packages/ant_design_qt/src/widgets/image.cpp
+@@ -50,7 +50,7 @@
+ #include <memory>
+ #include <limits>
+ #include <new>
+-#include <stop_token>
++#include "stop_token.hpp"
+ #include <string>
+ #include <utility>
+ #include <vector>

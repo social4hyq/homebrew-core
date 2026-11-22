@@ -1,0 +1,20 @@
+diff --git a/snow_image/src/alpha_analysis.h b/snow_image/src/alpha_analysis.h
+index 8b93eb5..eaee2f3 100644
+--- a/snow_image/src/alpha_analysis.h
++++ b/snow_image/src/alpha_analysis.h
+@@ -1,3 +1,6 @@
++#include "condition_variable_any2.hpp"
++#include "condition_variable_any2.hpp"
++
+ #pragma once
+ 
+ #include <atomic>
+@@ -17,7 +20,7 @@ enum class AlphaAnalysisValue : std::uint8_t {
+ struct AlphaAnalysisState final {
+     std::atomic<AlphaAnalysisValue> value{AlphaAnalysisValue::unknown};
+     std::mutex mutex;
+-    std::condition_variable_any changed;
++    std::condition_variable_any2 changed;
+ };
+ 
+ } // namespace snow::image::detail
