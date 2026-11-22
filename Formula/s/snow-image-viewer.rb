@@ -12,9 +12,9 @@ class SnowImageViewer < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-image-viewer-v1.6.1-r2"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b12176eed3be503e69c5de16612ea55ae05edf50828520c3b879f8e0495b2181"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-image-viewer-v1.6.1-r3"
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f04f3150d17b504d75336f80683e77bd6144b9dfc808c20fc69ce817f1c770a9"
   end
 
   # These libraries are copied into the HAP after their ELF dependency graph
@@ -40,27 +40,17 @@ class SnowImageViewer < Formula
     sha256 "d3a20e0c1b2758c4545b0a97490afa2986e39c8b4387c3dba2007def742cbeb0"
   end
 
-  # 0001: accept the 6.13.0 kit (upstream pins 6.12.0 EXACT for their audits).
-  # 0002: OHOS NDK libc++ lacks C++20 <stop_token>/jthread: route the includes
-  #      to the vendored jthread polyfill (formula resource).
-  # 0003: the strict-warning set is tuned for MSVC/Xcode clangs; do not fail
-  #      the OHOS clang-15 build on warnings.
-  # 0004: HarmonyOS hosts load Qt apps as a shared library via the qohos
-  #      platform plugin, not as a spawned executable.
-  patch :p1 do
-    file "Patches/snow-image-viewer/0001-qt-toolchain-6.13.0.patch"
-  end
+  # Accept the 6.13.0 kit (upstream pins 6.12.0 EXACT for their audits).
+  # OHOS NDK libc++ lacks C++20 <stop_token>/jthread: route the includes to the
+  # vendored jthread polyfill (formula resource). The strict-warning set is
+  # tuned for MSVC/Xcode clangs; do not fail the OHOS clang-15 build on warnings.
+  # HarmonyOS hosts load Qt apps as a shared library via the qohos platform
+  # plugin, not as a spawned executable.
   patch_root = Pathname(__dir__).parent.parent
-  Dir[(patch_root/"Patches/snow-image-viewer/0002-ohos-libcxx-polyfill/*.patch").to_s].each do |path|
+  Dir[(patch_root/"Patches/snow-image-viewer/*.patch").to_s].each do |path|
     patch :p1 do
       file Pathname(path).relative_path_from(patch_root).to_s
     end
-  end
-  patch :p1 do
-    file "Patches/snow-image-viewer/0003-port-warnings.patch"
-  end
-  patch :p1 do
-    file "Patches/snow-image-viewer/0004-ohos-app-library.patch"
   end
 
   def install
