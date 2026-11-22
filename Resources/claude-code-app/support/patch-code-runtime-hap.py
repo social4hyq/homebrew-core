@@ -74,8 +74,15 @@ def patch_asar(archive: bytes) -> bytes:
     if len(archive) < 16:
         raise ValueError("truncated vendor ASAR")
     marker, header_size, pickle_size, json_size = struct.unpack("<4I", archive[:16])
-    if marker != 4 or header_size != json_size + 8 or pickle_size != json_size + 4:
+    if marker != 4 or header_size != pickle_size + 4 or pickle_size < json_size + 4:
         raise ValueError("unexpected vendor ASAR header")
+    padding = pickle_size - json_size - 4
+    if padding:
+        # Newer @electron/asar writes the header through Pickle.writeString,
+        # which appends a NUL terminator and zero-pads the pickle to 4 bytes.
+        expected = (4 - (json_size + 5) % 4) % 4 + 1
+        if padding != expected or archive[16 + json_size:16 + json_size + padding] != b"\0" * padding:
+            raise ValueError("unexpected vendor ASAR header padding")
     header_bytes = archive[16:16 + json_size]
     root = json.loads(header_bytes)
     target_chunk = find_target_chunk(archive, root, header_size)
@@ -142,8 +149,15 @@ def patch_asar(archive: bytes) -> bytes:
     if not target_seen:
         raise ValueError("target Code manager chunk was not packed")
     new_header = json.dumps(root, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
-    prefix = struct.pack("<4I", 4, len(new_header) + 8, len(new_header) + 4, len(new_header))
-    return prefix + new_header + b"".join(payload)
+    # Newer @electron/asar Pickle.writeString layout: the 16-byte prefix holds
+    # the pickle sizes, the JSON starts at offset 16, then a NUL plus zero
+    # padding aligns the pickle payload to 4 bytes.
+    tail = new_header + b"\0"
+    tail += b"\0" * (-(len(new_header) + 5) % 4)
+    header_pickle_size = 4 + len(tail)
+    prefix = struct.pack("<4I", 4, header_pickle_size + 4, header_pickle_size,
+                         len(new_header))
+    return prefix + tail + b"".join(payload)
 
 
 def copy_entry(src, dst, info, *, data=None):
