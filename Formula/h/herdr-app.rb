@@ -35,8 +35,10 @@ class HerdrApp < Formula
     url "https://github.com/ghostty-org/ghostty/archive/291fd050b9e9c293c8adb6a140742649b7e42d3a.tar.gz"
     sha256 "f35b464f1aee22ffda9f6359038b9ad18a784342b4a4fa1cb97a79fb9ade79a4"
 
-    patch do
-      file "Patches/herdr-app/ghostty/0001-simdutf-pic-ohos.patch"
+    Dir[(patch_root/"Patches/herdr-app/ghostty/*.patch").to_s].each do |path|
+      patch do
+        file Pathname(path).relative_path_from(patch_root).to_s
+      end
     end
   end
 
@@ -76,7 +78,7 @@ class HerdrApp < Formula
     sha256 "39d931489e99f80b496f900f88d67d7aad6b5f25ce83810a408eb42f6af6839e"
   end
 
-  Dir[(patch_root/"Patches/herdr-app/*.patch").to_s].each do |path|
+  Dir[(patch_root/"Patches/herdr-app/ohos/*.patch").to_s].each do |path|
     patch do
       file Pathname(path).relative_path_from(patch_root).to_s
     end

@@ -1,5 +1,5 @@
 diff --git a/Cargo.lock b/Cargo.lock
-index 6108bf8..3526742 100644
+index 6108bf8..73cb64a 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
 @@ -50,6 +50,17 @@ dependencies = [
@@ -587,151 +587,7 @@ index 6108bf8..3526742 100644
  [[package]]
  name = "libm"
  version = "0.2.16"
-@@ -4483,7 +4460,6 @@ checksum = "11d3d7f243d5c5a8b9bb5d6dd2b1602c0cb0b9db1621bafc7ed66e35ff9fe092"
- [[package]]
- name = "llrt_abort"
- version = "0.9.0-beta"
--source = "git+https://github.com/awslabs/llrt?rev=7b95c82a9b15e7ddfb2778eca4b5a63111e74f51#7b95c82a9b15e7ddfb2778eca4b5a63111e74f51"
- dependencies = [
-  "llrt_async_hooks",
-  "llrt_events",
-@@ -4496,7 +4472,6 @@ dependencies = [
- [[package]]
- name = "llrt_async_hooks"
- version = "0.9.0-beta"
--source = "git+https://github.com/awslabs/llrt?rev=7b95c82a9b15e7ddfb2778eca4b5a63111e74f51#7b95c82a9b15e7ddfb2778eca4b5a63111e74f51"
- dependencies = [
-  "llrt_hooking",
-  "llrt_utils",
-@@ -4507,7 +4482,6 @@ dependencies = [
- [[package]]
- name = "llrt_buffer"
- version = "0.9.0-beta"
--source = "git+https://github.com/awslabs/llrt?rev=7b95c82a9b15e7ddfb2778eca4b5a63111e74f51#7b95c82a9b15e7ddfb2778eca4b5a63111e74f51"
- dependencies = [
-  "itoa",
-  "llrt_encoding",
-@@ -4520,7 +4494,6 @@ dependencies = [
- [[package]]
- name = "llrt_build"
- version = "0.9.0-beta"
--source = "git+https://github.com/awslabs/llrt?rev=7b95c82a9b15e7ddfb2778eca4b5a63111e74f51#7b95c82a9b15e7ddfb2778eca4b5a63111e74f51"
- dependencies = [
-  "rustc_version",
- ]
-@@ -4528,7 +4501,6 @@ dependencies = [
- [[package]]
- name = "llrt_compression"
- version = "0.9.0-beta"
--source = "git+https://github.com/awslabs/llrt?rev=7b95c82a9b15e7ddfb2778eca4b5a63111e74f51#7b95c82a9b15e7ddfb2778eca4b5a63111e74f51"
- dependencies = [
-  "brotli",
-  "flate2",
-@@ -4538,7 +4510,6 @@ dependencies = [
- [[package]]
- name = "llrt_context"
- version = "0.9.0-beta"
--source = "git+https://github.com/awslabs/llrt?rev=7b95c82a9b15e7ddfb2778eca4b5a63111e74f51#7b95c82a9b15e7ddfb2778eca4b5a63111e74f51"
- dependencies = [
-  "llrt_build",
-  "llrt_utils",
-@@ -4550,7 +4521,6 @@ dependencies = [
- [[package]]
- name = "llrt_crypto"
- version = "0.9.0-beta"
--source = "git+https://github.com/awslabs/llrt?rev=7b95c82a9b15e7ddfb2778eca4b5a63111e74f51#7b95c82a9b15e7ddfb2778eca4b5a63111e74f51"
- dependencies = [
-  "aes 0.9.3",
-  "aes-gcm",
-@@ -4590,7 +4560,6 @@ dependencies = [
- [[package]]
- name = "llrt_encoding"
- version = "0.9.0-beta"
--source = "git+https://github.com/awslabs/llrt?rev=7b95c82a9b15e7ddfb2778eca4b5a63111e74f51#7b95c82a9b15e7ddfb2778eca4b5a63111e74f51"
- dependencies = [
-  "base64-simd",
-  "hex-simd",
-@@ -4602,7 +4571,6 @@ dependencies = [
- [[package]]
- name = "llrt_events"
- version = "0.9.0-beta"
--source = "git+https://github.com/awslabs/llrt?rev=7b95c82a9b15e7ddfb2778eca4b5a63111e74f51#7b95c82a9b15e7ddfb2778eca4b5a63111e74f51"
- dependencies = [
-  "llrt_utils",
-  "rquickjs",
-@@ -4612,7 +4580,6 @@ dependencies = [
- [[package]]
- name = "llrt_exceptions"
- version = "0.9.0-beta"
--source = "git+https://github.com/awslabs/llrt?rev=7b95c82a9b15e7ddfb2778eca4b5a63111e74f51#7b95c82a9b15e7ddfb2778eca4b5a63111e74f51"
- dependencies = [
-  "llrt_utils",
-  "rquickjs",
-@@ -4621,7 +4588,6 @@ dependencies = [
- [[package]]
- name = "llrt_hooking"
- version = "0.9.0-beta"
--source = "git+https://github.com/awslabs/llrt?rev=7b95c82a9b15e7ddfb2778eca4b5a63111e74f51#7b95c82a9b15e7ddfb2778eca4b5a63111e74f51"
- dependencies = [
-  "llrt_utils",
-  "once_cell",
-@@ -4631,7 +4597,6 @@ dependencies = [
- [[package]]
- name = "llrt_json"
- version = "0.9.0-beta"
--source = "git+https://github.com/awslabs/llrt?rev=7b95c82a9b15e7ddfb2778eca4b5a63111e74f51#7b95c82a9b15e7ddfb2778eca4b5a63111e74f51"
- dependencies = [
-  "itoa",
-  "llrt_build",
-@@ -4644,7 +4609,6 @@ dependencies = [
- [[package]]
- name = "llrt_path"
- version = "0.9.0-beta"
--source = "git+https://github.com/awslabs/llrt?rev=7b95c82a9b15e7ddfb2778eca4b5a63111e74f51#7b95c82a9b15e7ddfb2778eca4b5a63111e74f51"
- dependencies = [
-  "llrt_utils",
-  "memchr",
-@@ -4654,7 +4618,6 @@ dependencies = [
- [[package]]
- name = "llrt_stream_web"
- version = "0.9.0-beta"
--source = "git+https://github.com/awslabs/llrt?rev=7b95c82a9b15e7ddfb2778eca4b5a63111e74f51#7b95c82a9b15e7ddfb2778eca4b5a63111e74f51"
- dependencies = [
-  "llrt_abort",
-  "llrt_utils",
-@@ -4664,7 +4627,6 @@ dependencies = [
- [[package]]
- name = "llrt_timers"
- version = "0.9.0-beta"
--source = "git+https://github.com/awslabs/llrt?rev=7b95c82a9b15e7ddfb2778eca4b5a63111e74f51#7b95c82a9b15e7ddfb2778eca4b5a63111e74f51"
- dependencies = [
-  "llrt_context",
-  "llrt_hooking",
-@@ -4677,7 +4639,6 @@ dependencies = [
- [[package]]
- name = "llrt_url"
- version = "0.9.0-beta"
--source = "git+https://github.com/awslabs/llrt?rev=7b95c82a9b15e7ddfb2778eca4b5a63111e74f51#7b95c82a9b15e7ddfb2778eca4b5a63111e74f51"
- dependencies = [
-  "llrt_utils",
-  "rquickjs",
-@@ -4687,7 +4648,6 @@ dependencies = [
- [[package]]
- name = "llrt_utils"
- version = "0.9.0-beta"
--source = "git+https://github.com/awslabs/llrt?rev=7b95c82a9b15e7ddfb2778eca4b5a63111e74f51#7b95c82a9b15e7ddfb2778eca4b5a63111e74f51"
- dependencies = [
-  "half",
-  "libc",
-@@ -4703,7 +4663,6 @@ dependencies = [
- [[package]]
- name = "llrt_zlib"
- version = "0.9.0-beta"
--source = "git+https://github.com/awslabs/llrt?rev=7b95c82a9b15e7ddfb2778eca4b5a63111e74f51#7b95c82a9b15e7ddfb2778eca4b5a63111e74f51"
- dependencies = [
-  "llrt_buffer",
-  "llrt_compression",
-@@ -5060,47 +5019,147 @@ dependencies = [
+@@ -5060,47 +5037,147 @@ dependencies = [
  ]
  
  [[package]]
@@ -906,25 +762,66 @@ index 6108bf8..3526742 100644
   "memchr",
   "minimal-lexical",
  ]
-@@ -5682,80 +5741,637 @@ dependencies = [
- 
- [[package]]
- name = "object"
--version = "0.36.7"
-+version = "0.37.3"
- source = "registry+https://github.com/rust-lang/crates.io-index"
--checksum = "62948e14d923ea95ea2c7c86c71013138b66525b86bdc08d2dcc262bdb497b87"
-+checksum = "ff76201f031d8863c38aa7f905eca4f53abbfa15f609db4277d44cd8938f33fe"
- dependencies = [
-- "crc32fast",
-- "hashbrown 0.15.5",
-- "indexmap",
-  "memchr",
+@@ -5636,69 +5713,481 @@ dependencies = [
  ]
  
  [[package]]
--name = "object"
--version = "0.37.3"
+-name = "objc2-screen-capture-kit"
+-version = "0.3.2"
++name = "objc2-screen-capture-kit"
++version = "0.3.2"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "74b7c5390f477482f001bc354d6571a70db7e4f8d5288e860c45521fbce11394"
++dependencies = [
++ "block2 0.6.2",
++ "dispatch2",
++ "objc2 0.6.4",
++ "objc2-core-graphics",
++ "objc2-core-media",
++ "objc2-foundation 0.3.2",
++]
++
++[[package]]
++name = "objc2-user-notifications"
++version = "0.3.2"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "9df9128cbbfef73cda168416ccf7f837b62737d748333bfe9ab71c245d76613e"
++dependencies = [
++ "bitflags 2.13.1",
++ "block2 0.6.2",
++ "objc2 0.6.4",
++ "objc2-core-location",
++ "objc2-foundation 0.3.2",
++]
++
++[[package]]
++name = "objc_exception"
++version = "0.1.2"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "ad970fb455818ad6cba4c122ad012fae53ae8b4795f86378bce65e4f6bab2ca4"
++dependencies = [
++ "cc",
++]
++
++[[package]]
++name = "objc_id"
++version = "0.1.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "c92d4ddb4bd7b50d730c215ff871754d0da6b2178849f8a2a2ab69712d0c073b"
++dependencies = [
++ "objc",
++]
++
++[[package]]
++name = "object"
++version = "0.37.3"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "ff76201f031d8863c38aa7f905eca4f53abbfa15f609db4277d44cd8938f33fe"
++dependencies = [
++ "memchr",
++]
++
++[[package]]
 +name = "ohos-accessibility-binding"
 +version = "0.2.0"
 +source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1282,50 +1179,80 @@ index 6108bf8..3526742 100644
 +[[package]]
 +name = "ohos-resource-manager-sys"
 +version = "0.3.4"
-+source = "registry+https://github.com/rust-lang/crates.io-index"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "74b7c5390f477482f001bc354d6571a70db7e4f8d5288e860c45521fbce11394"
 +checksum = "f975fc2f533a962a33e68c7fe8ed28b332b7c8e84981865726f3e2429a06a5d2"
-+dependencies = [
+ dependencies = [
+- "block2 0.6.2",
+- "dispatch2",
+- "objc2 0.6.4",
+- "objc2-core-graphics",
+- "objc2-core-media",
+- "objc2-foundation 0.3.2",
 + "napi-sys-ohos",
-+]
-+
-+[[package]]
+ ]
+ 
+ [[package]]
+-name = "objc2-user-notifications"
+-version = "0.3.2"
 +name = "ohos-udmf-binding"
 +version = "0.0.8"
-+source = "registry+https://github.com/rust-lang/crates.io-index"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "9df9128cbbfef73cda168416ccf7f837b62737d748333bfe9ab71c245d76613e"
 +checksum = "f802a13e4503ffa2ae3a10a67182f733d08bd5f0a90664ef925f79494d53f34f"
-+dependencies = [
+ dependencies = [
+- "bitflags 2.13.1",
+- "block2 0.6.2",
+- "objc2 0.6.4",
+- "objc2-core-location",
+- "objc2-foundation 0.3.2",
 + "ohos-enum-derive",
 + "ohos-image-native-binding",
 + "ohos-udmf-sys",
-+]
-+
-+[[package]]
+ ]
+ 
+ [[package]]
+-name = "objc_exception"
+-version = "0.1.2"
 +name = "ohos-udmf-sys"
 +version = "0.0.5"
-+source = "registry+https://github.com/rust-lang/crates.io-index"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "ad970fb455818ad6cba4c122ad012fae53ae8b4795f86378bce65e4f6bab2ca4"
 +checksum = "bb0fbdf76430b57da06eee20dd9e8197acce4c561006ddc1f438979b67b04a66"
-+dependencies = [
+ dependencies = [
+- "cc",
 + "ohos-image-native-sys",
-+]
-+
-+[[package]]
+ ]
+ 
+ [[package]]
+-name = "objc_id"
+-version = "0.1.1"
 +name = "ohos-window-manager-binding"
 +version = "0.1.2"
-+source = "registry+https://github.com/rust-lang/crates.io-index"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "c92d4ddb4bd7b50d730c215ff871754d0da6b2178849f8a2a2ab69712d0c073b"
 +checksum = "a9e09753a593f8163428320183715d7856d23a2402a6124a10df5c6ea46b8dd5"
-+dependencies = [
+ dependencies = [
+- "objc",
 + "ohos-enum-derive",
 + "ohos-image-native-binding",
 + "ohos-multi-modal-input-sys",
 + "ohos-native-window-manager-sys",
-+]
-+
-+[[package]]
+ ]
+ 
+ [[package]]
+-name = "object"
+-version = "0.36.7"
 +name = "ohos-xcomponent-binding"
 +version = "0.6.0"
-+source = "registry+https://github.com/rust-lang/crates.io-index"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "62948e14d923ea95ea2c7c86c71013138b66525b86bdc08d2dcc262bdb497b87"
 +checksum = "c45f2877e08ab3cea8efc1dfc6b8b4877917e16547cba5c6a392708388bb43b5"
-+dependencies = [
+ dependencies = [
+- "crc32fast",
+- "hashbrown 0.15.5",
+- "indexmap",
+- "memchr",
 + "napi-derive-ohos",
 + "napi-ohos",
 + "napi-sys-ohos",
@@ -1335,81 +1262,31 @@ index 6108bf8..3526742 100644
 + "ohos-hilog-binding",
 + "ohos-xcomponent-sys",
 + "raw-window-handle",
-+]
-+
-+[[package]]
+ ]
+ 
+ [[package]]
+-name = "object"
+-version = "0.37.3"
 +name = "ohos-xcomponent-sys"
 +version = "0.1.6"
-+source = "registry+https://github.com/rust-lang/crates.io-index"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "ff76201f031d8863c38aa7f905eca4f53abbfa15f609db4277d44cd8938f33fe"
 +checksum = "e365f1e413612ef058a0b996c1ff4769a064761a5d5aa1e25aa5258b76f3f80b"
-+dependencies = [
+ dependencies = [
+- "memchr",
 + "ohos-accessibility-sys",
 + "ohos-arkui-input-sys",
 + "ohos-arkui-sys",
-+]
-+
-+[[package]]
-+name = "once_cell"
-+version = "1.21.4"
-+source = "registry+https://github.com/rust-lang/crates.io-index"
-+checksum = "9f7c3e4beb33f85d45ae3e3a1792185706c8e16d043238c593331cc7cd313b50"
-+
-+[[package]]
-+name = "once_cell_polyfill"
-+version = "1.70.2"
-+source = "registry+https://github.com/rust-lang/crates.io-index"
-+checksum = "384b8ab6d37215f3c5301a95a4accb5d64aa607f1fcb26a11b5303878451b4fe"
-+
-+[[package]]
-+name = "oo7"
-+version = "0.6.0"
-+source = "registry+https://github.com/rust-lang/crates.io-index"
-+checksum = "78f2bfed90f1618b4b48dcad9307f25e14ae894e2949642c87c351601d62cebd"
-+dependencies = [
-+ "aes 0.8.4",
-+ "ashpd",
-+ "async-fs",
-+ "async-io",
-+ "async-lock",
-+ "blocking",
-+ "cbc 0.1.2",
-+ "cipher 0.4.4",
-+ "digest 0.10.7",
-+ "endi",
-+ "futures-lite",
-+ "futures-util",
-+ "getrandom 0.4.3",
-+ "hkdf 0.12.4",
-+ "hmac 0.12.1",
-+ "md-5 0.10.6",
-+ "num",
-+ "num-bigint-dig",
-+ "pbkdf2 0.12.2",
-+ "serde",
-+ "serde_bytes",
-+ "sha2 0.10.9",
-+ "subtle",
-+ "zbus",
-+ "zbus_macros",
-+ "zeroize",
-+ "zvariant",
-+]
-+
-+[[package]]
-+name = "open"
-+version = "5.4.3"
-+source = "registry+https://github.com/rust-lang/crates.io-index"
-+checksum = "7c603ab8300cf18bc3b14146b19fe3dfcc4843ae5a400cd0e7a30b95aa366634"
-+dependencies = [
-+ "is-wsl",
-+ "libc",
-+]
-+
+ ]
+ 
+ [[package]]
+@@ -5758,6 +6247,149 @@ dependencies = [
+  "libc",
+ ]
+ 
 +[[package]]
 +name = "openharmony-ability"
 +version = "1.0.0-beta.5"
-+source = "registry+https://github.com/rust-lang/crates.io-index"
-+checksum = "c3d65db22273d3afdef8fd8eb9411546243aae365236829e67a8deca79eed5f1"
 +dependencies = [
 + "futures-channel",
 + "log",
@@ -1496,23 +1373,18 @@ index 6108bf8..3526742 100644
 +[[package]]
 +name = "openharmony-ability-plugin-notification"
 +version = "1.0.0-beta.5"
- source = "registry+https://github.com/rust-lang/crates.io-index"
--checksum = "ff76201f031d8863c38aa7f905eca4f53abbfa15f609db4277d44cd8938f33fe"
++source = "registry+https://github.com/rust-lang/crates.io-index"
 +checksum = "3ffb1b97ae77ca02fcffeb7c94279017058a95b694f461b040bf01a410d230a6"
- dependencies = [
-- "memchr",
++dependencies = [
 + "napi-derive-ohos",
 + "napi-ohos",
 + "openharmony-ability",
- ]
- 
- [[package]]
--name = "once_cell"
--version = "1.21.4"
++]
++
++[[package]]
 +name = "openharmony-ability-plugin-resource"
 +version = "1.0.0-beta.5"
- source = "registry+https://github.com/rust-lang/crates.io-index"
--checksum = "9f7c3e4beb33f85d45ae3e3a1792185706c8e16d043238c593331cc7cd313b50"
++source = "registry+https://github.com/rust-lang/crates.io-index"
 +checksum = "98127a906724941fcba6daddb13313c87cf8823c14a1c18e51720510e1dcb560"
 +dependencies = [
 + "napi-derive-ohos",
@@ -1520,14 +1392,11 @@ index 6108bf8..3526742 100644
 + "ohos-resource-manager-binding",
 + "openharmony-ability",
 +]
- 
- [[package]]
--name = "once_cell_polyfill"
--version = "1.70.2"
++
++[[package]]
 +name = "openharmony-ability-plugin-system-state"
 +version = "1.0.0-beta.5"
- source = "registry+https://github.com/rust-lang/crates.io-index"
--checksum = "384b8ab6d37215f3c5301a95a4accb5d64aa607f1fcb26a11b5303878451b4fe"
++source = "registry+https://github.com/rust-lang/crates.io-index"
 +checksum = "a26cf57d26b4c7e55226913b1b1c766c4f2331db42d00743aee383cb47611596"
 +dependencies = [
 + "crossbeam-channel",
@@ -1535,66 +1404,33 @@ index 6108bf8..3526742 100644
 + "napi-ohos",
 + "openharmony-ability",
 +]
- 
- [[package]]
--name = "oo7"
--version = "0.6.0"
++
++[[package]]
 +name = "openharmony-ability-plugin-url"
 +version = "1.0.0-beta.5"
- source = "registry+https://github.com/rust-lang/crates.io-index"
--checksum = "78f2bfed90f1618b4b48dcad9307f25e14ae894e2949642c87c351601d62cebd"
++source = "registry+https://github.com/rust-lang/crates.io-index"
 +checksum = "891de71b5f9160b44ca4f6fc8759b79e95e70bb6343b8b9d949df457547f0952"
- dependencies = [
-- "aes 0.8.4",
-- "ashpd",
-- "async-fs",
-- "async-io",
-- "async-lock",
-- "blocking",
-- "cbc 0.1.2",
-- "cipher 0.4.4",
-- "digest 0.10.7",
-- "endi",
-- "futures-lite",
-- "futures-util",
-- "getrandom 0.4.3",
-- "hkdf 0.12.4",
-- "hmac 0.12.1",
-- "md-5 0.10.6",
-- "num",
-- "num-bigint-dig",
-- "pbkdf2 0.12.2",
-- "serde",
-- "serde_bytes",
-- "sha2 0.10.9",
-- "subtle",
-- "zbus",
-- "zbus_macros",
-- "zeroize",
-- "zvariant",
++dependencies = [
 + "napi-derive-ohos",
 + "napi-ohos",
 + "openharmony-ability",
- ]
- 
- [[package]]
--name = "open"
--version = "5.4.3"
++]
++
++[[package]]
 +name = "openharmony-ability-plugin-window"
 +version = "1.0.0-beta.5"
- source = "registry+https://github.com/rust-lang/crates.io-index"
--checksum = "7c603ab8300cf18bc3b14146b19fe3dfcc4843ae5a400cd0e7a30b95aa366634"
++source = "registry+https://github.com/rust-lang/crates.io-index"
 +checksum = "f85c80fe2b8a4193f6b753e56051770701800da65a0f4a525c7fe75fc656c83e"
- dependencies = [
-- "is-wsl",
-- "libc",
++dependencies = [
 + "napi-derive-ohos",
 + "napi-ohos",
 + "openharmony-ability",
- ]
- 
++]
++
  [[package]]
-@@ -6226,18 +6842,6 @@ dependencies = [
+ name = "openssl-probe"
+ version = "0.2.1"
+@@ -6226,18 +6858,6 @@ dependencies = [
   "thiserror 1.0.69",
  ]
  
@@ -1613,7 +1449,7 @@ index 6108bf8..3526742 100644
  [[package]]
  name = "potential_utf"
  version = "0.1.6"
-@@ -6441,7 +7045,6 @@ dependencies = [
+@@ -6441,7 +7061,6 @@ dependencies = [
  [[package]]
  name = "quickjs-jit"
  version = "0.12.11"
@@ -1621,7 +1457,7 @@ index 6108bf8..3526742 100644
  dependencies = [
   "quickjs-jit-core",
   "quickjs-jit-macro",
-@@ -6450,7 +7053,6 @@ dependencies = [
+@@ -6450,7 +7069,6 @@ dependencies = [
  [[package]]
  name = "quickjs-jit-core"
  version = "0.12.11"
@@ -1629,7 +1465,7 @@ index 6108bf8..3526742 100644
  dependencies = [
   "async-lock",
   "half",
-@@ -6462,7 +7064,6 @@ dependencies = [
+@@ -6462,7 +7080,6 @@ dependencies = [
  [[package]]
  name = "quickjs-jit-macro"
  version = "0.12.11"
@@ -1637,7 +1473,7 @@ index 6108bf8..3526742 100644
  dependencies = [
   "convert_case 0.11.0",
   "fnv",
-@@ -6479,28 +7080,19 @@ dependencies = [
+@@ -6479,21 +7096,13 @@ dependencies = [
  name = "quickjs-jit-runtime"
  version = "0.12.11"
  dependencies = [
@@ -1659,14 +1495,7 @@ index 6108bf8..3526742 100644
   "windows-sys 0.61.2",
  ]
  
- [[package]]
- name = "quickjs-jit-stdlib"
- version = "0.12.7"
--source = "git+https://github.com/longbridge/quickjs-jit?rev=605da483611a3548edb8c33fdff602e3f5f42076#605da483611a3548edb8c33fdff602e3f5f42076"
- dependencies = [
-  "llrt_buffer",
-  "llrt_crypto",
-@@ -6513,7 +7105,6 @@ dependencies = [
+@@ -6513,7 +7122,6 @@ dependencies = [
  [[package]]
  name = "quickjs-jit-sys"
  version = "0.12.11"
@@ -1674,7 +1503,7 @@ index 6108bf8..3526742 100644
  dependencies = [
   "cc",
  ]
-@@ -6866,21 +7457,6 @@ dependencies = [
+@@ -6866,21 +7474,6 @@ dependencies = [
   "syn 3.0.4",
  ]
  
@@ -1696,7 +1525,7 @@ index 6108bf8..3526742 100644
  [[package]]
  name = "regex"
  version = "1.13.1"
-@@ -7628,9 +8204,6 @@ name = "smallvec"
+@@ -7628,9 +8221,6 @@ name = "smallvec"
  version = "1.15.2"
  source = "registry+https://github.com/rust-lang/crates.io-index"
  checksum = "8ed6a63f02c8539c91a8685a86f4099661ba3da017932f6ebbea6de3f0fa7c90"
@@ -1706,7 +1535,7 @@ index 6108bf8..3526742 100644
  
  [[package]]
  name = "smol"
-@@ -8036,12 +8609,6 @@ dependencies = [
+@@ -8036,12 +8626,6 @@ dependencies = [
   "objc",
  ]
  
@@ -1719,7 +1548,7 @@ index 6108bf8..3526742 100644
  [[package]]
  name = "tauri-winrt-notification"
  version = "0.7.3"
-@@ -8853,12 +9420,11 @@ dependencies = [
+@@ -8853,12 +9437,11 @@ dependencies = [
  
  [[package]]
  name = "wasm-bindgen"
@@ -1734,7 +1563,7 @@ index 6108bf8..3526742 100644
   "rustversion",
   "wasm-bindgen-macro",
   "wasm-bindgen-shared",
-@@ -8866,19 +9432,20 @@ dependencies = [
+@@ -8866,19 +9449,20 @@ dependencies = [
  
  [[package]]
  name = "wasm-bindgen-futures"
@@ -1759,7 +1588,7 @@ index 6108bf8..3526742 100644
  dependencies = [
   "quote",
   "wasm-bindgen-macro-support",
-@@ -8886,22 +9453,22 @@ dependencies = [
+@@ -8886,22 +9470,22 @@ dependencies = [
  
  [[package]]
  name = "wasm-bindgen-macro-support"
@@ -1787,7 +1616,7 @@ index 6108bf8..3526742 100644
  dependencies = [
   "unicode-ident",
  ]
-@@ -9032,9 +9599,9 @@ dependencies = [
+@@ -9032,9 +9616,9 @@ dependencies = [
  
  [[package]]
  name = "web-sys"
@@ -1799,7 +1628,7 @@ index 6108bf8..3526742 100644
  dependencies = [
   "js-sys",
   "wasm-bindgen",
-@@ -9089,7 +9656,36 @@ dependencies = [
+@@ -9089,7 +9673,36 @@ dependencies = [
   "hashbrown 0.16.1",
   "js-sys",
   "log",
@@ -1837,7 +1666,7 @@ index 6108bf8..3526742 100644
   "parking_lot",
   "portable-atomic",
   "profiling",
-@@ -9099,9 +9695,9 @@ dependencies = [
+@@ -9099,9 +9712,9 @@ dependencies = [
   "wasm-bindgen",
   "wasm-bindgen-futures",
   "web-sys",
@@ -1850,7 +1679,7 @@ index 6108bf8..3526742 100644
  ]
  
  [[package]]
-@@ -9120,7 +9716,7 @@ dependencies = [
+@@ -9120,7 +9733,7 @@ dependencies = [
   "hashbrown 0.16.1",
   "indexmap",
   "log",
@@ -1859,7 +1688,7 @@ index 6108bf8..3526742 100644
   "once_cell",
   "parking_lot",
   "portable-atomic",
-@@ -9130,12 +9726,45 @@ dependencies = [
+@@ -9130,12 +9743,45 @@ dependencies = [
   "smallvec",
   "thiserror 2.0.20",
   "wgpu-core-deps-apple",
@@ -1910,7 +1739,7 @@ index 6108bf8..3526742 100644
  ]
  
  [[package]]
-@@ -9144,7 +9773,7 @@ version = "29.0.4"
+@@ -9144,7 +9790,7 @@ version = "29.0.4"
  source = "registry+https://github.com/rust-lang/crates.io-index"
  checksum = "f5e39e26c4c0e07589e67d18546cf79ff45383659fc72fca4dd293358a0347f3"
  dependencies = [
@@ -1919,7 +1748,7 @@ index 6108bf8..3526742 100644
  ]
  
  [[package]]
-@@ -9153,7 +9782,16 @@ version = "29.0.4"
+@@ -9153,7 +9799,16 @@ version = "29.0.4"
  source = "registry+https://github.com/rust-lang/crates.io-index"
  checksum = "01e09be551dc939498bdd5f6b2c66e55ab275dad25825267a08605a80fc9f0af"
  dependencies = [
@@ -1937,7 +1766,7 @@ index 6108bf8..3526742 100644
  ]
  
  [[package]]
-@@ -9162,7 +9800,7 @@ version = "29.0.4"
+@@ -9162,7 +9817,7 @@ version = "29.0.4"
  source = "registry+https://github.com/rust-lang/crates.io-index"
  checksum = "af1fb1798be2a912497d4c224f72d39bb0cb34af50e8bcc29865bc339c943059"
  dependencies = [
@@ -1946,7 +1775,7 @@ index 6108bf8..3526742 100644
  ]
  
  [[package]]
-@@ -9171,7 +9809,16 @@ version = "29.0.4"
+@@ -9171,7 +9826,16 @@ version = "29.0.4"
  source = "registry+https://github.com/rust-lang/crates.io-index"
  checksum = "4e592c1bbef6ad047647ae6e666ebd8cee7a32bb4544d9700ec96cbf73230257"
  dependencies = [
@@ -1964,7 +1793,7 @@ index 6108bf8..3526742 100644
  ]
  
  [[package]]
-@@ -9197,9 +9844,9 @@ dependencies = [
+@@ -9197,9 +9861,9 @@ dependencies = [
   "js-sys",
   "khronos-egl",
   "libc",
@@ -1976,7 +1805,7 @@ index 6108bf8..3526742 100644
   "ndk-sys",
   "objc2 0.6.4",
   "objc2-core-foundation",
-@@ -9221,21 +9868,70 @@ dependencies = [
+@@ -9221,21 +9885,70 @@ dependencies = [
   "wasm-bindgen",
   "wayland-sys",
   "web-sys",
@@ -2051,7 +1880,7 @@ index 6108bf8..3526742 100644
  ]
  
  [[package]]
-@@ -9252,6 +9948,22 @@ dependencies = [
+@@ -9252,6 +9965,22 @@ dependencies = [
   "web-sys",
  ]
  
@@ -2074,7 +1903,7 @@ index 6108bf8..3526742 100644
  [[package]]
  name = "which"
  version = "8.0.6"
-@@ -9638,15 +10350,6 @@ dependencies = [
+@@ -9638,15 +10367,6 @@ dependencies = [
   "windows-targets 0.52.6",
  ]
  
@@ -2090,119 +1919,3 @@ index 6108bf8..3526742 100644
  [[package]]
  name = "windows-sys"
  version = "0.61.2"
-@@ -10480,3 +11183,115 @@ dependencies = [
-  "syn 3.0.4",
-  "winnow 1.0.4",
- ]
-+
-+[[patch.unused]]
-+name = "llrt"
-+version = "0.9.0-beta"
-+
-+[[patch.unused]]
-+name = "llrt_assert"
-+version = "0.9.0-beta"
-+
-+[[patch.unused]]
-+name = "llrt_child_process"
-+version = "0.9.0-beta"
-+
-+[[patch.unused]]
-+name = "llrt_console"
-+version = "0.9.0-beta"
-+
-+[[patch.unused]]
-+name = "llrt_core"
-+version = "0.9.0-beta"
-+
-+[[patch.unused]]
-+name = "llrt_dgram"
-+version = "0.9.0-beta"
-+
-+[[patch.unused]]
-+name = "llrt_dns"
-+version = "0.9.0-beta"
-+
-+[[patch.unused]]
-+name = "llrt_dns_cache"
-+version = "0.9.0-beta"
-+
-+[[patch.unused]]
-+name = "llrt_fetch"
-+version = "0.9.0-beta"
-+
-+[[patch.unused]]
-+name = "llrt_fs"
-+version = "0.9.0-beta"
-+
-+[[patch.unused]]
-+name = "llrt_http"
-+version = "0.9.0-beta"
-+
-+[[patch.unused]]
-+name = "llrt_intl"
-+version = "0.9.0-beta"
-+
-+[[patch.unused]]
-+name = "llrt_logging"
-+version = "0.9.0-beta"
-+
-+[[patch.unused]]
-+name = "llrt_modules"
-+version = "0.9.0-beta"
-+
-+[[patch.unused]]
-+name = "llrt_navigator"
-+version = "0.9.0-beta"
-+
-+[[patch.unused]]
-+name = "llrt_net"
-+version = "0.9.0-beta"
-+
-+[[patch.unused]]
-+name = "llrt_numbers"
-+version = "0.9.0-beta"
-+
-+[[patch.unused]]
-+name = "llrt_os"
-+version = "0.9.0-beta"
-+
-+[[patch.unused]]
-+name = "llrt_perf_hooks"
-+version = "0.9.0-beta"
-+
-+[[patch.unused]]
-+name = "llrt_process"
-+version = "0.9.0-beta"
-+
-+[[patch.unused]]
-+name = "llrt_stream"
-+version = "0.9.0-beta"
-+
-+[[patch.unused]]
-+name = "llrt_string_decoder"
-+version = "0.9.0-beta"
-+
-+[[patch.unused]]
-+name = "llrt_temporal"
-+version = "0.9.0-beta"
-+
-+[[patch.unused]]
-+name = "llrt_test"
-+version = "0.9.0-beta"
-+
-+[[patch.unused]]
-+name = "llrt_test_tls"
-+version = "0.9.0-beta"
-+
-+[[patch.unused]]
-+name = "llrt_tls"
-+version = "0.9.0-beta"
-+
-+[[patch.unused]]
-+name = "llrt_tty"
-+version = "0.9.0-beta"
-+
-+[[patch.unused]]
-+name = "llrt_util"
-+version = "0.9.0-beta"

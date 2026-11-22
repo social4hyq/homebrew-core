@@ -1,0 +1,18 @@
+diff --git a/src/mods.rs b/src/mods.rs
+index 03a518c..a35ae53 100644
+--- a/src/mods.rs
++++ b/src/mods.rs
+@@ -845,6 +845,13 @@ fn exec_limit(options: Option<&HostValue>) -> Result<Duration, HostError> {
+ }
+ 
+ pub(crate) fn run_blocking(command: &str, args: &[String], cwd: Option<String>, limit: Duration) -> Result<(i32, String, String), String> {
++    // The HAP sandbox may not spawn processes: run it on the host through the core.
++    #[cfg(all(target_os = "linux", target_env = "ohos"))]
++    {
++        let cwd = Some(cwd.unwrap_or_else(|| home().to_string_lossy().into_owned()));
++        return crate::ohos_exec::exec(command, args, cwd, limit)
++            .map(|(code, out, err)| (code, String::from_utf8_lossy(&out).into_owned(), String::from_utf8_lossy(&err).into_owned()));
++    }
+     use std::io::Read;
+     // The core may have no `hc` link beside it (a Windows zip has only herdr-core.exe).
+     let program = if command == "hc" { crate::core_bin::path() } else { PathBuf::from(command) };
