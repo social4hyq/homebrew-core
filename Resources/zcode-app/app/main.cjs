@@ -5,13 +5,17 @@
 // before HAP signing; the bottle HAP only carries a placeholder. When the
 // service is not up on launch the shell starts it by running the host
 // `zcode-app serve` (idempotent; requires the CUSTOM_SANDBOX /
-// READ_WRITE_USER_FILE ACLs). The service stays CLI-managed: it is not stopped
-// when the shell exits.
-const { app, BrowserWindow, shell } = require('electron');
+// READ_WRITE_USER_FILE ACLs). The shell never stops the service itself, but a
+// service it started ends with the app (aa force-stop, tray quit): detaching
+// does not leave the app's cgroup, measured on the device. Only a service
+// started from a terminal outlives the app, so the tray quit asks first when
+// the shell started the service (lifecycle.cjs).
+const { app, BrowserWindow, Menu, dialog, shell } = require('electron');
 const { spawn } = require('node:child_process');
 const fs = require('node:fs');
 const http = require('node:http');
 const path = require('node:path');
+const lifecycle = require('./lifecycle.cjs');
 const tray = require('./tray.cjs');
 
 let config = { port: 0, workspace: '' };
@@ -28,6 +32,10 @@ const origin = configured ? `http://127.0.0.1:${config.port}` : null;
 const canAutoStart = configured && typeof config.launcher === 'string' && config.launcher.length > 0;
 let serveChild = null;
 let serveSpawnError = '';
+// True once this shell had to start the service (it was not up when the shell
+// connected). Such a service ends with the app; one that was already running is
+// not affected by quitting.
+let startedService = false;
 
 // ZCODE_DESKTOP_NO_TRAY=1 (or "tray": false in config.json) restores the old
 // behaviour where closing the window quits the shell.
@@ -110,7 +118,8 @@ function spawnService() {
       env,
       cwd: typeof host.home === 'string' && host.home.length > 0 ? host.home : undefined,
       // Detached, so the background service the launcher starts does not share
-      // the shell's process group.
+      // the shell's process group. It still belongs to the app's cgroup and
+      // ends when the app does.
       detached: true,
       stdio: ['ignore', logFd === undefined ? 'ignore' : logFd, logFd === undefined ? 'ignore' : logFd],
     });
@@ -153,6 +162,9 @@ async function drive(win) {
   for (;;) {
     if (win.isDestroyed()) return;
     if (await serverUp(2000)) {
+      try {
+        fs.appendFileSync(serveLogPath(), `[attach] ${new Date().toISOString()} ${lifecycle.attachLine({ startedService })}\n`);
+      } catch {}
       await win.loadURL(origin + '/');
       return;
     }
@@ -160,6 +172,7 @@ async function drive(win) {
     // 10s so a failing launcher cannot spin the CPU.
     if (canAutoStart && !serveChild && Date.now() - lastSpawnAttempt > 10000) {
       lastSpawnAttempt = Date.now();
+      startedService = true;
       spawnService();
     }
     const state = serveSpawnError ? 'spawn-failed' : 'waiting';
@@ -169,6 +182,37 @@ async function drive(win) {
     }
     // Detect startup promptly, then back off if the host service stays down.
     await new Promise((resolve) => setTimeout(resolve, serveChild || Date.now() < fastPollUntil ? 250 : 3000));
+  }
+}
+
+// Tray "退出应用". Quitting ends a service this shell started, so ask first. A
+// second click while the question is open quits anyway, and anything that goes
+// wrong while asking (dialog failure) quits as before.
+let confirming = false;
+async function confirmQuit() {
+  if (confirming) {
+    app.exit(0);
+    return;
+  }
+  confirming = true;
+  try {
+    if (lifecycle.shouldConfirmQuit({ startedService, serviceUp: await serverUp(2000) })) {
+      let proceed = true;
+      try {
+        tray.showWindow();
+        const parent = shellWindow && !shellWindow.isDestroyed() ? shellWindow : undefined;
+        const { response } = await dialog.showMessageBox(parent, lifecycle.quitDialog());
+        proceed = lifecycle.confirmedQuit(response);
+      } catch (error) {
+        console.error('ZCODE_DESKTOP quit dialog failed: ' + String(error));
+      }
+      if (!proceed) return;
+    }
+    // The shell's ArkTS windowStageClose handler refuses to close the window, so
+    // a regular app.quit() would be vetoed; exit the process directly.
+    app.exit(0);
+  } finally {
+    confirming = false;
   }
 }
 
@@ -187,10 +231,16 @@ app.whenReady().then(() => {
   // the process alive while the item exists.
   if (useTray) {
     try {
-      tray.create({
+      const trayItem = tray.create({
         tooltip: 'ZCode',
         iconPath: path.join(__dirname, 'tray-icon.png'),
       });
+      // Same menu as tray.cjs builds, with a quit that can ask first.
+      trayItem.setContextMenu(Menu.buildFromTemplate([
+        { label: '显示窗口', click: tray.showWindow },
+        { type: 'separator' },
+        { label: '退出应用', click: confirmQuit },
+      ]));
       trayReady = true;
     } catch (error) {
       console.error('ZCODE_DESKTOP tray unavailable: ' + String(error));
@@ -227,8 +277,9 @@ app.whenReady().then(() => {
 
 app.on('before-quit', (event) => {
   // A system-level close request (dock "close", session end) reaches Electron
-  // as before-quit; veto it and hide to the tray instead of exiting. The host
-  // `zcode --web` service this shell talks to is not affected either way.
+  // as before-quit; veto it and hide to the tray instead of exiting. Hiding
+  // does not touch the service; only an actual exit (tray quit, force-stop)
+  // ends a service this shell started.
   if (trayReady && !tray.isQuitting()) {
     event.preventDefault();
     if (shellWindow && !shellWindow.isDestroyed()) shellWindow.hide();
