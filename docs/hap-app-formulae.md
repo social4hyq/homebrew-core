@@ -79,13 +79,18 @@ end
 - 设备已连接、华为开发者已登录：立刻签名安装，装完用 `bm dump` 校验权限。
   默认每个 app 只打印两行（开始、结果），安装输出写 `~/.cache/hap-app/logs/`；
   失败时打印原因、下一步和日志路径（`verbose=1` 或 `HAP_APP_VERBOSE=1` 可流式）。
-- 设备没连、多个设备、没登录、装机失败、权限未授予：不报错、不阻塞 brew，
+- 设备已连接但没登录：默认打开浏览器并最多等 120s，登录成功后继续安装；
+  登录未完成时入队，10 分钟内不为后续 app 重复弹登录。
+- 设备没连、多个设备、登录未完成、装机失败、权限未授予：不报错、不阻塞 brew，
   把 `<command>` 登记到 `~/.cache/hap-app/pending/<command>.json`，
-  提示运行 `hap-app install-pending`；登录只做一次。
+  提示运行 `hap-app install-pending`；补装时登录只做一次。
 - 自动路径**不启动** app：`hap-app` 导出 `HAP_INSTALLER_NO_START=1`，app-installer
   据此不 `aa start`；app 自己的 `install` 脚本如果会打开窗口（目前只有 `orca-app`），
   也必须遵守这个变量（非 0 时只安装、不打开），不要把这种例外塞进共享的 `hap-app`。
-  也不弹登录（除非 `HAP_APP_AUTO_LOGIN=1`，最多等 120s，每次 brew 进程只试一次）。
+  `HAP_APP_AUTO_LOGIN=0`（或配置文件 `auto_login=0`）可关闭自动登录。
+- 自动签名前总会执行 `devecocli signature generate --product default` 刷新本地调试
+  profile，成功后重新签名安装；续签失败按 `sign` 入队。外部 `--profile` 和自有
+  `--keystore` 材料不经过这条自动续签路径，也不加后台定时续签进程。
 - 手动 `<app>-app install` 行为不变：仍会启动 app、仍会阻塞登录。
 - 权限：自动路径永远用默认 ACL 变体，不传 `--no-acl`；`hap-app` 从 app wrapper
   的 `*_MODULE_ACL` 取 ACL 清单传给 `app-installer permissions --expect-acl`，
@@ -154,7 +159,7 @@ tls_ca=/absolute/path/to/proxy-ca.pem     # 首选：信任代理/VPN 的 CA
 - 同一轮 brew 里如果签名已因证书链失败，10 分钟内（且 `~/.app-installer/config`
   没变）后续 app 直接入队、不再重复尝试；`hap-app install-pending` 会清除这个标记，
   所以改完配置手动补装一定能重试。
-- `~/.config/hap-app/config` 管行为：`auto_install=0`、`auto_login=1`、`verbose=1`。
+- `~/.config/hap-app/config` 管行为：`auto_install=0`、`auto_login=0`、`verbose=1`。
 - 日志在 `~/.cache/hap-app/logs/`（0600，保留最近 20 个），失败时结果里会打印路径。
 
 ## 共享安装库
