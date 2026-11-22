@@ -8,6 +8,7 @@ class OrcaApp < Formula
   # Tap-authored shell scripts (MIT) on the CPF-Electron runtime (mixed
   # MIT/BSD/LGPL).
   license :cannot_represent
+  revision 1
 
   livecheck do
     url :stable
@@ -15,9 +16,8 @@ class OrcaApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/orca-app-v1.4.267-r2"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cc123fd6b9e5d1d2b39e9936a6ab77f650fae55a3d874d9353e2ae0d4b10364a"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/orca-app-v1.4.267-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cd10939ba7099bb4cdee1eeec6401dabc09be7a121660d92f9b6fc83ae6ae95f"
   end
 
   depends_on "openjdk" => :build
@@ -220,6 +220,15 @@ class OrcaApp < Formula
         orca-app start      # open the app
         orca-app status     # host-side runtime
         orca-app stop
+
+      The `orca` CLI finds a runtime through the profile named by ORCA_USER_DATA_PATH
+      (default $XDG_CONFIG_HOME/orca), not through ~/.orca. To see the same projects
+      and terminals from the CLI as in `orca-app serve`, set it in that shell:
+
+        export ORCA_USER_DATA_PATH=$HOME/.orca
+
+      The runtime the app starts itself keeps a separate profile in the app sandbox;
+      the CLI cannot see it.
 
       `install --no-acl` installs the strong-sandbox variant (no JIT/paste; it waits
       for `orca-app serve` instead of spawning the runtime).
