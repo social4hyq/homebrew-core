@@ -6,7 +6,7 @@ class ClaudeCodeApp < Formula
   version "6.28899.6"
   sha256 "239c20d218456cacc656d48382fd59116325ac679aa4e476377af1456ac85715"
   license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
-  revision 2
+  revision 3
 
   livecheck do
     url "https://downloads.claude.ai/claude-desktop/apt/stable/dists/stable/main/binary-arm64/Packages"
@@ -224,8 +224,10 @@ class ClaudeCodeApp < Formula
       #!/bin/sh
       printf '%s\\n' "$*" >> #{hdc_log}
       if [ "$1" = "shell" ] && [ "$2" = "ps -ef" ]; then
-        [ -n "${FAKE_STOPPED:-}" ] ||
-          printf '%s\\n' "a com.social4hyq.claudecode" "b com.other.app"
+        if [ -z "${FAKE_STOPPED:-}" ]; then
+          printf '%s\\n' "u 1 1 1 1 ? 00:00:00 com.social4hyq.claudecode"
+        fi
+        printf '%s\\n' "u 1 1 1 1 ? 00:00:00 sh -c echo com.social4hyq.claudecode"
       fi
     SH
     chmod 0755, fake_bin/"hdc"
