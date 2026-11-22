@@ -4,6 +4,7 @@ class SnowShotApp < Formula
   url "https://github.com/mg-chao/snow-shot/archive/refs/tags/v1.6.2_snow-shot.tar.gz"
   sha256 "ab84c57dfafb13ae9cbcc48af39fde6c27b5804f718b37c4d3d5ca3e157f1549"
   license "GPL-3.0-or-later"
+  revision 1
 
   livecheck do
     url "https://github.com/mg-chao/snow-shot.git"
@@ -371,8 +372,8 @@ class SnowShotApp < Formula
     (libexec/"snow-shot-install").write (res/"snow-shot-install.sh").read
     chmod 0555, libexec/"snow-shot-install"
     (bin/"snow-shot-app").write_env_script libexec/"snow-shot-install",
-      SNOW_SHOT_HAP: libexec/"snow-shot-unsigned.hap",
-      SNOW_SHOT_HDC: formula_opt_prefix("ohos-sdk-toolchains")/"hdc"
+      SNOW_SHOT_HAP:         libexec/"snow-shot-unsigned.hap",
+      SNOW_SHOT_HDC_DEFAULT: formula_opt_prefix("ohos-sdk-toolchains")/"hdc"
     bin.install_symlink "snow-shot-app" => "snow-shot"
   end
 
@@ -617,7 +618,8 @@ class SnowShotApp < Formula
       Manual install: `snow-shot-app install`. See docs/hap-app-formulae.md.
 
       The HAP is unsigned in the bottle; install signs it with a local debug profile
-      (Huawei Developer login on first run).
+      (Huawei Developer login on first run). `snow-shot-app uninstall` removes the
+      app but keeps its data; only `snow-shot-app uninstall --purge` deletes it.
     EOS
   end
 
@@ -645,6 +647,43 @@ class SnowShotApp < Formula
     assert_equal ["--hap", hap.to_s], args.first(2)
     assert_equal %w[--bundle-id com.social4hyq.snowshot --app-name SnowShot --module entry
                     --ability QAbility --no-start], args.drop(2)
+
+    # The wider CLI matrix: start/stop/status address the device through the
+    # bundled hdc; uninstall goes through app-installer and keeps the app's
+    # data unless --purge is given.
+    hdc_log = testpath/"hdc-log"
+    (fake_bin/"hdc").delete
+    (fake_bin/"hdc").write <<~SH
+      #!/bin/sh
+      printf '%s\\n' "$*" >> #{hdc_log}
+      if [ "$1" = "shell" ] && [ "$2" = "ps -ef" ]; then
+        [ -n "${FAKE_STOPPED:-}" ] ||
+          printf '%s\\n' "a com.social4hyq.snowshot" "b com.other.app"
+      fi
+    SH
+    chmod 0755, fake_bin/"hdc"
+    with_env("SNOW_SHOT_HDC" => (fake_bin/"hdc").to_s, "PATH" => "#{fake_bin}:#{ENV["PATH"]}") do
+      shell_output("#{bin}/snow-shot-app start --device tablet-1")
+      assert_match "-t tablet-1 shell aa start", (testpath/"hdc-log").read
+      shell_output("#{bin}/snow-shot-app stop")
+      assert_match "shell aa force-stop com.social4hyq.snowshot", (testpath/"hdc-log").read
+      assert_match "running", shell_output("#{bin}/snow-shot-app status")
+      with_env("FAKE_STOPPED" => "1") do
+        assert_match "not running", shell_output("#{bin}/snow-shot-app status 2>&1", 1)
+      end
+      shell_output("#{bin}/snow-shot-app uninstall --purge --device tablet-1")
+      assert_equal %w[uninstall --bundle-id com.social4hyq.snowshot --device tablet-1 --purge],
+                   installer_args.read.lines(chomp: true)
+      shell_output("#{bin}/snow-shot-app uninstall")
+      assert_equal %w[uninstall --bundle-id com.social4hyq.snowshot], installer_args.read.lines(chomp: true)
+    end
+    with_env("HDC_TARGET" => "env-device", "SNOW_SHOT_HDC" => (fake_bin/"hdc").to_s,
+             "PATH" => "#{fake_bin}:#{ENV["PATH"]}") do
+      shell_output("#{bin}/snow-shot-app uninstall")
+    end
+    assert_equal %w[uninstall --bundle-id com.social4hyq.snowshot --device env-device],
+                 installer_args.read.lines(chomp: true)
+    assert_match "uninstall", shell_output("#{bin}/snow-shot-app --help")
     listing = shell_output("unzip -l #{hap}")
     %w[
       libsnow_shot.so libqohos.so libQt6Widgets.so.6
