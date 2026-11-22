@@ -11,7 +11,7 @@
 // this shell still ends when the app process ends (`aa force-stop`, tray quit):
 // measured on the device, detaching does not keep it alive. Only a service
 // started from a terminal outlives the app.
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, Menu, dialog } = require('electron');
 const { spawn } = require('node:child_process');
 const fs = require('node:fs');
 const http = require('node:http');
@@ -35,6 +35,10 @@ const useTray = process.env.OPENCODE_DESKTOP_NO_TRAY !== '1' && config.tray !== 
 let trayReady = false;
 let shellWindow = null;
 let driving = false;
+// True once this shell had to start the service (it was not running when the
+// shell connected). Such a service ends with the app, so quitting may interrupt
+// running tasks; a service that was already up is not touched by quitting.
+let startedService = false;
 
 // The state file `opencode service` writes: {"url", "password", "pid", ...}.
 // An empty xdgState means the host did not define XDG_STATE_HOME.
@@ -134,6 +138,76 @@ function startService() {
   }
 }
 
+// Number of running sessions on the service, or null when it cannot be told
+// (unreachable, unexpected answer).
+function activeSessionCount(service) {
+  return new Promise((resolve) => {
+    const req = http.get({
+      host: service.hostname, port: service.port, path: '/api/session/active',
+      headers: { Authorization: service.authHeader }, timeout: 2000, agent: false,
+    }, (res) => {
+      let body = '';
+      res.setEncoding('utf8');
+      res.on('data', (chunk) => { body += chunk; });
+      res.on('end', () => {
+        try {
+          if (res.statusCode !== 200) return resolve(null);
+          const data = JSON.parse(body).data;
+          if (Array.isArray(data)) return resolve(data.length);
+          if (data && typeof data === 'object') return resolve(Object.keys(data).length);
+          resolve(null);
+        } catch (error) {
+          resolve(null);
+        }
+      });
+    });
+    req.on('timeout', () => { req.destroy(); resolve(null); });
+    req.on('error', () => resolve(null));
+  });
+}
+
+// Tray "退出应用". A service this shell started ends with the app (it lives in
+// the app's cgroup), so ask first when it is running tasks. Anything that goes
+// wrong while asking (no service, no answer, no dialog) quits as before.
+let confirming = false;
+async function confirmQuit() {
+  // A second click while the question is still open means "quit anyway"; it
+  // also keeps the menu from getting stuck if the dialog never shows.
+  if (confirming) {
+    app.exit(0);
+    return;
+  }
+  confirming = true;
+  try {
+    const service = startedService ? readService() : null;
+    const active = service ? await activeSessionCount(service) : null;
+    if (active && active > 0) {
+      let proceed = true;
+      try {
+        tray.showWindow();
+        const parent = shellWindow && !shellWindow.isDestroyed() ? shellWindow : undefined;
+        const { response } = await dialog.showMessageBox(parent, {
+          type: 'warning',
+          title: '退出 OpenCode',
+          message: `有 ${active} 个任务正在运行`,
+          detail: '退出应用会同时结束由本应用启动的后台服务，运行中的任务会被中断。' +
+            '要让任务在退出后继续，请先在终端运行 opencode-app serve。',
+          buttons: ['取消', '仍然退出'], defaultId: 0, cancelId: 0,
+        });
+        proceed = response === 1;
+      } catch (error) {
+        console.error('OPENCODE_DESKTOP quit dialog failed: ' + String(error));
+      }
+      if (!proceed) return;
+    }
+    // The shell's ArkTS windowStageClose handler refuses to close the window,
+    // so a regular app.quit() would be vetoed; exit the process directly.
+    app.exit(0);
+  } finally {
+    confirming = false;
+  }
+}
+
 // The service address can change between runs, so the auth hook follows it.
 let hookedOrigin = null;
 function installAuthHook(win, service) {
@@ -164,6 +238,7 @@ async function drive(win) {
     // spin CPU.
     if (canAutoStart && Date.now() - lastStartAttempt > 10000) {
       lastStartAttempt = Date.now();
+      startedService = true;
       startService();
     }
     if (!waiting) {
@@ -189,12 +264,19 @@ app.whenReady().then(() => {
   // the process alive while the item exists.
   if (useTray) {
     try {
-      tray.create({
+      const trayItem = tray.create({
         tooltip: 'OpenCode',
         iconPath: path.join(__dirname, 'tray-icon.png'),
         restartLabel: '重新连接后端',
         onRestartBackend: startDrive,
       });
+      // Same menu as tray.cjs builds, with a quit that can ask first.
+      trayItem.setContextMenu(Menu.buildFromTemplate([
+        { label: '显示窗口', click: tray.showWindow },
+        { label: '重新连接后端', click: startDrive },
+        { type: 'separator' },
+        { label: '退出应用', click: confirmQuit },
+      ]));
       trayReady = true;
     } catch (error) {
       console.error('OPENCODE_DESKTOP tray unavailable: ' + String(error));

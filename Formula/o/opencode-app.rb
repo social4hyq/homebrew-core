@@ -6,7 +6,7 @@ class OpencodeApp < Formula
   # Tap-authored shell sources (MIT) on the CPF-Electron runtime (mixed
   # MIT/BSD/LGPL).
   license :cannot_represent
-  revision 2
+  revision 3
 
   livecheck do
     url :stable
@@ -203,7 +203,8 @@ class OpencodeApp < Formula
       The shell connects to the background service that `opencode` runs for the
       terminal (`opencode service`), so the TUI and the app show the same sessions.
       It starts that service on launch when it is not running, but a service the
-      app starts ends when the app exits (quit or `aa force-stop`). To keep tasks
+      app starts ends when the app exits (quit or `aa force-stop`); the tray's
+      quit asks first when tasks are running. To keep tasks
       running after the app is closed, start the service from a terminal first:
       `opencode-app serve` (or `opencode service start`; `opencode-app start
       --serve-only` in a shell startup file). A service started there survives
