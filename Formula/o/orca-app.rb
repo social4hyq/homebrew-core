@@ -8,7 +8,7 @@ class OrcaApp < Formula
   # Tap-authored shell scripts (MIT) on the CPF-Electron runtime (mixed
   # MIT/BSD/LGPL).
   license :cannot_represent
-  revision 3
+  revision 4
 
   livecheck do
     url :stable
@@ -42,6 +42,7 @@ class OrcaApp < Formula
     Resources/orca-app/scripts/install-desktop.sh
     Resources/orca-app/scripts/orca-desktop.sh
     Resources/orca-app/tests/attach.test.cjs
+    Resources/orca-app/tests/close-handler.test.cjs
   ].freeze
 
   resource "electron-ohos" do
@@ -113,8 +114,11 @@ class OrcaApp < Formula
                     ],
               JSON5
 
-    # windowStageClose hides the ability and cancels the close so the window
-    # goes to the tray; the tray quit calls app.exit() to bypass that handler.
+    # windowStageClose hides the ability and returns true, which tells the
+    # system not to close the window, so the window goes to the tray. Returning
+    # false let the system close it right after the hide: the ability's session
+    # was destroyed and the whole app was killed and relaunched. The tray quit
+    # calls app.exit() to bypass that handler.
     close_handler = [
       "    super.onWindowStageCreate(windowStage);",
       "    try {",
@@ -124,7 +128,7 @@ class OrcaApp < Formula
       "        }",
       "        const widgetId = Number(this.xcomponentId.substring(ConfigData.WINDOW_PREFIX.length));",
       "        Inject.getOrCreate(AppWindowAdapter).hideWindow(widgetId);",
-      "        return false;",
+      "        return true;",
       "      });",
       "    } catch (exception) {",
       "      LogUtil.error(TAG, 'Failed to register window close handler: ' + JSON.stringify(exception));",
@@ -535,6 +539,7 @@ class OrcaApp < Formula
     tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
     system "node", "--check", tap_root/"Resources/orca-app/app/main.cjs"
     system "node", "--test", tap_root/"Resources/orca-app/tests/attach.test.cjs"
+    system "node", "--test", tap_root/"Resources/orca-app/tests/close-handler.test.cjs"
     placeholder = JSON.parse(shell_output("unzip -p #{hap} resources/resfile/resources/app/config.json"))
     assert_equal 0, placeholder.fetch("port")
     refute placeholder.key?("url")
