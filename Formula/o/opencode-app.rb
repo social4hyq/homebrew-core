@@ -6,7 +6,7 @@ class OpencodeApp < Formula
   # Tap-authored shell sources (MIT) on the CPF-Electron runtime (mixed
   # MIT/BSD/LGPL).
   license :cannot_represent
-  revision 5
+  revision 6
 
   livecheck do
     url :stable
@@ -216,6 +216,8 @@ class OpencodeApp < Formula
       READ_WRITE_USER_FILE) come from the local debug profile. READ_PASTEBOARD
       enables paste and the kernel ACLs keep WebAssembly/markdown rendering.
       `--no-acl` installs the strong-sandbox HAP and waits for `opencode-app serve`.
+      `opencode-app uninstall` removes the app but keeps its data; only
+      `opencode-app uninstall --purge` deletes the app data.
     EOS
   end
 
@@ -253,6 +255,7 @@ class OpencodeApp < Formula
     ENV.prepend_path "PATH", fake_bin
     ENV.prepend_path "PATH", formula_opt_bin("node").to_s
     ENV["OPENCODE_DESKTOP_HDC"] = (fake_bin/"hdc").to_s
+    ENV["OPENCODE_DESKTOP_INSTALLER"] = fake_installer.to_s
 
     saved_xdg = %w[XDG_CONFIG_HOME XDG_DATA_HOME XDG_STATE_HOME].to_h { |key| [key, ENV.fetch(key, nil)] }
     ENV["XDG_CONFIG_HOME"] = "/opencode-xdg-test/config"
@@ -292,6 +295,20 @@ class OpencodeApp < Formula
     strong = JSON.parse(shell_output("unzip -p #{injected_copy} module.json"))
     assert_equal %w[ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET],
                  strong.fetch("module").fetch("requestPermissions").map { |entry| entry.fetch("name") }.sort
+
+    # uninstall goes through app-installer and keeps the app's data unless
+    # --purge is given; --device/HDC_TARGET pick the hdc target.
+    shell_output("#{bin}/opencode-app uninstall --purge --device tablet-1")
+    assert_equal %w[uninstall --bundle-id com.social4hyq.opencodedesktop --device tablet-1 --purge],
+                 installer_args.read.lines(chomp: true)
+    shell_output("#{bin}/opencode-app uninstall")
+    assert_equal %w[uninstall --bundle-id com.social4hyq.opencodedesktop], installer_args.read.lines(chomp: true)
+    with_env("HDC_TARGET" => "env-device") do
+      shell_output("#{bin}/opencode-app uninstall")
+    end
+    assert_equal %w[uninstall --bundle-id com.social4hyq.opencodedesktop --device env-device],
+                 installer_args.read.lines(chomp: true)
+    assert_match "uninstall", shell_output("#{bin}/opencode-app --help")
     keep_tmp = testpath/"keep"
     keep_tmp.mkpath
     kept_output = with_env(TMPDIR: keep_tmp.to_s) do
