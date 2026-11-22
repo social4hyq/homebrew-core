@@ -39,11 +39,11 @@ File.open(File.join(home, "test.log"), "w") do |log|
     warn "test-server-detach: launch"
     _, status = Process.wait2(pid)
     web_log = File.join(config_dir, "web.log")
-    raise "dsh-app serve failed: #{File.read(web_log)}" unless status.success?
+    raise "deepseek-harness-app serve failed: #{File.read(web_log)}" unless status.success?
 
     backend_pid = Integer(File.read(File.join(config_dir, "web.pid")).strip)
     warn "test-server-detach: launcher exited, verify server pid #{backend_pid}"
-    # The launching dsh-app process has already exited; the server must persist.
+    # The launching deepseek-harness-app process has already exited; the server must persist.
     sleep 0.5
     Process.kill(0, backend_pid)
     url = "http://127.0.0.1:#{port}/"
@@ -52,11 +52,11 @@ File.open(File.join(home, "test.log"), "w") do |log|
 
     warn "test-server-detach: stop server"
     stop_status = system(env, "bash", script, "stop", out: log, err: log)
-    raise "dsh-app stop failed" unless stop_status
+    raise "deepseek-harness-app stop failed" unless stop_status
 
     begin
       Process.kill(0, backend_pid)
-      raise "detached backend remained after dsh-app stop"
+      raise "detached backend remained after deepseek-harness-app stop"
     rescue Errno::ESRCH
       # Expected: the stop command reaps the background backend.
     end
