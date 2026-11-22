@@ -72,8 +72,13 @@ app_prepare() {
         urls+=("${OBSIDIAN_ASAR_MIRROR}${ASAR_URL}")
       fi
       ok=0
+      curl_tls_args=()
+      if [ "${HAP_INSTALLER_TLS_INSECURE:-0}" = "1" ]; then
+        curl_tls_args=(--insecure)
+        log "warning: TLS certificate verification is disabled for the vendor download"
+      fi
       for url in "${urls[@]}"; do
-        if curl -fL --retry 2 --connect-timeout 20 -o "$cached.part" "$url"; then
+        if curl "${curl_tls_args[@]}" -fL --retry 2 --connect-timeout 20 -o "$cached.part" "$url"; then
           ok=1
           break
         fi
