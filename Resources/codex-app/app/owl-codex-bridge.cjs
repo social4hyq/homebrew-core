@@ -1,16 +1,21 @@
 'use strict';
 
-// Stands in for `codex app-server` (JSON-RPC lines on stdin/stdout) when the
-// terminal runs a shared server (see owl-share.cjs). Runs under the host Node:
+// Stands in for `codex app-server` (JSON-RPC lines on stdin/stdout) so the app and
+// the terminal can share one server (see owl-share.cjs). Runs under the host Node:
 //   node owl-codex-bridge.cjs --endpoint server.json --codex <codex> -- <codex args>
 //
-// It attaches to the server's loopback WebSocket with the capability token and
-// copies one JSON message per line each way. When the server cannot be reached
-// or refuses the token it runs `<codex> <args>` itself, so the app behaves as
-// before. If the server goes away later the bridge exits, and the app starts
-// it again like any crashed app-server.
+// It attaches to the registered server's loopback WebSocket with the capability
+// token and copies one JSON message per line each way. With no usable server it
+// starts one (a terminal can then use it with `codex-app tui` while the app is
+// open; it ends with the app) and attaches to that. Only when even that fails does
+// it run `<codex> <args>` itself, so the app behaves as before. If the server goes
+// away later the bridge exits, and the app starts it again like any crashed
+// app-server.
 const fs = require('node:fs');
 const childProcess = require('node:child_process');
+const http = require('node:http');
+const net = require('node:net');
+const share = require('./owl-share.cjs');
 
 const CONNECT_TIMEOUT_MS = 2000;
 
@@ -55,14 +60,25 @@ function connect(url, token) {
   });
 }
 
+// A server this bridge started goes away with it.
+let owned = null;
+function release() {
+  if (owned) owned.stop();
+  owned = null;
+}
+for (const signal of ['SIGTERM', 'SIGINT', 'SIGHUP']) {
+  process.on(signal, () => { release(); process.exit(0); });
+}
+process.on('exit', release);
+
 function pipe(socket) {
   let pending = '';
   socket.onmessage = (event) => {
     const text = typeof event.data === 'string' ? event.data : Buffer.from(event.data).toString('utf8');
     process.stdout.write(text.endsWith('\n') ? text : text + '\n');
   };
-  socket.onclose = () => { say('the shared server closed the connection'); process.exit(1); };
-  socket.onerror = () => { say('the shared server connection failed'); process.exit(1); };
+  socket.onclose = () => { say('the shared server closed the connection'); release(); process.exit(1); };
+  socket.onerror = () => { say('the shared server connection failed'); release(); process.exit(1); };
   process.stdin.setEncoding('utf8');
   process.stdin.on('data', (chunk) => {
     pending += chunk;
@@ -80,9 +96,15 @@ function pipe(socket) {
     socket.onclose = null;
     socket.onerror = null;
     try { socket.close(); } catch {}
+    release();
     setTimeout(() => process.exit(0), 100);
   });
   process.stdin.resume();
+}
+
+async function attach(info) {
+  const token = fs.readFileSync(info.tokenFile, 'utf8').trim();
+  return connect('ws://127.0.0.1:' + info.port, token);
 }
 
 async function main() {
@@ -94,14 +116,35 @@ async function main() {
   // Hold stdin until it is decided who answers, so no request is lost.
   process.stdin.pause();
   let socket;
-  try {
-    const info = JSON.parse(fs.readFileSync(endpoint, 'utf8'));
-    const token = fs.readFileSync(info.tokenFile, 'utf8').trim();
-    socket = await connect('ws://127.0.0.1:' + info.port, token);
-  } catch (error) {
-    return runOwn(codex, rest, 'no usable shared server (' + error.message + ')');
+  let reason = 'no registered server';
+  const registered = share.readEndpoint(endpoint, fs);
+  if (registered) {
+    try {
+      socket = await attach(registered);
+    } catch (error) {
+      reason = 'the registered server does not answer (' + error.message + ')';
+    }
   }
-  say('attached to the shared server on port ' + new URL(socket.url).port);
+  if (!socket) {
+    // The usual port unless CODEX_APP_SHARE_PORT says otherwise (tests); any free one when taken.
+    const defaultPort = Number(process.env.CODEX_APP_SHARE_PORT) || undefined;
+    owned = await share.startSharedServer({ codex, args: rest, endpoint, defaultPort }, {
+      fs, childProcess, http, net, env: process.env, log: say,
+    });
+    if (owned) {
+      try {
+        socket = await attach(owned);
+        say('started the shared server on port ' + owned.port);
+      } catch (error) {
+        reason = 'the server this app started does not answer (' + error.message + ')';
+        release();
+      }
+    } else {
+      reason += '; no shared server could be started';
+    }
+  }
+  if (!socket) return runOwn(codex, rest, reason);
+  if (!owned) say('attached to the shared server on port ' + new URL(socket.url).port);
   pipe(socket);
 }
 

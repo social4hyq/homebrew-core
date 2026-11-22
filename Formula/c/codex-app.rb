@@ -6,7 +6,7 @@ class CodexApp < Formula
   version "26.1117.41037"
   sha256 "714146e9c667b26a1bd4e57633c544334a9ed47c399989bfd98cf764140bdc53"
   license :cannot_represent # OpenAI service and software terms
-  revision 5
+  revision 6
 
   livecheck do
     url "https://persistent.oaistatic.com/codex-app-prod/linux/deb/dists/stable/main/binary-arm64/Packages"
@@ -49,15 +49,19 @@ class CodexApp < Formula
     Resources/codex-app/app/owl-pty-shim.cjs
     Resources/codex-app/app/owl-share.cjs
     Resources/codex-app/app/owl-sqlite-shim.cjs
+    Resources/codex-app/app/owl-tray.cjs
     Resources/codex-app/app/owl-utility-entry.cjs
+    Resources/codex-app/app/tray-icon.png
     Resources/codex-app/scripts/codex-app.sh
     Resources/codex-app/scripts/install-chatgpt-desktop.sh
     Resources/codex-app/scripts/stage-ohos-shell.sh
     Resources/codex-app/support/assemble-local-hap.py
     Resources/_shared/hap-app/enable-cookie-encryption.py
     Resources/codex-app/tests/chatgpt-bootstrap.test.cjs
+    Resources/codex-app/tests/close-handler.test.cjs
     Resources/codex-app/tests/fake-codex.cjs
     Resources/codex-app/tests/owl-share.test.cjs
+    Resources/codex-app/tests/owl-tray.test.cjs
     Resources/codex-app/tests/share-flow.test.cjs
     Resources/codex-app/tests/assemble-local-hap.test.py
     Resources/_shared/hap-app/install-lib.sh
@@ -219,13 +223,16 @@ class CodexApp < Formula
       saved as `config.toml.pre-owl`) and, when missing, writes the shell's proxy
       variables to `~/.config/codex-app/env.json` (never overwritten).
 
-      By default the app runs its own codex app-server, which ends with the app.
-      To share one with the terminal, run `codex-app serve`: it starts
-      `codex app-server` on a loopback WebSocket (default port 14288, capability
-      token in `~/.config/codex-app/ws-token`) that keeps running after the app
-      exits. While it runs, the app attaches to it instead of starting its own, and
-      `codex-app tui` opens the Codex terminal UI on the same server. Stop it with
-      `codex-app serve --stop`; if it is not running the app starts its own as before.
+      The app and the terminal share one codex app-server on a loopback WebSocket
+      (default port 14288, capability token in `~/.config/codex-app/ws-token`).
+      Start it from the terminal with `codex-app serve` and the app attaches to it
+      (it keeps running after the app exits); open the app first and it starts the
+      server itself, which ends with the app, and `codex-app serve` or
+      `codex-app tui` (the Codex terminal UI on the same server) then use that one.
+      `codex-app serve --stop` stops it; while the app is open it starts one again.
+      Closing the window hides it to the system tray (the tray menu restores it or
+      quits; quitting asks first when the app started the server). The tray needs
+      the HAP rebuilt from this bottle: run `codex-app install` after upgrading.
     EOS
   end
 
@@ -289,7 +296,7 @@ class CodexApp < Formula
     assert_match "source output", shell_output("python3 #{pkgshare}/enable-cookie-encryption.py --help")
     system "node", "--check", tap_root/"Resources/codex-app/app/chatgpt-bootstrap.cjs"
     owl_shims = %w[owl-codex-bridge owl-compat owl-host-shim owl-pty-host owl-pty-shim owl-share owl-sqlite-shim
-                   owl-utility-entry]
+                   owl-tray owl-utility-entry]
     owl_shims.each do |name|
       system "node", "--check", tap_root/"Resources/codex-app/app/#{name}.cjs"
     end
@@ -298,6 +305,8 @@ class CodexApp < Formula
     refute_path_exists libexec/"node_modules/node-pty/prebuilds/darwin-arm64"
     system "node", "--test", tap_root/"Resources/codex-app/tests/chatgpt-bootstrap.test.cjs"
     system "node", "--test", tap_root/"Resources/codex-app/tests/owl-share.test.cjs"
+    system "node", "--test", tap_root/"Resources/codex-app/tests/owl-tray.test.cjs"
+    system "node", "--test", tap_root/"Resources/codex-app/tests/close-handler.test.cjs"
     system "node", "--test", tap_root/"Resources/codex-app/tests/share-flow.test.cjs"
     system "python3", tap_root/"Resources/codex-app/tests/assemble-local-hap.test.py"
 

@@ -17,8 +17,9 @@ Usage: codex-app <command>
   serve       Start the shared codex app-server on 127.0.0.1 if it is not
               running. The app attaches to it, so the app, `codex-app tui`
               and other clients see the same threads. It keeps running after
-              the app exits. Options: --port N (default 14288), --stop,
-              --status
+              the app exits. (When the app is opened first it starts one
+              itself, which ends with the app, and this finds it.) Options:
+              --port N (default 14288), --stop, --status
   tui         Open the Codex terminal UI on the shared server (extra
               arguments go to codex)
   start       Start the installed ChatGPT app

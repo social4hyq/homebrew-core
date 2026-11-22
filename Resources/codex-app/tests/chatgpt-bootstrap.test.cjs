@@ -23,6 +23,8 @@ function boot(packageVersion = '26.1117.41037', shellVersion = packageVersion) {
     appPath: null,
     loaded: null,
     compatLoaded: false,
+    order: [],
+    tray: null,
     name: null,
     paths: {},
     madeDirs: [],
@@ -53,13 +55,23 @@ function boot(packageVersion = '26.1117.41037', shellVersion = packageVersion) {
     }
     if (id === 'node:child_process') return childProcess;
     if (id === 'electron') return { app };
-    if (id === './owl-compat.cjs') { state.compatLoaded = true; return {}; }
+    if (id === './owl-compat.cjs') { state.compatLoaded = true; state.order.push('compat'); return {}; }
+    if (id === './owl-share.cjs') {
+      return {
+        endpointFile: (home) => `${home}/.config/codex-app/server.json`,
+        appOwnedServer: (file) => ({ file }),
+      };
+    }
+    if (id === './owl-tray.cjs') {
+      return { install: (electron, options) => { state.order.push('tray'); state.tray = { electron, options }; } };
+    }
     if (id === vendor) return {};
     if (id === path.join(__dirname, 'package.json')) return { version: shellVersion };
     if (id === path.join(vendor, 'package.json')) {
       return { version: packageVersion, main: '.vite/build/early-bootstrap.js' };
     }
     if (id === path.join(vendor, '.vite/build/early-bootstrap.js')) {
+      state.order.push('vendor');
       state.loaded = id;
       return {};
     }
@@ -81,6 +93,17 @@ test('loads the official app and configures the supported host Codex CLI overrid
   assert.equal(state.loaded, path.join(vendor, '.vite/build/early-bootstrap.js'));
   assert.equal(state.process.env.CODEX_CLI_PATH, hostConfig.codexCli);
   assert.equal(state.compatLoaded, true);
+});
+
+test('installs the tray before the vendor code can open a window', () => {
+  const state = boot();
+  assert.deepEqual(state.order, ['compat', 'tray', 'vendor']);
+  assert.equal(state.tray.options.iconPath, path.join(__dirname, 'tray-icon.png'), 'next to the bootstrap in the HAP');
+});
+
+test('the tray asks about the shared server registered under the host home', () => {
+  const state = boot();
+  assert.deepEqual({ ...state.tray.options.ownedServer() }, { file: `${hostConfig.home}/.config/codex-app/server.json` });
 });
 
 test('launches Codex with host HOME, CODEX_HOME and PATH while preserving workspace cwd', () => {

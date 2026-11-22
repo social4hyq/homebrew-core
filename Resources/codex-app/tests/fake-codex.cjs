@@ -25,6 +25,8 @@ if (!args.includes('app-server')) {
 
 if (process.env.FAKE_CODEX_ARGS_FILE) fs.writeFileSync(process.env.FAKE_CODEX_ARGS_FILE, JSON.stringify(args));
 const listen = value('--listen');
+// A codex that cannot serve a WebSocket (tests of the fallback to a private server).
+if (listen && process.env.FAKE_CODEX_NO_LISTEN) process.exit(1);
 if (!listen) {
   let pending = '';
   process.stdin.setEncoding('utf8');
