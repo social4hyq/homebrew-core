@@ -1,0 +1,45 @@
+diff --git a/snow_draw_engine_qt/src/core/snow_canvas_input_adapter.cpp b/snow_draw_engine_qt/src/core/snow_canvas_input_adapter.cpp
+index 90c65b6..64712ef 100644
+--- a/snow_draw_engine_qt/src/core/snow_canvas_input_adapter.cpp
++++ b/snow_draw_engine_qt/src/core/snow_canvas_input_adapter.cpp
+@@ -17,11 +17,17 @@
+ #include <QWheelEvent>
+ 
+ QCursor snowCanvasCornerRadiusCursor(qreal devicePixelRatio) {
++#if defined(Q_OS_HARMONY)
++    // Qt's OHOS QPA crashes in setCustomCursor when a pixmap cursor is set.
++    Q_UNUSED(devicePixelRatio);
++    return QCursor(Qt::SizeFDiagCursor);
++#else
+     constexpr int kCursorLogicalSize = 32;
+     constexpr QPoint kHotSpot(3, 3);
+     return adqt::icons::makeCursor(snow::draw_engine::icons::cursor::CornerRadius(),
+                                    QSize(kCursorLogicalSize, kCursorLogicalSize), kHotSpot,
+                                    devicePixelRatio);
++#endif
+ }
+ 
+ namespace snow_canvas_input {
+@@ -92,6 +98,14 @@ QCursor serialNumberCursor(const SnowCanvasSceneItem& preview, const QFont& font
+ 
+ QCursor strokeCursor(double diameter, const std::optional<QColor>& color, bool crosshair,
+                      qreal devicePixelRatio) {
++#if defined(Q_OS_HARMONY)
++    // Qt's OHOS QPA crashes in setCustomCursor when a pixmap cursor is set.
++    Q_UNUSED(diameter);
++    Q_UNUSED(color);
++    Q_UNUSED(crosshair);
++    Q_UNUSED(devicePixelRatio);
++    return QCursor(Qt::CrossCursor);
++#else
+     diameter = std::isfinite(diameter) ? std::clamp(diameter, 1.0, 1024.0) : 1.0;
+     const qreal dpr =
+         std::isfinite(devicePixelRatio) && devicePixelRatio > 0.0 ? devicePixelRatio : 1.0;
+@@ -125,6 +139,7 @@ QCursor strokeCursor(double diameter, const std::optional<QColor>& color, bool c
+     }
+     painter.end();
+     return QCursor(pixmap, radius, radius);
++#endif
+ }
+ 
+ QCursor cursorForSnowCursor(SnowCursorStyle style, qreal devicePixelRatio) {

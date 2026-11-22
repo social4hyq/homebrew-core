@@ -1,0 +1,60 @@
+--- /dev/null
++++ b/snow_shot/tests/ohos_tray_close_tests.cpp
+@@ -0,0 +1,57 @@
++#include "../src/platform/ohos/trayclose_p.h"
++#include "../src/platform/ohos/traystate_p.h"
++#include "../src/platform/ohos/windowregistry_p.h"
++#include <QApplication>
++#include <QCloseEvent>
++#include <QWidget>
++#include <cstdio>
++#include <cstdlib>
++
++namespace {
++void require(bool condition, const char* message) {
++    if (!condition) {
++        std::fprintf(stderr, "%s\n", message);
++        std::exit(EXIT_FAILURE);
++    }
++}
++}
++
++int main(int argc, char** argv) {
++    QApplication app(argc, argv);
++    QWidget window;
++    window.show();
++    using namespace snow_shot::platform::ohos;
++    registerOwnedWindow(101, true);
++    registerOwnedWindow(101, true);
++    registerOwnedWindow(202, true);
++    require(ownedWindowSnapshot() == std::vector<int32_t>({101, 202}),
++            "Window registration must be idempotent");
++    const auto frozen = ownedWindowSnapshot();
++    registerOwnedWindow(101, false);
++    require(frozen.size() == 2 && ownedWindowSnapshot() == std::vector<int32_t>({202}),
++            "Registry snapshots must survive concurrent lifecycle changes");
++    registerOwnedWindow(202, false);
++    require(ownedWindowSnapshot().empty(), "Destroyed windows must leave the registry");
++    trayAvailable.store(false);
++    QCloseEvent unavailable;
++    require(!closeToTray(window, unavailable, trayEnabled.load() && trayAvailable.load()),
++            "Unavailable tray must not intercept close");
++    require(window.isVisible() && unavailable.isAccepted(),
++            "Registration failure must preserve normal close handling");
++    trayAvailable.store(true);
++    QCloseEvent disabled;
++    require(!snow_shot::platform::ohos::closeToTray(window, disabled, false),
++            "Disabled tray must not intercept close");
++    require(disabled.isAccepted() && window.isVisible(),
++            "Disabled tray must leave normal close processing unchanged");
++    for (int cycle = 0; cycle < 3; ++cycle) {
++        QCloseEvent close;
++        require(snow_shot::platform::ohos::closeToTray(window, close, true),
++                "Enabled tray must intercept close");
++        require(!close.isAccepted() && !window.isVisible(),
++                "Close-to-tray must ignore destruction and hide the window");
++        window.show();
++        require(window.isVisible(), "A hidden window must be restorable");
++    }
++    std::puts("SNOW_OHOS_TRAY_CLOSE_TESTS_OK");
++}

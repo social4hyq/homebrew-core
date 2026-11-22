@@ -1,0 +1,25 @@
+diff --git a/snow_shot/src/presentation/overlay/screenshotoverlaycanvaspresenter.cpp b/snow_shot/src/presentation/overlay/screenshotoverlaycanvaspresenter.cpp
+index 24e2417..b74311c 100644
+--- a/snow_shot/src/presentation/overlay/screenshotoverlaycanvaspresenter.cpp
++++ b/snow_shot/src/presentation/overlay/screenshotoverlaycanvaspresenter.cpp
+@@ -568,6 +568,12 @@ void ScreenshotOverlayCanvasPresenter::setOverlayEffectCursor(
+     if (canvas == nullptr)
+         return;
+     const qreal dpr = canvas->devicePixelRatioF();
++#if defined(Q_OS_HARMONY)
++    // Qt's OHOS QPA crashes in setCustomCursor when a pixmap cursor is set.
++    Q_UNUSED(handle);
++    Q_UNUSED(dpr);
++    canvas->setCursorForLayer(SnowCanvasCursorLayer::Host, QCursor(Qt::SizeFDiagCursor));
++#else
+     const QCursor cursor =
+         handle == ScreenshotSelectionEffectHandle::Width
+             ? adqt::icons::makeCursor(
+@@ -575,6 +581,7 @@ void ScreenshotOverlayCanvasPresenter::setOverlayEffectCursor(
+                   QSize(32, 32), QPoint(14, 10), dpr)
+             : snowCanvasCornerRadiusCursor(dpr);
+     canvas->setCursorForLayer(SnowCanvasCursorLayer::Host, cursor);
++#endif
+ }
+ 
+ namespace {

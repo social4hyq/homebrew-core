@@ -1,0 +1,30 @@
+OHOS: keep the scrolled application and its controls visible during capture.
+Hide the opaque full-screen overlay, use the visible stitched preview as the
+scrolling toolbar's owner, and present the toolbar for previewShown. A dedicated
+scrolling-presentation flag allows show requests before the palette changes mode
+and cancels them on exit. Add SNOW_OHOS_TOOLBAR_BEFORE/AFTER and
+SNOW_OHOS_PREVIEW_SHOWN diagnostics to compare widget and native visibility.
+
+diff --git a/snow_shot/include/snow_shot/presentation/screenshotoverlaywindow.h b/snow_shot/include/snow_shot/presentation/screenshotoverlaywindow.h
+index 7e4ca6f..14d1cde 100644
+--- a/snow_shot/include/snow_shot/presentation/screenshotoverlaywindow.h
++++ b/snow_shot/include/snow_shot/presentation/screenshotoverlaywindow.h
+@@ -105,6 +105,10 @@ class ScreenshotOverlayWindow final : public QWidget {
+     void setCanvasClearBackgroundEnabled(bool enabled);
+     [[nodiscard]] QJsonObject scrollingDiagnostics() const;
+     void setScrollingCaptureMode(bool enabled);
++    // OHOS cannot composite a transparent full-screen main window, so scrolling
++    // capture hides the frozen overlay instead of relying on a see-through hole.
++    // The toolbar and the stitched-preview thumbnail stay on screen.
++    void setScrollingCaptureOverlayHidden(bool hidden);
+     void beginScrollingThumbnail(
+         const QRect& localSelection,
+         ScreenshotScrollingRecognitionMode mode = ScreenshotScrollingRecognitionMode::Vertical,
+@@ -197,6 +201,7 @@ class ScreenshotOverlayWindow final : public QWidget {
+     ScreenshotScrollingRecognitionMode m_scrollingThumbnailMode =
+         ScreenshotScrollingRecognitionMode::Vertical;
+     bool m_scrollingCaptureMode = false;
++    bool m_scrollingCaptureOverlayHidden = false;
+     bool m_canvasContentWasVisible = true;
+     bool m_canvasClearBackgroundWasEnabled = true;
+     bool m_canvasInteractionWasEnabled = true;

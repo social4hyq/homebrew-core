@@ -1,0 +1,12 @@
+diff --git a/snow_shot/src/presentation/recording/recordingtrimsession.h b/snow_shot/src/presentation/recording/recordingtrimsession.h
+index 8763370..7235477 100644
+--- a/snow_shot/src/presentation/recording/recordingtrimsession.h
++++ b/snow_shot/src/presentation/recording/recordingtrimsession.h
+@@ -34,6 +34,7 @@ class RecordingTrimSession final : public QObject {
+     [[nodiscard]] QString outputPath() const;
+     [[nodiscard]] bool ready() const;
+     [[nodiscard]] QString phase() const;
++    [[nodiscard]] bool copyExport() const { return m_copy; }
+     std::function<void(const QString&)> reportError;
+     std::function<void(const QString&)> exported;
+ 

@@ -1,0 +1,12 @@
+--- a/snow_shot/include/snow_shot/presentation/mainwindow.h
++++ b/snow_shot/include/snow_shot/presentation/mainwindow.h
+@@ -38,7 +38,8 @@ class MainWindow : public QMainWindow {
+                snow_shot::presentation::settings::SettingsRuntimeSession& runtimeSession,
+                QWidget* parent = nullptr, SnowShotApiClient* translationClient = nullptr);
+ 
+-    void showAndActivate();
++    Q_INVOKABLE void showAndActivate();
++    void setVisible(bool visible) override;
+     void showGeneralSettings();
+     void showScreenshotSettings();
+     void showSettingsLocation(const QString& pageId, const QString& sectionId = {});

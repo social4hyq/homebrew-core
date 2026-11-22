@@ -1,0 +1,68 @@
+--- a/snow_shot/src/presentation/mainwindow.cpp
++++ b/snow_shot/src/presentation/mainwindow.cpp
+@@ -19,6 +19,14 @@
+ #include "theme/theme_manager.h"
+ #include "widgets/message.h"
+ 
++#include <QApplication>
++#include <QVariant>
++#ifdef Q_OS_HARMONY
++#include "../platform/ohos/trayclose_p.h"
++#include "../platform/ohos/traystate_p.h"
++#include <QShortcut>
++#endif
++
+ #include <QCloseEvent>
+ #include <QEvent>
+ #include <QFont>
+@@ -84,6 +92,9 @@ MainWindow::MainWindow(const snow_shot::presentation::settings::SettingsRegistry
+     setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
+ #endif
+     setObjectName(QStringLiteral("snowShotMainWindow"));
++#ifdef Q_OS_HARMONY
++    qApp->setProperty("snowOhosMainWindow", QVariant::fromValue(QPointer<QObject>(this)));
++#endif
+     setAccessibleName(snow_shot::app::edition::isMini ? snow_shot::app::edition::productName()
+                                                       : QStringLiteral("SnowShot"));
+     setWindowTitle(snow_shot::app::edition::isMini ? snow_shot::app::edition::productName()
+@@ -101,6 +112,11 @@ MainWindow::MainWindow(const snow_shot::presentation::settings::SettingsRegistry
+     setFont(interfaceFont);
+ 
+     snow_shot::presentation::installWindowCloseShortcut(this, [this] { close(); });
++#ifdef Q_OS_HARMONY
++    auto* closeShortcut = new QShortcut(QKeySequence(QStringLiteral("Ctrl+W")), this);
++    connect(closeShortcut, &QShortcut::activated, this, [this] { close(); });
++#endif
++
+ 
+     menuBar()->hide();
+     statusBar()->hide();
+@@ -115,12 +131,28 @@ MainWindow::MainWindow(const snow_shot::presentation::settings::SettingsRegistry
+ }
+ 
+ void MainWindow::closeEvent(QCloseEvent* event) {
++#ifdef Q_OS_HARMONY
++    const bool enabled = snow_shot::storage::ApplicationStorage::instance()
++                             .configuration().value(QStringLiteral("tray/enabled")).toBool();
++    if (snow_shot::platform::ohos::closeToTray(*this, *event, enabled && snow_shot::platform::ohos::trayAvailable.load())) {
++        qApp->setProperty("snowOhosTrayHidden", true);
++        return;
++    }
++#endif
+     QMainWindow::closeEvent(event);
+     if (event->isAccepted()) {
+         m_geometryMemory.captureAcceptedClose();
+     }
+ }
+ 
++void MainWindow::setVisible(bool visible) {
++#ifdef Q_OS_HARMONY
++    if (visible && qApp->property("snowOhosTrayHidden").toBool())
++        return;
++#endif
++    QMainWindow::setVisible(visible);
++}
++
+ bool MainWindow::event(QEvent* event) {
+     const bool handled = QMainWindow::event(event);
+ 

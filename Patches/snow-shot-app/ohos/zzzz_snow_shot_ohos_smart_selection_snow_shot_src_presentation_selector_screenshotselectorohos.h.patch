@@ -1,0 +1,71 @@
+diff --git a/snow_shot/src/presentation/selector/screenshotselectorohos.h b/snow_shot/src/presentation/selector/screenshotselectorohos.h
+new file mode 100644
+index 0000000..7671029
+--- /dev/null
++++ b/snow_shot/src/presentation/selector/screenshotselectorohos.h
+@@ -0,0 +1,65 @@
++#ifndef SNOW_SHOT_PRESENTATION_SCREENSHOTSELECTOROHOS_H
++#define SNOW_SHOT_PRESENTATION_SCREENSHOTSELECTOROHOS_H
++
++#include "snow_shot/presentation/screenshottypes.h"
++
++#include <QRect>
++#include <QVector>
++
++#include <optional>
++
++namespace snow_shot::presentation::ohos_selector_detail {
++
++inline QVector<qint64> displayIdsForLookup(const QVector<CapturedDisplayModel>& displays,
++                                           std::optional<qint64> defaultDisplayId) {
++    QVector<qint64> displayIds;
++    if (displays.isEmpty()) {
++        if (defaultDisplayId)
++            displayIds.push_back(*defaultDisplayId);
++        return displayIds;
++    }
++    displayIds.reserve(displays.size());
++    for (const CapturedDisplayModel& display : displays)
++        displayIds.push_back(static_cast<qint64>(display.nativeDisplayId));
++    return displayIds;
++}
++
++inline bool sameRect(const QRect& left, const QRect& right) {
++    return !left.isEmpty() && !right.isEmpty() && qAbs(left.x() - right.x()) <= 2 &&
++           qAbs(left.y() - right.y()) <= 2 && qAbs(left.width() - right.width()) <= 2 &&
++           qAbs(left.height() - right.height()) <= 2;
++}
++
++inline QVector<QRect> withoutOwnWindows(const QVector<QRect>& candidates,
++                                        const QVector<QRect>& own) {
++    QVector<bool> used(own.size(), false);
++    QVector<QRect> rects;
++    rects.reserve(candidates.size());
++    for (const QRect& candidate : candidates) {
++        qsizetype matched = -1;
++        for (qsizetype index = 0; index < own.size(); ++index) {
++            if (!used.at(index) && sameRect(own.at(index), candidate)) {
++                matched = index;
++                break;
++            }
++        }
++        if (matched >= 0) {
++            used[matched] = true;
++            continue;
++        }
++        rects.push_back(candidate);
++    }
++    return rects;
++}
++
++inline std::optional<QRect> windowAtPoint(const QPoint& point, const QVector<QRect>& candidates) {
++    for (const QRect& candidate : candidates) {
++        if (candidate.contains(point))
++            return candidate;
++    }
++    return std::nullopt;
++}
++
++} // namespace snow_shot::presentation::ohos_selector_detail
++
++#endif // SNOW_SHOT_PRESENTATION_SCREENSHOTSELECTOROHOS_H

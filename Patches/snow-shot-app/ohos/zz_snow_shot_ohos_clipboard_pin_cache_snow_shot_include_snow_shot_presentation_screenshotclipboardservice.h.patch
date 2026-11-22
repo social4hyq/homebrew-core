@@ -1,0 +1,55 @@
+diff --git a/snow_shot/include/snow_shot/presentation/screenshotclipboardservice.h b/snow_shot/include/snow_shot/presentation/screenshotclipboardservice.h
+index f04146d..8bedd2f 100644
+--- a/snow_shot/include/snow_shot/presentation/screenshotclipboardservice.h
++++ b/snow_shot/include/snow_shot/presentation/screenshotclipboardservice.h
+@@ -15,8 +15,14 @@
+ #include <atomic>
+ #include <functional>
+ #include <memory>
++#include <optional>
+ #include <utility>
+ 
++#if defined(Q_OS_HARMONY)
++#include <QMutex>
++#include <cstdint>
++#endif
++
+ class QClipboard;
+ class QMimeData;
+ class QObject;
+@@ -185,4 +191,35 @@ class ScreenshotClipboardCommitScope final {
+     std::shared_ptr<ScreenshotClipboardCommitScopeState> m_state;
+ };
+ 
++#if defined(Q_OS_HARMONY)
++namespace snow_shot::presentation::clipboard_cache {
++// Header-local storage keeps the publisher and reader on the same instance
++// even when they are linked from different static libraries.
++[[nodiscard]] inline QMutex& mutex() {
++    static QMutex value;
++    return value;
++}
++
++[[nodiscard]] inline std::optional<QByteArray>& latestPng() {
++    static std::optional<QByteArray> value;
++    return value;
++}
++
++[[nodiscard]] inline std::uint32_t& recordedChangeCount() {
++    static std::uint32_t value = 0;
++    return value;
++}
++
++[[nodiscard]] inline quint64& publishSerial() {
++    static quint64 value = 0;
++    return value;
++}
++} // namespace snow_shot::presentation::clipboard_cache
++
++// OHOS requires the restricted READ_PASTEBOARD permission to read the system
++// clipboard. When this process published the current clipboard image, reuse
++// that payload so copy -> pin still works without the permission.
++[[nodiscard]] std::optional<QByteArray> latestPublishedClipboardPng();
++#endif
++
+ #endif // SNOW_SHOT_PRESENTATION_SCREENSHOTCLIPBOARDSERVICE_H

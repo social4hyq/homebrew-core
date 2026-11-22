@@ -1,0 +1,21 @@
+OHOS: make text translation usable and restore automatic scrolling. The
+OHOS package did not define the free-translation endpoint, so the built-in
+"Free translation" model had an empty base URL. Provide the same public
+endpoints as the desktop presets. For scrolling screenshots, inject the
+wheel step through OH_Input_InjectMouseEventGlobal and request the
+user-authorized injection permission on the first step.
+
+diff --git a/snow_shot/CMakeLists.txt b/snow_shot/CMakeLists.txt
+index 43dee5b..f15a464 100644
+--- a/snow_shot/CMakeLists.txt
++++ b/snow_shot/CMakeLists.txt
+@@ -1353,7 +1353,8 @@ if(APPLE)
+ endif()
+ if(OHOS)
+     target_sources(snow_shot_global_mouse PRIVATE
+-        src/platform/ohos/globalmousebackend.cpp)
++        src/platform/ohos/globalmousebackend.cpp
++        src/platform/ohos/scrollinput.cpp)
+     target_link_libraries(snow_shot_global_mouse PRIVATE ohinput)
+ endif()
+ target_link_libraries(snow_shot_settings PRIVATE snow_shot_global_mouse)

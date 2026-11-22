@@ -1,0 +1,37 @@
+diff --git a/snow_shot/tests/scrolling_hover_geometry_tests.cpp b/snow_shot/tests/scrolling_hover_geometry_tests.cpp
+index e2937f5..fd19eba 100644
+--- a/snow_shot/tests/scrolling_hover_geometry_tests.cpp
++++ b/snow_shot/tests/scrolling_hover_geometry_tests.cpp
+@@ -137,6 +137,24 @@ void constrainedViewportPreservesAspectAndSourceBounds(ScreenshotScrollingRecogn
+             "fractional display extent at the scrollbar maximum must reach the final source pixel");
+ }
+ 
++void topLevelThumbnailSurvivesHiddenOverlay() {
++    QWidget overlay;
++    overlay.show();
++    auto* thumbnail = new ScreenshotScrollingThumbnailWidget();
++    int shownNotifications = 0;
++    QObject::connect(thumbnail, &ScreenshotScrollingThumbnailWidget::previewShown, thumbnail,
++                     [&shownNotifications] { ++shownNotifications; });
++    thumbnail->show();
++    QApplication::processEvents();
++    require(shownNotifications == 1,
++            "the preview must notify scrolling controls after its native window is shown");
++    overlay.hide();
++    QApplication::processEvents();
++    require(thumbnail->parentWidget() == nullptr && thumbnail->isWindow() && thumbnail->isVisible(),
++            "the scrolling preview must stay visible after the overlay hides");
++    delete thumbnail;
++}
++
+ void lifecycleAndTrimPriority() {
+     QWidget parent;
+     ScreenshotScrollingThumbnailWidget thumbnail(parent);
+@@ -515,6 +533,7 @@ int main(int argc, char** argv) {
+         terminalTrimHandleReachesRasterEdge(mode);
+         cropPreviewTracksBothHandlesAndThumbnailScrolling(mode);
+     }
++    topLevelThumbnailSurvivesHiddenOverlay();
+     lifecycleAndTrimPriority();
+     cropPreviewUsesClampedTrimAndFullCaptureSize();
+     blueHoverFillKeepsTrimHandlesVisible();

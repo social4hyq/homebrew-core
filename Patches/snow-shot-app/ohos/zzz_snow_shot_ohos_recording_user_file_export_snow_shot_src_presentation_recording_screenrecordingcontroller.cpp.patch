@@ -1,0 +1,115 @@
+diff --git a/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp b/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp
+index 6f29abd..c722eaf 100644
+--- a/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp
++++ b/snow_shot/src/presentation/recording/screenrecordingcontroller.cpp
+@@ -629,10 +629,24 @@ struct ScreenRecordingController::Impl {
+     }
+ 
+     void showRecordingControls() {
++#ifdef Q_OS_HARMONY
++        // A Qt::Tool area cannot take keyboard focus reliably on OHOS. Keep
++        // the area as the capture-friendly tool window and let the focusable
++        // toolbar own the recording shortcuts. Retry after the window is
++        // mapped; the first activateWindow can arrive before the native
++        // surface is ready.
++        toolbarWindow->showAndActivate();
++        QTimer::singleShot(0, toolbarWindow,
++                           [window = QPointer<ScreenRecordingToolbarWindow>(toolbarWindow)]() {
++                               if (window != nullptr && window->isVisible())
++                                   window->showAndActivate();
++                           });
++#else
+         toolbarWindow->showWithoutActivating();
+         if (!areaWindow->activateInput()) {
+             toolbarWindow->showAndActivate();
+         }
++#endif
+     }
+ 
+     bool followCaptureActive() const {
+@@ -1931,8 +1945,20 @@ struct ScreenRecordingController::Impl {
+         trimSession = new RecordingTrimSession(areaWindow, toolbarWindow, &owner);
+         trimSession->reportError = [this](const QString& error) { showError(error); };
+         trimSession->exported = [this, session = trimSession](const QString& path) {
++            const bool copy = session->copyExport();
+             if (trimSession == session)
+                 autoExitAfterRecordingEnds();
++            if (!copy) {
++                // Leave trim mode before presenting the system picker. The
++                // recording surfaces are always-on-top tool windows and can
++                // otherwise hide the picker from the user.
++                QTimer::singleShot(0, &owner, [this, path]() {
++                    if (uiSession != nullptr)
++                        destroyUi();
++                    emit owner.showMainWindowRequested();
++                    offerUserFileExport(path);
++                });
++            }
+             notifyExportCompleted(path);
+         };
+     }
+@@ -2095,6 +2121,10 @@ struct ScreenRecordingController::Impl {
+         // Finalized observers can destroy the controller or start a new session.
+         // Keep the original Copy intent and its path independent of that callback.
+         const QPointer<ScreenRecordingController> guard(&owner);
++        // A copy-only finish keeps the clipboard payload private; other finishes
++        // offer the user a public destination through the picker.
++        if (!shouldCopy)
++            offerUserFileExport(completedPath);
+         notifyExportCompleted(completedPath);
+         if (guard)
+             emit guard->finalized();
+@@ -2102,6 +2132,21 @@ struct ScreenRecordingController::Impl {
+             copyFileToClipboard(completedPath);
+     }
+ 
++    void offerUserFileExport(const QString& path) {
++#ifdef Q_OS_HARMONY
++        if (!userFileExporter || automationOwned || automationCommand) {
++            qWarning() << "SNOW_RECORDING_USER_FILE_EXPORT_SKIPPED" << path
++                       << static_cast<bool>(userFileExporter) << automationOwned
++                       << automationCommand;
++            return;
++        }
++        qWarning() << "SNOW_RECORDING_USER_FILE_EXPORT_REQUEST" << path;
++        userFileExporter(path);
++#else
++        Q_UNUSED(path);
++#endif
++    }
++
+     void notifyExportCompleted(const QString& path) {
+         if (snow_shot::storage::RecordingSettings().notifyAfterExportCompletes())
+             emit owner.exportNotificationRequested(path);
+@@ -2205,6 +2250,12 @@ struct ScreenRecordingController::Impl {
+                 trimSession->reportError = [this](const QString& error) { showError(error); };
+                 trimSession->exported = [this, marker, record](const QString& path) {
+                     static_cast<void>(clearRecovery(marker, record));
++                    QTimer::singleShot(0, &owner, [this, path]() {
++                        if (uiSession != nullptr)
++                            destroyUi();
++                        emit owner.showMainWindowRequested();
++                        offerUserFileExport(path);
++                    });
+                     notifyExportCompleted(path);
+                 };
+                 trimSession->open(record.sourcePath, pendingOutputPath, {}, true, false, {});
+@@ -3040,6 +3091,7 @@ struct ScreenRecordingController::Impl {
+     }
+ 
+     PermissionCheck permissionCheck;
++    std::function<void(const QString&)> userFileExporter;
+     bool sessionEnding = false;
+     bool recoveryOffered = false;
+     QJsonObject automationOptions;
+@@ -3266,6 +3318,10 @@ void ScreenRecordingController::setPreviewPermissionSnapshot(
+ }
+ #endif
+ 
++void ScreenRecordingController::setUserFileExporter(UserFileExporter exporter) {
++    m_impl->userFileExporter = std::move(exporter);
++}
++
+ void ScreenRecordingController::open(const QRect& recordingRegion) {
+     m_impl->open(recordingRegion);
+ }

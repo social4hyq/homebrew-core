@@ -1,0 +1,88 @@
+--- a/snow_shot/src/presentation/selector/screenshotselectorserviceclient.cpp
++++ b/snow_shot/src/presentation/selector/screenshotselectorserviceclient.cpp
+@@ -292,6 +292,7 @@ void ScreenshotSelectorServiceClient::resultCallback(const SnowUiSelectorEvent*
+ #elif defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
+ 
+ #include "screenshotselectorohos.h"
++#include "../../platform/ohos/windowregistry_p.h"
+ 
+ #include <QDebug>
+ #include <QGuiApplication>
+@@ -361,13 +362,34 @@ QRect physicalDesktopRect(const QRect& logical, QScreen* screen) {
+                        qRound(logical.height() * devicePixelRatio)));
+ }
+ 
+-QVector<QRect> ownWindowRects() {
++QVector<QRect> ownWindowRects(const QVector<std::uintptr_t>& excludedHwnds) {
+     QVector<QRect> own;
+     const QWindowList windows = QGuiApplication::topLevelWindows();
+     for (QWindow* window : windows) {
+-        if (window != nullptr && window->isVisible())
++        if (window == nullptr)
++            continue;
++        // Qt can report the pre-capture overlay as hidden while its UIAbility
++        // already has a visible native surface. Honor explicit exclusions even
++        // during that transition; do not create handles just to inspect them.
++        const bool explicitlyExcluded = window->handle() != nullptr &&
++            excludedHwnds.contains(static_cast<std::uintptr_t>(window->winId()));
++        if (window->isVisible() || explicitlyExcluded)
+             own.push_back(physicalDesktopRect(window->geometry(), window->screen()));
+     }
++    for (const int32_t id : snow_shot::platform::ohos::ownedWindowSnapshot()) {
++        bool shown = false;
++        WindowManager_WindowProperties properties{};
++        if (OH_WindowManager_IsWindowShown(id, &shown) != 0 || !shown ||
++            OH_WindowManager_GetWindowProperties(id, &properties) != 0)
++            continue;
++        const auto& rect = properties.windowRect;
++        const QRect bounds(rect.posX, rect.posY, static_cast<int>(rect.width),
++                           static_cast<int>(rect.height));
++        // One native window may already be represented by Qt's visible list.
++        // Do not consume a second matching rectangle from another application.
++        if (!bounds.isEmpty() && !own.contains(bounds))
++            own.push_back(bounds);
++    }
+     return own;
+ }
+ 
+@@ -396,7 +418,8 @@ bool enumerateMainWindows(QVector<QRect>* rects) {
+     return !rects->isEmpty();
+ }
+ 
+-QVector<QRect> enumeratedWindowRects(const QVector<CapturedDisplayModel>& displays) {
++QVector<QRect> enumeratedWindowRects(const QVector<CapturedDisplayModel>& displays,
++                                    const QVector<std::uintptr_t>& excludedHwnds) {
+     const auto displayIds = ohos_selector_detail::displayIdsForLookup(displays, defaultDisplayId());
+     QVector<QRect> candidates;
+     for (const qint64 displayId : std::as_const(displayIds)) {
+@@ -419,7 +442,7 @@ QVector<QRect> enumeratedWindowRects(const QVector<CapturedDisplayModel>& displa
+     // per matching candidate instead of removing every equal rect: a maximized
+     // application window can share the overlay's full-display geometry and must
+     // stay selectable after the overlay itself has been skipped.
+-    return ohos_selector_detail::withoutOwnWindows(candidates, ownWindowRects());
++    return ohos_selector_detail::withoutOwnWindows(candidates, ownWindowRects(excludedHwnds));
+ }
+ } // namespace
+ 
+@@ -452,9 +475,8 @@ void ScreenshotSelectorServiceClient::destroyService() {
+ 
+ bool ScreenshotSelectorServiceClient::startRefresh(quint64 requestId,
+                                                    const QVector<std::uintptr_t>& excludedHwnds) {
+-    Q_UNUSED(excludedHwnds);
+     m_ohosDisplays.clear();
+-    m_ohosWindowRects = enumeratedWindowRects(m_ohosDisplays);
++    m_ohosWindowRects = enumeratedWindowRects(m_ohosDisplays, excludedHwnds);
+     qInfo() << "SNOW_OHOS_SELECTOR_REFRESH" << requestId << m_ohosWindowRects.size();
+     QMetaObject::invokeMethod(
+         this,
+@@ -469,9 +491,8 @@ bool ScreenshotSelectorServiceClient::startRefresh(quint64 requestId,
+ bool ScreenshotSelectorServiceClient::startRefreshWithDisplays(
+     quint64 requestId, const QVector<std::uintptr_t>& excludedHwnds,
+     const QVector<CapturedDisplayModel>& displays) {
+-    Q_UNUSED(excludedHwnds);
+     m_ohosDisplays = displays;
+-    m_ohosWindowRects = enumeratedWindowRects(m_ohosDisplays);
++    m_ohosWindowRects = enumeratedWindowRects(m_ohosDisplays, excludedHwnds);
+     qInfo() << "SNOW_OHOS_SELECTOR_REFRESH" << requestId << m_ohosWindowRects.size()
+             << m_ohosDisplays.size();
+     QMetaObject::invokeMethod(

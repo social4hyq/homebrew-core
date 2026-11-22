@@ -1,0 +1,105 @@
+diff --git a/snow_shot/tests/screenshot_toolbar_remembered_tool_tests.cpp b/snow_shot/tests/screenshot_toolbar_remembered_tool_tests.cpp
+index a7b5bd5..577cfe9 100644
+--- a/snow_shot/tests/screenshot_toolbar_remembered_tool_tests.cpp
++++ b/snow_shot/tests/screenshot_toolbar_remembered_tool_tests.cpp
+@@ -27,10 +27,12 @@
+ #include <QAbstractButton>
+ #include <QEvent>
+ #include <QElapsedTimer>
++#include <QEventLoop>
+ #include <QPointer>
+ #include <QScopeGuard>
+ #include <QTemporaryDir>
+ #include <QThread>
++#include <QTimer>
+ #include <QWindow>
+ 
+ #include <cstdlib>
+@@ -751,6 +753,74 @@ void speechBubbleReachesScreenshotCommands() {
+     require(palette->activeTool() == ScreenshotToolPalette::Tool::SpeechBubble,
+             "screenshot tool synchronization recognizes Speech Bubble");
+ }
++void detachedScrollingToolbarSurvivesHiddenOwner() {
++    QWidget owner;
++    owner.show();
++    RecordingToolbarCommands commands;
++    ScreenshotToolbarWindow toolbar(commands);
++    toolbar.setOwnerWindow(&owner);
++    toolbar.show();
++    QCoreApplication::processEvents();
++
++    toolbar.setOwnerWindow(nullptr);
++    owner.hide();
++    toolbar.show();
++    toolbar.raise();
++    QCoreApplication::processEvents();
++    require(toolbar.parentWidget() == nullptr && toolbar.isWindow() && toolbar.isVisible(),
++            "the detached scrolling toolbar must survive its overlay owner hiding");
++
++    toolbar.setOwnerWindow(&owner);
++    owner.show();
++    toolbar.show();
++    QCoreApplication::processEvents();
++    require(toolbar.parentWidget() == &owner && toolbar.isVisible(),
++            "the toolbar must reattach when scrolling presentation restores");
++}
++void deferredScrollingToolbarRaisesAboveSettings() {
++    QWidget settings;
++    RecordingToolbarCommands commands;
++    ScreenshotToolbarWindow toolbar(commands);
++#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++    require((toolbar.windowFlags() & Qt::WindowType_Mask) == Qt::Window,
++            "OHOS must create the toolbar as an independent app window from the start");
++#endif
++    toolbar.presentForScrollingCapture(&settings);
++    require(toolbar.parentWidget() == &settings,
++            "the scrolling toolbar must use the visible preview as its OHOS owner");
++#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++    require((toolbar.windowFlags() & Qt::WindowType_Mask) == Qt::Window,
++            "OHOS scrolling must preserve the independent app window surface");
++#endif
++
++    settings.show();
++    settings.raise();
++    settings.activateWindow();
++    QCoreApplication::processEvents();
++    require(settings.isActiveWindow(),
++            "the settings window must preempt the initial toolbar presentation");
++
++    QEventLoop loop;
++    QTimer::singleShot(250, &loop, &QEventLoop::quit);
++    loop.exec();
++    require(toolbar.isVisible() && toolbar.windowHandle()->isExposed(),
++            "the deferred scrolling presentation must keep the toolbar exposed above settings");
++
++    toolbar.setOwnerWindow(&settings);
++#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++    require((toolbar.windowFlags() & Qt::WindowType_Mask) == Qt::Window,
++            "ordinary presentation must preserve the OHOS independent window surface");
++#endif
++
++    toolbar.presentForScrollingCapture(&settings);
++    toolbar.setScrollingScreenshotMode(false);
++    toolbar.hide();
++    QEventLoop stoppedLoop;
++    QTimer::singleShot(250, &stoppedLoop, &QEventLoop::quit);
++    stoppedLoop.exec();
++    require(!toolbar.isVisible(),
++            "leaving scrolling must cancel the deferred toolbar presentation");
++}
+ #ifdef Q_OS_WIN
+ void scrollingCompositionPreservesVisibleToolbar() {
+     // Match main.cpp: native toolbars must not materialize every sibling widget.
+@@ -882,6 +952,12 @@ int main(int argc, char** argv) {
+         applicationStorage.shutdown();
+         return 0;
+     }
++    if (application.arguments().contains(QStringLiteral("--detached-scrolling-only"))) {
++        detachedScrollingToolbarSurvivesHiddenOwner();
++        deferredScrollingToolbarRaisesAboveSettings();
++        applicationStorage.shutdown();
++        return 0;
++    }
+     eraserSubtoolsReachToolbarCommands();
+     repeatedToolsReachMoveCommand();
+     editSelectionToolbarFollowsSetting();

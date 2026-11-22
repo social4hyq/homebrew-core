@@ -1,0 +1,28 @@
+diff --git a/snow_shot/include/snow_shot/presentation/screenshotscrollingthumbnailwidget.h b/snow_shot/include/snow_shot/presentation/screenshotscrollingthumbnailwidget.h
+index bfe9fbc..1c6ad62 100644
+--- a/snow_shot/include/snow_shot/presentation/screenshotscrollingthumbnailwidget.h
++++ b/snow_shot/include/snow_shot/presentation/screenshotscrollingthumbnailwidget.h
+@@ -26,6 +26,9 @@ class ScreenshotScrollingThumbnailWidget final : public QWidget {
+     Q_OBJECT
+ 
+   public:
++    // A parentless thumbnail is a top-level window; OHOS uses it so the preview
++    // survives while the full-screen scrolling overlay hides itself.
++    ScreenshotScrollingThumbnailWidget();
+     explicit ScreenshotScrollingThumbnailWidget(QWidget& parent);
+ 
+     void reset();
+@@ -53,8 +56,13 @@ class ScreenshotScrollingThumbnailWidget final : public QWidget {
+ 
+   signals:
+     void hoverSourceRectChanged(const QRect& sourceRect, bool cropping);
++    void previewShown();
++
++  private:
++    void initialize();
+ 
+   protected:
++    void showEvent(QShowEvent* event) override;
+     bool event(QEvent* event) override;
+     bool eventFilter(QObject* watched, QEvent* event) override;
+     void paintEvent(QPaintEvent* event) override;

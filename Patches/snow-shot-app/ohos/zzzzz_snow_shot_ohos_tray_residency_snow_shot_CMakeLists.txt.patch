@@ -1,0 +1,18 @@
+--- a/snow_shot/CMakeLists.txt
++++ b/snow_shot/CMakeLists.txt
+@@ -3939,6 +3939,15 @@ if(SNOW_SHOT_BUILD_TESTS)
+             "PATH=path_list_prepend:$<TARGET_FILE_DIR:Qt6::Core>"
+     )
+ 
++    add_executable(snow-shot-ohos-tray-close-tests tests/ohos_tray_close_tests.cpp)
++    target_link_libraries(snow-shot-ohos-tray-close-tests PRIVATE Qt6::Widgets)
++    add_test(NAME snow-shot-ohos-tray-close-tests
++        COMMAND snow-shot-ohos-tray-close-tests -platform offscreen)
++    set_tests_properties(snow-shot-ohos-tray-close-tests PROPERTIES
++        LABELS "unit" TIMEOUT 30
++        ENVIRONMENT_MODIFICATION "PATH=path_list_prepend:$<TARGET_FILE_DIR:Qt6::Core>"
++    )
++
+     add_executable(snow-shot-ohos-selector-tests tests/ohos_selector_tests.cpp)
+     target_include_directories(snow-shot-ohos-selector-tests PRIVATE
+         "${CMAKE_CURRENT_SOURCE_DIR}/include"

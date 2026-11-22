@@ -1,0 +1,76 @@
+diff --git a/snow_shot/src/presentation/capture/screenshotscrollingcapturecontroller.cpp b/snow_shot/src/presentation/capture/screenshotscrollingcapturecontroller.cpp
+index aa949f1..2e02032 100644
+--- a/snow_shot/src/presentation/capture/screenshotscrollingcapturecontroller.cpp
++++ b/snow_shot/src/presentation/capture/screenshotscrollingcapturecontroller.cpp
+@@ -8,6 +8,7 @@
+ #include "snow_shot/presentation/screenshotgeometry.h"
+ #include "snow_shot/presentation/screenshotoverlaycoordinator.h"
+ #include "snow_shot/presentation/screenshotoverlaywindow.h"
++#include "snow_shot/presentation/screenshotscrollingthumbnailwidget.h"
+ #include "snow_shot/presentation/screenshottoolbarwindow.h"
+ 
+ #if defined(Q_OS_WIN) || defined(_WIN32) || defined(Q_OS_MACOS)
+@@ -224,13 +225,49 @@ struct ScreenshotScrollingCaptureController::Impl {
+         pipelineInitialized = false;
+ 
+         context.overlayCoordinator.setScrollingCaptureMode(context.displaySession, true);
++#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++        // The OHOS compositor keeps a full-screen main window opaque, so the frozen
++        // overlay would both hide the scrolled application and become the subject of
++        // the stitched frames. Hide it; the toolbar and preview thumbnail stay on top.
++        anchorOverlay->setScrollingCaptureOverlayHidden(true);
++        if (ScreenshotToolbarWindow* toolbar = context.overlayCoordinator.toolbar()) {
++            // Use the independent preview as the visible owner so the auto-scroll
++            // button survives hiding the frozen overlay; stop() restores the overlay.
++            auto* preview = static_cast<ScreenshotScrollingThumbnailWidget*>(
++                anchorOverlay->scrollingThumbnailWindow());
++            toolbar->presentForScrollingCapture(preview);
++            if (preview != nullptr) {
++                const QPointer<ScreenshotToolbarWindow> guardedToolbar = toolbar;
++                const quint64 presentationSession = generation;
++                QObject::connect(preview, &ScreenshotScrollingThumbnailWidget::previewShown, &owner,
++                                 [this, guardedToolbar, presentationSession] {
++                                     if (active && generation == presentationSession &&
++                                         !guardedToolbar.isNull()) {
++                                         guardedToolbar->presentForScrollingCapture(
++                                             guardedToolbar->parentWidget());
++                                     }
++                                 },
++                                 Qt::SingleShotConnection);
++            }
++        }
++#endif
+ 
+         logPreparation();
+         logScrollingEvent("scrolling.prepared", generation);
+         const QRect requestPhysicalSelection =
+             canvasSelection.translated(context.geometry.canvasOrigin());
+         autoScroller.start(requestPhysicalSelection, mode);
++#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++        // Give the window manager one frame to remove the overlay before the first
++        // frame is captured, otherwise frame zero is the frozen overlay itself.
++        const quint64 presentationSession = generation;
++        QTimer::singleShot(120, &owner, [this, presentationSession] {
++            if (active && generation == presentationSession && !pipelineInitialized)
++                beginPipelineAfterPresentationClear();
++        });
++#else
+         beginPipelineAfterPresentationClear();
++#endif
+         refreshHoverEligibility();
+         return true;
+     }
+@@ -329,6 +366,13 @@ struct ScreenshotScrollingCaptureController::Impl {
+         if (wasActive) {
+             context.overlayCoordinator.setScrollingCaptureMode(context.displaySession, false);
+             if (restoreScreenshotPresentation) {
++                if (thumbnailHost != nullptr) {
++#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++                    if (ScreenshotToolbarWindow* toolbar = context.overlayCoordinator.toolbar())
++                        toolbar->setOwnerWindow(thumbnailHost);
++#endif
++                    thumbnailHost->setScrollingCaptureOverlayHidden(false);
++                }
+                 context.overlayCoordinator.applyDisplayModels(context.displaySession);
+             }
+         } else if (thumbnailHost != nullptr) {
