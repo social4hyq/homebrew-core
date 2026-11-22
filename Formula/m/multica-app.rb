@@ -4,7 +4,7 @@ class MulticaApp < Formula
   url "https://github.com/multica-ai/multica/archive/refs/tags/v0.11.1.tar.gz"
   sha256 "8a8f2149447dfd0c178fca332f88b539560fa57a5075d67c6e440958de8d49fc"
   license :cannot_represent # Multica License (Apache-2.0 plus additional conditions)
-  revision 5
+  revision 6
 
   livecheck do
     url :stable
@@ -12,8 +12,8 @@ class MulticaApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-app-v0.11.1-r7"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2dced026755063e844f7979d015b95d8b7f46fa104ff00c44b34b89da816d871"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-app-v0.11.1-r8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a4acdb5ed322c8b298390d69c3eac573b6d8bf284187b73327ee1f18fd534f9f"
   end
 
   depends_on "go" => :build
@@ -40,6 +40,7 @@ class MulticaApp < Formula
     Resources/_shared/hap-app/install-lib.sh
     Resources/multica-app/assets/tray-icon.png
     Resources/multica-app/scripts/install-desktop.sh
+    Resources/multica-app/tests/close-handler.test.cjs
   ].freeze
 
   def patch
@@ -111,9 +112,11 @@ class MulticaApp < Formula
               '"bundleName": "com.huawei.ohos_electron"',
               '"bundleName": "com.social4hyq.multica"'
 
-    # hideAbility() must run synchronously before the teardown; hiding afterwards
-    # makes the app exit. The tray quit calls app.exit() to bypass the close
-    # handler and keep the bridge alive.
+    # windowStageClose hides the ability and returns true, which tells the system
+    # not to close the window, so the window goes to the tray. Returning false let
+    # the system close it right after the hide: the ability's session was destroyed
+    # and the whole app was killed and relaunched. The tray quit calls app.exit()
+    # to bypass this handler.
     close_handler = [
       "    super.onWindowStageCreate(windowStage);",
       "    try {",
@@ -123,7 +126,7 @@ class MulticaApp < Formula
       "        }",
       "        const widgetId = Number(this.xcomponentId.substring(ConfigData.WINDOW_PREFIX.length));",
       "        Inject.getOrCreate(AppWindowAdapter).hideWindow(widgetId);",
-      "        return false;",
+      "        return true;",
       "      });",
       "    } catch (exception) {",
       "      LogUtil.error(TAG, 'Failed to register window close handler: ' + JSON.stringify(exception));",
@@ -427,6 +430,8 @@ class MulticaApp < Formula
     hap = libexec/"multica-desktop-unsigned.hap"
     listing = shell_output("unzip -l #{hap}")
     assert_match "libs/arm64-v8a/libelectron.so", listing
+    tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
+    system "node", "--test", tap_root/"Resources/multica-app/tests/close-handler.test.cjs"
     assert_match "resources/resfile/resources/app/out/main/index.js", listing
     refute_match "node_modules/typescript/", listing
     refute_match "node_modules/@multica/eslint-config/", listing
