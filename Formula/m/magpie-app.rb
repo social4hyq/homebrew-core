@@ -4,7 +4,7 @@ class MagpieApp < Formula
   url "https://github.com/yetone/magpie/archive/refs/tags/v0.1.4661.tar.gz"
   sha256 "eacabbef905695537e60b7ed41271a2c89c9f83014d4817ab3cf8aba6379dd42"
   license :cannot_represent
-  revision 1
+  revision 2
 
   livecheck do
     url :stable
@@ -35,9 +35,15 @@ class MagpieApp < Formula
     Resources/magpie-app/app/connect.html
     Resources/magpie-app/app/main.cjs
     Resources/magpie-app/app/package.json
+    Resources/magpie-app/app/shared-web.cjs
     Resources/magpie-app/scripts/install-desktop.sh
     Resources/magpie-app/scripts/magpie-app.sh
     Resources/magpie-app/tests/close-handler.test.cjs
+    Resources/magpie-app/tests/fake-magpie.cjs
+    Resources/magpie-app/tests/shared-web.test.cjs
+    Resources/magpie-app/tests/shell-harness.cjs
+    Resources/magpie-app/tests/shell-start.test.cjs
+    Resources/magpie-app/tests/web-flow.test.cjs
   ].freeze
 
   def install
@@ -53,7 +59,7 @@ class MagpieApp < Formula
     app = shell/"web_engine/src/main/resources/resfile/resources/app"
     rm_r app if app.exist?
     app.mkpath
-    %w[main.cjs package.json config.json connect.html].each do |name|
+    %w[main.cjs package.json config.json connect.html shared-web.cjs].each do |name|
       cp res/"app"/name, app/name
     end
 
@@ -183,9 +189,14 @@ class MagpieApp < Formula
       `hap-app status`, then run `hap-app install-pending`.
       Manual install: `magpie-app install`. See docs/hap-app-formulae.md.
 
-      Starts the installed Magpie CLI and shares its settings; the web UI listens on
-      loopback with a per-launch key. Needs a debug profile for READ_PASTEBOARD
-      (paste). Without ACLs: `magpie-app install --no-acl`, then run
+      Shares the installed Magpie CLI's settings. To use one gateway and one web UI
+      with the terminal, run `magpie-app web` there (`magpie web` on 127.0.0.1:3431,
+      `--port N` to change it, with a key kept in `~/.config/magpie-app/web-key`; a plain
+      `magpie web` gets a new key each run, so the app cannot open it):
+      while it answers the app opens it instead of starting its own, and closing the
+      app leaves it running. Without it the app starts its own, which ends with the
+      app, as before. Needs a debug profile for READ_PASTEBOARD (paste). Without
+      ACLs: `magpie-app install --no-acl`, then run
       `magpie web --addr 127.0.0.1:3430 --no-open` yourself.
     EOS
   end
@@ -197,8 +208,11 @@ class MagpieApp < Formula
     listing = shell_output("unzip -Z1 #{hap}")
     assert_match "libs/arm64-v8a/libelectron.so", listing
     tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
-    system "node", "--test", tap_root/"Resources/magpie-app/tests/close-handler.test.cjs"
+    tests = tap_root/"Resources/magpie-app/tests"
+    system "node", "--test", tests/"close-handler.test.cjs", tests/"shared-web.test.cjs",
+           tests/"web-flow.test.cjs", tests/"shell-start.test.cjs"
     assert_match "#{entry}/connect.html", listing
+    assert_match "#{entry}/shared-web.cjs", listing
     assert_match "Usage: magpie-app", shell_output("#{bin}/magpie-app --help")
 
     fake = testpath/"app-installer"
