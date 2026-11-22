@@ -6,7 +6,7 @@ class OpencodeApp < Formula
   # Tap-authored shell sources (MIT) on the CPF-Electron runtime (mixed
   # MIT/BSD/LGPL).
   license :cannot_represent
-  revision 4
+  revision 5
 
   livecheck do
     url :stable
@@ -15,8 +15,8 @@ class OpencodeApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-app-v2.3.2-r6"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "780ed810b9b4425b061ddc651386c631adc60226655fa2bfd86eee0815372501"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-app-v2.3.2-r7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d12086b8ede2a565f9b592416b4035cc1a0d5d287d5693cceb57cdb7b0d50ba1"
   end
 
   depends_on "app-installer"
@@ -41,6 +41,7 @@ class OpencodeApp < Formula
     Resources/opencode-app/assets/tray-icon.png
     Resources/opencode-app/scripts/install-desktop.sh
     Resources/opencode-app/scripts/opencode-desktop.sh
+    Resources/opencode-app/tests/close-handler.test.cjs
     Resources/opencode-app/tests/tray.test.cjs
   ].freeze
 
@@ -108,8 +109,11 @@ class OpencodeApp < Formula
                     ],
               JSON5
 
-    # windowStageClose hides the ability and cancels the close so the window
-    # goes to the tray; the tray quit calls app.exit() to bypass that handler.
+    # windowStageClose hides the ability and returns true, which tells the system
+    # not to close the window, so the window goes to the tray. Returning false let
+    # the system close it right after the hide: the ability's session was destroyed
+    # and the whole app was killed and relaunched. The tray quit calls app.exit()
+    # to bypass this handler.
     close_handler = [
       "    super.onWindowStageCreate(windowStage);",
       "    try {",
@@ -119,7 +123,7 @@ class OpencodeApp < Formula
       "        }",
       "        const widgetId = Number(this.xcomponentId.substring(ConfigData.WINDOW_PREFIX.length));",
       "        Inject.getOrCreate(AppWindowAdapter).hideWindow(widgetId);",
-      "        return false;",
+      "        return true;",
       "      });",
       "    } catch (exception) {",
       "      LogUtil.error(TAG, 'Failed to register window close handler: ' + JSON.stringify(exception));",
@@ -360,6 +364,7 @@ class OpencodeApp < Formula
     tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
     system "node", "--check", tap_root/"Resources/opencode-app/app/main.cjs"
     system "node", "--test", tap_root/"Resources/opencode-app/tests/tray.test.cjs"
+    system "node", "--test", tap_root/"Resources/opencode-app/tests/close-handler.test.cjs"
     waiting_source = shell_output("unzip -p #{hap} resources/resfile/resources/app/waiting.html")
     assert_match "opencode-app status", waiting_source
     refute_match "{{", waiting_source
