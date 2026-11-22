@@ -25,9 +25,9 @@ class Opencv < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencv-v5.1.0-r4"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "13f80b9f7563890683069de1751f33c3656e09f4f28b570cdb0d4a7fe3505621"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencv-v5.1.0-r5"
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "39be136825d73ef28e03336dd6c0a3cf865e88084e5f9600e86a905eb87966aa"
   end
 
   head do
