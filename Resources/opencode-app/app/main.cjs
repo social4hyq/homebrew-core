@@ -1,10 +1,14 @@
 'use strict';
 // OpenCode desktop shell for OpenHarmony.
-// Loads a local `opencode serve` instance and injects HTTP basic auth for its
-// origin. Connection parameters and the host environment needed to spawn the
-// server are baked into config.json by `opencode-app install` before HAP
-// signing. On launch the shell starts the server itself when it is not
-// already running (requires the CUSTOM_SANDBOX / READ_WRITE_USER_FILE ACLs).
+// Connects to the background service `opencode service` runs for the terminal
+// (the TUI, `opencode run` and this shell share one process, so they see the
+// same sessions) and injects HTTP basic auth for its origin. The service's
+// address and password come from its state file, not from this package. The
+// host `opencode` binary and the host environment it needs are baked into
+// config.json by `opencode-app install` before HAP signing. On launch the shell
+// starts the service when it is not running (requires the CUSTOM_SANDBOX /
+// READ_WRITE_USER_FILE ACLs) and never stops it: tasks keep running after the
+// window or the app is closed.
 const { app, BrowserWindow } = require('electron');
 const { spawn } = require('node:child_process');
 const fs = require('node:fs');
@@ -12,18 +16,16 @@ const http = require('node:http');
 const path = require('node:path');
 const tray = require('./tray.cjs');
 
-let config = { port: 0, password: '' };
+let config = {};
 try {
   Object.assign(config, JSON.parse(fs.readFileSync(path.join(__dirname, 'config.json'), 'utf8')));
 } catch (error) {
   console.error('OPENCODE_DESKTOP config unreadable: ' + String(error));
 }
-const configured = Number.isInteger(config.port) && config.port > 0 && typeof config.password === 'string' && config.password.length > 0;
-const origin = configured ? `http://127.0.0.1:${config.port}` : null;
-const authHeader = configured ? 'Basic ' + Buffer.from(`opencode:${config.password}`, 'utf8').toString('base64') : null;
+const host = config.host && typeof config.host === 'object' ? config.host : {};
+const configured = typeof host.home === 'string' && host.home.length > 0;
 const canAutoStart = configured && typeof config.opencode === 'string' && config.opencode.length > 0;
 
-let serveChild = null;
 let serveSpawnError = '';
 // DSH-style switch: OPENCODE_DESKTOP_NO_TRAY=1 (or "tray": false in config.json)
 // restores the old behaviour where closing the window quits the shell.
@@ -32,12 +34,38 @@ let trayReady = false;
 let shellWindow = null;
 let driving = false;
 
-function serverUp(timeoutMs) {
+// The state file `opencode service` writes: {"url", "password", "pid", ...}.
+// An empty xdgState means the host did not define XDG_STATE_HOME.
+function serviceStatePath() {
+  const state = typeof host.xdgState === 'string' && host.xdgState ? host.xdgState : path.join(host.home, '.local', 'state');
+  return path.join(state, 'opencode', 'service.json');
+}
+
+// Returns {origin, port, authHeader} or null. The password is only ever sent
+// to a loopback address.
+function readService() {
+  if (!configured) return null;
+  try {
+    const state = JSON.parse(fs.readFileSync(serviceStatePath(), 'utf8'));
+    const url = new URL(state.url);
+    if (url.protocol !== 'http:' || (url.hostname !== '127.0.0.1' && url.hostname !== 'localhost')) return null;
+    if (typeof state.password !== 'string' || !state.password) return null;
+    return {
+      origin: url.origin,
+      hostname: url.hostname,
+      port: Number(url.port),
+      authHeader: 'Basic ' + Buffer.from(`opencode:${state.password}`, 'utf8').toString('base64'),
+    };
+  } catch (error) {
+    return null;
+  }
+}
+
+function serviceUp(service, timeoutMs) {
   return new Promise((resolve) => {
-    if (!configured) return resolve(false);
     const req = http.get({
-      host: '127.0.0.1', port: config.port, path: '/api/config',
-      headers: { Authorization: authHeader }, timeout: timeoutMs, agent: false,
+      host: service.hostname, port: service.port, path: '/api/config',
+      headers: { Authorization: service.authHeader }, timeout: timeoutMs, agent: false,
     }, (res) => {
       res.resume();
       resolve(res.statusCode === 200);
@@ -48,79 +76,68 @@ function serverUp(timeoutMs) {
 }
 
 function serveLogPath() {
-  const home = config.host && config.host.home;
-  if (typeof home === 'string' && home.length > 0) {
-    try {
-      const dir = path.join(home, '.cache', 'opencode-desktop');
-      fs.mkdirSync(dir, { recursive: true });
-      return path.join(dir, 'serve.log');
-    } catch (error) {
-      console.error('OPENCODE_DESKTOP host log dir unavailable: ' + String(error));
-    }
+  try {
+    const dir = path.join(host.home, '.cache', 'opencode-desktop');
+    fs.mkdirSync(dir, { recursive: true });
+    return path.join(dir, 'serve.log');
+  } catch (error) {
+    console.error('OPENCODE_DESKTOP host log dir unavailable: ' + String(error));
   }
   return path.join(app.getPath('userData'), 'opencode-serve.log');
 }
 
-function spawnServer() {
-  if (!canAutoStart || serveChild) return;
-  const host = config.host && typeof config.host === 'object' ? config.host : {};
+// `opencode service start` is idempotent and returns once the background
+// service is up; the service itself is not a child of this shell.
+function startService() {
+  if (!canAutoStart) return;
   const env = Object.assign({}, process.env);
-  // The child runs in the app sandbox with the weak-sandbox ACLs: host paths
+  // The command runs in the app sandbox with the weak-sandbox ACLs: host paths
   // are reachable, but HOME/XDG must point at the real host values so the
-  // server shares the TUI's database and configuration.
-  if (typeof host.home === 'string') env.HOME = host.home;
+  // service shares the TUI's database, configuration and state file.
+  env.HOME = host.home;
   if (typeof host.path === 'string') env.PATH = host.path;
   // An empty value means "the host did not define it"; drop the sandbox's
-  // inherited value instead of pointing the server at a sandbox path.
+  // inherited value instead of pointing the service at a sandbox path.
   for (const [key, envKey] of [['xdgConfig', 'XDG_CONFIG_HOME'], ['xdgData', 'XDG_DATA_HOME'], ['xdgState', 'XDG_STATE_HOME']]) {
     if (typeof host[key] !== 'string') continue;
     if (host[key]) env[envKey] = host[key];
     else delete env[envKey];
   }
-  env.OPENCODE_SERVER_PASSWORD = config.password;
   // Temp files must stay inside the sandbox; the host TMPDIR may be denied.
   env.TMPDIR = app.getPath('temp');
 
   let logFd;
-  const logPath = serveLogPath();
   try {
-    logFd = fs.openSync(logPath, 'a');
-    fs.writeSync(logFd, `\n[shell] ${new Date().toISOString()} spawn ${config.opencode} serve ` +
+    logFd = fs.openSync(serveLogPath(), 'a');
+    fs.writeSync(logFd, `\n[shell] ${new Date().toISOString()} ${config.opencode} service start ` +
       `HOME=${env.HOME} TMPDIR=${env.TMPDIR} XDG_CONFIG_HOME=${env.XDG_CONFIG_HOME === undefined ? '<unset>' : env.XDG_CONFIG_HOME}\n`);
   } catch (error) {
     console.error('OPENCODE_DESKTOP cannot open serve log: ' + String(error));
     logFd = undefined;
   }
+  const stdio = ['ignore', logFd === undefined ? 'ignore' : logFd, logFd === undefined ? 'ignore' : logFd];
   try {
-    serveChild = spawn(config.opencode, ['serve', '--hostname', '127.0.0.1', '--port', String(config.port)], {
-      env,
-      // The server's config watcher follows the cwd; spawning with cwd "/"
-      // makes it watch / and the sandbox denies access('/'), turning
-      // /api/config into a 500. Anchor it on the host home instead.
-      cwd: typeof host.home === 'string' && host.home.length > 0 ? host.home : undefined,
-      stdio: ['ignore', logFd === undefined ? 'ignore' : logFd, logFd === undefined ? 'ignore' : logFd],
+    // detached + unref: the service must outlive this shell.
+    const child = spawn(config.opencode, ['service', 'start'], { env, cwd: host.home, stdio, detached: true });
+    child.on('error', (error) => {
+      serveSpawnError = String(error);
+      console.error('OPENCODE_DESKTOP spawn error: ' + serveSpawnError);
     });
+    child.unref();
+    serveSpawnError = '';
   } catch (error) {
     serveSpawnError = String(error);
     console.error('OPENCODE_DESKTOP spawn failed: ' + serveSpawnError);
-    return;
   }
-  serveChild.on('error', (error) => {
-    serveSpawnError = String(error);
-    console.error('OPENCODE_DESKTOP spawn error: ' + serveSpawnError);
-  });
-  serveChild.on('exit', () => { serveChild = null; });
 }
 
-function stopServer() {
-  if (!serveChild) return;
-  try { serveChild.kill(); } catch (error) { console.error('OPENCODE_DESKTOP kill failed: ' + String(error)); }
-  serveChild = null;
-}
-
-function installAuthHook(win) {
-  win.webContents.session.webRequest.onBeforeSendHeaders({ urls: [origin + '/*'] }, (details, callback) => {
-    details.requestHeaders.Authorization = authHeader;
+// The service address can change between runs, so the auth hook follows it.
+let hookedOrigin = null;
+function installAuthHook(win, service) {
+  if (hookedOrigin === service.origin) return;
+  hookedOrigin = service.origin;
+  win.webContents.session.webRequest.onBeforeSendHeaders({ urls: [service.origin + '/*'] }, (details, callback) => {
+    details.requestHeaders.Authorization = service.authHeader;
     callback({ requestHeaders: details.requestHeaders });
   });
 }
@@ -130,27 +147,27 @@ async function drive(win) {
     await win.loadFile(path.join(__dirname, 'waiting.html'), { hash: 'not-configured' });
     return;
   }
-  installAuthHook(win);
   let waiting = false;
-  let lastSpawnAttempt = 0;
+  let lastStartAttempt = 0;
   for (;;) {
     if (win.isDestroyed()) return;
-    if (await serverUp(2000)) {
-      await win.loadURL(origin + '/');
+    const service = readService();
+    if (service && await serviceUp(service, 2000)) {
+      installAuthHook(win, service);
+      await win.loadURL(service.origin + '/');
       return;
     }
-    // Start (or restart) the server ourselves. A freshly exited child is
-    // retried at most every 10s so a crash loop cannot spin CPU.
-    if (canAutoStart && !serveChild && Date.now() - lastSpawnAttempt > 10000) {
-      lastSpawnAttempt = Date.now();
-      spawnServer();
+    // Start the service ourselves, at most every 10s so a failing start cannot
+    // spin CPU.
+    if (canAutoStart && Date.now() - lastStartAttempt > 10000) {
+      lastStartAttempt = Date.now();
+      startService();
     }
     if (!waiting) {
       waiting = true;
       await win.loadFile(path.join(__dirname, 'waiting.html'), { hash: serveSpawnError ? 'spawn-failed' : 'waiting' });
     }
-    // Poll frequently while our server starts; keep failed-start retries slow.
-    await new Promise((resolve) => setTimeout(resolve, serveChild ? 250 : 3000));
+    await new Promise((resolve) => setTimeout(resolve, canAutoStart && !serveSpawnError ? 500 : 3000));
   }
 }
 
@@ -172,11 +189,8 @@ app.whenReady().then(() => {
       tray.create({
         tooltip: 'OpenCode',
         iconPath: path.join(__dirname, 'tray-icon.png'),
-        onQuit: stopServer,
-        onRestartBackend: () => {
-          stopServer();
-          startDrive();
-        },
+        restartLabel: '重新连接后端',
+        onRestartBackend: startDrive,
       });
       trayReady = true;
     } catch (error) {
@@ -210,13 +224,12 @@ app.on('before-quit', (event) => {
     if (shellWindow && !shellWindow.isDestroyed()) shellWindow.hide();
     return;
   }
-  stopServer();
 });
 
 app.on('window-all-closed', () => {
-  // With a tray the window is only hidden, never closed; keep the process (and
-  // the backend it started) alive. Without a tray, keep the old behaviour.
+  // With a tray the window is only hidden, never closed; keep the process
+  // alive. Without a tray, keep the old behaviour. The background service is
+  // never stopped here: `opencode-app stop` (or `opencode service stop`) does.
   if (trayReady) return;
-  stopServer();
   app.quit();
 });
