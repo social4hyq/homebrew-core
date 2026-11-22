@@ -4,6 +4,7 @@ class MagpieApp < Formula
   url "https://github.com/yetone/magpie/archive/refs/tags/v0.1.4661.tar.gz"
   sha256 "eacabbef905695537e60b7ed41271a2c89c9f83014d4817ab3cf8aba6379dd42"
   license :cannot_represent
+  revision 1
 
   livecheck do
     url :stable
@@ -36,6 +37,7 @@ class MagpieApp < Formula
     Resources/magpie-app/app/package.json
     Resources/magpie-app/scripts/install-desktop.sh
     Resources/magpie-app/scripts/magpie-app.sh
+    Resources/magpie-app/tests/close-handler.test.cjs
   ].freeze
 
   def install
@@ -91,8 +93,11 @@ class MagpieApp < Formula
                     ],
               JSON5
 
-    # windowStageClose hides the ability and cancels the close, so the window
-    # goes to the tray; the tray quit calls app.exit() to bypass that handler.
+    # windowStageClose hides the ability and returns true, which tells the system
+    # not to close the window, so the window goes to the tray. Returning false let
+    # the system close it right after the hide: the ability's session was destroyed
+    # and the whole app was killed and relaunched. The tray quit calls app.exit()
+    # to bypass this handler.
     close_handler = [
       "    super.onWindowStageCreate(windowStage);",
       "    try {",
@@ -102,7 +107,7 @@ class MagpieApp < Formula
       "        }",
       "        const widgetId = Number(this.xcomponentId.substring(ConfigData.WINDOW_PREFIX.length));",
       "        Inject.getOrCreate(AppWindowAdapter).hideWindow(widgetId);",
-      "        return false;",
+      "        return true;",
       "      });",
       "    } catch (exception) {",
       "      LogUtil.error(TAG, 'Failed to register window close handler: ' + JSON.stringify(exception));",
@@ -191,6 +196,8 @@ class MagpieApp < Formula
     system "unzip", "-tq", hap
     listing = shell_output("unzip -Z1 #{hap}")
     assert_match "libs/arm64-v8a/libelectron.so", listing
+    tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
+    system "node", "--test", tap_root/"Resources/magpie-app/tests/close-handler.test.cjs"
     assert_match "#{entry}/connect.html", listing
     assert_match "Usage: magpie-app", shell_output("#{bin}/magpie-app --help")
 
