@@ -364,6 +364,7 @@ class OrcaApp < Formula
     # A healthy server without a pairing file (as the shell's own runtime) is
     # reported as healthy with exit status 0.
     up_port = free_port
+    state_dir = testpath/"home/.config/orca-app"
     (testpath/"home/.config/orca-app/config.json").delete
     (testpath/"home/.config/orca-app/config.json").write JSON.generate("port" => up_port)
     web = spawn(formula_opt_bin("node")/"node", "-e",
@@ -381,7 +382,6 @@ class OrcaApp < Formula
 
       # Installing while `orca-app serve` is running keeps its port, so the shell
       # attaches to that runtime instead of starting a second one next to it.
-      state_dir = testpath/"home/.config/orca-app"
       (state_dir/"server.pid").write "#{web}\n"
       ready_record = { "type" => "orca_server_ready", "endpoint" => "ws://127.0.0.1:#{up_port}" }
       (state_dir/"server.ready.json").write JSON.generate(ready_record)
@@ -390,14 +390,14 @@ class OrcaApp < Formula
       assert_equal up_port, baked.fetch("port")
 
       # A pid file that points at a dead process does not pin the port.
-      (state_dir/"server.pid").write "2147483646\n"
+      (state_dir/"server.pid").atomic_write "2147483646\n"
       assert_match "installed", shell_output("#{bin}/orca-app install --hap #{fake_hap} --no-serve")
       baked = JSON.parse(shell_output("unzip -p #{injected_copy} resources/resfile/resources/app/config.json"))
       refute_equal up_port, baked.fetch("port")
     ensure
       Process.kill("TERM", web)
       Process.wait(web)
-      rm_f [testpath/"home/.config/orca-app/server.pid", testpath/"home/.config/orca-app/server.ready.json"]
+      [state_dir/"server.pid", state_dir/"server.ready.json"].each { |file| file.delete if file.exist? }
     end
 
     saved_home = Dir.home
