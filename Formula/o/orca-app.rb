@@ -8,7 +8,7 @@ class OrcaApp < Formula
   # Tap-authored shell scripts (MIT) on the CPF-Electron runtime (mixed
   # MIT/BSD/LGPL).
   license :cannot_represent
-  revision 1
+  revision 2
 
   livecheck do
     url :stable
@@ -16,8 +16,8 @@ class OrcaApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/orca-app-v1.4.269-r3"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "33e4ab9470b431332ed24c766ad7a031db025e72a553f36e064cad646b9cf030"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/orca-app-v1.4.269-r4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "af6d84310448672f5e932be33dd6ece57516e6a04f695861c3b8d25b8793e991"
   end
 
   depends_on "openjdk" => :build
@@ -239,6 +239,11 @@ class OrcaApp < Formula
       different server: click Connect. With no runtime serving, the app starts its
       own, which ends when the app exits.
 
+      A runtime killed instead of stopped with `orca-app stop`, or left behind when the
+      terminal app was updated (its uid changes), leaves ~/.orca/orcad.lock and the
+      next `orca-app serve` fails with a message saying so. `orca-app serve --reclaim`
+      removes that lock when the pid it names is gone and no orcad process is running.
+
       `install --no-acl` installs the strong-sandbox variant (no JIT/paste; it waits
       for `orca-app serve` instead of spawning the runtime).
     EOS
@@ -399,6 +404,75 @@ class OrcaApp < Formula
       Process.wait(web)
       [state_dir/"server.pid", state_dir/"server.ready.json"].each { |file| file.delete if file.exist? }
     end
+
+    # `serve` explains a startup failure caused by the data root's lock, and
+    # `--reclaim` removes a stale lock only when its holder is provably gone. The
+    # runtime, `ps` and /proc are fakes, so nothing here touches real processes.
+    data_root = testpath/"orca-data"
+    data_root.mkpath
+    lock = data_root/"orcad.lock"
+    fake_proc = testpath/"fake-proc"
+    fake_proc.mkpath
+    fake_ps = testpath/"fake-ps"
+    fake_ps.write "#!/bin/sh\ncat #{testpath}/ps-output\n"
+    chmod 0755, fake_ps
+    (testpath/"ps-output").write "PID ARGS\n/bin/sh\n"
+    (state_dir/"config.json").atomic_write JSON.generate("port" => free_port)
+    write_lock = lambda do |pid, identity|
+      lock.atomic_write JSON.generate("pid" => pid, "identity" => identity, "role" => "orcad")
+    end
+    fake_runtime = lambda do |failure|
+      fake_node = testpath/"fake-orcad-node"
+      fake_node.atomic_write <<~SH
+        #!/bin/sh
+        [ "$1" = "-e" ] && exec #{formula_opt_bin("node")}/node "$@"
+        echo "orcad: failed to start: #{failure}" >&2
+        exit 1
+      SH
+      chmod 0755, fake_node
+      fake_node
+    end
+    serve = lambda do |*args, failure: "{ code: 'other_failure' }"|
+      with_env(ORCA_DESKTOP_NODE: fake_runtime.call(failure).to_s, ORCA_DESKTOP_DATA: data_root.to_s,
+               ORCA_DESKTOP_PS: fake_ps.to_s, ORCA_DESKTOP_PROC_ROOT: fake_proc.to_s) do
+        shell_output("#{bin}/orca-app serve #{args.join(" ")} 2>&1", 1)
+      end
+    end
+
+    write_lock.call(2_147_483_646, "20020262")
+    output = serve.call(failure: "{ code: 'orcad_instance_lock_foreign_identity' }")
+    assert_match "locked by another identity (uid 20020262, pid 2147483646)", output
+    assert_match "orca-app serve --reclaim", output
+    refute_match "failed to start", output
+
+    output = serve.call(failure: "{ code: 'orcad_instance_lock_holder_unverifiable' }")
+    assert_match "cannot prove that here", output
+    assert_match "orca-app serve --reclaim", output
+
+    assert_match "failed to start: { code: 'other_failure' }", serve.call
+    refute_match "--reclaim", serve.call
+
+    # The lock names a live pid: refuse and keep the lock.
+    (fake_proc/"2147483646").mkpath
+    assert_match "still running", serve.call("--reclaim")
+    assert_path_exists lock
+    (fake_proc/"2147483646").rmdir
+
+    # An orcad process is running anywhere: refuse and keep the lock. The process
+    # list is read without a pipe into `grep -q`, which pipefail would turn into
+    # "not running" through SIGPIPE.
+    (testpath/"ps-output").atomic_write "#{"x" * 70_000}\nnode /x/orcad/orcad-server.js --port 1\n"
+    assert_match "an orcad process is running", serve.call("--reclaim")
+    assert_path_exists lock
+    (testpath/"ps-output").atomic_write "PID ARGS\n/bin/sh\n"
+
+    # Holder gone and nothing running: the lock is removed, then startup proceeds.
+    output = serve.call("--reclaim")
+    assert_match "removed the stale lock of pid 2147483646 (identity 20020262)", output
+    refute_path_exists lock
+
+    # Without a lock there is nothing to reclaim.
+    assert_match "nothing to reclaim", serve.call("--reclaim")
 
     saved_home = Dir.home
     saved_xdg = ENV.fetch("XDG_CONFIG_HOME", nil)
