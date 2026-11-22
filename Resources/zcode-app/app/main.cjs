@@ -10,7 +10,7 @@
 // does not leave the app's cgroup, measured on the device. Only a service
 // started from a terminal outlives the app, so the tray quit asks first when
 // the shell started the service (lifecycle.cjs).
-const { app, BrowserWindow, Menu, dialog, shell } = require('electron');
+const { app, BrowserWindow, dialog, shell } = require('electron');
 const { spawn } = require('node:child_process');
 const fs = require('node:fs');
 const http = require('node:http');
@@ -231,16 +231,13 @@ app.whenReady().then(() => {
   // the process alive while the item exists.
   if (useTray) {
     try {
-      const trayItem = tray.create({
+      // The menu is set once, inside create(), with a quit that can ask first:
+      // a second setContextMenu() right after create() was sometimes refused.
+      tray.create({
         tooltip: 'ZCode',
         iconPath: path.join(__dirname, 'tray-icon.png'),
+        onQuitRequest: confirmQuit,
       });
-      // Same menu as tray.cjs builds, with a quit that can ask first.
-      trayItem.setContextMenu(Menu.buildFromTemplate([
-        { label: '显示窗口', click: tray.showWindow },
-        { type: 'separator' },
-        { label: '退出应用', click: confirmQuit },
-      ]));
       trayReady = true;
     } catch (error) {
       console.error('ZCODE_DESKTOP tray unavailable: ' + String(error));

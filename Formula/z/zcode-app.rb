@@ -9,7 +9,7 @@ class ZcodeApp < Formula
   # Tap-authored shell scripts (MIT) on the CPF-Electron runtime (mixed
   # MIT/BSD/LGPL).
   license :cannot_represent
-  revision 23
+  revision 24
 
   livecheck do
     url "https://raw.githubusercontent.com/zai-org/ZCode/main/package.json"
@@ -19,8 +19,8 @@ class ZcodeApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-app-v3.18.2-r28"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b9b125baa7adf6cccc64fd8a9a690cf60c8c38a637d10fc1be8d17971ff19849"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-app-v3.18.2-r29"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "928a26f936dc22631f098d4d2ef904ea87ece78a5cdf0019b5fea56db9ae0339"
   end
 
   depends_on "app-installer"
@@ -34,7 +34,6 @@ class ZcodeApp < Formula
 
   # The unused-resource audit requires literal tap paths.
   RESOURCE_FILES = %w[
-    Resources/_shared/electron-shell/tray.cjs
     Resources/_shared/hap-app/install-lib.sh
     Resources/_shared/waiting-page/render-waiting.cjs
     Resources/_shared/waiting-page/waiting.html.in
@@ -42,12 +41,14 @@ class ZcodeApp < Formula
     Resources/zcode-app/app/lifecycle.cjs
     Resources/zcode-app/app/main.cjs
     Resources/zcode-app/app/package.json
+    Resources/zcode-app/app/tray.cjs
     Resources/zcode-app/app/waiting.json
     Resources/zcode-app/assets/icon.png
     Resources/zcode-app/assets/tray-icon.png
     Resources/zcode-app/scripts/install-desktop.sh
     Resources/zcode-app/scripts/zcode-desktop.sh
     Resources/zcode-app/tests/lifecycle.test.cjs
+    Resources/zcode-app/tests/tray.test.cjs
   ].freeze
 
   resource "electron-ohos" do
@@ -68,10 +69,9 @@ class ZcodeApp < Formula
     app = shell/"web_engine/src/main/resources/resfile/resources/app"
     rm_r app if app.exist?
     app.mkpath
-    %w[main.cjs lifecycle.cjs package.json config.json].each do |name|
+    %w[main.cjs lifecycle.cjs tray.cjs package.json config.json].each do |name|
       cp res/"app"/name, app/name
     end
-    cp tap_root/"Resources/_shared/electron-shell/tray.cjs", app/"tray.cjs"
     system "node", tap_root/"Resources/_shared/waiting-page/render-waiting.cjs",
            tap_root/"Resources/_shared/waiting-page/waiting.html.in",
            res/"app/waiting.json", app/"waiting.html"
@@ -380,9 +380,11 @@ class ZcodeApp < Formula
     hap = libexec/"zcode-desktop-unsigned.hap"
     assert_match "libs/arm64-v8a/libelectron.so", shell_output("unzip -Z1 #{hap}")
     assert_match "resources/resfile/resources/app/lifecycle.cjs", shell_output("unzip -Z1 #{hap}")
+    assert_match "onQuitRequest", shell_output("unzip -p #{hap} resources/resfile/resources/app/tray.cjs")
     tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
     system "node", "--check", tap_root/"Resources/zcode-app/app/main.cjs"
     system "node", "--test", tap_root/"Resources/zcode-app/tests/lifecycle.test.cjs"
+    system "node", "--test", tap_root/"Resources/zcode-app/tests/tray.test.cjs"
     waiting_source = shell_output("unzip -p #{hap} resources/resfile/resources/app/waiting.html")
     assert_match "zcode-app status", waiting_source
     refute_match "{{", waiting_source
