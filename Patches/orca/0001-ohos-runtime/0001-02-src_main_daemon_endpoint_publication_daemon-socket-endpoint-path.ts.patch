@@ -1,0 +1,40 @@
+diff --git a/src/main/daemon/endpoint/publication/daemon-socket-endpoint-path.ts b/src/main/daemon/endpoint/publication/daemon-socket-endpoint-path.ts
+--- a/src/main/daemon/endpoint/publication/daemon-socket-endpoint-path.ts
++++ b/src/main/daemon/endpoint/publication/daemon-socket-endpoint-path.ts
+@@ -2,6 +2,7 @@
+ import { createHash } from 'node:crypto'
+ import { lstatSync, mkdirSync } from 'node:fs'
+ import { posix } from 'node:path'
++import { isOpenHarmony } from '../../../../shared/file-write/publish-staged-file'
+ import { unixSocketPathFits } from '../../../../shared/network/unix-socket-path-limit'
+ import { errnoCodeOrUnknown } from '../../../../shared/errors/errno-code'
+ import { PRIVATE_DIR_MODE } from './daemon-private-file-modes'
+@@ -8,7 +9,17 @@
+ 
+ // Keep the fallback path independent of user-directory length.
+-export const SHORT_DAEMON_SOCKET_DIR_PREFIX = '/tmp/.orca-daemon-'
++// HarmonyOS allows no Unix sockets on the shared home mount and keeps /tmp
++// read-only for apps, so its relocated sockets live in the app runtime dir.
++function shortDaemonSocketDirPrefix(): string {
++  if (!isOpenHarmony()) {
++    return '/tmp/.orca-daemon-'
++  }
++  const runtimeDir = process.env.TMPDIR ?? process.env.XDG_RUNTIME_DIR ?? '/tmp'
++  return `${runtimeDir.replace(/\/+$/, '')}/.orca-daemon-`
++}
+ 
++export const SHORT_DAEMON_SOCKET_DIR_PREFIX = shortDaemonSocketDirPrefix()
++
+ export function shortDaemonSocketDir(runtimeDir: string, uid: number): string {
+   const runtimeHash = createHash('sha256').update(runtimeDir).digest('hex').slice(0, 12)
+   return `${SHORT_DAEMON_SOCKET_DIR_PREFIX}${uid}/${runtimeHash}`
+@@ -21,6 +32,9 @@
+   uid: number | undefined = process.getuid?.()
+ ): string {
+   const preferred = posix.join(runtimeDir, socketName)
++  if ((platform as string) === 'openharmony' && uid !== undefined) {
++    return posix.join(shortDaemonSocketDir(runtimeDir, uid), socketName)
++  }
+   if (
+     uid === undefined ||
+     unixSocketPathFits(preferred, platform === 'darwin' ? 'darwin' : 'linux')

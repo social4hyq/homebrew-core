@@ -1,0 +1,20 @@
+diff --git a/src/main/filesystem/atomic-file-publication.ts b/src/main/filesystem/atomic-file-publication.ts
+--- a/src/main/filesystem/atomic-file-publication.ts
++++ b/src/main/filesystem/atomic-file-publication.ts
+@@ -11,6 +11,7 @@
+ import { isPermissionError } from './permission-errors'
+ import { nodeFileContentsEqualSync } from '../../shared/file-content/node-file-content-equality'
+ import { renameFileWithWindowsRetry } from '../../shared/file-write/windows-retry-file-operations'
++import { publishStagedFileExclusively } from '../../shared/file-write/publish-staged-file'
+ import { assertGuardedFileCurrent, recordGuardedPublication } from './concurrent-file-edit-guard'
+ 
+ export function writeFileAtomically(
+@@ -190,7 +191,7 @@
+ 
+ export function publishFileWithoutOverwrite(sourcePath: string, targetPath: string): boolean {
+   try {
+-    linkSync(sourcePath, targetPath)
++    publishStagedFileExclusively(sourcePath, targetPath)
+     return true
+   } catch (error) {
+     if ((error as NodeJS.ErrnoException).code === 'EEXIST') {

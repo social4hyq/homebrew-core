@@ -1,0 +1,21 @@
+diff --git a/src/main/orcad/host-lifecycle/managed-stop/orcad-managed-stop-decision.ts b/src/main/orcad/host-lifecycle/managed-stop/orcad-managed-stop-decision.ts
+index 59bcbcba..a60b6744 100644
+--- a/src/main/orcad/host-lifecycle/managed-stop/orcad-managed-stop-decision.ts
++++ b/src/main/orcad/host-lifecycle/managed-stop/orcad-managed-stop-decision.ts
+@@ -1,5 +1,6 @@
+ // Exclusive hard links arbitrate stop versus cancel; cancel cannot succeed once dispatch wins.
+-import { linkSync, rmSync } from 'node:fs'
++import { rmSync } from 'node:fs'
++import { publishStagedFileExclusively } from '../../../../shared/file-write/publish-staged-file'
+ import { randomUUID } from 'node:crypto'
+ import { writeDurableSecureJsonFile } from '../../../../shared/secure-storage/secure-file'
+ import {
+@@ -37,7 +38,7 @@ export function claimOrcadManagedStopDecision(
+     throw new Error('orcad_managed_stop_decision_permissions_unconfirmed')
+   }
+   try {
+-    linkSync(staged, path)
++    publishStagedFileExclusively(staged, path)
+     return decision
+   } catch (error) {
+     if (!hasErrorCode(error, 'EEXIST')) {

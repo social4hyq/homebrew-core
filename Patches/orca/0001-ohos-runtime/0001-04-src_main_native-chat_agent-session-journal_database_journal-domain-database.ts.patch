@@ -1,0 +1,21 @@
+diff --git a/src/main/native-chat/agent-session-journal/database/journal-domain-database.ts b/src/main/native-chat/agent-session-journal/database/journal-domain-database.ts
+index fdc1620c..c905f209 100644
+--- a/src/main/native-chat/agent-session-journal/database/journal-domain-database.ts
++++ b/src/main/native-chat/agent-session-journal/database/journal-domain-database.ts
+@@ -1,5 +1,6 @@
+ import { ensurePRWatchTables } from '../../../github/pr-watch/pr-watch-tables'
+-import { existsSync, linkSync, mkdirSync, mkdtempSync, readdirSync, rmSync } from 'node:fs'
++import { existsSync, mkdirSync, mkdtempSync, readdirSync, rmSync } from 'node:fs'
++import { publishStagedFileExclusively } from '../../../../shared/file-write/publish-staged-file'
+ import { join } from 'node:path'
+ import Database from '../../../sqlite/sync-database'
+ import { hardenSqliteDatabaseFiles } from '../../../sqlite/harden-database-files'
+@@ -71,7 +72,7 @@ export async function initializeJournalDomainDatabase(stateDirectory: string): P
+     }
+     try {
+       // Publish complete metadata without replacing another initializer's result.
+-      linkSync(filename, destination)
++      publishStagedFileExclusively(filename, destination)
+     } catch (error) {
+       if (!(error instanceof Error && 'code' in error && error.code === 'EEXIST')) {
+         throw error

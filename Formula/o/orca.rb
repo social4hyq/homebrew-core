@@ -63,10 +63,21 @@ class Orca < Formula
     sha256 "266866c1b0efd7ca5307fe312411e4f1895b997086fb76f392ec5b60aadf31c8"
   end
 
+  # HarmonyOS userdata rejects hard links and reports the shared home mount's
+  # owner as a fixed account uid, which breaks the runtime's atomic file
+  # publication and its data-root ownership check. The patches add fallbacks
+  # only used on openharmony.
+  patch_root = Pathname(__dir__).parent.parent
+  Dir[(patch_root/"Patches/orca/0001-ohos-runtime/*.patch").to_s].each do |path|
+    patch do
+      file Pathname(path).relative_path_from(patch_root).to_s
+    end
+  end
+
   # Tap-authored files that are copied into the build or the keg but are not
   # patches, so they live in Resources/ rather than Patches/. Every path is
   # listed literally: the weekly remove-unused-patches job keeps a Resources/
-  # directory only while a formula names it. The one patch stays in Patches/.
+  # directory only while a formula names it. Patches stay in Patches/.
   RESOURCE_FILES = %w[
     Resources/orca/build-orcad-server.mjs
     Resources/orca/orca.sh
@@ -86,12 +97,6 @@ class Orca < Formula
     sdk = formula_opt_prefix("ohos-sdk-native")
     toolchain = sdk/"llvm/bin/aarch64-unknown-linux-ohos-clang"
     odie "the OpenHarmony native SDK toolchain is missing" unless toolchain.exist?
-
-    # HarmonyOS userdata rejects hard links and reports the shared home mount's
-    # owner as a fixed account uid, which breaks the runtime's atomic file
-    # publication and its data-root ownership check. The patch adds fallbacks
-    # only used on openharmony.
-    system "patch", "-p1", "-i", tap_root/"Patches/orca/0001-ohos-runtime.patch"
 
     # package.json pins pnpm 12.14.0, which ships no openharmony-arm64 build; the
     # installed pnpm resolves this lockfile as-is, so keep it instead of letting

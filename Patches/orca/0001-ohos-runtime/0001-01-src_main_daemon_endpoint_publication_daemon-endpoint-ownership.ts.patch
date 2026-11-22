@@ -1,0 +1,21 @@
+diff --git a/src/main/daemon/endpoint/publication/daemon-endpoint-ownership.ts b/src/main/daemon/endpoint/publication/daemon-endpoint-ownership.ts
+index 1ade6cc5..d2e7c18b 100644
+--- a/src/main/daemon/endpoint/publication/daemon-endpoint-ownership.ts
++++ b/src/main/daemon/endpoint/publication/daemon-endpoint-ownership.ts
+@@ -3,6 +3,7 @@ import { randomBytes } from 'node:crypto'
+ import { linkSync, lstatSync, renameSync, statSync, unlinkSync } from 'node:fs'
+ import { dirname, join } from 'node:path'
+ import { endpointIsProvenDead, type SocketProbeOutcome } from './daemon-endpoint-probe'
++import { linkIsUnsupported } from '../../../../shared/file-write/publish-staged-file'
+ 
+ // Retried only when another publisher demonstrably took the name, so a small bound suffices.
+ const PUBLISH_ATTEMPTS = 3
+@@ -187,7 +188,7 @@ function isLinkUnsupportedError(error: unknown): boolean {
+     return false
+   }
+   const code = (error as NodeJS.ErrnoException).code
+-  return code === 'EPERM' || code === 'EOPNOTSUPP' || code === 'ENOTSUP' || code === 'ENOSYS'
++  return code === 'EPERM' || code === 'EOPNOTSUPP' || code === 'ENOTSUP' || code === 'ENOSYS' || linkIsUnsupported(error)
+ }
+ 
+ function isFileExistsError(error: unknown): boolean {
