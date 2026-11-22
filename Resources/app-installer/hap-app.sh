@@ -41,6 +41,29 @@ recover_user_home() {
 }
 recover_user_home
 
+# Vendor downloads run before app-installer, so they need the same persistent
+# network configuration as the DevEco CLI. Explicit shell settings always win.
+load_network_config() {
+  local file="$HOME/.app-installer/config" proxy no_proxy insecure
+  [ -f "$file" ] || return 0
+  if [ -z "${HTTPS_PROXY:-}${https_proxy:-}" ]; then
+    proxy="$(sed -n 's/^[[:space:]]*https_proxy[[:space:]]*=[[:space:]]*//p' "$file" | tail -n 1)"
+    [ -n "$proxy" ] && export HTTPS_PROXY="$proxy" https_proxy="$proxy"
+  fi
+  if [ -z "${NO_PROXY:-}${no_proxy:-}" ]; then
+    no_proxy="$(sed -n 's/^[[:space:]]*no_proxy[[:space:]]*=[[:space:]]*//p' "$file" | tail -n 1)"
+    [ -n "$no_proxy" ] && export NO_PROXY="$no_proxy" no_proxy="$no_proxy"
+  fi
+  if [ -z "${HAP_INSTALLER_TLS_INSECURE+x}" ]; then
+    insecure="$(sed -n 's/^[[:space:]]*tls_insecure[[:space:]]*=[[:space:]]*//p' "$file" | tail -n 1)"
+    if [ "$insecure" = "1" ]; then
+      export HAP_INSTALLER_TLS_INSECURE=1
+      printf '%s\n' 'hap-app: WARNING: tls_insecure=1 — vendor downloads that support this setting will skip TLS certificate verification.' >&2
+    fi
+  fi
+}
+load_network_config
+
 # State lives under the (recovered) home so the post_install run and the user's
 # own shells agree, even when XDG_CONFIG_HOME/XDG_CACHE_HOME point elsewhere.
 config_dir="${HAP_APP_CONFIG_DIR:-$HOME/.config/hap-app}"
@@ -165,6 +188,10 @@ Environment:
   HAP_APP_INSTALL_TIMEOUT  Overall install timeout in seconds (900)
   HAP_APP_USER_HOME        Override the home directory recovered from
                            HOMEBREW_PREFIX (for tests or unusual layouts)
+  ~/.app-installer/config  https_proxy=... and no_proxy=... are restored for
+                           vendor downloads and DevEco after postinstall;
+                           tls_insecure=1 is forwarded to app installers;
+                           explicit shell settings win
 EOF
 }
 

@@ -4,7 +4,7 @@ class AppInstaller < Formula
   url "https://registry.npmjs.org/@deveco/deveco-cli-openharmony-arm64/-/deveco-cli-openharmony-arm64-1.3.12.tgz"
   sha256 "eaa29900d4892e89b2ae6156733ffa97597971b7a26fa1df6c686cc5934a02fb"
   license "MIT"
-  revision 2
+  revision 3
 
   livecheck do
     url :stable
@@ -12,8 +12,8 @@ class AppInstaller < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/app-installer-v1.3.12-r3"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7af5272677edffb23edc40715ec87a7f2672c6e576af7e6354be862f80d327de"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/app-installer-v1.3.12-r5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "528ff2935b903760a4c73fb13b960045cfb4d7bb9de04bd9ef2102ecdf983085"
   end
 
   depends_on "bash"
@@ -181,9 +181,12 @@ class AppInstaller < Formula
       debug profile before signing; a refresh failure also queues the app.
 
       Behind a proxy or VPN that intercepts HTTPS, signing needs the proxy CA:
-      put `tls_ca=/path/to/ca.pem` (or `https_proxy=...`) in
-      ~/.app-installer/config. Homebrew clears the environment for post-install
-      steps, so a variable exported in your shell does not reach the DevEco CLI.
+      put `tls_ca=/path/to/ca.pem` in ~/.app-installer/config. Set
+      `https_proxy=...` and optional `no_proxy=...` there to control network
+      access for both DevEco signing and app vendor downloads during
+      post-install; settings already present in your shell take precedence.
+      Homebrew clears shell variables for
+      post-install steps, so the file is the persistent configuration channel.
       Each automatic install prints one start line and one result line and keeps
       the full output in ~/.cache/hap-app/logs/.
     EOS
