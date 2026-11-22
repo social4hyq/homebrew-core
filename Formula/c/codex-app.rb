@@ -6,7 +6,7 @@ class CodexApp < Formula
   version "26.1117.41037"
   sha256 "714146e9c667b26a1bd4e57633c544334a9ed47c399989bfd98cf764140bdc53"
   license :cannot_represent # OpenAI service and software terms
-  revision 5
+  revision 6
 
   livecheck do
     url "https://persistent.oaistatic.com/codex-app-prod/linux/deb/dists/stable/main/binary-arm64/Packages"
@@ -247,8 +247,10 @@ class CodexApp < Formula
       #!/bin/sh
       printf '%s\\n' "$*" >> #{hdc_log}
       if [ "$1" = "shell" ] && [ "$2" = "ps -ef" ]; then
-        [ -n "${FAKE_STOPPED:-}" ] ||
-          printf '%s\\n' "app1 com.social4hyq.chatgpt" "app2 com.other.app"
+        if [ -z "${FAKE_STOPPED:-}" ]; then
+          printf '%s\\n' "u 1 1 1 1 ? 00:00:00 com.social4hyq.chatgpt"
+        fi
+        printf '%s\\n' "u 1 1 1 1 ? 00:00:00 sh -c echo com.social4hyq.chatgpt"
       fi
     SH
     chmod 0755, fake_bin/"hdc"
