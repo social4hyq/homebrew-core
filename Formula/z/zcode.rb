@@ -25,24 +25,8 @@ class Zcode < Formula
   depends_on "python@3.14" => :build
   depends_on "bun"
 
-  patch do
-    file "Patches/zcode/0001-ohos-sea-targets.patch"
-  end
-
-  patch do
-    file "Patches/zcode/0002-bun-node-sea-guards.patch"
-  end
-
-  patch do
-    file "Patches/zcode/0003-ohos-skip-desktop-electron-runtime.patch"
-  end
-
-  patch do
-    file "Patches/zcode/0004-web-login-server-oauth.patch"
-  end
-
   patch_root = Pathname(__dir__).parent.parent
-  Dir[(patch_root/"Patches/zcode/0005-ohos-frozen-lockfile/*.patch").to_s].each do |path|
+  Dir[(patch_root/"Patches/zcode/*.patch").to_s].each do |path|
     patch do
       file Pathname(path).relative_path_from(patch_root).to_s
     end

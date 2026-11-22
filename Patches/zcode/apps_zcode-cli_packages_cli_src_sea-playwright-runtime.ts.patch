@@ -1,0 +1,14 @@
+--- a/apps/zcode-cli/packages/cli/src/sea-playwright-runtime.ts
++++ b/apps/zcode-cli/packages/cli/src/sea-playwright-runtime.ts
+@@ -30,8 +30,9 @@
+ const PACKAGE_JSON_PATH = "node_modules/playwright-core/package.json";
+
+ export async function loadCliPlaywrightChromium(): Promise<PlaywrightChromiumModule> {
+-  const sea = await import("node:sea");
+-  if (!sea.isSea()) {
++  // Bun has no node:sea module; use the ordinary runtime path.
++  const sea = await import("node:sea").catch(() => undefined);
++  if (!sea?.isSea()) {
+     return (await import("playwright-core")) as PlaywrightChromiumModule;
+   }
+

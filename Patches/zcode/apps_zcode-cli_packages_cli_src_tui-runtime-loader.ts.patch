@@ -1,0 +1,15 @@
+--- a/apps/zcode-cli/packages/cli/src/tui-runtime-loader.ts
++++ b/apps/zcode-cli/packages/cli/src/tui-runtime-loader.ts
+@@ -33,9 +33,10 @@
+ const manifestFileName = "manifest.json";
+
+ export const loadTuiRuntime = async (): Promise<TuiRuntimeModule> => {
+-  const sea = await import("node:sea");
++  // Bun has no node:sea module; use the ordinary runtime path.
++  const sea = await import("node:sea").catch(() => undefined);
+
+-  if (!sea.isSea()) {
++  if (!sea?.isSea()) {
+     return await import("@zcode/tui");
+   }
+

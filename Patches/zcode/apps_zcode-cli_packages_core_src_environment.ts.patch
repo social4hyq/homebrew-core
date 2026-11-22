@@ -1,0 +1,15 @@
+--- a/apps/zcode-cli/packages/core/src/environment.ts
++++ b/apps/zcode-cli/packages/core/src/environment.ts
+@@ -1,4 +1,3 @@
+-import { isSea } from "node:sea";
+ import type { RuntimeInfo } from "@zcode/shared-types";
+
+ export { type RuntimeInfo };
+@@ -9,6 +8,6 @@
+   execPath: process.execPath,
+   node: process.version,
+   platform: process.platform,
+-  sea: isSea(),
++  sea: process.getBuiltinModule("node:sea")?.isSea() ?? false,
+   versions: process.versions,
+ });
