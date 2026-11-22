@@ -62,7 +62,11 @@ function fixture(t) {
       if (cmd.includes('bm install')) { console.log(process.env.INSTALL_FAIL ? 'error: failed' : 'install bundle successfully'); }
       if (cmd.includes('aa force-stop') && process.env.STOP_MISSING) { console.log('error: failed to force stop process.'); console.log('Error Code:10104002  Error Message:Failed to retrieve specified package information.'); }
       if (cmd.includes('aa start')) { console.log(process.env.START_FAIL ? 'screen locked' : 'start ability successfully'); }
-      if (cmd.includes('bm uninstall')) { console.log(process.env.UNINSTALL_FAIL ? 'error: bundle not found' : 'uninstall bundle successfully.'); }
+      if (cmd.includes('bm uninstall')) {
+        if (process.env.UNINSTALL_MISSING) console.log('error: bundle not found');
+        else if (process.env.UNINSTALL_FAIL) console.log('error: failed to uninstall the bundle.');
+        else console.log('uninstall bundle successfully.');
+      }
       if (cmd.includes('bm dump') && process.env.TEST_BM_DUMP) { console.log(fs.readFileSync(process.env.TEST_BM_DUMP, 'utf8')); }
       else if (cmd.includes('bm dump') && process.env.DUMP_FAIL) { console.log('error: failed to get information and the parameters may be wrong.'); }
       else if (cmd.includes('bm dump')) { console.log('{\\n  "bundleName": "' + cmd.split(' ').pop() + '",\\n  "versionName": "1.2.3",\\n  "irrelevant": 1\\n}'); }
@@ -204,9 +208,26 @@ test('uninstall and info address the chosen device', t => {
   const f=fixture(t);
   let r=spawnSync('bash',[script,'uninstall','--bundle-id',bundle,'--hdc',f.hdc,'--device','chosen'],{env:f.env,encoding:'utf8'});
   assert.equal(r.status,0,r.stdout+r.stderr); assert.match(r.stdout,/uninstall bundle successfully/);
-  assert.ok(f.calls().some(c=>c.join(' ').includes('-t chosen shell bm uninstall -n '+bundle)));
+  // The default uninstall keeps the app's user data on the device.
+  assert.ok(f.calls().some(c=>c.join(' ').includes('-t chosen shell bm uninstall -n '+bundle+' -k')));
   r=spawnSync('bash',[script,'info','--bundle-id',bundle,'--hdc',f.hdc,'--device','chosen'],{env:f.env,encoding:'utf8'});
   assert.equal(r.status,0,r.stdout+r.stderr); assert.match(r.stdout,/"versionName": "1.2.3"/); assert.doesNotMatch(r.stdout,/irrelevant/);
+});
+test('--purge uninstalls without keeping user data', t => {
+  const f=fixture(t);
+  const r=spawnSync('bash',[script,'uninstall','--bundle-id',bundle,'--purge','--hdc',f.hdc,'--device','chosen'],{env:f.env,encoding:'utf8'});
+  assert.equal(r.status,0,r.stdout+r.stderr); assert.match(r.stdout,/uninstall bundle successfully/);
+  assert.ok(f.calls().some(c=>c.join(' ').includes('shell bm uninstall -n '+bundle)));
+  assert.ok(!f.calls().some(c=>c.join(' ').includes('bm uninstall -n '+bundle+' -k')));
+});
+test('--purge is refused outside uninstall', t => {
+  const f=fixture(t);
+  const r=f.run(['--purge']); assert.equal(r.status,2); assert.match(r.stderr,/--purge is only valid for uninstall/);
+});
+test('uninstalling a bundle that is not installed succeeds', t => {
+  const f=fixture(t);
+  const r=spawnSync('bash',[script,'uninstall','--bundle-id',bundle,'--hdc',f.hdc,'--device','x'],{env:{...f.env,UNINSTALL_MISSING:'1'},encoding:'utf8'});
+  assert.equal(r.status,0,r.stdout+r.stderr); assert.match(r.stdout,/not installed \(com\.example\.desktop\)/);
 });
 test('failed uninstall reports an error', t => {
   const f=fixture(t);

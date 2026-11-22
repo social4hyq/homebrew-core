@@ -4,7 +4,7 @@ class AppInstaller < Formula
   url "https://registry.npmjs.org/@deveco/deveco-cli-openharmony-arm64/-/deveco-cli-openharmony-arm64-1.3.12.tgz"
   sha256 "eaa29900d4892e89b2ae6156733ffa97597971b7a26fa1df6c686cc5934a02fb"
   license "MIT"
-  revision 4
+  revision 5
 
   livecheck do
     url :stable
@@ -213,9 +213,11 @@ class AppInstaller < Formula
     assert_match "Authentication commands", shell_output("#{bin}/devecocli auth --help")
     assert_match "COMMAND_LINE_TOOL_PATH=", (bin/"devecocli").read
     assert_match "--profile <path>", shell_output("#{bin}/app-installer --help")
-    %w[--sign-only --method --keystore --no-browser uninstall doctor].each do |option|
+    %w[--sign-only --method --keystore --no-browser uninstall doctor --purge].each do |option|
       assert_match option, shell_output("#{bin}/app-installer --help")
     end
+    assert_match "uninstall --bundle-id <id> [--device <id>] [--hdc <path>] [--purge]",
+                 shell_output("#{bin}/app-installer --help")
     assert_match "--keystore <p12>", shell_output("#{bin}/app-installer-sign --help")
     assert_match 'signed_hap="${signed_hap:-${TMPDIR:-$home/.cache}/app-installer/signed/$bundle_id.hap}"',
                  (libexec/"app-installer.sh").read

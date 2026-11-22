@@ -51,7 +51,13 @@
 |---|---|
 | `install` | 往 HAP 的副本里注入本机配置，签名并安装 |
 | `start` / `stop` / `status` | 打开应用、停止、查看状态（有宿主后端的 app 同时管理后端） |
-| `serve` | 只启动宿主后端（浏览器或 CLI 使用） |
+| `serve` | 只启动宿主后端（浏览器或 CLI 使用）；仅确有宿主后端的 app 提供 |
+| `uninstall` | 从设备卸载本 app（`bm uninstall -k`，**默认保留**沙箱用户数据；仅 `--purge` 删数据） |
+
+无宿主后端的 app 的 `stop` 是设备侧 `aa force-stop`，`status` 报告设备上是否在运行。
+每个 `<app>-app uninstall` 接受 `--device ID`（缺省用 `HDC_TARGET` 环境变量或 hdc
+第一个设备），对已不存在的 HAP 幂等成功。卸载逻辑统一走 `app-installer uninstall`
+（默认 `-k` 保留数据，`--purge` 删除数据，多设备无 `--device` 时报错列出设备）。
 
 `install` 的选项：`--hap PATH`、`--config PATH`、`--device ID`、`--no-acl`、`--keep`。约定：结果行（`installed (<bundle>, <variant>)`）写 stdout，进度和错误写 stderr，这样 `brew test` 和调用方可以只读 stdout。
 

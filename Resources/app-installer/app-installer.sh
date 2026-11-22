@@ -5,7 +5,7 @@ usage() {
   cat <<'EOF'
 Usage: app-installer --hap <unsigned.hap> --bundle-id <id> [options]
        app-installer install   --hap <unsigned.hap> --bundle-id <id> [options]
-       app-installer uninstall --bundle-id <id> [--device <id>] [--hdc <path>]
+       app-installer uninstall --bundle-id <id> [--device <id>] [--hdc <path>] [--purge]
        app-installer info      --bundle-id <id> [--device <id>] [--hdc <path>]
        app-installer doctor    [--device <id>] [--hdc <path>]
        app-installer ready     [--device <id>] [--hdc <path>]
@@ -37,6 +37,8 @@ Options:
   --device <id>         hdc target serial (default: first connected device)
   --no-start            Install without starting the app
   --no-browser          Do not open the Huawei Developer login page automatically
+  --purge               uninstall only: delete the app's user data instead of
+                        keeping it (the default uninstall keeps user data)
   -h, --help            Show this help
 
 Your own signing material (skips the Huawei Developer login; all five needed
@@ -108,6 +110,7 @@ prepare="${HAP_INSTALLER_PREPARE:-$(dirname "${BASH_SOURCE[0]}")/prepare-profile
 start_app=1
 open_browser=1
 login_timeout=0
+purge=0
 expect_acl=
 network_probe=0
 
@@ -141,6 +144,7 @@ while (($#)); do
       ;;
     --sign-only) sign_only=1; shift ;;
     --network) network_probe=1; shift ;;
+    --purge) purge=1; shift ;;
     --no-start) start_app=0; ability=; shift ;;
     --no-browser) open_browser=0; shift ;;
     -h|--help) usage; exit 0 ;;
@@ -169,6 +173,9 @@ if [[ -n "$keystore" ]]; then
   if [[ -z "$cert" || -z "$profile_file" || -z "$key_alias" ]]; then
     die '--keystore needs --cert, --profile-file and --key-alias' 2
   fi
+fi
+if ((purge)) && [[ "$cmd" != uninstall ]]; then
+  die '--purge is only valid for uninstall' 2
 fi
 
 hdc_cmd() {
@@ -468,14 +475,24 @@ case "$cmd" in
     ;;
   uninstall|info)
     [[ -n "$bundle_id" ]] || { usage >&2; exit 2; }
-    require_hdc
-    resolve_device
     if [[ "$cmd" == uninstall ]]; then
-      out=$(hdc_cmd shell "bm uninstall -n $bundle_id" 2>&1) || { printf '%s\n' "$out" >&2; exit 1; }
+      # Default to `bm uninstall -k`: the app's user data in its sandbox
+      # survives, so reinstalling keeps its state. Only --purge removes it.
+      bm_args=(-n "$bundle_id")
+      ((purge)) || bm_args+=(-k)
+      require_hdc
+      resolve_device
+      out=$(hdc_cmd shell "bm uninstall ${bm_args[*]}" 2>&1) || { printf '%s\n' "$out" >&2; exit 1; }
+      if printf '%s\n' "$out" | grep -qiE 'not found|does not exist|not installed'; then
+        printf 'not installed (%s)\n' "$bundle_id"
+        exit 0
+      fi
       printf '%s\n' "$out"
       printf '%s\n' "$out" | grep -qiE 'uninstall bundle successfully|^success' ||
         die 'device did not report successful uninstallation.'
     else
+      require_hdc
+      resolve_device
       out=$(hdc_cmd shell "bm dump -n $bundle_id" 2>&1) || { printf '%s\n' "$out" >&2; exit 1; }
       # hdc shell does not pass the device command's exit status through, so a
       # missing bundle only shows up as an "error:" line in the output.
