@@ -330,9 +330,9 @@ class OpencodeApp < Formula
       end
       assert_match "serving at http://127.0.0.1:#{service_port}", shell_output("#{bin}/opencode-app serve")
       assert_match "healthy at http://127.0.0.1:#{service_port}", shell_output("#{bin}/opencode-app status")
-      state_file.write JSON.generate(url: "http://127.0.0.1:#{service_port}", password: "wrong")
+      state_file.atomic_write JSON.generate(url: "http://127.0.0.1:#{service_port}", password: "wrong")
       assert_match "not healthy", shell_output("#{bin}/opencode-app status 2>&1", 1)
-      state_file.write JSON.generate(url: "http://127.0.0.1:#{service_port}", password: "test-password")
+      state_file.atomic_write JSON.generate(url: "http://127.0.0.1:#{service_port}", password: "test-password")
       assert_match "stopped", shell_output("#{bin}/opencode-app stop")
       assert_equal ["service start", "service stop"], calls.read.lines(chomp: true)
     ensure
