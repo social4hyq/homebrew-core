@@ -228,15 +228,19 @@ try {
 ' "$DATA_ROOT/orcad.lock"
 }
 
-# No pipe into `grep -q`: under pipefail the early exit of grep kills the lister
-# with SIGPIPE and the whole check would report "not running".
-orcad_running() {
+# "pid command" lines of the running orcad runtimes: node processes that run
+# .../orcad/orcad-server.js. Matching the bare words would also catch an editor
+# or a shell that only mentions the file name. The process list goes into awk,
+# which reads all of it; a `grep -q` there would exit early and, under pipefail,
+# make the whole check report "not running" through SIGPIPE.
+orcad_processes() {
   local procs
-  procs="$("$PS_BIN" -eo args 2>/dev/null || true)"
-  case "$procs" in
-    *orcad-server*) return 0 ;;
-  esac
-  return 1
+  procs="$("$PS_BIN" -eo pid,args 2>/dev/null || true)"
+  printf '%s\n' "$procs" | awk '
+    $1 ~ /^[0-9]+$/ && $2 ~ /(^|\/)node$/ && index($0, "orcad/orcad-server.js") {
+      sub(/^ +/, "")
+      print
+    }'
 }
 
 # Remove the data root's orcad.lock when its holder is provably gone: the pid it
@@ -254,8 +258,13 @@ reclaim_lock() {
   if [ -e "$PROC_ROOT/$pid" ]; then
     die "the lock in $DATA_ROOT belongs to pid $pid, which is still running; stop it with 'orca-app stop' first"
   fi
-  if orcad_running; then
-    die "an orcad process is running; not removing the lock of pid $pid. Stop it with 'orca-app stop' first"
+  local running
+  running="$(orcad_processes)"
+  if [ -n "$running" ]; then
+    log "an orcad process is running; not removing the lock of pid $pid:"
+    printf '%s\n' "$running" | awk 'NR <= 3 { print "orca-app:   " substr($0, 1, 160) }
+      END { if (NR > 3) print "orca-app:   ... and " (NR - 3) " more" }' >&2
+    die "stop it with 'orca-app stop' (or end that process) and run this again"
   fi
   rm -f "$DATA_ROOT/orcad.lock"
   log "removed the stale lock of pid $pid (identity $identity) from $DATA_ROOT"

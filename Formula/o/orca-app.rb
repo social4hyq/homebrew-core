@@ -8,7 +8,7 @@ class OrcaApp < Formula
   # Tap-authored shell scripts (MIT) on the CPF-Electron runtime (mixed
   # MIT/BSD/LGPL).
   license :cannot_represent
-  revision 2
+  revision 3
 
   livecheck do
     url :stable
@@ -416,7 +416,7 @@ class OrcaApp < Formula
     fake_ps = testpath/"fake-ps"
     fake_ps.write "#!/bin/sh\ncat #{testpath}/ps-output\n"
     chmod 0755, fake_ps
-    (testpath/"ps-output").write "PID ARGS\n/bin/sh\n"
+    (testpath/"ps-output").write "  PID ARGS\n    1 /bin/sh\n"
     (state_dir/"config.json").atomic_write JSON.generate("port" => free_port)
     write_lock = lambda do |pid, identity|
       lock.atomic_write JSON.generate("pid" => pid, "identity" => identity, "role" => "orcad")
@@ -458,15 +458,40 @@ class OrcaApp < Formula
     assert_path_exists lock
     (fake_proc/"2147483646").rmdir
 
-    # An orcad process is running anywhere: refuse and keep the lock. The process
-    # list is read without a pipe into `grep -q`, which pipefail would turn into
-    # "not running" through SIGPIPE.
-    (testpath/"ps-output").atomic_write "#{"x" * 70_000}\nnode /x/orcad/orcad-server.js --port 1\n"
-    assert_match "an orcad process is running", serve.call("--reclaim")
+    # An orcad runtime is running anywhere: refuse, keep the lock and name the
+    # process. The list is read without a pipe into `grep -q`, which pipefail
+    # would turn into "not running" through SIGPIPE; the long line makes the
+    # output larger than a pipe buffer.
+    orcad = "node /x/orcad/orcad-server.js --port 1"
+    (testpath/"ps-output").atomic_write "  PID ARGS\n    2 #{"x" * 70_000}\n 4242 #{orcad}\n"
+    output = serve.call("--reclaim")
+    assert_match "an orcad process is running; not removing the lock of pid 2147483646", output
+    assert_match "4242 #{orcad}", output
     assert_path_exists lock
-    (testpath/"ps-output").atomic_write "PID ARGS\n/bin/sh\n"
 
-    # Holder gone and nothing running: the lock is removed, then startup proceeds.
+    # At most three are listed, the rest is counted; an absolute path to node counts.
+    (testpath/"ps-output").atomic_write <<~PS
+      4242 #{orcad}
+      4243 /usr/bin/node /x/orcad/orcad-server.js --port 2
+      4244 #{orcad}
+      4245 #{orcad}
+    PS
+    output = serve.call("--reclaim")
+    assert_match "4243 /usr/bin/node", output
+    assert_match "... and 1 more", output
+    refute_match "4245 node", output
+    assert_path_exists lock
+
+    # Processes that only mention the file name are not runtimes and do not block.
+    (testpath/"ps-output").atomic_write <<~PS
+      PID ARGS
+      10 vim notes-about-orcad-server.txt
+      11 sh -c ps -eo args | grep orcad-server
+      12 python3 -c pass /x/orcad/orcad-server.js
+      13 vim /x/orcad/orcad-server.js
+    PS
+
+    # Holder gone and no runtime running: the lock is removed, then startup proceeds.
     output = serve.call("--reclaim")
     assert_match "removed the stale lock of pid 2147483646 (identity 20020262)", output
     refute_path_exists lock
