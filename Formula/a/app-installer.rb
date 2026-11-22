@@ -12,8 +12,8 @@ class AppInstaller < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/app-installer-v1.3.12-r3"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7af5272677edffb23edc40715ec87a7f2672c6e576af7e6354be862f80d327de"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/app-installer-v1.3.12-r5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "528ff2935b903760a4c73fb13b960045cfb4d7bb9de04bd9ef2102ecdf983085"
   end
 
   depends_on "bash"
