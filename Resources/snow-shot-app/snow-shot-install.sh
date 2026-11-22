@@ -115,15 +115,15 @@ cmd_status() {
   ensure_device
   # shellcheck disable=SC2086
   processes="$("$hdc" $target shell "ps -ef" 2>/dev/null || true)"
-  case "$processes" in
-    *"$BUNDLE_ID"*)
-      printf 'snow-shot-app: running (%s)\n' "$BUNDLE_ID"
-      ;;
-    *)
-      printf 'snow-shot-app: not running (%s)\n' "$BUNDLE_ID" >&2
-      exit 1
-      ;;
-  esac
+  if printf '%s\n' "$processes" | awk -v bundle="$BUNDLE_ID" '
+    $8 == bundle || index($8, bundle ":") == 1 { found = 1 }
+    END { exit !found }
+  '; then
+    printf 'snow-shot-app: running (%s)\n' "$BUNDLE_ID"
+  else
+    printf 'snow-shot-app: not running (%s)\n' "$BUNDLE_ID" >&2
+    exit 1
+  fi
 }
 
 cmd_uninstall() {
