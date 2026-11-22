@@ -4,7 +4,7 @@ class HerdrApp < Formula
   url "https://github.com/herdrdev/herdr-app/archive/refs/tags/v0.1.16.tar.gz"
   sha256 "fea3d920607f2199ed330eb3cdcb1fa3626dcea5080c92a97a296d983d6bc681"
   license "Apache-2.0"
-  revision 9
+  revision 10
 
   livecheck do
     url "https://github.com/herdrdev/herdr-app.git"
@@ -217,6 +217,8 @@ class HerdrApp < Formula
       (`herdr-app bridge status|stop|restart`). Install and start run it; the token
       lives in ~/.config/herdr-app/bridge.conf (0600) and is baked into the
       app (`install --new-token` rotates it). Open with `herdr-app start`.
+      `herdr-app uninstall` removes the app but keeps its data; only
+      `herdr-app uninstall --purge` deletes the app data.
     EOS
   end
 
@@ -250,6 +252,7 @@ class HerdrApp < Formula
     (testpath/"hc").write "#!/bin/sh\nexec cat\n"
     (testpath/"bin/app-installer").write <<~SH
       #!/bin/sh
+      printf '%s\\n' "$@" > #{testpath}/installer-args
       while [ "$#" -gt 0 ]; do
         [ "$1" = "--hap" ] && cp "$2" "#{testpath}/injected.hap"
         shift
@@ -264,6 +267,7 @@ class HerdrApp < Formula
       "HERDR_APP_BRIDGE" => (libexec/"herdr-bridge.py").to_s,
       "HERDR_APP_PYTHON" => python.to_s,
       "HERDR_APP_HAP"    => hap.to_s,
+      "APP_INSTALLER"    => (testpath/"bin/app-installer").to_s,
       "TMPDIR"           => (testpath/"tmp").to_s,
       "PATH"             => "#{testpath}/bin:#{ENV["PATH"]}",
     }
@@ -307,5 +311,25 @@ class HerdrApp < Formula
     status = with_env(home_env) { shell_output("#{script} bridge status 2>&1", 1) }
     assert_match "config:         #{testpath}/home/.config/herdr-app/bridge.conf", status
     assert_equal legacy_conf, (testpath/"home/.config/herdr-app/bridge.conf").read
+
+    # Top-level stop/status manage the bridge; uninstall goes through
+    # app-installer and keeps the app's data unless --purge is given.
+    with_env(env) do
+      shell_output("#{script} stop 2>&1")
+      assert_match "bridge is not running", shell_output("#{script} stop 2>&1")
+      assert_match "not running", shell_output("#{script} status 2>&1", 1)
+      shell_output("#{script} uninstall --purge --device tablet-1")
+      assert_equal %w[uninstall --bundle-id com.social4hyq.herdrapp --device tablet-1 --purge],
+                   (testpath/"installer-args").read.lines(chomp: true)
+      shell_output("#{script} uninstall")
+      assert_equal %w[uninstall --bundle-id com.social4hyq.herdrapp],
+                   (testpath/"installer-args").read.lines(chomp: true)
+    end
+    with_env({ "HDC_TARGET" => "env-device" }.merge(env)) do
+      shell_output("#{script} uninstall")
+    end
+    assert_equal %w[uninstall --bundle-id com.social4hyq.herdrapp --device env-device],
+                 (testpath/"installer-args").read.lines(chomp: true)
+    assert_match "uninstall", shell_output("#{bin}/herdr-app --help")
   end
 end
