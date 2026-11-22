@@ -23,7 +23,13 @@ Commands:
   stop      Stop the CLI-managed backing instance
   status    Verify the backing instance's authenticated Web UI handshake
   install   Inject config/host env, sign and install the desktop HAP
+  uninstall [--device ID] [--purge]
+            Remove the app from the device. The default keeps the app's data;
+            --purge also deletes it.
   -h, --help  Show this help
+
+Device options: --device ID picks the hdc target (default: HDC_TARGET, else
+the first connected device).
 EOF
 }
 
@@ -229,12 +235,35 @@ cmd_install() {
   exec bash "$DSH_DESKTOP_INSTALL_SCRIPT" --hap "$DSH_DESKTOP_UNSIGNED_HAP" --config "$CONFIG_FILE" "$@"
 }
 
+# Uninstall through app-installer so the data-handling matches every other
+# desktop app: `bm uninstall -k` keeps the app's data unless --purge is given.
+cmd_uninstall() {
+  local purge="" device=""
+  while (($#)); do
+    case "$1" in
+      --purge) purge=1 ;;
+      --device)
+        [[ $# -ge 2 && -n "$2" ]] || { printf 'dsh-app: --device needs an id\n' >&2; exit 2; }
+        device="$2"; shift ;;
+      -h|--help) usage; exit 0 ;;
+      *) printf 'dsh-app: unknown option: %s\n' "$1" >&2; exit 2 ;;
+    esac
+    shift
+  done
+  device="${device:-${HDC_TARGET:-}}"
+  local args=(uninstall --bundle-id "$BUNDLE_ID")
+  [[ -z "$device" ]] || args+=(--device "$device")
+  [[ "$purge" != 1 ]] || args+=(--purge)
+  "${DSH_DESKTOP_INSTALLER:-app-installer}" "${args[@]}"
+}
+
 case "${1:-}" in
   start) shift; cmd_start "$@" ;;
   serve) shift; ensure_serve ;;
   stop) shift; cmd_stop "$@" ;;
   status) shift; cmd_status "$@" ;;
   install) shift; cmd_install "$@" ;;
+  uninstall) shift; cmd_uninstall "$@" ;;
   -h|--help|help) usage ;;
   "") usage >&2; exit 2 ;;
   *) printf 'dsh-app: unknown command: %s\n' "$1" >&2; usage >&2; exit 2 ;;
