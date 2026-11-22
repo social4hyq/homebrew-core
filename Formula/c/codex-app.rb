@@ -6,7 +6,7 @@ class CodexApp < Formula
   version "26.1117.41037"
   sha256 "714146e9c667b26a1bd4e57633c544334a9ed47c399989bfd98cf764140bdc53"
   license :cannot_represent # OpenAI service and software terms
-  revision 3
+  revision 4
 
   livecheck do
     url "https://persistent.oaistatic.com/codex-app-prod/linux/deb/dists/stable/main/binary-arm64/Packages"
@@ -14,8 +14,8 @@ class CodexApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codex-app-v26.1117.41037-r6"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2a85b402ca79bed5e755c04e3a335a79815cf51633a77aaf69f810c57ae425b3"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codex-app-v26.1117.41037-r7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e0f214ac280e5a5cdf48f035fb2c96e8205a54f955df84e2142ded35b26908c0"
   end
 
   depends_on "app-installer"
@@ -172,7 +172,7 @@ class CodexApp < Formula
       "$PATH",
     ].join(":")
     (bin/"codex-app").write_env_script libexec/"codex-app.sh",
-      CHATGPT_APP_HDC:            formula_opt_prefix("ohos-sdk-toolchains")/"hdc",
+      CHATGPT_APP_HDC_DEFAULT:    formula_opt_prefix("ohos-sdk-toolchains")/"hdc",
       CHATGPT_APP_UNSIGNED_HAP:   libexec/"codex-app-shell-unsigned.hap",
       CHATGPT_APP_VENDOR_JSON:    libexec/"vendor.json",
       CHATGPT_APP_ASSEMBLE_DIR:   pkgshare/"assemble",
@@ -182,7 +182,6 @@ class CodexApp < Formula
       CHATGPT_APP_BREW_PREFIX:    formula_opt_prefix("codex").parent.parent,
       CHATGPT_APP_MODULE_ACL:     pkgshare/"module-acl.json",
       CHATGPT_APP_INSTALL_SCRIPT: pkgshare/"install-desktop.sh",
-      CHATGPT_APP_INSTALLER:      formula_opt_bin("app-installer"),
       PATH:                       runtime_path
   end
 
@@ -198,6 +197,9 @@ class CodexApp < Formula
       connected and Huawei Developer login is ready. If queued, check
       `hap-app status`, then run `hap-app install-pending`.
       Manual install: `codex-app install`. See docs/hap-app-formulae.md.
+
+      `codex-app uninstall` removes the app but keeps its data; only
+      `codex-app uninstall --purge` deletes the app data.
 
       The bottle ships only the tap-authored shell; the first install asks
       OpenAI for the official ChatGPT package (~519 MB, sha256-checked) and
@@ -222,6 +224,53 @@ class CodexApp < Formula
     assert_match(/\A[0-9a-f]{64}\z/, vendor.fetch("sha256"))
     assert_match(%r{\Ahttps://}, vendor.fetch("url"))
     assert_match "Usage: codex-app", shell_output("#{bin}/codex-app --help")
+
+    # The CLI matrix: start/stop/status address the device; uninstall goes
+    # through app-installer and keeps the app's data unless --purge is given.
+    fake_bin = testpath/"cli-bin"
+    fake_bin.mkpath
+    hdc_log = testpath/"cli-hdc-log"
+    (fake_bin/"hdc").write <<~SH
+      #!/bin/sh
+      printf '%s\\n' "$*" >> #{hdc_log}
+      if [ "$1" = "shell" ] && [ "$2" = "ps -ef" ]; then
+        [ -n "${FAKE_STOPPED:-}" ] ||
+          printf '%s\\n' "app1 com.social4hyq.chatgpt" "app2 com.other.app"
+      fi
+    SH
+    chmod 0755, fake_bin/"hdc"
+    installer_args = testpath/"cli-installer-args"
+    (fake_bin/"app-installer").write <<~SH
+      #!/bin/sh
+      printf '%s\\n' "$@" > #{installer_args}
+    SH
+    chmod 0755, fake_bin/"app-installer"
+    cli_env = {
+      "CHATGPT_APP_HDC"       => "hdc",
+      "CHATGPT_APP_INSTALLER" => fake_bin/"app-installer",
+      "PATH"                  => "#{fake_bin}:#{ENV.fetch("PATH")}",
+    }
+    with_env(cli_env) do
+      shell_output("#{bin}/codex-app start --device tablet-1")
+      assert_match "-t tablet-1 shell aa start", (testpath/"cli-hdc-log").read
+      shell_output("#{bin}/codex-app stop")
+      assert_match "shell aa force-stop com.social4hyq.chatgpt", (testpath/"cli-hdc-log").read
+      assert_match "running", shell_output("#{bin}/codex-app status")
+      with_env("FAKE_STOPPED" => "1") do
+        assert_match "not running", shell_output("#{bin}/codex-app status 2>&1", 1)
+      end
+      shell_output("#{bin}/codex-app uninstall --purge --device tablet-1")
+      assert_equal %w[uninstall --bundle-id com.social4hyq.chatgpt --device tablet-1 --purge],
+                   installer_args.read.lines(chomp: true)
+      shell_output("#{bin}/codex-app uninstall")
+      assert_equal %w[uninstall --bundle-id com.social4hyq.chatgpt], installer_args.read.lines(chomp: true)
+    end
+    with_env({ "HDC_TARGET" => "env-device" }.merge(cli_env)) do
+      shell_output("#{bin}/codex-app uninstall")
+    end
+    assert_equal %w[uninstall --bundle-id com.social4hyq.chatgpt --device env-device],
+                 installer_args.read.lines(chomp: true)
+    assert_match "uninstall", shell_output("#{bin}/codex-app --help")
 
     assert_match "shell deb output", shell_output("python3 #{pkgshare}/assemble/assemble-local-hap.py --help")
     assert_match "source output", shell_output("python3 #{pkgshare}/enable-cookie-encryption.py --help")
