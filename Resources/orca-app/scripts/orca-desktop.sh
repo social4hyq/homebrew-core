@@ -129,6 +129,33 @@ process.exit(1);
 }
 
 # Free port near the default: the shell's runtime binds it on this same host.
+# Port of the runtime `orca-app serve` left serving: its process is alive, its
+# ready record names the port and the port answers. Installing while it runs keeps
+# that port, so the shell attaches to it instead of starting a second runtime on
+# the next free port.
+managed_port() {
+  [ -f "$READY_FILE" ] && [ -f "$PID_FILE" ] || return 1
+  proc_alive "$(cat "$PID_FILE" 2>/dev/null || true)" || return 1
+  local found
+  found="$("$NODE_BIN" -e '
+const fs = require("node:fs");
+for (const line of fs.readFileSync(process.argv[1], "utf8").split("\n")) {
+  if (!line.includes("orca_server_ready")) continue;
+  try {
+    const port = Number(new URL(JSON.parse(line).endpoint).port);
+    if (Number.isInteger(port) && port > 0) {
+      process.stdout.write(String(port));
+      process.exit(0);
+    }
+  } catch {}
+}
+process.exit(1);
+' "$READY_FILE")" || return 1
+  PORT="$found"
+  healthy || return 1
+  printf '%s' "$found"
+}
+
 choose_port() {
   local requested="$1" offset=0 candidate
   while [ "$offset" -lt 50 ]; do
@@ -268,12 +295,17 @@ cmd_install() {
     ""|*[!0-9]*) die "--port needs a number" ;;
   esac
   # The shell starts the runtime itself, so the HAP only needs the port it
-  # should bind and the host environment to spawn it in; no live server (and no
-  # single-use pairing link) is involved at install time.
+  # should bind and the host environment to spawn it in; no single-use pairing
+  # link is involved at install time. A runtime that `orca-app serve` left running
+  # only contributes its port (managed_port).
   if [ -z "$config" ]; then
     [ -n "$ORCA_BIN" ] && [ -x "$ORCA_BIN" ] || die "orca binary not found; set ORCA_DESKTOP_ORCA_BIN"
     config="$CONFIG_FILE"
-    write_install_config "$(choose_port "${port:-$DEFAULT_PORT}")"
+    local chosen
+    if [ -n "$port" ] || ! chosen="$(managed_port)"; then
+      chosen="$(choose_port "${port:-$DEFAULT_PORT}")"
+    fi
+    write_install_config "$chosen"
   fi
   [ -f "$config" ] || die "host config not found: $config"
   "${ORCA_DESKTOP_INSTALL_SCRIPT:?missing install script}" \
