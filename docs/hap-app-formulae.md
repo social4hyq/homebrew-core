@@ -135,24 +135,30 @@ sha256，缓存到 `~/.cache/<app>/vendor/`，再合成 HAP、签名安装。`ob
 
 Homebrew 跑 `post_install` 时清空环境变量，所以**在 shell 里 export 的
 `NODE_EXTRA_CA_CERTS` / `NODE_TLS_REJECT_UNAUTHORIZED` / `HTTPS_PROXY` 不会传给
-DevEco CLI**——公司电脑上最常见的失败就是 `devecocli signature generate` 报
-`self-signed certificate in certificate chain`，而手动 `hap-app install-pending`
-又正常。把网络设置写进文件（不会被清掉）：
+DevEco CLI 或厂商包下载的 curl**——公司电脑上常见的失败就是签名报
+`self-signed certificate in certificate chain`、厂商包直连超时，而手动
+`hap-app install-pending` 又正常。把网络设置写进文件（不会被清掉）：
 
 ```ini
 # ~/.app-installer/config
 tls_ca=/absolute/path/to/proxy-ca.pem     # 首选：信任代理/VPN 的 CA
 # https_proxy=http://127.0.0.1:7890       # 可选
+# no_proxy=localhost,127.0.0.1            # 可选；与代理配置独立
 # tls_insecure=1                          # 最后手段：完全关掉证书校验
 ```
 
-- 文件只影响 app-installer 调 DevEco 签名的环境；shell 里已有的同名变量优先。
-- `tls_ca` 指向不存在的文件会直接报错，不会悄悄跳过。
+- `https_proxy` 和 `no_proxy` 由 `hap-app` 在恢复真实 HOME 后分别导出为大小写两套
+  环境变量，DevEco 签名和厂商包下载都会继承。shell 里已有 `HTTPS_PROXY` 或
+  `https_proxy` 时优先使用 shell 的代理；`NO_PROXY` 或 `no_proxy` 同理。两组设置独立，
+  shell 只设代理时仍会读取文件里的 `no_proxy`。
+- `tls_ca` 只影响 app-installer 调 DevEco 签名的环境，指向不存在的文件会直接报错。
 - `tls_insecure=1` 会给 DevEco CLI（及其子进程）设上
-  `NODE_TLS_REJECT_UNAUTHORIZED=0`，即彻底不校验证书。这是唯一能穿透 brew
-  post_install 清环境问题的通道，代价是华为登录 token 和签名响应在链路上可被读取/
-  伪造；每次运行都会打 WARNING，`doctor` 显示 `warn TLS config (... disabled)`。证书
-  能装就优先用 `tls_ca`，把它当临时手段并在修好后删掉。
+  `NODE_TLS_REJECT_UNAUTHORIZED=0`，并给上述三个厂商包的 curl 下载加 `--insecure`，
+  即彻底不校验证书。shell 里已有 `HAP_INSTALLER_TLS_INSECURE` 时优先使用 shell（包括
+  显式设为 `0`）。curl 禁用证书校验不会关闭下载后的 sha256 校验；不使用全局 `.curlrc`。
+  该设置也能穿透 brew post_install 清环境，但代价是华为登录 token、签名响应和厂商下载
+  在链路上可被读取/伪造；每次运行都会打 WARNING，`doctor` 显示
+  `warn TLS config (... disabled)`。证书能装就优先用 `tls_ca`，把它当临时手段并在修好后删掉。
 - `app-installer doctor` 显示当前 TLS 配置；`app-installer doctor --network` 会用
   同样的 TLS 设置探测 `https://developer.huawei.com`（配了 HTTPS 代理时跳过，因为
   DevEco 可能走不同路由）；确认证书不被信任时按提示改配置再重试，不用重装 brew 包。
