@@ -6,7 +6,7 @@ set -euo pipefail
 APP_CMD=antigravity-ide-app
 ENV_PREFIX=ANTIGRAVITY_IDE_APP
 BUNDLE_ID_DEFAULT=com.social4hyq.antigravityide
-APP_NAME_DEFAULT="Antigravity IDE"
+APP_NAME_DEFAULT=AntigravityIDE
 NEED_CONFIG=0
 MODULE=electron
 ABILITY=EntryAbility
