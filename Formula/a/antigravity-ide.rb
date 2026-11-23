@@ -5,7 +5,7 @@ class AntigravityIde < Formula
       "2.8.0-6733682917113856/linux-arm/Antigravity%20IDE.tar.gz"
   sha256 "d8f85ce40306587a80a7478af4de85cb10b83cf26dd9179b902afa9933fcf9f2"
   license :cannot_represent # Google Terms of Service; closed-source prebuilt desktop app
-  revision 1
+  revision 2
 
   livecheck do
     url :homepage
@@ -151,11 +151,13 @@ class AntigravityIde < Formula
       ANTIGRAVITY_IDE_MODULE_ACL:     pkgshare/"module-acl.json",
       ANTIGRAVITY_IDE_INSTALL_SCRIPT: pkgshare/"install-desktop.sh",
       PATH:                           runtime_path
+    # hap-app validates auto-install command names as <name>-app.
+    bin.install_symlink "antigravity-ide" => "antigravity-ide-app"
   end
 
   post_install_steps do
     run "{{HOMEBREW_PREFIX}}/bin/hap-app",
-        args: ["auto-install", "antigravity-ide", "com.social4hyq.antigravityide"],
+        args: ["auto-install", "antigravity-ide-app", "com.social4hyq.antigravityide"],
         must_succeed: false, print_stdout: true, network_access: true
   end
 
@@ -165,5 +167,6 @@ class AntigravityIde < Formula
     assert_match(/\A[0-9a-f]{64}\z/, vendor.fetch("sha256"))
     assert_match "Usage: antigravity-ide", shell_output("#{bin}/antigravity-ide --help")
     assert_path_exists libexec/"antigravity-ide-shell-unsigned.hap"
+    assert_path_exists bin/"antigravity-ide-app"
   end
 end
