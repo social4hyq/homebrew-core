@@ -65,7 +65,7 @@ say '```'
 
 hr
 say "### 4b. Real bottle redirect chain (from the runner, with pin applied in container)"
-ROOT=$(cexec "grep -m1 'root_url' $TAP_IN_CONTAINER/Formula/c/claude-code.rb | sed -E 's/.*\\"([^\\"]+)\\".*/\\1/'")
+ROOT=$(cexec "grep -m1 'root_url' $TAP_IN_CONTAINER/Formula/c/claude-code.rb | awk -F'\"' '{print \$2}'")
 TAG=${ROOT##*/}
 say "- root_url: \`$ROOT\`"
 ASSET=$(curl -sS --max-time 30 "https://atomgit.com/api/v5/repos/social4hyq/homebrew-core/releases/tags/$TAG" 2>/dev/null | python3 -c 'import json,sys; d=json.load(sys.stdin); print(next((a["name"] for a in d.get("assets",[]) if "bottle.tar.gz" in a["name"]), ""))' 2>/dev/null || true)
