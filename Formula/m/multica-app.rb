@@ -229,30 +229,6 @@ class MulticaApp < Formula
         must_succeed: false, print_stdout: true, network_access: true
   end
 
-  def caveats
-    <<~EOS
-      `brew install` and `brew upgrade` try to install the HAP when a device is
-      connected and Huawei Developer login is ready. If queued, check
-      `hap-app status`, then run `hap-app install-pending`.
-      Manual install: `multica-app install`. See docs/hap-app-formulae.md.
-
-      The CLI and daemon come from the `multica` formula; keep both versions equal
-      (`multica-app` warns when they differ). The desktop runs in its sandbox, so a
-      loopback bridge runs on the host: `multica-app` starts it and opens the app,
-      `multica-app stop` stops it. To start only the bridge from a login script,
-      use the absolute path because it may run before Homebrew's bin is on PATH:
-
-        "#{opt_bin}/multica-app" start --bridge-only
-
-      The default install also requests CUSTOM_SANDBOX and READ_WRITE_USER_FILE,
-      which the locally generated debug profile grants; `install --no-acl` installs
-      the basic variant that asks only for INTERNET and GET_NETWORK_INFO. The bundle
-      is `com.social4hyq.multica`; older `com.huawei.ohos_electron` copies are left
-      in place. `multica-app uninstall` removes the app but keeps its data; only
-      `multica-app uninstall --purge` deletes the app data.
-    EOS
-  end
-
   test do
     require "net/http"
 

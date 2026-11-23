@@ -198,22 +198,6 @@ class DeepseekHarnessApp < Formula
         must_succeed: false, print_stdout: true, network_access: true
   end
 
-  def caveats
-    <<~EOS
-      `brew install` and `brew upgrade` try to install the HAP when a device is
-      connected and Huawei Developer login is ready. If queued, check
-      `hap-app status`, then run `hap-app install-pending`.
-      Manual install: `deepseek-harness-app install`. See docs/hap-app-formulae.md.
-
-      Closing the window hides it to the tray. `deepseek-harness-app install`/`start` run a
-      detached `dsh web` backend that survives the window; the tray menu shows or
-      quits it. Weak-sandbox ACLs (including READ_PASTEBOARD) come from the local
-      debug profile. CLI and desktop versions may differ (warning only).
-      `deepseek-harness-app uninstall` removes the app but keeps its data; only
-      `deepseek-harness-app uninstall --purge` deletes the app data.
-    EOS
-  end
-
   test do
     ENV["HOME"] = testpath/"home"
     %w[deepseek-harness-app dsh-app deepseek-harness-desktop].each do |command|
