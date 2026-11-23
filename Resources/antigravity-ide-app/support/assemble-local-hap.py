@@ -66,7 +66,7 @@ def assemble(shell, tarball, output, pin_path):
     if output.exists():
         raise FileExistsError(f"refusing to overwrite {output}")
     verify_tarball(tarball, pin_path)
-    with tempfile.TemporaryDirectory(prefix="antigravity-ide-vendor-") as temp:
+    with tempfile.TemporaryDirectory(prefix="antigravity-ide-app-vendor-") as temp:
         vendor = Path(temp) / "app"
         vendor.mkdir()
         selected_app(tarball, vendor)
@@ -74,7 +74,7 @@ def assemble(shell, tarball, output, pin_path):
             names = source.namelist()
             if len(names) != len(set(names)) or "module.json" not in names:
                 raise ValueError("expected a shell-only Electron HAP")
-            if APP_ROOT + "antigravity-ide-bootstrap.cjs" not in names:
+            if APP_ROOT + "antigravity-ide-app-bootstrap.cjs" not in names:
                 raise ValueError("shell HAP is missing the IDE bootstrap")
             module = json.loads(source.read("module.json"))
             if module.get("app", {}).get("bundleName") != BUNDLE_ID:

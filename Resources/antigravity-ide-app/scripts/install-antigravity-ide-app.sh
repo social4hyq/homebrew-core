@@ -3,8 +3,8 @@
 # it locally. The bottle ships only the tap-authored shell.
 set -euo pipefail
 
-APP_CMD=antigravity-ide
-ENV_PREFIX=ANTIGRAVITY_IDE
+APP_CMD=antigravity-ide-app
+ENV_PREFIX=ANTIGRAVITY_IDE_APP
 BUNDLE_ID_DEFAULT=com.social4hyq.antigravityide
 APP_NAME_DEFAULT="Antigravity IDE"
 NEED_CONFIG=0
@@ -12,7 +12,7 @@ MODULE=electron
 ABILITY=EntryAbility
 
 EXTRA_TOOLS=(curl tar sha256sum python3)
-VENDOR_TARBALL="${ANTIGRAVITY_IDE_VENDOR_TARBALL:-}"
+VENDOR_TARBALL="${ANTIGRAVITY_IDE_APP_VENDOR_TARBALL:-}"
 CLEAN_CACHE=0
 
 log() { printf '%s\n' "$*" >&2; }
@@ -47,9 +47,9 @@ process.stdout.write(String(v[process.argv[2]]||""));
 }
 
 app_prepare() {
-  local cache_dir="${HOME}/.cache/antigravity-ide"
-  local vendor_json="${ANTIGRAVITY_IDE_VENDOR_JSON:?missing vendor.json}"
-  local shell_libexec="${ANTIGRAVITY_IDE_LIBEXEC:?missing libexec path}"
+  local cache_dir="${HOME}/.cache/antigravity-ide-app"
+  local vendor_json="${ANTIGRAVITY_IDE_APP_VENDOR_JSON:?missing vendor.json}"
+  local shell_libexec="${ANTIGRAVITY_IDE_APP_LIBEXEC:?missing libexec path}"
   local url sha version tarfile assembled
   mkdir -p "$cache_dir/vendor" "$cache_dir/assembled"
   [ "$CLEAN_CACHE" != 1 ] || rm -rf "$cache_dir/vendor" "$cache_dir/assembled"
@@ -80,7 +80,7 @@ app_prepare() {
     fi
   fi
 
-  assembled="$cache_dir/assembled/antigravity-ide.hap"
+  assembled="$cache_dir/assembled/antigravity-ide-app.hap"
   rm -f "$assembled"
   python3 "$shell_libexec/assemble-local-hap.py" \
     "$shell_hap" "$tarfile" "$vendor_json" "$assembled"
