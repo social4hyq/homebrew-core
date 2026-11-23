@@ -8,6 +8,7 @@ document URI through the user-file export queue, keeping error handling,
 thread hand-off, cleanup and history-completion behavior unchanged.
 
 diff --git a/snow_shot/src/presentation/services/screenshotcontroller.cpp b/snow_shot/src/presentation/services/screenshotcontroller.cpp
+index ded283b..cdda278 100644
 --- a/snow_shot/src/presentation/services/screenshotcontroller.cpp
 +++ b/snow_shot/src/presentation/services/screenshotcontroller.cpp
 @@ -32,7 +32,12 @@
@@ -140,7 +141,7 @@ diff --git a/snow_shot/src/presentation/services/screenshotcontroller.cpp b/snow
  #if SNOW_SHOT_ENABLE_TABLE_RECOGNITION || SNOW_SHOT_ENABLE_LATEX_RECOGNITION ||                    \
      SNOW_SHOT_ENABLE_IMAGE_CONVERSION || SNOW_SHOT_ENABLE_TEXT_TRANSLATION
      if (m_tableRecognition == nullptr) {
-@@ -5049,8 +5108,14 @@
+@@ -5057,8 +5116,14 @@
          return;
      }
  #endif
@@ -157,8 +158,8 @@ diff --git a/snow_shot/src/presentation/services/screenshotcontroller.cpp b/snow
          saveSelectionWithSnowDialog();
          return;
      }
-@@ -5072,6 +5137,57 @@
-                                          outputSettings.manualSaveFilenameFormat());
+@@ -5080,6 +5145,57 @@
+                                             outputSettings.manualSaveFilenameFormat());
      const auto defaults = screenshotManualSaveDefaults(QDateTime::currentDateTime(), names);
      QString selectedFilter = defaults.selectedFilter;
 +#ifdef Q_OS_HARMONY
@@ -215,12 +216,12 @@ diff --git a/snow_shot/src/presentation/services/screenshotcontroller.cpp b/snow
      const QString selectedPath = QFileDialog::getSaveFileName(
          dialogOwner.data(), QCoreApplication::translate("ScreenshotController", "Save screenshot"),
          defaults.initialPath, ScreenshotImageFileService::saveDialogFilter(), &selectedFilter);
-@@ -5078,3 +5194,4 @@
+@@ -5086,3 +5202,4 @@
 +#endif
      if (selectedPath.isEmpty()) {
          return;
      }
-@@ -5196,6 +5313,186 @@
+@@ -5204,6 +5321,186 @@
          ScreenshotImageFileService::suggestedBaseName(settings.manualSaveFilenameFormat(),
                                                        timestamp, names),
          QLatin1Char('.') + ScreenshotRecognitionFileExport::extension(snapshot.kind)));
@@ -407,7 +408,7 @@ diff --git a/snow_shot/src/presentation/services/screenshotcontroller.cpp b/snow
      QString selectedFilter;
      QString selectedPath = QFileDialog::getSaveFileName(
          dialogOwner.data(),
-@@ -5232,6 +5529,7 @@
+@@ -5240,6 +5537,7 @@
      static_cast<void>(settings.setLastManualSaveDirectory(QFileInfo(result.path).absolutePath()));
      detachCaptureForExport(ExportDetachMode::Immediate,
                             ScreenshotCaptureFocusDisposition::RestorePrevious);
@@ -415,7 +416,7 @@ diff --git a/snow_shot/src/presentation/services/screenshotcontroller.cpp b/snow
  #else
      Q_UNUSED(snapshot)
  #endif
-@@ -5432,6 +5730,28 @@
+@@ -5440,6 +5738,28 @@
      ScreenshotPdfOptions pdf, ScreenshotImageEncodingOptions encoding, quint64 generation,
      std::shared_ptr<std::optional<ScreenshotHistoryEntry>> historyCandidate, qreal outputScale,
      ScreenshotExportTasks tasks) {
@@ -444,7 +445,7 @@ diff --git a/snow_shot/src/presentation/services/screenshotcontroller.cpp b/snow
      auto artifact = scaledExport(std::move(source), outputScale, tasks);
      const QPointer<ScreenshotController> receiver(&owner);
      std::erase_if(m_saveArtifacts, [](const auto& weak) { return weak.expired(); });
-@@ -5447,8 +5767,67 @@
+@@ -5455,8 +5775,67 @@
                  std::move(result), generation, historyCandidate,
                  snow_shot::storage::CaptureHistorySource::SavedToFile, artifact);
      };
@@ -514,7 +515,7 @@ diff --git a/snow_shot/src/presentation/services/screenshotcontroller.cpp b/snow
          complete(ScreenshotExportTaskResult::failure(
              ScreenshotExportFailureStage::Queue,
              QCoreApplication::translate("ScreenshotController",
-@@ -5478,9 +5857,17 @@
+@@ -5486,9 +5865,17 @@
      }
      if (result.succeeded()) {
          const snow_shot::storage::ScreenshotSettings settings;
@@ -535,7 +536,7 @@ diff --git a/snow_shot/src/presentation/services/screenshotcontroller.cpp b/snow
          publishHistoryResult(std::move(historyCandidate), historySource, std::move(artifact));
      }
  }
-@@ -6555,7 +6942,22 @@
+@@ -6584,7 +6971,22 @@
          m_selection.regionOperationActive() || m_selection.constructionActive() || m_recaptureBusy)
          return;
      if (!m_qrRecognition)
@@ -558,7 +559,7 @@ diff --git a/snow_shot/src/presentation/services/screenshotcontroller.cpp b/snow
      if (!m_qrController) {
          m_qrController = std::make_unique<ScreenshotQrController>(
              *m_qrRecognition, ScreenshotQrController::Actions{{}, [this] { cancelCapture(); }},
-@@ -7151,6 +7553,33 @@
+@@ -7180,6 +7582,33 @@
      }
  }
  
