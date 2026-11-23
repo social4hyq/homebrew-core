@@ -19,8 +19,8 @@ class ZcodeApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-app-v3.18.2-r37"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d102b56b06129df9d06887026b28e17c16458215fc704d897251b494d33a1d8b"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-app-v3.18.2-r38"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "de06735b8132e0bb6ea42a3b95797f90cd6403499e05b02875b16d8c7888efd4"
   end
 
   depends_on "app-installer"
@@ -121,7 +121,8 @@ class ZcodeApp < Formula
               <<~JSON5.chomp
                 "requestPermissions": [
                       { "name": "ohos.permission.INTERNET" },
-                      { "name": "ohos.permission.GET_NETWORK_INFO" }
+                      { "name": "ohos.permission.GET_NETWORK_INFO" },
+                      { "name": "ohos.permission.MICROPHONE", "reason": "$string:microphone", "usedScene": { "abilities": ["EntryAbility"], "when": "inuse" } }
                     ],
               JSON5
 
@@ -246,7 +247,10 @@ class ZcodeApp < Formula
     fake_hap = testpath/"shell.hap"
     hap_tree = testpath/"hap-tree"
     (hap_tree/"resources/resfile/resources/app").mkpath
-    fake_module = { "name" => "electron", "requestPermissions" => [{ "name" => "ohos.permission.INTERNET" }] }
+    fake_module = { "name" => "electron", "requestPermissions" => [
+      { "name" => "ohos.permission.INTERNET" },
+      { "name" => "ohos.permission.MICROPHONE" },
+    ] }
     (hap_tree/"module.json").write JSON.generate(
       "app"    => { "bundleName" => "com.social4hyq.zcodedesktop" },
       "module" => fake_module,
@@ -322,7 +326,7 @@ class ZcodeApp < Formula
     acl_module = JSON.parse(shell_output("unzip -p #{injected_copy} module.json"))
     acl_permissions = acl_module.dig("module", "requestPermissions").map { |permission| permission.fetch("name") }
     assert_equal %w[ohos.permission.CUSTOM_SANDBOX ohos.permission.GET_NETWORK_INFO
-                    ohos.permission.INTERNET ohos.permission.READ_PASTEBOARD
+                    ohos.permission.INTERNET ohos.permission.MICROPHONE ohos.permission.READ_PASTEBOARD
                     ohos.permission.READ_WRITE_USER_FILE
                     ohos.permission.kernel.ALLOW_WRITABLE_CODE_MEMORY
                     ohos.permission.kernel.DISABLE_CODE_MEMORY_PROTECTION].sort,
@@ -340,7 +344,7 @@ class ZcodeApp < Formula
     strong_module = JSON.parse(shell_output("unzip -p #{injected_copy} module.json"))
     strong_requests = strong_module.dig("module", "requestPermissions")
     strong_permissions = strong_requests.map { |permission| permission.fetch("name") }
-    assert_equal %w[ohos.permission.INTERNET], strong_permissions
+    assert_equal %w[ohos.permission.INTERNET ohos.permission.MICROPHONE], strong_permissions
 
     keep_tmp = testpath/"keep-tmp"
     keep_tmp.mkpath
@@ -401,11 +405,12 @@ class ZcodeApp < Formula
     assert_equal 0, placeholder.fetch("port")
     permissions = JSON.parse(shell_output("unzip -p #{hap} module.json"))
                       .fetch("module").fetch("requestPermissions").map { |permission| permission.fetch("name") }
-    assert_equal %w[ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET], permissions.sort
+    assert_equal %w[ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET
+                    ohos.permission.MICROPHONE], permissions.sort
     acl = JSON.parse((pkgshare/"module-acl.json").read)
     acl_requested = acl.fetch("module").fetch("requestPermissions").map { |permission| permission.fetch("name") }
     assert_equal %w[ohos.permission.CUSTOM_SANDBOX ohos.permission.GET_NETWORK_INFO
-                    ohos.permission.INTERNET ohos.permission.READ_PASTEBOARD
+                    ohos.permission.INTERNET ohos.permission.MICROPHONE ohos.permission.READ_PASTEBOARD
                     ohos.permission.READ_WRITE_USER_FILE
                     ohos.permission.kernel.ALLOW_WRITABLE_CODE_MEMORY
                     ohos.permission.kernel.DISABLE_CODE_MEMORY_PROTECTION].sort,
