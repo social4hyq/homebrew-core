@@ -28,7 +28,7 @@ app_prepare() {
 }
 
 # Write the per-host config into the HAP tree: $1 is the host config written by
-# `dsh-app install`, $2 the root of the tree that is added to the HAP.
+# `deepseek-harness-app install`, $2 the root of the tree that is added to the HAP.
 stage_tree() {
   local dest="$2/resources/resfile/resources/app/config.json"
   mkdir -p "$(dirname "$dest")"

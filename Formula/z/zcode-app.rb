@@ -9,7 +9,7 @@ class ZcodeApp < Formula
   # Tap-authored shell scripts (MIT) on the CPF-Electron runtime (mixed
   # MIT/BSD/LGPL).
   license :cannot_represent
-  revision 25
+  revision 26
 
   livecheck do
     url "https://raw.githubusercontent.com/zai-org/ZCode/main/package.json"
@@ -19,8 +19,9 @@ class ZcodeApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-app-v3.18.2-r30"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "4eb978afd5f58b1433f35950a56ff6467069db8216080378c804932b02bbcbe9"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-app-v3.18.2-r33"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8719dbdd44f72e5463b0a6ec86232391ba79421d81e472d7adc0e72a3e2ee56e"
   end
 
   depends_on "app-installer"
@@ -245,6 +246,9 @@ class ZcodeApp < Formula
       strong-sandbox variant (no JIT/paste, cannot start the service).
       The embedded terminal is unavailable (node-pty cannot spawn under
       bun on HarmonyOS).
+
+      `zcode-app uninstall` removes the app but keeps its data; only
+      `zcode-app uninstall --purge` deletes the app data.
     EOS
   end
 
@@ -303,6 +307,21 @@ class ZcodeApp < Formula
 
     ENV.prepend_path "PATH", fake_bin
     ENV["ZCODE_DESKTOP_HDC"] = (fake_bin/"hdc").to_s
+    ENV["ZCODE_DESKTOP_INSTALLER"] = (fake_bin/"app-installer").to_s
+
+    # uninstall goes through app-installer and keeps the app's data unless
+    # --purge is given; --device/HDC_TARGET pick the hdc target.
+    shell_output("#{bin}/zcode-app uninstall --purge --device tablet-1")
+    assert_equal %w[uninstall --bundle-id com.social4hyq.zcodedesktop --device tablet-1 --purge],
+                 installer_args.read.lines(chomp: true)
+    shell_output("#{bin}/zcode-app uninstall")
+    assert_equal %w[uninstall --bundle-id com.social4hyq.zcodedesktop], installer_args.read.lines(chomp: true)
+    with_env("HDC_TARGET" => "env-device") do
+      shell_output("#{bin}/zcode-app uninstall")
+    end
+    assert_equal %w[uninstall --bundle-id com.social4hyq.zcodedesktop --device env-device],
+                 installer_args.read.lines(chomp: true)
+    assert_match "uninstall", shell_output("#{bin}/zcode-app --help")
 
     assert_match "installed", shell_output("#{bin}/zcode-app install --hap #{fake_hap} --no-serve")
     host_config = JSON.parse((testpath/"home/.config/zcode-desktop/config.json").read)

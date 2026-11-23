@@ -1,13 +1,13 @@
-OHOS: route the multica-desktop commands (install, start, stop, status) to
-their scripts, and warn when the multica CLI is of another version than this
-desktop.
+OHOS: route the multica-desktop commands (install, start, stop, status,
+uninstall) to their scripts, and warn when the multica CLI is of another
+version than this desktop.
 
 diff --git a/scripts/multica-desktop-dispatch-ohos.sh b/scripts/multica-desktop-dispatch-ohos.sh
 new file mode 100755
-index 0000000..b0f7703
+index 0000000..6ad9f9e
 --- /dev/null
 +++ b/scripts/multica-desktop-dispatch-ohos.sh
-@@ -0,0 +1,47 @@
+@@ -0,0 +1,72 @@
 +#!/usr/bin/env bash
 +set -euo pipefail
 +
@@ -19,7 +19,10 @@ index 0000000..b0f7703
 +    '  start [--bridge-only]' \
 +    '                ensure the host bridge is running, then open the app (default)' \
 +    '  stop          stop the bridge; the daemon keeps running' \
-+    '  status        print the bridge state; exit 1 when it is stopped'
++    '  status        print the bridge state; exit 1 when it is stopped' \
++    '  uninstall [--device <hdc serial>] [--purge]' \
++    '                remove the app from the device. The default keeps the app data;' \
++    '                --purge also deletes it (device default: HDC_TARGET, else the first one)'
 +}
 +
 +# The desktop reaches the CLI through the bridge, so a CLI of another version
@@ -42,6 +45,28 @@ index 0000000..b0f7703
 +    shift
 +    check_cli_version
 +    exec "$MULTICA_INSTALL_DESKTOP" "$@"
++    ;;
++  uninstall)
++    shift
++    # app-installer runs 'bm uninstall -k' unless --purge is given, so the
++    # app's data survives a plain uninstall. The bundle name is fixed by the
++    # formula, which rewrites the vendor template's shared one.
++    device=""
++    purge=""
++    while (($#)); do
++      case "$1" in
++        --device)
++          (($# >= 2)) && [[ -n "$2" && "$2" != --* ]] || { printf 'multica-app: --device needs an id\n' >&2; exit 2; }
++          device="$2"; shift 2 ;;
++        --purge) purge=1; shift ;;
++        *) printf 'multica-app: unknown option: %s\n' "$1" >&2; exit 2 ;;
++      esac
++    done
++    device="${device:-${HDC_TARGET:-}}"
++    args=(uninstall --bundle-id com.social4hyq.multica)
++    [[ -z "$device" ]] || args+=(--device "$device")
++    [[ -z "$purge" ]] || args+=(--purge)
++    exec app-installer "${args[@]}"
 +    ;;
 +  start | stop | status | -*)
 +    # `multica-desktop --bridge-only` means `start --bridge-only`.

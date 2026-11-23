@@ -4,7 +4,7 @@ class DeepseekHarnessApp < Formula
   url "https://github.com/deepseek-ai/deepseek-harness/archive/refs/tags/dsh-v0.2.2-rc.5.tar.gz"
   sha256 "4e24e132a9fc267d5cdc5724525873db2575680e073fd2db4519b92553614215"
   license :cannot_represent
-  revision 4
+  revision 6
 
   livecheck do
     url "https://github.com/deepseek-ai/deepseek-harness.git"
@@ -12,8 +12,8 @@ class DeepseekHarnessApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/deepseek-harness-app-v0.2.2-rc.5-r8"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0467d0a81de7e0b87a02fd19712cfa122042d898f159f004a1fdb1c99a8928da"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/deepseek-harness-app-v0.2.2-rc.5-r10"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "61697c236e39c3ede2ed9b5b1c79ff58b232050792adab3a32bfdae130b9d93e"
   end
 
   depends_on "app-installer"
@@ -177,7 +177,7 @@ class DeepseekHarnessApp < Formula
       (res/"scripts/deepseek-harness-desktop.sh").read,
     )
     chmod 0755, libexec/"deepseek-harness-desktop.sh"
-    (bin/"dsh-app").write_env_script opt_libexec/"deepseek-harness-desktop.sh",
+    (bin/"deepseek-harness-app").write_env_script opt_libexec/"deepseek-harness-desktop.sh",
       DSH_DESKTOP_UNSIGNED_HAP:   opt_libexec/"deepseek-harness-desktop-unsigned.hap",
       DSH_DESKTOP_INSTALL_SCRIPT: opt_pkgshare/"install-desktop.sh",
       DSH_DESKTOP_MODULE_ACL:     opt_pkgshare/"module-acl.json",
@@ -189,12 +189,13 @@ class DeepseekHarnessApp < Formula
     cp res/"tests/test-startup.cjs", pkgshare/"test-startup.cjs"
     cp res/"tests/test-proxy.cjs", pkgshare/"test-proxy.cjs"
     cp res/"tests/test-server-detach.rb", pkgshare/"test-server-detach.rb"
-    bin.install_symlink bin/"dsh-app" => "deepseek-harness-desktop"
+    bin.install_symlink bin/"deepseek-harness-app" => "dsh-app"
+    bin.install_symlink bin/"deepseek-harness-app" => "deepseek-harness-desktop"
   end
 
   post_install_steps do
     run "{{HOMEBREW_PREFIX}}/bin/hap-app",
-        args: ["auto-install", "dsh-app", "com.social4hyq.deepseekharness"],
+        args: ["auto-install", "deepseek-harness-app", "com.social4hyq.deepseekharness"],
         must_succeed: false, print_stdout: true, network_access: true
   end
 
@@ -203,19 +204,24 @@ class DeepseekHarnessApp < Formula
       `brew install` and `brew upgrade` try to install the HAP when a device is
       connected and Huawei Developer login is ready. If queued, check
       `hap-app status`, then run `hap-app install-pending`.
-      Manual install: `dsh-app install`. See docs/hap-app-formulae.md.
+      Manual install: `deepseek-harness-app install`. See docs/hap-app-formulae.md.
 
-      Closing the window hides it to the tray. `dsh-app install`/`start` run a
+      Closing the window hides it to the tray. `deepseek-harness-app install`/`start` run a
       detached `dsh web` backend that survives the window; the tray menu shows or
       quits it. Weak-sandbox ACLs (including READ_PASTEBOARD) come from the local
       debug profile. CLI and desktop versions may differ (warning only).
+      `deepseek-harness-app uninstall` removes the app but keeps its data; only
+      `deepseek-harness-app uninstall --purge` deletes the app data.
     EOS
   end
 
   test do
     ENV["HOME"] = testpath/"home"
-    assert_match "Usage: dsh-app", shell_output("#{bin}/deepseek-harness-desktop --help")
-    assert_match "Usage: dsh-app", shell_output("#{bin}/dsh-app --help")
+    %w[deepseek-harness-app dsh-app deepseek-harness-desktop].each do |command|
+      assert_match "Usage: deepseek-harness-app", shell_output("#{bin}/#{command} --help")
+    end
+    assert_predicate bin/"dsh-app", :symlink?
+    assert_predicate bin/"deepseek-harness-desktop", :symlink?
 
     fake_bin = testpath/"bin"
     fake_bin.mkpath
@@ -244,8 +250,9 @@ class DeepseekHarnessApp < Formula
     ENV.prepend_path "PATH", fake_bin
     ENV.prepend_path "PATH", formula_opt_bin("node").to_s
     ENV["DSH_DESKTOP_HDC"] = (fake_bin/"hdc").to_s
+    ENV["DSH_DESKTOP_INSTALLER"] = fake_installer.to_s
 
-    assert_match "installed", shell_output("#{bin}/dsh-app install")
+    assert_match "installed", shell_output("#{bin}/deepseek-harness-app install")
     config = JSON.parse(shell_output("unzip -p #{injected_copy} resources/resfile/resources/app/config.json"))
     assert_operator config.fetch("port"), :>, 0
     refute_empty config.fetch("dsh")
@@ -263,25 +270,25 @@ class DeepseekHarnessApp < Formula
     assert_equal "electron", installer[installer.index("--module") + 1]
     assert_equal (fake_bin/"hdc").to_s, installer[installer.index("--hdc") + 1]
     refute_path_exists Pathname.new(Dir.home)/".hap-installer"
-    assert_match "installed", shell_output("#{bin}/dsh-app install --device chosen")
+    assert_match "installed", shell_output("#{bin}/deepseek-harness-app install --device chosen")
     installer = installer_args.read.lines(chomp: true)
     assert_equal "chosen", installer[installer.index("--device") + 1]
-    assert_match "strong-sandbox", shell_output("#{bin}/dsh-app install --no-acl")
+    assert_match "strong-sandbox", shell_output("#{bin}/deepseek-harness-app install --no-acl")
     strong = JSON.parse(shell_output("unzip -p #{injected_copy} module.json"))
     assert_equal %w[ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET],
                  strong.fetch("module").fetch("requestPermissions").map { |entry| entry.fetch("name") }.sort
     keep_tmp = testpath/"keep"
     keep_tmp.mkpath
     kept_output = with_env(TMPDIR: keep_tmp.to_s) do
-      shell_output("#{bin}/dsh-app install --keep 2>&1")
+      shell_output("#{bin}/deepseek-harness-app install --keep 2>&1")
     end
     assert_match "installed (com.social4hyq.deepseekharness, ACL)", kept_output
     assert_match "signed HAP kept", kept_output
     assert_path_exists keep_tmp/"deepseek-harness-app-signed.hap"
 
-    assert_match(/serving at|already healthy/, shell_output("#{bin}/dsh-app serve"))
-    assert_match "healthy", shell_output("#{bin}/dsh-app status")
-    assert_match "stopped", shell_output("#{bin}/dsh-app stop")
+    assert_match(/serving at|already healthy/, shell_output("#{bin}/deepseek-harness-app serve"))
+    assert_match "healthy", shell_output("#{bin}/deepseek-harness-app status")
+    assert_match "stopped", shell_output("#{bin}/deepseek-harness-app stop")
 
     serve_only_args = testpath/"hdc-start-args"
     fake_hdc.delete
@@ -290,23 +297,37 @@ class DeepseekHarnessApp < Formula
       printf '%s\\n' "$@" > #{serve_only_args}
     SH
     chmod 0755, fake_hdc
-    assert_match(/serving at|already healthy/, shell_output("#{bin}/dsh-app start --serve-only"))
-    assert_match "opened", shell_output("#{bin}/dsh-app start")
-    assert_match "healthy", shell_output("#{bin}/dsh-app status")
+    assert_match(/serving at|already healthy/, shell_output("#{bin}/deepseek-harness-app start --serve-only"))
+    assert_match "opened", shell_output("#{bin}/deepseek-harness-app start")
+    assert_match "healthy", shell_output("#{bin}/deepseek-harness-app status")
     assert_equal %w[shell aa start -a EntryAbility -b com.social4hyq.deepseekharness -m electron],
                  serve_only_args.read.lines(chomp: true)
-    assert_match "stopped", shell_output("#{bin}/dsh-app stop")
+    assert_match "stopped", shell_output("#{bin}/deepseek-harness-app stop")
 
-    assert_match "opened", shell_output("#{bin}/dsh-app start")
-    assert_match "healthy", shell_output("#{bin}/dsh-app status")
-    assert_match "stopped", shell_output("#{bin}/dsh-app stop")
+    assert_match "opened", shell_output("#{bin}/deepseek-harness-app start")
+    assert_match "healthy", shell_output("#{bin}/deepseek-harness-app status")
+    assert_match "stopped", shell_output("#{bin}/deepseek-harness-app stop")
+
+    # uninstall goes through app-installer and keeps the app's data unless
+    # --purge is given; --device/HDC_TARGET pick the hdc target.
+    shell_output("#{bin}/deepseek-harness-app uninstall --purge --device tablet-1")
+    assert_equal %w[uninstall --bundle-id com.social4hyq.deepseekharness --device tablet-1 --purge],
+                 installer_args.read.lines(chomp: true)
+    shell_output("#{bin}/deepseek-harness-app uninstall")
+    assert_equal %w[uninstall --bundle-id com.social4hyq.deepseekharness], installer_args.read.lines(chomp: true)
+    with_env("HDC_TARGET" => "env-device") do
+      shell_output("#{bin}/deepseek-harness-app uninstall")
+    end
+    assert_equal %w[uninstall --bundle-id com.social4hyq.deepseekharness --device env-device],
+                 installer_args.read.lines(chomp: true)
+    assert_match "uninstall", shell_output("#{bin}/deepseek-harness-app --help")
 
     hap = libexec/"deepseek-harness-desktop-unsigned.hap"
     assert_match "libs/arm64-v8a/libelectron.so", shell_output("unzip -Z1 #{hap}")
     tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
     system "node", "--test", tap_root/"Resources/deepseek-harness-app/tests/close-handler.test.cjs"
     waiting_source = shell_output("unzip -p #{hap} resources/resfile/resources/app/waiting.html")
-    assert_match "dsh-app status", waiting_source
+    assert_match "deepseek-harness-app status", waiting_source
     refute_match "{{", waiting_source
     helper = testpath/"startup.cjs"
     helper.write shell_output("unzip -p #{hap} resources/resfile/resources/app/startup.cjs")

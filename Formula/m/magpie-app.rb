@@ -4,7 +4,7 @@ class MagpieApp < Formula
   url "https://github.com/yetone/magpie/archive/refs/tags/v0.1.4661.tar.gz"
   sha256 "eacabbef905695537e60b7ed41271a2c89c9f83014d4817ab3cf8aba6379dd42"
   license :cannot_represent
-  revision 2
+  revision 4
 
   livecheck do
     url :stable
@@ -12,8 +12,8 @@ class MagpieApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/magpie-app-v0.1.4661-r5"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0f8fdf0e1b9d469c563ad2866c24f66842665edfe192da5f7cf65e1c51a7e41a"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/magpie-app-v0.1.4661-r6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2c158504a2d3a63a00911d152c3196ece9c49242f8ce6dd646dad7a27fc6286b"
   end
 
   depends_on "app-installer"
@@ -189,6 +189,9 @@ class MagpieApp < Formula
       `hap-app status`, then run `hap-app install-pending`.
       Manual install: `magpie-app install`. See docs/hap-app-formulae.md.
 
+      `magpie-app uninstall` removes the app but keeps its data; only
+      `magpie-app uninstall --purge` deletes the app data.
+
       Shares the installed Magpie CLI's settings. To use one gateway and one web UI
       with the terminal, run `magpie-app web` there (`magpie web` on 127.0.0.1:3431,
       `--port N` to change it, with a key kept in `~/.config/magpie-app/web-key`; a plain
@@ -214,6 +217,55 @@ class MagpieApp < Formula
     assert_match "#{entry}/connect.html", listing
     assert_match "#{entry}/shared-web.cjs", listing
     assert_match "Usage: magpie-app", shell_output("#{bin}/magpie-app --help")
+
+    # The CLI matrix: start/stop/status address the device; uninstall goes
+    # through app-installer and keeps the app's data unless --purge is given.
+    fake_bin = testpath/"cli-bin"
+    fake_bin.mkpath
+    hdc_log = testpath/"cli-hdc-log"
+    (fake_bin/"hdc").write <<~SH
+      #!/bin/sh
+      printf '%s\\n' "$*" >> #{hdc_log}
+      if [ "$1" = "shell" ] && [ "$2" = "ps -ef" ]; then
+        if [ -z "${FAKE_STOPPED:-}" ]; then
+          printf '%s\\n' "u 1 1 1 1 ? 00:00:00 com.social4hyq.magpiedesktop"
+        fi
+        printf '%s\\n' "u 1 1 1 1 ? 00:00:00 sh -c echo com.social4hyq.magpiedesktop"
+      fi
+    SH
+    chmod 0755, fake_bin/"hdc"
+    installer_args = testpath/"cli-installer-args"
+    (fake_bin/"app-installer").write <<~SH
+      #!/bin/sh
+      printf '%s\\n' "$@" > #{installer_args}
+    SH
+    chmod 0755, fake_bin/"app-installer"
+    cli_env = {
+      "MAGPIE_APP_HDC"       => (fake_bin/"hdc").to_s,
+      "MAGPIE_APP_INSTALLER" => (fake_bin/"app-installer").to_s,
+      "PATH"                 => "#{fake_bin}:#{ENV.fetch("PATH")}",
+    }
+    with_env(cli_env) do
+      shell_output("#{bin}/magpie-app start --device tablet-1")
+      assert_match "-t tablet-1 shell aa start", (testpath/"cli-hdc-log").read
+      shell_output("#{bin}/magpie-app stop")
+      assert_match "shell aa force-stop com.social4hyq.magpiedesktop", (testpath/"cli-hdc-log").read
+      assert_match "running", shell_output("#{bin}/magpie-app status")
+      with_env("FAKE_STOPPED" => "1") do
+        assert_match "not running", shell_output("#{bin}/magpie-app status 2>&1", 1)
+      end
+      shell_output("#{bin}/magpie-app uninstall --purge --device tablet-1")
+      assert_equal %w[uninstall --bundle-id com.social4hyq.magpiedesktop --device tablet-1 --purge],
+                   installer_args.read.lines(chomp: true)
+      shell_output("#{bin}/magpie-app uninstall")
+      assert_equal %w[uninstall --bundle-id com.social4hyq.magpiedesktop], installer_args.read.lines(chomp: true)
+    end
+    with_env({ "HDC_TARGET" => "env-device" }.merge(cli_env)) do
+      shell_output("#{bin}/magpie-app uninstall")
+    end
+    assert_equal %w[uninstall --bundle-id com.social4hyq.magpiedesktop --device env-device],
+                 installer_args.read.lines(chomp: true)
+    assert_match "uninstall", shell_output("#{bin}/magpie-app --help")
 
     fake = testpath/"app-installer"
     fake.write <<~SH

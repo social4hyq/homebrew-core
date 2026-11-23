@@ -6,6 +6,7 @@ class GenofficeApp < Formula
   # Apache-2.0 upstream with tap-authored packaging on the CPF-Electron runtime
   # (mixed MIT/BSD/LGPL).
   license :cannot_represent
+  revision 2
 
   livecheck do
     url :stable
@@ -13,9 +14,8 @@ class GenofficeApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/genoffice-app-v0.13.615-r3"
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2888e344f67aefed0bc82ab651f69d60a76890ff95505c68f2956d842b3ba226"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/genoffice-app-v0.13.615-r5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9d742c78e08b6520ed3f86a813eff8059c9fb0343db5b38b9125203acf59049b"
   end
 
   depends_on "genoffice" => :build
@@ -235,6 +235,9 @@ class GenofficeApp < Formula
       `hap-app status`, then run `hap-app install-pending`.
       Manual install: `genoffice-app install`. See docs/hap-app-formulae.md.
 
+      `genoffice-app uninstall` removes the app but keeps its data; only
+      `genoffice-app uninstall --purge` deletes the app data.
+
       The app runs entirely in its own sandbox: CUSTOM_SANDBOX, READ_WRITE_USER_FILE
       and READ_PASTEBOARD come from the local debug profile, and the kernel ACLs keep
       WebAssembly working. The `genoffice` CLI is a separate tool that cannot reach
@@ -244,6 +247,55 @@ class GenofficeApp < Formula
 
   test do
     assert_match "Usage: genoffice-app", shell_output("#{bin}/genoffice-app --help")
+
+    # The CLI matrix: start/stop/status address the device; uninstall goes
+    # through app-installer and keeps the app's data unless --purge is given.
+    fake_bin = testpath/"cli-bin"
+    fake_bin.mkpath
+    hdc_log = testpath/"cli-hdc-log"
+    (fake_bin/"hdc").write <<~SH
+      #!/bin/sh
+      printf '%s\\n' "$*" >> #{hdc_log}
+      if [ "$1" = "shell" ] && [ "$2" = "ps -ef" ]; then
+        if [ -z "${FAKE_STOPPED:-}" ]; then
+          printf '%s\\n' "u 1 1 1 1 ? 00:00:00 com.social4hyq.genoffice"
+        fi
+        printf '%s\\n' "u 1 1 1 1 ? 00:00:00 sh -c echo com.social4hyq.genoffice"
+      fi
+    SH
+    chmod 0755, fake_bin/"hdc"
+    installer_args = testpath/"cli-installer-args"
+    (fake_bin/"app-installer").write <<~SH
+      #!/bin/sh
+      printf '%s\\n' "$@" > #{installer_args}
+    SH
+    chmod 0755, fake_bin/"app-installer"
+    cli_env = {
+      "GENOFFICE_DESKTOP_HDC"       => (fake_bin/"hdc").to_s,
+      "GENOFFICE_DESKTOP_INSTALLER" => (fake_bin/"app-installer").to_s,
+      "PATH"                        => "#{fake_bin}:#{ENV.fetch("PATH")}",
+    }
+    with_env(cli_env) do
+      shell_output("#{bin}/genoffice-app start --device tablet-1")
+      assert_match "-t tablet-1 shell aa start", (testpath/"cli-hdc-log").read
+      shell_output("#{bin}/genoffice-app stop")
+      assert_match "shell aa force-stop com.social4hyq.genoffice", (testpath/"cli-hdc-log").read
+      assert_match "running", shell_output("#{bin}/genoffice-app status")
+      with_env("FAKE_STOPPED" => "1") do
+        assert_match "not running", shell_output("#{bin}/genoffice-app status 2>&1", 1)
+      end
+      shell_output("#{bin}/genoffice-app uninstall --purge --device tablet-1")
+      assert_equal %w[uninstall --bundle-id com.social4hyq.genoffice --device tablet-1 --purge],
+                   installer_args.read.lines(chomp: true)
+      shell_output("#{bin}/genoffice-app uninstall")
+      assert_equal %w[uninstall --bundle-id com.social4hyq.genoffice], installer_args.read.lines(chomp: true)
+    end
+    with_env({ "HDC_TARGET" => "env-device" }.merge(cli_env)) do
+      shell_output("#{bin}/genoffice-app uninstall")
+    end
+    assert_equal %w[uninstall --bundle-id com.social4hyq.genoffice --device env-device],
+                 installer_args.read.lines(chomp: true)
+    assert_match "uninstall", shell_output("#{bin}/genoffice-app --help")
 
     hap = libexec/"genoffice-desktop-unsigned.hap"
     listing = shell_output("unzip -l #{hap}")
