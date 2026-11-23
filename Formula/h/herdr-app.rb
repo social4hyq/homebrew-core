@@ -4,7 +4,7 @@ class HerdrApp < Formula
   url "https://github.com/herdrdev/herdr-app/archive/refs/tags/v0.1.16.tar.gz"
   sha256 "fea3d920607f2199ed330eb3cdcb1fa3626dcea5080c92a97a296d983d6bc681"
   license "Apache-2.0"
-  revision 15
+  revision 16
 
   livecheck do
     url "https://github.com/herdrdev/herdr-app.git"
@@ -213,6 +213,11 @@ class HerdrApp < Formula
     assert_includes permissions, "ohos.permission.INTERNET"
     assert_includes permissions, "ohos.permission.READ_PASTEBOARD"
     assert_equal "com.social4hyq.herdrapp", manifest.dig("app", "bundleName")
+    # The Rust side bridges permission requests through PermissionPlugin; without
+    # registering it, READ_PASTEBOARD is declared but never prompts for access.
+    ability_source = (Pathname(__FILE__).expand_path.dirname.parent.parent/
+                      "Resources/herdr-app/hap/entry/src/main/ets/entryability/EntryAbility.ets").read
+    assert_match "new PermissionPlugin()", ability_source
 
     system "unzip", "-o", hap, "resources/base/media/example_icon.png", "-d", testpath/"icon"
     assert_equal "66be46ebed8e540bb023dbf71db04c758b2de14b64b643d7cafbcc31268fbd4c",
