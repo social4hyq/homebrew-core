@@ -14,13 +14,18 @@ const VERSION = '2.34.0';
 let server = null;
 let pollTimer = null;
 
-app.commandLine.appendSwitch('no-sandbox');
-app.commandLine.appendSwitch('disable-gpu');
-app.commandLine.appendSwitch('disable-blink-features', 'AutomationControlled');
-app.commandLine.appendSwitch('disable-features', 'FedCm,CalculateNativeWinOcclusion');
+// OHOS Electron exposes appData as an unsupported path; map it to the app's
+// private userData directory before Chromium initialises (same as the other
+// Electron HAPs in this tap). The adapter already passes --no-sandbox.
+const privateDataBase = app.getPath('userData');
+if (typeof privateDataBase !== 'string' || !path.isAbsolute(privateDataBase)) {
+  throw new Error('Electron did not provide a private userData path');
+}
+fs.mkdirSync(privateDataBase, { recursive: true, mode: 0o700 });
+app.setPath('appData', privateDataBase);
 
 function dataDir() {
-  const dir = path.join(app.getPath('userData'), 'antigravity');
+  const dir = path.join(privateDataBase, 'antigravity');
   fs.mkdirSync(dir, { recursive: true });
   return dir;
 }

@@ -5,7 +5,7 @@ class AntigravityApp < Formula
       "2.34.0-5887025308631040/linux-arm/Antigravity.tar.gz"
   sha256 "91f31ce50c795e0571e7922511119ff3e7afc2ee4f640a97d69dbad2063c1866"
   license :cannot_represent # Google Terms of Service; closed-source prebuilt desktop app
-  revision 3
+  revision 4
 
   livecheck do
     url :homepage
@@ -13,8 +13,8 @@ class AntigravityApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/antigravity-app-v2.34.0-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a924cb30a90db61b06d5b47adc4f747b6489eb1a49be499bdf689f3315432557"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/antigravity-app-v2.34.0-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "93481e1277d00c55d6b8a63e5e13eb1d3a56c010b57d56171c749327e66819b1"
   end
 
   depends_on "app-installer"
