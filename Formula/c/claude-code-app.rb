@@ -6,7 +6,7 @@ class ClaudeCodeApp < Formula
   version "6.28899.6"
   sha256 "239c20d218456cacc656d48382fd59116325ac679aa4e476377af1456ac85715"
   license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
-  revision 6
+  revision 7
 
   livecheck do
     url "https://downloads.claude.ai/claude-desktop/apt/stable/dists/stable/main/binary-arm64/Packages"
@@ -14,8 +14,8 @@ class ClaudeCodeApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-app-v6.28899.6-r11"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "22d576b94fc35168595534c3664be6613c3de9f0a669a3523f0c061d7f1f0197"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-app-v6.28899.6-r12"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3ac8eba76ae2793a69c56532bd1ed5b49bc369d496105323f473fdd81c810885"
   end
 
   depends_on "app-installer"
@@ -262,17 +262,9 @@ class ClaudeCodeApp < Formula
     assert_equal (major << 25) | (minor << 8) | patch, module_json.dig("app", "versionCode")
     permissions = module_json.dig("module", "requestPermissions").map { |entry| entry.fetch("name") }
     assert_includes permissions, "ohos.permission.INTERNET"
+    assert_includes permissions, "ohos.permission.MICROPHONE"
     refute_includes permissions, "ohos.permission.CUSTOM_SANDBOX"
     assert_empty module_json.dig("module", "executableBinaryPaths") || []
-
-    # The install-time ACL variant must request the microphone so voice input can
-    # prompt for access; the strong-sandbox bottle intentionally excludes it.
-    acl_probe = "import importlib.util,sys; " \
-                "it=importlib.util.spec_from_file_location('p',sys.argv[1]); " \
-                "m=importlib.util.module_from_spec(it); it.loader.exec_module(m); " \
-                "print(chr(10).join(m.ACL_PERMISSIONS))"
-    acl_permissions = shell_output("python3 -c #{Shellwords.escape(acl_probe)} #{pkgshare}/patch-code-runtime-hap.py")
-    assert_includes acl_permissions.lines(chomp: true), "ohos.permission.MICROPHONE"
 
     resource_strings = shell_output("unzip -p #{hap} resources.index | strings")
     assert_match "Claude Code", resource_strings
