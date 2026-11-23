@@ -13,9 +13,8 @@
 // user to confirm whenever a link is for a different host (a terminal's runtime
 // after the app's own, or back); hostIdOf and needsFreshSavedServer let the shell
 // drop the saved server first, so the link connects without a question. And the
-// terminal's orca CLI needs only the runtime's orca-runtime.json to drive a
-// runtime whose data root it cannot see (the app's own lives in the app sandbox),
-// so publishRuntimeProfile copies it to a directory under the host home.
+// terminal's orca CLI cannot reach the app's own runtime (its socket is in the app
+// sandbox), which relay.cjs solves.
 //
 // Nothing here needs Electron, so the decisions are unit tested on their own.
 const fs = require('node:fs');
@@ -196,40 +195,6 @@ function writeState(file, state) {
   }
 }
 
-// Where the terminal's CLI finds the runtime this shell started: a profile
-// directory under the host home (the app's own data root is in its sandbox).
-function profileDir(home) {
-  return path.join(home, '.config', 'orca-app', 'app-runtime');
-}
-
-// Copy the runtime's orca-runtime.json (port and auth token) to the profile
-// directory, only when it describes the runtime that just announced itself.
-function publishRuntimeProfile({ dataRoot, home, runtimeId }) {
-  try {
-    const text = fs.readFileSync(path.join(dataRoot, 'orca-runtime.json'), 'utf8');
-    const record = JSON.parse(text);
-    if (!record || (runtimeId && record.runtimeId !== runtimeId)) return false;
-    const dir = profileDir(home);
-    fs.mkdirSync(dir, { recursive: true });
-    fs.writeFileSync(path.join(dir, 'orca-runtime.json'), text, { mode: 0o600 });
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-// Remove the published profile, but only the one that is still this runtime's.
-function unpublishRuntimeProfile({ home, runtimeId }) {
-  const file = path.join(profileDir(home), 'orca-runtime.json');
-  try {
-    if (runtimeId && JSON.parse(fs.readFileSync(file, 'utf8')).runtimeId !== runtimeId) return false;
-    fs.unlinkSync(file);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
 module.exports = {
   HEAD_BYTES,
   SAVED_SERVER_KEY,
@@ -239,11 +204,8 @@ module.exports = {
   lastClientConnectedAt,
   needsFreshSavedServer,
   parseReadyRecord,
-  profileDir,
-  publishRuntimeProfile,
   readHead,
   readState,
   readTail,
-  unpublishRuntimeProfile,
   writeState,
 };

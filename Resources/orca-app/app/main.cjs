@@ -16,9 +16,10 @@
 // Sharing with the terminal, both ways:
 //  - a terminal's runtime is connected without the web client's "different server"
 //    question (the saved server is dropped first, see attach.cjs);
-//  - the runtime this shell starts itself is published for the terminal's orca CLI
-//    (~/.config/orca-app/app-runtime/orca-runtime.json, `orca-app cli ...`) and
-//    `orca-app serve` reports it instead of starting a second one. It ends with the
+//  - the runtime this shell starts itself is reachable from the terminal's orca CLI
+//    through a loopback relay (relay.cjs, `orca-app cli ...`), because its Unix socket
+//    is in the app sandbox, and `orca-app serve` reports it instead of starting a
+//    second one. It ends with the
 //    app, so quitting from the tray asks first when it holds terminals.
 // Spawning host binaries and reading the host home directory need the
 // CUSTOM_SANDBOX / READ_WRITE_USER_FILE ACLs.
@@ -28,6 +29,7 @@ const fs = require('node:fs');
 const http = require('node:http');
 const path = require('node:path');
 const attach = require('./attach.cjs');
+const relay = require('./relay.cjs');
 const tray = require('./tray.cjs');
 
 let config = { port: 0 };
@@ -147,14 +149,14 @@ function spawnServer() {
   });
   serveChild.on('exit', (code, signal) => {
     serveChild = null;
-    unpublishRuntime();
+    stopRelay();
     serveFailure = `server exited (code ${code}, signal ${signal})`;
     console.error('ORCA_DESKTOP_ORCAD_EXIT ' + serveFailure);
   });
 }
 
 function stopServer() {
-  unpublishRuntime();
+  stopRelay();
   if (!serveChild) return;
   try { serveChild.kill(); } catch (error) { console.error('ORCA_DESKTOP kill failed: ' + String(error)); }
   serveChild = null;
@@ -289,18 +291,26 @@ async function clearSavedServer(win) {
   }
 }
 
-// The runtime this shell started, as the terminal's CLI can reach it.
-let publishedRuntimeId = null;
-function publishRuntime(runtimeId) {
-  if (!hostHome || !runtimeId) return;
-  const dataRoot = childEnv().ORCA_USER_DATA;
-  if (attach.publishRuntimeProfile({ dataRoot, home: hostHome, runtimeId })) publishedRuntimeId = runtimeId;
+// The relay that lets the terminal's `orca-app cli` reach the runtime this shell started.
+let relayServer = null;
+async function startRelay(runtimeId) {
+  if (!hostHome || relayServer || !canAutoStart) return;
+  const env = childEnv();
+  env.ORCA_USER_DATA_PATH = env.ORCA_USER_DATA;
+  try {
+    relayServer = await relay.startRelay({ orca: config.orca, env, home: hostHome });
+    relay.publish(hostHome, { port: relayServer.port, token: relayServer.token, pid: process.pid, runtimeId });
+  } catch (error) {
+    // The app works without it; only the terminal's CLI cannot reach this runtime.
+    console.error('ORCA_DESKTOP relay unavailable: ' + String(error));
+    relayServer = null;
+  }
 }
 
-function unpublishRuntime() {
-  if (!hostHome) return;
-  attach.unpublishRuntimeProfile({ home: hostHome, runtimeId: publishedRuntimeId });
-  publishedRuntimeId = null;
+function stopRelay() {
+  if (hostHome) relay.unpublish(hostHome, process.pid);
+  if (relayServer) relayServer.stop();
+  relayServer = null;
 }
 
 // How many terminals the runtime this shell started holds, or null (not ours, or
@@ -398,7 +408,7 @@ async function drive(win) {
       if (target.kind === 'link') trackPairing({ runtimeId: target.runtimeId, hostId: target.hostId, sinceIso });
       if (target.kind === 'own') {
         trackPairing({ runtimeId: target.runtimeId, hostId: target.hostId, sinceIso, own: true });
-        publishRuntime(target.runtimeId);
+        void startRelay(target.runtimeId);
       }
       return;
     }

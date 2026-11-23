@@ -70,11 +70,11 @@ Usage: orca-app <command>
                       app's data; --purge also deletes it.
   pair                Print the host-side server's browser URL again.
   cli [ARGS...]       Run the orca CLI against the runtime in use: the one the
-                      app started when it is running, else the one `serve`
-                      started (see env).
-  env                 Print the ORCA_USER_DATA_PATH setting that makes a plain
-                      `orca` command reach that runtime, e.g.
-                      eval "$(orca-app env)".
+                      app started when it is running (through the app), else the
+                      one `serve` started (see env).
+  env                 Print what makes a plain `orca` command reach that runtime
+                      (a function while the app's runtime runs, else the
+                      ORCA_USER_DATA_PATH setting), e.g. eval "$(orca-app env)".
 EOF
 }
 
@@ -147,41 +147,86 @@ process.exit(1);
 ' "$READY_FILE"
 }
 
-# The runtime the app started itself keeps its data in the app's sandbox, which a
-# terminal cannot read; the app publishes the runtime's orca-runtime.json here so
-# the orca CLI can still reach it. Trusted only while the process it names runs
-# (a force-stopped app leaves the file behind). The pid belongs to another user,
-# so look for its /proc entry instead of signalling it.
-APP_PROFILE="$CONFIG_DIR/app-runtime"
+# The runtime the app started itself keeps its data, and the Unix socket the orca CLI
+# needs, in the app's sandbox, which a terminal cannot reach. The app runs a loopback
+# relay (relay.cjs) for it and registers where in relay.json; `cli` posts the
+# arguments there and prints what the command printed. The registration is trusted
+# only while the app's process exists (the pid belongs to another user, so look for
+# its /proc entry instead of signalling it) and the relay answers.
+APP_RELAY="$CONFIG_DIR/app-runtime/relay.json"
+
+# `probe` exits 0 when the relay answers; `run CWD ARGS...` runs the orca CLI through
+# it and exits with the command's own status (69: the relay is not reachable).
+relay_client() {
+  "$NODE_BIN" -e '
+const fs = require("node:fs");
+const http = require("node:http");
+const [file, mode, ...rest] = process.argv.slice(1);
+let relay;
+try { relay = JSON.parse(fs.readFileSync(file, "utf8")); } catch { process.exit(69); }
+if (!Number.isInteger(relay.port) || typeof relay.token !== "string") process.exit(69);
+function call(method, path, body, timeout) {
+  return new Promise((resolve, reject) => {
+    const text = body === undefined ? undefined : JSON.stringify(body);
+    const headers = { authorization: "Bearer " + relay.token };
+    if (text !== undefined) { headers["content-type"] = "application/json"; headers["content-length"] = Buffer.byteLength(text); }
+    const request = http.request({ host: "127.0.0.1", port: relay.port, path, method, headers, timeout }, (response) => {
+      let data = "";
+      response.setEncoding("utf8");
+      response.on("data", (chunk) => { data += chunk; });
+      response.on("end", () => { try { resolve({ status: response.statusCode, body: JSON.parse(data) }); } catch { resolve({ status: response.statusCode, body: {} }); } });
+    });
+    request.on("timeout", () => request.destroy(new Error("timed out")));
+    request.on("error", reject);
+    if (text !== undefined) request.write(text);
+    request.end();
+  });
+}
+if (mode === "probe") {
+  call("GET", "/health", undefined, 2000).then((r) => process.exit(r.status === 200 ? 0 : 69), () => process.exit(69));
+} else {
+  const [cwd, ...args] = rest;
+  call("POST", "/run", { args, cwd, timeoutMs: 300000 }, 310000).then((r) => {
+    if (r.status !== 200) { process.stderr.write("orca-app: the app refused the command: " + (r.body.error || r.status) + "\n"); process.exit(70); }
+    process.stdout.write(r.body.stdout || "");
+    process.stderr.write(r.body.stderr || "");
+    if (r.body.timedOut) process.stderr.write("orca-app: the command did not finish in time\n");
+    if (r.body.spawnError) process.stderr.write("orca-app: the app could not run orca (" + r.body.spawnError + ")\n");
+    process.exit((r.body.code || 0) & 255);
+  }, (error) => { process.stderr.write("orca-app: the app'"'"'s runtime is not reachable (" + error.message + ")\n"); process.exit(69); });
+}
+' "$APP_RELAY" "$@"
+}
 
 app_runtime_live() {
-  [ -f "$APP_PROFILE/orca-runtime.json" ] || return 1
+  [ -f "$APP_RELAY" ] || return 1
   local pid
   pid="$("$NODE_BIN" -e '
 try {
   const pid = JSON.parse(require("node:fs").readFileSync(process.argv[1], "utf8")).pid;
   if (Number.isInteger(pid) && pid > 0) process.stdout.write(String(pid));
 } catch {}
-' "$APP_PROFILE/orca-runtime.json")"
-  [ -n "$pid" ] && [ -e "$PROC_ROOT/$pid" ]
+' "$APP_RELAY")"
+  [ -n "$pid" ] && [ -e "$PROC_ROOT/$pid" ] && relay_client probe
 }
 
-# The profile directory the orca CLI should use.
-cli_profile() {
+# What makes a plain `orca` reach the runtime in use: a function that goes through the
+# app's relay while the app's runtime runs, else the data root of `orca-app serve`.
+cmd_env() {
   if app_runtime_live; then
-    printf '%s' "$APP_PROFILE"
+    printf 'orca() { command orca-app cli "$@"; }\n'
   else
-    printf '%s' "$DATA_ROOT"
+    printf 'export ORCA_USER_DATA_PATH=%q\n' "$DATA_ROOT"
   fi
 }
 
-cmd_env() {
-  printf 'export ORCA_USER_DATA_PATH=%q\n' "$(cli_profile)"
-}
-
 cmd_cli() {
+  if app_runtime_live; then
+    relay_client run "$PWD" "$@"
+    return
+  fi
   [ -n "$ORCA_BIN" ] || die "the orca CLI is not installed"
-  ORCA_USER_DATA_PATH="$(cli_profile)" exec "$ORCA_BIN" "$@"
+  ORCA_USER_DATA_PATH="$DATA_ROOT" exec "$ORCA_BIN" "$@"
 }
 
 # Free port near the default: the shell's runtime binds it on this same host.

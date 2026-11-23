@@ -197,32 +197,3 @@ test('chooseTarget gives the link target the host it is for', () => {
   assert.equal(target.kind, 'link');
   assert.equal(target.hostId, 'installation:i9');
 });
-
-test('publishRuntimeProfile copies orca-runtime.json for the runtime that announced itself', (t) => {
-  const root = tempDir(t);
-  const home = path.join(root, 'home');
-  const dataRoot = path.join(root, 'data');
-  fs.mkdirSync(dataRoot);
-  const record = JSON.stringify({ runtimeId: 'r1', pid: 12, transports: [], authToken: 'tok' });
-  fs.writeFileSync(path.join(dataRoot, 'orca-runtime.json'), record);
-  assert.equal(attach.publishRuntimeProfile({ dataRoot, home, runtimeId: 'r1' }), true);
-  const copy = path.join(attach.profileDir(home), 'orca-runtime.json');
-  assert.equal(fs.readFileSync(copy, 'utf8'), record);
-  assert.equal(attach.publishRuntimeProfile({ dataRoot, home, runtimeId: 'r2' }), false, 'another runtime\'s file');
-  assert.equal(attach.publishRuntimeProfile({ dataRoot: path.join(root, 'nope'), home, runtimeId: 'r1' }), false);
-  fs.writeFileSync(path.join(dataRoot, 'orca-runtime.json'), 'junk');
-  assert.equal(attach.publishRuntimeProfile({ dataRoot, home, runtimeId: 'r1' }), false);
-});
-
-test('unpublishRuntimeProfile removes only the profile of the runtime it is told', (t) => {
-  const root = tempDir(t);
-  const home = path.join(root, 'home');
-  const dir = attach.profileDir(home);
-  fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(path.join(dir, 'orca-runtime.json'), JSON.stringify({ runtimeId: 'r1' }));
-  assert.equal(attach.unpublishRuntimeProfile({ home, runtimeId: 'r2' }), false);
-  assert.equal(fs.existsSync(path.join(dir, 'orca-runtime.json')), true);
-  assert.equal(attach.unpublishRuntimeProfile({ home, runtimeId: 'r1' }), true);
-  assert.equal(fs.existsSync(path.join(dir, 'orca-runtime.json')), false);
-  assert.equal(attach.unpublishRuntimeProfile({ home, runtimeId: 'r1' }), false, 'already gone');
-});

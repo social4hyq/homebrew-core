@@ -45,6 +45,15 @@ if (args[0] === 'serve') {
 } else if (args[0] === 'terminal' && args[1] === 'list') {
   if (process.env.FAKE_TERMINALS === 'fail') process.exit(1);
   process.stdout.write(JSON.stringify({ ok: true, result: { terminals: [], totalCount: Number(process.env.FAKE_TERMINALS || 0) } }) + '\n');
+} else if (args[0] === 'cwd') {
+  process.stdout.write(process.cwd() + '\n');
+} else if (args[0] === 'exit') {
+  process.stderr.write('exiting with ' + args[1] + '\n');
+  process.exit(Number(args[1]));
+} else if (args[0] === 'sleep') {
+  setTimeout(() => process.stdout.write('slept\n'), Number(args[1]));
+} else if (args[0] === 'big') {
+  process.stdout.write('x'.repeat(Number(args[1])));
 } else {
   process.stdout.write('fake-orca ' + args.join(' ') + ' profile=' + (process.env.ORCA_USER_DATA_PATH || '') + '\n');
 }
