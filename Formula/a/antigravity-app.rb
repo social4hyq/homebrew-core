@@ -5,7 +5,7 @@ class AntigravityApp < Formula
       "2.34.0-5887025308631040/linux-arm/Antigravity.tar.gz"
   sha256 "91f31ce50c795e0571e7922511119ff3e7afc2ee4f640a97d69dbad2063c1866"
   license :cannot_represent # Google Terms of Service; closed-source prebuilt desktop app
-  revision 4
+  revision 5
 
   livecheck do
     url :homepage
@@ -136,6 +136,12 @@ class AntigravityApp < Formula
        ohos.permission.kernel.DISABLE_CODE_MEMORY_PROTECTION].each do |name|
       requested << { "name" => name } unless requested.any? { |permission| permission["name"] == name }
     end
+    # The ACL module.json replaces the HAP's own manifest at install time, so it
+    # must keep the executable declaration for the engine injected on device.
+    module_info = module_json.fetch("module")
+    exec_paths = (module_info["executableBinaryPaths"] ||= [])
+    ls_path = "libs/arm64-v8a/antigravity-language-server.bin"
+    exec_paths << { "path" => ls_path } unless exec_paths.any? { |entry| entry["path"] == ls_path }
     (pkgshare/"module-acl.json").write JSON.generate(module_json)
 
     chmod 0755, [libexec/"antigravity-app.sh", pkgshare/"antigravity-app.sh",

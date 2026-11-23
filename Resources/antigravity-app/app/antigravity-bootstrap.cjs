@@ -8,7 +8,8 @@ const fs = require('fs');
 
 const PORT_RE = /listening on \w+ port at (\d+) for HTTP(S)?\b/i;
 const HAP_ROOT = path.join(__dirname, '..', '..', '..', '..');
-const LS_BIN = path.join(HAP_ROOT, 'libs', 'arm64-v8a', 'antigravity-language-server.bin');
+// bm reports nativeLibraryPath=libs/arm64; the v8a HAP entry is deployed there at runtime.
+const LS_BIN = path.join(HAP_ROOT, 'libs', 'arm64', 'antigravity-language-server.bin');
 const VERSION = '2.34.0';
 
 let server = null;
