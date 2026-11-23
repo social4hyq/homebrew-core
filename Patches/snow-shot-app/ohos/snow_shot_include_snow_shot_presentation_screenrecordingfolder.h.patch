@@ -3,10 +3,10 @@ parent probe, and the real write probe that screenrecordingfolder.cpp
 implements and the recording controller calls before a recording starts.
 
 diff --git a/snow_shot/include/snow_shot/presentation/screenrecordingfolder.h b/snow_shot/include/snow_shot/presentation/screenrecordingfolder.h
-index 137f192..5c51d4d 100644
+index 1a7dcd4..9523e49 100644
 --- a/snow_shot/include/snow_shot/presentation/screenrecordingfolder.h
 +++ b/snow_shot/include/snow_shot/presentation/screenrecordingfolder.h
-@@ -8,11 +8,17 @@
+@@ -8,6 +8,10 @@
  
  namespace snow_shot::presentation::recording {
  [[nodiscard]] QStringList
@@ -15,10 +15,12 @@ index 137f192..5c51d4d 100644
 +                                   const QString& applicationDataDirectory = {});
 +[[nodiscard]] QStringList
  screenRecordingDirectories(const QDateTime& timestamp = QDateTime::currentDateTime(),
-                            const storage::ScreenshotWindowNames& names = {});
+                            const storage::ScreenshotExportContext& names = {});
+ [[nodiscard]] QStringList
+@@ -16,6 +20,8 @@
  [[nodiscard]] QString
  screenRecordingDirectory(const QDateTime& timestamp = QDateTime::currentDateTime(),
-                          const storage::ScreenshotWindowNames& names = {});
+                          const storage::ScreenshotExportContext& names = {});
 +[[nodiscard]] QString screenRecordingDirectoryProbePath(const QString& path);
 +[[nodiscard]] bool screenRecordingDirectoryWritable(const QString& directory);
  // The caller snapshots and expands the filename format before any worker handoff.

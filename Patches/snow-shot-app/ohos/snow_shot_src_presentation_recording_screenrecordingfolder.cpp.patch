@@ -6,10 +6,10 @@ parent rather than treating a future subdirectory that does not exist yet as
 proof the whole tree is unwritable.
 
 diff --git a/snow_shot/src/presentation/recording/screenrecordingfolder.cpp b/snow_shot/src/presentation/recording/screenrecordingfolder.cpp
-index 9d5d34c..6ef5614 100644
+index d58badf..4323445 100644
 --- a/snow_shot/src/presentation/recording/screenrecordingfolder.cpp
 +++ b/snow_shot/src/presentation/recording/screenrecordingfolder.cpp
-@@ -9,22 +9,27 @@
+@@ -9,6 +9,7 @@
  #include <QDir>
  #include <QFileInfo>
  #include <QStandardPaths>
@@ -17,6 +17,7 @@ index 9d5d34c..6ef5614 100644
  #include <QUrl>
  
  namespace snow_shot::presentation::recording {
+@@ -15,12 +16,17 @@
 -namespace {
 -QStringList defaultRecordingDirectories() {
 +QStringList screenRecordingFallbackDirectories(const QString& moviesDirectory,
@@ -42,11 +43,12 @@ index 9d5d34c..6ef5614 100644
      }
      return directories;
  }
+@@ -27,4 +33,3 @@
 -} // namespace
  
  QStringList screenRecordingDirectories(const QDateTime& timestamp,
-                                        const storage::ScreenshotWindowNames& names) {
-@@ -38,7 +43,11 @@ QStringList screenRecordingDirectories(const QDateTime& timestamp,
+                                        const storage::ScreenshotExportContext& names) {
+@@ -44,7 +49,11 @@
                                    storage::containsTimeVariables(configuredTemplate))) {
          directories.push_back(configured);
      }
@@ -59,7 +61,7 @@ index 9d5d34c..6ef5614 100644
          if (!directories.contains(fallback, Qt::CaseInsensitive)) {
              directories.push_back(fallback);
          }
-@@ -59,6 +68,34 @@ QString screenRecordingDirectory(const QDateTime& timestamp,
+@@ -65,6 +74,34 @@
      return directories.isEmpty() ? QString() : directories.constFirst();
  }
  

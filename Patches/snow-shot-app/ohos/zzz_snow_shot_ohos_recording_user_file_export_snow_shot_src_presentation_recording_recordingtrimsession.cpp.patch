@@ -28,7 +28,7 @@ index 8f76dba..1b469b8 100644
      }
 +#ifdef Q_OS_HARMONY
 +    if (m_destination.isEmpty()) {
-+        m_destination = nextOutput(m_outputPath, m_windowNames);
++        m_destination = nextOutput(m_outputPath, m_exportContext);
 +        if (m_destination.isEmpty()) {
 +            finishExport(false, QStringLiteral("No writable recording directory"));
 +            return;

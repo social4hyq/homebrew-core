@@ -47,7 +47,7 @@ index b3d7988..6f29abd 100644
 +            return true;
 +
 +        const QDateTime timestamp = QDateTime::currentDateTime();
-+        const auto names = exportWindowNames(configuredTemplate, settings.videoFilenameFormat());
++        const auto names = captureExportContext(configuredTemplate, settings.videoFilenameFormat());
 +        const QString configuredDirectory = snow_shot::storage::expandScreenshotExportVariables(
 +            configuredTemplate, timestamp, names);
 +        const QString probeDirectory =
