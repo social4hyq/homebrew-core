@@ -90,6 +90,44 @@ strip_comments() {
   ' | cat -s
 }
 
+# Strip a whole `def caveats ... end` method. caveats is user-facing hint text
+# that never lands in the bottle, so adding/changing/removing it must not
+# trigger a rebuild. Track heredocs so an `end` inside wrapper text is not
+# mistaken for the method's own end; the method end is the `end` at the exact
+# indentation of `def caveats`.
+strip_caveats() {
+  awk '
+    function hd(line,   d) {
+      if (match(line, /<<[-~]?[[:space:]]*['\''"]?[A-Za-z_][A-Za-z0-9_]*/)) {
+        d = substr(line, RSTART, RLENGTH)
+        sub(/^<<[-~]?[[:space:]]*/, "", d)
+        gsub(/['\''"]/, "", d)
+        return d
+      }
+      return ""
+    }
+    {
+      if (incav) {
+        if (here) {
+          t = $0; sub(/^[[:space:]]+/, "", t); sub(/[[:space:]]+$/, "", t)
+          if (t == here) here = ""
+          next
+        }
+        if ($0 ~ ("^" cavind "end[[:space:]]*$")) { incav = 0; next }
+        d = hd($0)
+        if (d != "") { here = d; next }
+        next
+      }
+      if (match($0, /def caveats([[:space:]]|$)/)) {
+        cavind = substr($0, 1, RSTART - 1)
+        incav = 1
+        next
+      }
+      print
+    }
+  ' | cat -s
+}
+
 mapfile -t FILES < <(git diff --name-status --no-renames "$BEFORE" "$AFTER" -- 'Formula/' \
   | awk '$1 != "D" && $2 ~ /^Formula\/[^\/]+\/[^\/]+\.rb$/ {print $2}')
 
@@ -133,9 +171,9 @@ for f in "${FILES[@]}"; do
   # edits still rebuild — heredoc bodies survive strip_comments, so a real
   # wrapper change stays visible in the diff.
   if git cat-file -e "$BEFORE:$f" 2>/dev/null && \
-     diff <(git show "$BEFORE:$f" | strip_bottle | strip_comments) \
-          <(git show "$AFTER:$f"  | strip_bottle | strip_comments) >/dev/null; then
-    echo "::notice::$name: comment only, skipping build"
+     diff <(git show "$BEFORE:$f" | strip_bottle | strip_caveats | strip_comments | grep -v '^[[:space:]]*$') \
+          <(git show "$AFTER:$f"  | strip_bottle | strip_caveats | strip_comments | grep -v '^[[:space:]]*$') >/dev/null; then
+    echo "::notice::$name: comment/caveats only, skipping build"
     continue
   fi
   if tr ' ' '\n' <<< "$HEAVY_FORMULAS" | grep -qx "$name"; then
