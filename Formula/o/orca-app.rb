@@ -8,7 +8,7 @@ class OrcaApp < Formula
   # Tap-authored shell scripts (MIT) on the CPF-Electron runtime (mixed
   # MIT/BSD/LGPL).
   license :cannot_represent
-  revision 7
+  revision 8
 
   livecheck do
     url :stable
@@ -16,8 +16,8 @@ class OrcaApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/orca-app-v1.4.269-r10"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "450cd77d17443e4ebb33a1e1ad9ee40e6770269d3ed8251fed6ba6d9bd0cca68"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/orca-app-v1.4.269-r11"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cbce829fbbba13ff748ae7203fc31c8aa9ff9f9da55c259bcdf3377210c9e7e5"
   end
 
   depends_on "openjdk" => :build
