@@ -152,7 +152,8 @@ process.exit(1);
 # relay (relay.cjs) for it and registers where in relay.json; `cli` posts the
 # arguments there and prints what the command printed. The registration is trusted
 # only while the app's process exists (the pid belongs to another user, so look for
-# its /proc entry instead of signalling it) and the relay answers.
+# its /proc entry instead of signalling it) and the relay answers. A registration whose
+# process is gone is removed.
 APP_RELAY="$CONFIG_DIR/app-runtime/relay.json"
 
 # `probe` exits 0 when the relay answers; `run CWD ARGS...` runs the orca CLI through
@@ -207,7 +208,19 @@ try {
   if (Number.isInteger(pid) && pid > 0) process.stdout.write(String(pid));
 } catch {}
 ' "$APP_RELAY")"
-  [ -n "$pid" ] && [ -e "$PROC_ROOT/$pid" ] && relay_client probe
+  [ -n "$pid" ] || return 1
+  if [ ! -e "$PROC_ROOT/$pid" ]; then
+    # The app was killed outright (aa force-stop) and could not remove its registration:
+    # remove it now, unless a newer app run has replaced it since it was read.
+    "$NODE_BIN" -e '
+const fs = require("node:fs");
+try {
+  if (JSON.parse(fs.readFileSync(process.argv[1], "utf8")).pid === Number(process.argv[2])) fs.unlinkSync(process.argv[1]);
+} catch {}
+' "$APP_RELAY" "$pid"
+    return 1
+  fi
+  relay_client probe
 }
 
 # What makes a plain `orca` reach the runtime in use: a function that goes through the

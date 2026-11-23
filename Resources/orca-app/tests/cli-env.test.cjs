@@ -88,6 +88,36 @@ test('a registration left by an app that is gone is not trusted', async (t) => {
   assert.equal((await ctx.run(['env'])).stdout.trim(), `export ORCA_USER_DATA_PATH=${ctx.data}`);
 });
 
+test('a registration left by a killed app is removed by the next env or cli', async (t) => {
+  const ctx = await setup(t);
+  await ctx.startRelay(4242, { present: false });
+  assert.equal(fs.existsSync(ctx.registration), true);
+  assert.equal((await ctx.run(['env'])).stdout.trim(), `export ORCA_USER_DATA_PATH=${ctx.data}`);
+  assert.equal(fs.existsSync(ctx.registration), false, 'env removed it');
+  await ctx.startRelay(4343, { present: false });
+  assert.equal((await ctx.run(['cli', 'status'])).stdout.trim(), `fake-orca status profile=${ctx.data}`);
+  assert.equal(fs.existsSync(ctx.registration), false, 'cli removed it');
+});
+
+test('a registration of an app that is running is kept, even when its relay does not answer', async (t) => {
+  const ctx = await setup(t);
+  const server = await ctx.startRelay();
+  server.stop();
+  await new Promise((resolve) => setTimeout(resolve, 100));
+  await ctx.run(['env']);
+  assert.equal(fs.existsSync(ctx.registration), true);
+});
+
+test('a registration that cannot be judged (no pid, or unreadable) is left alone', async (t) => {
+  const ctx = await setup(t);
+  fs.mkdirSync(path.dirname(ctx.registration), { recursive: true });
+  for (const content of ['junk', JSON.stringify({ version: 1, port: 1, token: 'a'.repeat(32) })]) {
+    fs.writeFileSync(ctx.registration, content);
+    await ctx.run(['env']);
+    assert.equal(fs.readFileSync(ctx.registration, 'utf8'), content);
+  }
+});
+
 test('a registration whose relay does not answer is not trusted either', async (t) => {
   const ctx = await setup(t);
   const server = await ctx.startRelay();
