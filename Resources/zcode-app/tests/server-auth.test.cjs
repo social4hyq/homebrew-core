@@ -207,8 +207,11 @@ test('status does not create the token and reports an unhealthy service without 
   try {
     const result = await run(sb, ['status']);
     assert.equal(result.status, 1);
-    // Only the verdict: a missing token file must not leak a shell error line.
-    assert.equal(result.stderr, `zcode-desktop: server not healthy at http://127.0.0.1:${port}\n`);
+    // The verdict and one reason, nothing else: a missing token file must not
+    // leak a shell error line.
+    assert.equal(result.stderr,
+      `zcode-desktop: server not healthy at http://127.0.0.1:${port}\n` +
+      `zcode-desktop: reason: no service token at ${sb.tokenFile} yet; run: zcode-app serve\n`);
     assert.equal(result.stdout, '');
     assert.equal(fs.existsSync(sb.tokenFile), false);
   } finally {
@@ -410,6 +413,88 @@ test('serve writes one line naming its parent chain, and nothing reaches the ter
     assert.match(lines[0], /zcode-desktop: serve requested by \d+:bash .*zcode-desktop\.sh serve < \d+:/);
     assert.ok(lines[0].includes(`< ${process.pid}:`), lines[0]);
     assert.equal(log.includes(fs.readFileSync(sb.tokenFile, 'utf8')), false);
+  } finally {
+    cleanup(sb);
+  }
+});
+
+// --- status says why it is not healthy ---------------------------------------
+
+// Exactly the verdict and one reason line, and never the token.
+function reasonOf(result, token) {
+  const lines = result.stderr.split('\n').filter(Boolean);
+  assert.equal(result.status, 1, result.stderr);
+  assert.equal(result.stdout, '');
+  assert.equal(lines.length, 2, result.stderr);
+  assert.match(lines[0], /^zcode-desktop: server not healthy at http:\/\/127\.0\.0\.1:\d+$/);
+  assert.match(lines[1], /^zcode-desktop: reason: /);
+  if (token) assert.equal(result.stderr.includes(token), false);
+  return lines[1].replace(/^zcode-desktop: reason: /, '');
+}
+
+test('status names the reason: nothing listening, wrong token, open or odd service', async () => {
+  const port = await freePort();
+  const sb = sandbox(port);
+  fs.mkdirSync(path.dirname(sb.tokenFile), { recursive: true });
+  fs.writeFileSync(sb.tokenFile, TOKEN);
+  let mode = 'protected';
+  const server = http.createServer((req, res) => {
+    if (mode === 'open') return reply(res, { version: '1', authRequired: false });
+    if (mode === 'broken') return reply(res, { error: 'boom' }, 500);
+    if (mode === 'odd') { res.statusCode = 200; return res.end('<html>not json</html>'); }
+    if (req.headers.authorization !== `Bearer ${TOKEN}`) return reply(res, { error: 'Unauthorized' }, 401);
+    return reply(res, { version: '1', authRequired: true });
+  });
+  try {
+    // 1) nothing on the port yet
+    assert.match(reasonOf(await run(sb, ['status']), TOKEN),
+      new RegExp(`^nothing is listening on port ${port} \\(curl exit 7\\)$`));
+
+    await new Promise((resolve) => server.listen(port, '127.0.0.1', resolve));
+
+    // 2) a service that wants another token
+    fs.writeFileSync(sb.tokenFile, TOKEN.replace(/^a/, 'b'));
+    const wrong = reasonOf(await run(sb, ['status']), TOKEN);
+    assert.match(wrong, new RegExp(`^the service on port ${port} answered 401: the token in .*desktop-token is not the one it was started with; run: zcode-app serve$`));
+
+    // 3) a service that does not ask for authentication (older version)
+    fs.writeFileSync(sb.tokenFile, TOKEN);
+    mode = 'open';
+    assert.match(reasonOf(await run(sb, ['status']), TOKEN),
+      new RegExp(`^the service on port ${port} does not require authentication \\(started by an older version\\); run: zcode-app serve$`));
+
+    // 4) another HTTP status, and an answer that is not server-info
+    mode = 'broken';
+    assert.equal(reasonOf(await run(sb, ['status']), TOKEN), `the service on port ${port} answered HTTP 500`);
+    mode = 'odd';
+    assert.match(reasonOf(await run(sb, ['status']), TOKEN), /^unexpected answer from port \d+ \(no authRequired in \/api\/server-info\)$/);
+
+    // a healthy service still prints nothing on stderr
+    mode = 'protected';
+    const good = await run(sb, ['status']);
+    assert.equal(good.status, 0);
+    assert.equal(good.stderr, '');
+  } finally {
+    server.close();
+    cleanup(sb);
+  }
+});
+
+test('status shows what curl itself said when curl cannot run', async () => {
+  const port = await freePort();
+  const sb = sandbox(port);
+  fs.mkdirSync(path.dirname(sb.tokenFile), { recursive: true });
+  fs.writeFileSync(sb.tokenFile, TOKEN);
+  // The case that was hidden by 2>/dev/null: Homebrew's curl shim refuses to run
+  // without HOMEBREW_LIBRARY and says so on stderr.
+  const bin = path.join(sb.root, 'bin');
+  fs.mkdirSync(bin);
+  fs.writeFileSync(path.join(bin, 'curl'),
+    '#!/bin/sh\ncat >/dev/null\necho "curl: This shim is internal and must be run via brew." >&2\nexit 1\n',
+    { mode: 0o755 });
+  try {
+    const reason = reasonOf(await run(sb, ['status'], { PATH: `${bin}:${process.env.PATH}` }), TOKEN);
+    assert.equal(reason, 'curl failed (exit 1): curl: This shim is internal and must be run via brew.');
   } finally {
     cleanup(sb);
   }
