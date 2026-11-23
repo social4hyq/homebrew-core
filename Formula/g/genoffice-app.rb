@@ -6,7 +6,7 @@ class GenofficeApp < Formula
   # Apache-2.0 upstream with tap-authored packaging on the CPF-Electron runtime
   # (mixed MIT/BSD/LGPL).
   license :cannot_represent
-  revision 2
+  revision 3
 
   livecheck do
     url :stable
@@ -14,8 +14,8 @@ class GenofficeApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/genoffice-app-v0.13.615-r5"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9d742c78e08b6520ed3f86a813eff8059c9fb0343db5b38b9125203acf59049b"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/genoffice-app-v0.13.615-r7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f4b4db38bd405c4736f13070cb1e82f6929688ad0773cf91635285b7d919b5cd"
   end
 
   depends_on "genoffice" => :build
@@ -164,7 +164,8 @@ class GenofficeApp < Formula
                 "requestPermissions": [
                       { "name": "ohos.permission.INTERNET" },
                       { "name": "ohos.permission.GET_NETWORK_INFO" },
-                      { "name": "ohos.permission.FILE_ACCESS_PERSIST" }
+                      { "name": "ohos.permission.FILE_ACCESS_PERSIST" },
+                      { "name": "ohos.permission.MICROPHONE", "reason": "$string:microphone", "usedScene": { "abilities": ["EntryAbility"], "when": "inuse" } }
                     ],
               JSON5
 
@@ -299,13 +300,16 @@ class GenofficeApp < Formula
     assert_includes sidecar.b, ".codesign"
 
     module_json = JSON.parse(shell_output("unzip -p #{hap} module.json"))
-    assert_equal %w[ohos.permission.FILE_ACCESS_PERSIST ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET],
+    assert_equal %w[ohos.permission.FILE_ACCESS_PERSIST ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET
+                    ohos.permission.MICROPHONE],
                  module_json.dig("module", "requestPermissions").map { |permission| permission["name"] }.sort
 
     acl_module = JSON.parse((pkgshare/"module-acl.json").read)
     acl_permissions = acl_module.dig("module", "requestPermissions").map { |permission| permission["name"] }
     %w[ohos.permission.CUSTOM_SANDBOX ohos.permission.READ_WRITE_USER_FILE ohos.permission.READ_PASTEBOARD
-       ohos.permission.FILE_ACCESS_PERSIST ohos.permission.kernel.ALLOW_WRITABLE_CODE_MEMORY].each do |permission|
+       ohos.permission.FILE_ACCESS_PERSIST ohos.permission.MICROPHONE
+       ohos.permission.kernel.ALLOW_WRITABLE_CODE_MEMORY
+       ohos.permission.kernel.DISABLE_CODE_MEMORY_PROTECTION].each do |permission|
       assert_includes acl_permissions, permission
     end
   end
