@@ -45,6 +45,12 @@ function startServer() {
     return Promise.reject(new Error('language server missing: ' + engine));
   }
   const csrf = crypto.randomBytes(32).toString('hex');
+  // The UI reads its CSRF token from a  cookie that the official
+  // Electron main process sets before loading the loopback page. Without it
+  // main.js throws "Missing LS CSRF token cookie" and renders a blank page.
+  session.defaultSession.cookies.set(
+    { url: 'https://127.0.0.1', name: 'csrfToken', value: csrf, path: '/' },
+  ).catch((error) => dlog('cookie set failed: ' + error));
   // The language server requires a path RELATIVE to its HOME (hostHome); an
   // absolute path makes it abort with "must not be absolute".
   const dir = '.antigravity/desktop';
