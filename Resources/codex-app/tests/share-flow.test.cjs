@@ -140,32 +140,175 @@ test('the bridge attaches to the shared server and relays lines both ways', asyn
   assert.equal(result.code, 0);
 });
 
-test('the bridge starts codex itself when no server answers', async (t) => {
+// A bridge held open: resolves once it has said how it is connected.
+function holdBridge(t, home, { port, rest = ['app-server', '--analytics-default-enabled'], env = {} } = {}) {
+  const endpoint = path.join(home, '.config/codex-app/server.json');
+  const child = childProcess.spawn(process.execPath, [bridgeScript, '--endpoint', endpoint, '--codex', fakeCli(home), '--', ...rest], {
+    env: { ...process.env, CODEX_APP_SHARE_PORT: String(port), ...env },
+  });
+  t.after(() => child.kill('SIGTERM')); // lets it stop the server it started
+  let err = '';
+  const exited = new Promise((resolve) => child.on('exit', (code, signal) => resolve({ code, signal })));
+  const connected = new Promise((resolve) => {
+    child.stderr.on('data', (chunk) => {
+      err += chunk;
+      if (/started the shared server|attached to the shared server|starting codex itself/.test(err)) resolve(err);
+    });
+  });
+  const ask = () => new Promise((resolve) => { child.stdout.once('data', (d) => resolve(JSON.parse(String(d)))); child.stdin.write(request + '\n'); });
+  return { child, connected, exited, ask, endpoint, end: () => child.stdin.end() };
+}
+
+const registration = (home) => JSON.parse(fs.readFileSync(path.join(home, '.config/codex-app/server.json'), 'utf8'));
+const portOpen = (port) => fetch(`http://127.0.0.1:${port}/readyz`).then((r) => r.status === 200, () => false);
+async function until(check, what) {
+  for (let i = 0; i < 100; i += 1) {
+    if (await check()) return;
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+  assert.fail('timed out waiting for ' + what);
+}
+
+test('the bridge starts the shared server itself when nothing is registered, and a terminal can use it', async (t) => {
   const home = tempHome(t);
-  const endpoint = writeEndpoint(home, await freePort());
-  const result = await talk(['--endpoint', endpoint, '--codex', fakeCli(home), '--', 'app-server'], [request]);
-  assert.deepEqual(result.out, [{ id: 1, result: { server: 'own-stdio', method: 'initialize' } }]);
-  assert.match(result.err, /no usable shared server/);
+  const port = await freePort();
+  const argsFile = path.join(home, 'server-args.json');
+  const bridge = holdBridge(t, home, { port, env: { FAKE_CODEX_ARGS_FILE: argsFile } });
+  assert.match(await bridge.connected, new RegExp(`started the shared server on port ${port}`));
+  assert.deepEqual(await bridge.ask(), { id: 1, result: { server: 'shared-ws', method: 'initialize' } });
+  const info = registration(home);
+  assert.equal(info.port, port);
+  assert.equal(info.owner, 'app');
+  assert.ok(info.pid > 0);
+  assert.equal(fs.statSync(path.join(home, '.config/codex-app/ws-token')).mode & 0o077, 0, 'token is private');
+  // The desktop's own arguments with the listener added after app-server.
+  assert.deepEqual(JSON.parse(fs.readFileSync(argsFile, 'utf8')), [
+    'app-server', '--listen', `ws://127.0.0.1:${port}`, '--ws-auth', 'capability-token',
+    '--ws-token-file', path.join(home, '.config/codex-app/ws-token'), '--analytics-default-enabled',
+  ]);
+  // The terminal finds it: serve reports it, tui attaches, serve does not start a second one.
+  assert.equal(run(home, ['serve', '--status']).status, 0);
+  const again = run(home, ['serve']);
+  assert.match(again.stdout, new RegExp(`serving at ws://127.0.0.1:${port} \\(pid ${info.pid}\\)`));
+  assert.equal(run(home, ['tui']).stdout.trim().startsWith(`fake-codex --remote ws://127.0.0.1:${port}`), true);
 });
 
-test('the bridge starts codex itself when the endpoint file or the token is missing', async (t) => {
+test('the server the bridge started ends with it and takes its registration away', async (t) => {
   const home = tempHome(t);
-  const missing = await talk(['--endpoint', path.join(home, 'nope.json'), '--codex', fakeCli(home), '--', 'app-server'], [request]);
-  assert.equal(missing.out[0].result.server, 'own-stdio');
-  const endpoint = writeEndpoint(home, await freePort());
-  fs.rmSync(path.join(home, '.config/codex-app/ws-token'));
-  const noToken = await talk(['--endpoint', endpoint, '--codex', fakeCli(home), '--', 'app-server'], [request]);
-  assert.equal(noToken.out[0].result.server, 'own-stdio');
+  const port = await freePort();
+  const bridge = holdBridge(t, home, { port });
+  await bridge.connected;
+  await bridge.ask();
+  assert.equal(await portOpen(port), true);
+  bridge.end();
+  assert.equal((await bridge.exited).code, 0);
+  await until(async () => !(await portOpen(port)), 'the server to stop');
+  assert.equal(fs.existsSync(bridge.endpoint), false);
 });
 
-test('the bridge starts codex itself when the server refuses the token', async (t) => {
+test('a terminated bridge takes the server it started with it', async (t) => {
+  const home = tempHome(t);
+  const port = await freePort();
+  const bridge = holdBridge(t, home, { port });
+  await bridge.connected;
+  bridge.child.kill('SIGTERM');
+  await bridge.exited;
+  await until(async () => !(await portOpen(port)), 'the server to stop');
+  assert.equal(fs.existsSync(bridge.endpoint), false);
+});
+
+test('a second bridge attaches to the running server and leaves it running when it ends', async (t) => {
+  const home = tempHome(t);
+  const port = await freePort();
+  const first = holdBridge(t, home, { port });
+  await first.connected;
+  const second = holdBridge(t, home, { port });
+  assert.match(await second.connected, /attached to the shared server/);
+  assert.equal((await second.ask()).result.server, 'shared-ws');
+  second.end();
+  assert.equal((await second.exited).code, 0);
+  assert.equal(await portOpen(port), true, 'still up for the first');
+  assert.equal(registration(home).owner, 'app');
+});
+
+test('a bridge does not stop a server a terminal started', async (t) => {
   const home = tempHome(t);
   const port = await freePort();
   assert.equal(run(home, ['serve', '--port', String(port)]).status, 0);
+  const bridge = holdBridge(t, home, { port: await freePort() });
+  assert.match(await bridge.connected, /attached/);
+  bridge.end();
+  await bridge.exited;
+  assert.equal(await portOpen(port), true);
+  assert.equal(registration(home).port, port);
+  assert.notEqual(registration(home).owner, 'app');
+});
+
+test('stopping the server from the terminal makes the bridge exit so the app starts it again', async (t) => {
+  const home = tempHome(t);
+  const port = await freePort();
+  const bridge = holdBridge(t, home, { port });
+  await bridge.connected;
+  await bridge.ask();
+  assert.equal(run(home, ['serve', '--stop']).status, 0);
+  assert.notEqual((await bridge.exited).code, 0);
+});
+
+test('a registration left by a server that is gone is replaced by a new one', async (t) => {
+  const home = tempHome(t);
+  const port = await freePort();
+  writeEndpoint(home, await freePort());
+  const bridge = holdBridge(t, home, { port });
+  assert.match(await bridge.connected, /started the shared server/);
+  assert.equal(registration(home).port, port);
+  assert.equal(registration(home).owner, 'app');
+});
+
+test('the bridge starts on another port when the usual one is taken', async (t) => {
+  const home = tempHome(t);
+  const taken = net.createServer();
+  const port = await new Promise((resolve) => taken.listen(0, '127.0.0.1', () => resolve(taken.address().port)));
+  t.after(() => taken.close());
+  const bridge = holdBridge(t, home, { port });
+  assert.match(await bridge.connected, /started the shared server/);
+  assert.notEqual(registration(home).port, port);
+  assert.equal((await bridge.ask()).result.server, 'shared-ws');
+});
+
+test('the bridge starts codex itself only when no shared server can be started', async (t) => {
+  const home = tempHome(t);
+  const bridge = holdBridge(t, home, { port: await freePort(), env: { FAKE_CODEX_NO_LISTEN: '1' } });
+  assert.match(await bridge.connected, /no shared server could be started; starting codex itself/);
+  assert.deepEqual(await bridge.ask(), { id: 1, result: { server: 'own-stdio', method: 'initialize' } });
+  assert.equal(fs.existsSync(bridge.endpoint), false);
+});
+
+test('the bridge starts its own server when the endpoint file or the token is missing', async (t) => {
+  const home = tempHome(t);
+  const first = holdBridge(t, home, { port: await freePort() });
+  await first.connected;
+  assert.equal((await first.ask()).result.server, 'shared-ws');
+  first.end();
+  await first.exited;
+  const endpoint = writeEndpoint(home, await freePort());
+  fs.rmSync(path.join(home, '.config/codex-app/ws-token'));
+  const second = holdBridge(t, home, { port: await freePort() });
+  await second.connected;
+  assert.equal((await second.ask()).result.server, 'shared-ws');
+  assert.equal(fs.existsSync(endpoint), true);
+});
+
+test('the bridge starts its own server when the registered one refuses the token', async (t) => {
+  const home = tempHome(t);
+  const port = await freePort();
+  assert.equal(run(home, ['serve', '--port', String(port)]).status, 0);
+  // The new registration replaces this one, so stop the first server by hand.
+  const original = registration(home).pid;
+  t.after(() => { try { process.kill(original); } catch { /* already gone */ } });
   fs.writeFileSync(path.join(home, '.config/codex-app/ws-token'), 'a-different-token\n');
-  const endpoint = path.join(home, '.config/codex-app/server.json');
-  const result = await talk(['--endpoint', endpoint, '--codex', fakeCli(home), '--', 'app-server'], [request]);
-  assert.equal(result.out[0].result.server, 'own-stdio');
+  const bridge = holdBridge(t, home, { port: await freePort() });
+  assert.match(await bridge.connected, /started the shared server/);
+  assert.equal((await bridge.ask()).result.server, 'shared-ws');
 });
 
 test('the bridge exits non-zero when the shared server goes away', async (t) => {
@@ -221,11 +364,14 @@ test('the shim sends the app-server spawn through the bridge to the shared serve
   assert.match(log, /OWL_SHARE app-server spawn goes through the bridge/);
 });
 
-test('the shim keeps the app-server spawn as it was when no shared server is registered', (t) => {
+test('the shim sends the app-server spawn through the bridge even when no server runs, and the bridge starts one', async (t) => {
   const home = tempHome(t);
+  const port = await freePort();
+  process.env.CODEX_APP_SHARE_PORT = String(port);
+  t.after(() => { delete process.env.CODEX_APP_SHARE_PORT; });
   const { log, reply } = appSpawn(shimDir(t, home), desktopArgs);
-  assert.deepEqual(JSON.parse(reply), { id: 1, result: { server: 'own-stdio', method: 'initialize' } });
-  assert.doesNotMatch(log, /OWL_SHARE/);
+  assert.deepEqual(JSON.parse(reply), { id: 1, result: { server: 'shared-ws', method: 'initialize' } });
+  assert.match(log, /OWL_SHARE app-server spawn goes through the bridge/);
 });
 
 test('the shim leaves other codex invocations alone even when a shared server runs', async (t) => {

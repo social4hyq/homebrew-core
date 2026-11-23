@@ -51,7 +51,9 @@ test('isDesktopAppServerArgs rejects every other codex invocation', () => {
 
 test('readEndpoint reads a valid file and refuses anything else', () => {
   assert.deepEqual(share.readEndpoint(endpoint, fakeFs({ [endpoint]: goodEndpoint })),
-    { port: 14288, tokenFile: home + '/.config/codex-app/ws-token' });
+    { port: 14288, tokenFile: home + '/.config/codex-app/ws-token', owner: 'terminal', pid: null });
+  assert.deepEqual(share.readEndpoint(endpoint, fakeFs({ [endpoint]: JSON.stringify({ ...JSON.parse(goodEndpoint), owner: 'app', pid: 42 }) })),
+    { port: 14288, tokenFile: home + '/.config/codex-app/ws-token', owner: 'app', pid: 42 });
   assert.equal(share.readEndpoint(endpoint, fakeFs({})), null);
   for (const text of [
     'not json', '{}', JSON.stringify({ version: 2, port: 1, tokenFile: '/t' }),
@@ -63,10 +65,8 @@ test('readEndpoint reads a valid file and refuses anything else', () => {
   }
 });
 
-test('planRedirect runs the app-server spawn through the bridge when a server is registered', () => {
-  const plan = share.planRedirect({
-    name: 'spawn', args: desktopArgs, hostNode: node, bridge, endpoint, codexCli: codex, fs: fakeFs({ [endpoint]: goodEndpoint }),
-  });
+test('planRedirect runs the app-server spawn through the bridge', () => {
+  const plan = share.planRedirect({ name: 'spawn', args: desktopArgs, hostNode: node, bridge, endpoint, codexCli: codex });
   assert.deepEqual(plan, {
     command: node,
     args: [bridge, '--endpoint', endpoint, '--codex', codex, '--', ...desktopArgs],
@@ -74,11 +74,30 @@ test('planRedirect runs the app-server spawn through the bridge when a server is
 });
 
 test('planRedirect keeps the original spawn in every other case', () => {
-  const base = { name: 'spawn', args: desktopArgs, hostNode: node, bridge, endpoint, codexCli: codex, fs: fakeFs({ [endpoint]: goodEndpoint }) };
-  assert.equal(share.planRedirect({ ...base, fs: fakeFs({}) }), null, 'no server registered');
-  assert.equal(share.planRedirect({ ...base, fs: fakeFs({ [endpoint]: 'junk' }) }), null, 'unusable endpoint file');
+  const base = { name: 'spawn', args: desktopArgs, hostNode: node, bridge, endpoint, codexCli: codex };
   assert.equal(share.planRedirect({ ...base, hostNode: null }), null, 'no host node');
   assert.equal(share.planRedirect({ ...base, name: 'execFile' }), null, 'not a spawn');
   assert.equal(share.planRedirect({ ...base, args: ['--version'] }), null, 'not an app-server');
   assert.equal(share.planRedirect({ ...base, args: ['app-server', 'daemon', 'start'] }), null, 'a daemon command');
+  assert.equal(share.planRedirect({ ...base, args: ['app-server', '--listen', 'ws://127.0.0.1:1'] }), null, 'already a listener');
+});
+
+test('appOwnedServer is the app\'s own running server and nothing else', () => {
+  const owned = JSON.stringify({ ...JSON.parse(goodEndpoint), owner: 'app', pid: 42 });
+  const alive = () => true;
+  const dead = () => false;
+  assert.equal(share.appOwnedServer(endpoint, fakeFs({ [endpoint]: owned }), alive).pid, 42);
+  assert.equal(share.appOwnedServer(endpoint, fakeFs({ [endpoint]: owned }), dead), null, 'the process is gone');
+  assert.equal(share.appOwnedServer(endpoint, fakeFs({ [endpoint]: goodEndpoint }), alive), null, 'a terminal\'s server');
+  assert.equal(share.appOwnedServer(endpoint, fakeFs({}), alive), null, 'nothing registered');
+  assert.equal(share.processAlive(process.pid), true);
+  assert.equal(share.processAlive(2 ** 22 + 12345), false);
+});
+
+test('listenArgs adds the WebSocket listener right after app-server', () => {
+  assert.deepEqual(share.listenArgs(desktopArgs, { port: 14288, tokenFile: '/t/ws-token' }), [
+    '-c', 'features.code_mode_host=true', 'app-server',
+    '--listen', 'ws://127.0.0.1:14288', '--ws-auth', 'capability-token', '--ws-token-file', '/t/ws-token',
+    '--analytics-default-enabled',
+  ]);
 });

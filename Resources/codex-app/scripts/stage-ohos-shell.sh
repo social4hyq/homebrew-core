@@ -84,6 +84,27 @@ for top in ("AppScope", "electron/src/main"):
 for name in ("app_icon.png", "icon.png"):
     shutil.copyfile(icon, root / "AppScope/resources/base/media" / name)
 
+# windowStageClose hides the ability and returns true, which tells the system not to
+# close the window, so the window goes to the tray (owl-tray.cjs). Returning false
+# lets the system close it right after the hide: the ability's session is destroyed
+# and the whole app is killed. The tray's quit calls app.exit() to bypass this.
+CLOSE_HANDLER = """    super.onWindowStageCreate(windowStage);
+    try {
+      windowStage.on('windowStageClose', () => {
+        if (CheckEmptyUtils.isEmpty(this.xcomponentId)) {
+          return false;
+        }
+        const widgetId = Number(this.xcomponentId.substring(ConfigData.WINDOW_PREFIX.length));
+        Inject.getOrCreate(AppWindowAdapter).hideWindow(widgetId);
+        return true;
+      });
+    } catch (exception) {
+      LogUtil.error(TAG, 'Failed to register window close handler: ' + JSON.stringify(exception));
+    }
+"""
+replace_one(root / "web_engine/src/main/ets/ability/WebAbility.ets",
+            "    super.onWindowStageCreate(windowStage);\n", CLOSE_HANDLER)
+
 app = root / "web_engine/src/main/resources/resfile/resources/app"
 if app.exists():
     shutil.rmtree(app)

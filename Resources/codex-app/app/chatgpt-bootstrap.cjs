@@ -9,6 +9,21 @@ const { app } = require('electron');
 // owl-compat.cjs supplies them (and the node:sqlite, host-spawn and terminal
 // shims) before the vendor entry point is loaded.
 require('./owl-compat.cjs');
+
+// Resident in the system tray: closing the last window hides it, the tray menu
+// restores or quits. Created before the vendor code opens its first window.
+const share = require('./owl-share.cjs');
+require('./owl-tray.cjs').install(require('electron'), {
+  iconPath: path.join(__dirname, 'tray-icon.png'),
+  ownedServer: () => {
+    try {
+      const home = JSON.parse(fs.readFileSync(path.join(__dirname, 'chatgpt-host-config.json'), 'utf8')).home;
+      return share.appOwnedServer(share.endpointFile(home), fs);
+    } catch {
+      return null;
+    }
+  },
+});
 const hostConfigPath = path.join(__dirname, 'chatgpt-host-config.json');
 
 // The OHOS Electron shell exposes appData as an unsupported path. The

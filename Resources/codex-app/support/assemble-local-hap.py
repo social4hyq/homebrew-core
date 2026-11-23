@@ -212,6 +212,8 @@ def assemble(shell, deb, output):
                 target.write(WORK / "chatgpt-bootstrap.cjs", APP_ROOT + "chatgpt-bootstrap.cjs")
                 for shim in sorted(WORK.glob("owl-*.cjs")):
                     target.write(shim, APP_ROOT + shim.name)
+                # The tray icon owl-tray.cjs loads from next to the bootstrap.
+                target.write(WORK / "tray-icon.png", APP_ROOT + "tray-icon.png")
 
                 for name, (payload, mode) in selected.items():
                     if name == "@root/owl-shell-runtime.json":

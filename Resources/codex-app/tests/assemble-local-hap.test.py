@@ -37,6 +37,8 @@ def main():
         assert shims, "missing Owl compatibility shims"
         for shim in shims:
             shutil.copy2(shim, support / shim.name)
+        TRAY_ICON = BOOTSTRAP.parent / "tray-icon.png"
+        shutil.copy2(TRAY_ICON, support / TRAY_ICON.name)
         assembler = load_module(script)
         vendor_json = root / "vendor.json"
         os.environ["CHATGPT_APP_VENDOR_JSON"] = str(vendor_json)
@@ -79,6 +81,7 @@ def main():
             assert archive.read(assembler.APP_ROOT + "chatgpt-bootstrap.cjs") == BOOTSTRAP.read_bytes()
             for shim in shims:
                 assert archive.read(assembler.APP_ROOT + shim.name) == shim.read_bytes()
+            assert archive.read(assembler.APP_ROOT + "tray-icon.png") == TRAY_ICON.read_bytes()
             assert archive.read(assembler.APP_ROOT + "vendor.asar") == b"app.asar"
             assert archive.read(assembler.APP_ROOT + "package.json") == json.dumps({
                 "name": "chatgpt-ohos-shell",
