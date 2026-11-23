@@ -134,6 +134,7 @@ test('status clears a registration left by an app that was killed outright', asy
   assert.notEqual(result.status, 0);
   assert.match(result.stderr, /not running/);
   assert.equal(fs.existsSync(file), false);
+  assert.equal(result.stderr, 'codex-app: shared server not running; run: codex-app serve\n', 'nothing else on stderr');
 });
 
 test('a registration naming a pid that something else now uses is cleared too', async (t) => {
@@ -149,6 +150,16 @@ test('tui clears a stale registration and says to run serve', async (t) => {
   const result = run(home, ['tui']);
   assert.notEqual(result.status, 0);
   assert.match(result.stderr, /run: codex-app serve/);
+  assert.equal(fs.existsSync(file), false);
+  assert.equal(result.stderr, 'codex-app: shared server not running; run: codex-app serve\n', 'nothing else on stderr');
+});
+
+test('serve --stop with a registration whose server is gone is quiet too', async (t) => {
+  const home = tempHome(t);
+  const file = writeRegistration(home, deadPid());
+  const result = run(home, ['serve', '--stop']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(result.stderr, '');
   assert.equal(fs.existsSync(file), false);
 });
 

@@ -60,7 +60,9 @@ share_drop_stale() {
   local pid command_line=""
   pid="$(share_field pid)"
   [[ "$pid" =~ ^[0-9]+$ ]] || return 0
-  command_line="$(tr '\0' ' ' <"/proc/$pid/cmdline" 2>/dev/null || true)"
+  # The braces matter: a redirection that fails (the process is gone) is reported by the
+  # shell itself, before a trailing 2>/dev/null on the command would apply.
+  command_line="$({ tr '\0' ' ' <"/proc/$pid/cmdline"; } 2>/dev/null || true)"
   [[ "$command_line" == *app-server* ]] || rm -f "$SHARE_FILE"
 }
 
@@ -99,7 +101,7 @@ share_serve() {
     stop)
       # Only signal a pid that is still an app-server, never a reused one.
       command_line=""
-      [[ -z "$pid" ]] || command_line="$(tr '\0' ' ' <"/proc/$pid/cmdline" 2>/dev/null || true)"
+      [[ -z "$pid" ]] || command_line="$({ tr '\0' ' ' <"/proc/$pid/cmdline"; } 2>/dev/null || true)"
       if [[ "$command_line" == *app-server* ]]; then
         kill "$pid" 2>/dev/null || true
         for _ in 1 2 3 4 5 6 7 8 9 10; do
