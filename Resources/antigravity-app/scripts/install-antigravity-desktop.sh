@@ -105,6 +105,22 @@ app_prepare() {
   mv -f "$pending" "$engine"
   rm -rf "$unpack"
 
+  # The closed-source engine launches the Google OAuth page with `xdg-open`.
+  # HarmonyOS has no xdg-open; provide a wrapper that opens the system browser
+  # via `aa` (same approach as the magpie port). It lives on the host PATH that
+  # is injected into the HAP config, so the engine finds it at login time.
+  local xdg_open="$brew_prefix/bin/xdg-open"
+  if [ ! -x "$xdg_open" ]; then
+    cat > "$xdg_open" <<'XDG'
+#!/usr/bin/env sh
+set -eu
+url="${1:-}"
+[ -n "$url" ] || exit 2
+exec /bin/aa start -b com.huawei.hmos.browser -a MainAbility -U "$url"
+XDG
+    chmod +x "$xdg_open"
+  fi
+
   export ANTIGRAVITY_APP_ENGINE="$engine"
   export ANTIGRAVITY_APP_HOST_HOME="${ANTIGRAVITY_APP_HOST_HOME:-$HOME}"
   export ANTIGRAVITY_APP_HOST_PATH="$brew_prefix/bin:$brew_prefix/sbin:/system/bin:/system/xbin:/usr/bin:/bin:/vendor/bin"
