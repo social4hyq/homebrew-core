@@ -8,7 +8,7 @@ class OrcaApp < Formula
   # Tap-authored shell scripts (MIT) on the CPF-Electron runtime (mixed
   # MIT/BSD/LGPL).
   license :cannot_represent
-  revision 8
+  revision 9
 
   livecheck do
     url :stable

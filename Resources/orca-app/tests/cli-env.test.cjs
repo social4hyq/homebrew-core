@@ -108,6 +108,29 @@ test('a registration of an app that is running is kept, even when its relay does
   assert.equal(fs.existsSync(ctx.registration), true);
 });
 
+// The removal runs in a Node step inside the script; whatever it prints would reach the terminal.
+test('removing a killed app\'s registration prints nothing on stderr, from env and from cli', async (t) => {
+  const ctx = await setup(t);
+  await ctx.startRelay(4242, { present: false });
+  const env = await ctx.run(['env']);
+  assert.equal(env.status, 0, env.stderr);
+  assert.equal(env.stdout.trim(), `export ORCA_USER_DATA_PATH=${ctx.data}`);
+  assert.equal(env.stderr, '', 'env writes nothing to stderr');
+  await ctx.startRelay(4343, { present: false });
+  const cli = await ctx.run(['cli', 'status']);
+  assert.equal(cli.status, 0, cli.stderr);
+  assert.equal(cli.stdout.trim(), `fake-orca status profile=${ctx.data}`);
+  assert.equal(cli.stderr, '', 'cli writes nothing to stderr');
+});
+
+test('a running app\'s registration is kept without anything on stderr', async (t) => {
+  const ctx = await setup(t);
+  await ctx.startRelay();
+  const result = await ctx.run(['env']);
+  assert.match(result.stdout, /orca\(\) \{ command orca-app cli/);
+  assert.equal(result.stderr, '');
+});
+
 test('a registration that cannot be judged (no pid, or unreadable) is left alone', async (t) => {
   const ctx = await setup(t);
   fs.mkdirSync(path.dirname(ctx.registration), { recursive: true });
