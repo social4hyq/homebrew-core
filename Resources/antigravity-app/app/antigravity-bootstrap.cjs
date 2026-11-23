@@ -10,6 +10,11 @@ const fs = require('fs');
 
 const PORT_RE = /listening on \w+ port at (\d+) for HTTP(S)?\b/i;
 const VERSION = '2.34.0';
+
+// The engine serves its UI over a self-signed loopback certificate. Electron
+// 40 on OHOS does not honour setCertificateVerifyProc for the main session, so
+// allow invalid certs for this shell (it only ever loads 127.0.0.1).
+app.commandLine.appendSwitch('ignore-certificate-errors');
 const CONFIG = path.join(__dirname, 'antigravity-host-config.json');
 
 let server = null;
