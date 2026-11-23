@@ -85,7 +85,11 @@ case "${1:-}" in
     shift
     parse_device "$@"
     device
-    if "${HDC}" "${device_args[@]}" shell "ps -ef | grep -q $BUNDLE_ID" >/dev/null 2>&1; then
+    processes="$("${HDC}" "${device_args[@]}" shell "ps -ef" 2>/dev/null || true)"
+    if printf '%s\n' "$processes" | awk -v bundle="$BUNDLE_ID" '
+      $8 == bundle || index($8, bundle ":") == 1 { found = 1 }
+      END { exit !found }
+    '; then
       echo "running"
     else
       echo "stopped"

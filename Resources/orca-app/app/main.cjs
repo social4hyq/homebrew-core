@@ -12,10 +12,18 @@
 // log; for a runtime started by `orca-app serve` it reads the record from
 // ~/.config/orca-app/server.ready.json (see attach.cjs). `orca-app install`
 // only writes the port, the runtime binary path and the host environment.
+//
+// Sharing with the terminal, both ways:
+//  - a terminal's runtime is connected without the web client's "different server"
+//    question (the saved server is dropped first, see attach.cjs);
+//  - the runtime this shell starts itself is published for the terminal's orca CLI
+//    (~/.config/orca-app/app-runtime/orca-runtime.json, `orca-app cli ...`) and
+//    `orca-app serve` reports it instead of starting a second one. It ends with the
+//    app, so quitting from the tray asks first when it holds terminals.
 // Spawning host binaries and reading the host home directory need the
 // CUSTOM_SANDBOX / READ_WRITE_USER_FILE ACLs.
-const { app, BrowserWindow, shell } = require('electron');
-const { spawn } = require('node:child_process');
+const { app, BrowserWindow, dialog, shell } = require('electron');
+const { execFile, spawn } = require('node:child_process');
 const fs = require('node:fs');
 const http = require('node:http');
 const path = require('node:path');
@@ -139,12 +147,14 @@ function spawnServer() {
   });
   serveChild.on('exit', (code, signal) => {
     serveChild = null;
+    unpublishRuntime();
     serveFailure = `server exited (code ${code}, signal ${signal})`;
     console.error('ORCA_DESKTOP_ORCAD_EXIT ' + serveFailure);
   });
 }
 
 function stopServer() {
+  unpublishRuntime();
   if (!serveChild) return;
   try { serveChild.kill(); } catch (error) { console.error('ORCA_DESKTOP kill failed: ' + String(error)); }
   serveChild = null;
@@ -178,6 +188,23 @@ function currentPairingUrl() {
   return url;
 }
 
+// The runtime id of the record written after the shell's own last spawn.
+function ownRuntimeId() {
+  let text;
+  try {
+    text = fs.readFileSync(serveLogPath(), 'utf8');
+  } catch {
+    return null;
+  }
+  const lines = text.split('\n');
+  let start = 0;
+  for (let index = 0; index < lines.length; index += 1) {
+    if (lines[index].startsWith('[shell]')) start = index;
+  }
+  const ready = attach.parseReadyRecord(lines.slice(start).join('\n'));
+  return ready ? ready.runtimeId : null;
+}
+
 // The HTTP port answers a moment before the ready record reaches the log; wait
 // for it so the shell never opens the client without its pairing link.
 async function waitForPairingUrl(timeoutMs) {
@@ -197,7 +224,9 @@ async function waitForPairingUrl(timeoutMs) {
 async function connectTarget() {
   if (serveChild) {
     const url = (await waitForPairingUrl(6000)) || origin + '/web-index.html';
-    return { kind: 'own', url, runtimeId: null, reason: 'own-runtime' };
+    return {
+      kind: 'own', url, runtimeId: ownRuntimeId(), reason: 'own-runtime', hostId: attach.hostIdOf(url),
+    };
   }
   const ready = readyFile ? attach.parseReadyRecord(attach.readHead(readyFile)) : null;
   const state = attachStateFile ? attach.readState(attachStateFile) : {};
@@ -207,23 +236,35 @@ async function connectTarget() {
 // The shell cannot see whether the web client accepted the link, but the
 // runtime logs every connection to the same file. Remember the runtime as
 // paired only once a new connection shows up; until then it counts as "tried",
-// so a spent or stale link is not offered again.
-function trackPairing(runtimeId, sinceIso) {
-  if (!readyFile || !attachStateFile || !runtimeId) return;
+// so a spent or stale link is not offered again. `own` is the shell's own
+// runtime: nothing is "tried" for it, but the host the web client is now paired
+// with is recorded, so the next link for another host clears the saved server.
+function trackPairing({ runtimeId, hostId, sinceIso, own = false }) {
+  if (!attachStateFile) return;
+  const sources = own ? [serveLogPath()] : (readyFile
+    ? [readyFile, path.join(path.dirname(readyFile), 'server.log')] : []);
+  if (sources.length === 0 || (!own && !runtimeId)) return;
   const before = attach.readState(attachStateFile);
-  attach.writeState(attachStateFile, {
-    lastPairedRuntimeId: before.lastPairedRuntimeId,
-    lastTriedRuntimeId: runtimeId,
-  });
-  const sources = [readyFile, path.join(path.dirname(readyFile), 'server.log')];
-  // The web client may first ask the user to confirm a different server, so
-  // allow for a human-sized delay.
+  if (!own) {
+    attach.writeState(attachStateFile, {
+      lastPairedRuntimeId: before.lastPairedRuntimeId,
+      lastTriedRuntimeId: runtimeId,
+      pairedHostId: before.pairedHostId,
+    });
+  }
+  // The web client may first ask the user to confirm a different server (only
+  // when the saved server could not be dropped), so allow for a human-sized delay.
   const deadline = Date.now() + 10 * 60 * 1000;
   const timer = setInterval(() => {
     for (const source of sources) {
       const connectedAt = attach.lastClientConnectedAt(attach.readTail(source));
       if (connectedAt && connectedAt > sinceIso) {
-        attach.writeState(attachStateFile, { lastPairedRuntimeId: runtimeId, lastTriedRuntimeId: null });
+        attach.writeState(attachStateFile, {
+          // Pairing with the shell's own runtime means a terminal runtime is no longer the paired one.
+          lastPairedRuntimeId: own ? null : runtimeId,
+          lastTriedRuntimeId: null,
+          pairedHostId: hostId || null,
+        });
         clearInterval(timer);
         return;
       }
@@ -231,6 +272,97 @@ function trackPairing(runtimeId, sinceIso) {
     if (Date.now() > deadline) clearInterval(timer);
   }, 1000);
   timer.unref();
+}
+
+// A link for another host would make the web client ask to replace its saved
+// server. Load a page of the same origin that is not the client (the runtime
+// answers 404 there) and drop the saved server, so the link connects directly.
+async function clearSavedServer(win) {
+  try {
+    await win.loadURL(origin + '/__orca-shell__').catch(() => {});
+    await win.webContents.executeJavaScript(
+      `window.localStorage.removeItem(${JSON.stringify(attach.SAVED_SERVER_KEY)}); true`,
+    );
+  } catch (error) {
+    // The question is shown instead; the link still works after "Connect".
+    console.error('ORCA_DESKTOP could not clear the saved server: ' + String(error));
+  }
+}
+
+// The runtime this shell started, as the terminal's CLI can reach it.
+let publishedRuntimeId = null;
+function publishRuntime(runtimeId) {
+  if (!hostHome || !runtimeId) return;
+  const dataRoot = childEnv().ORCA_USER_DATA;
+  if (attach.publishRuntimeProfile({ dataRoot, home: hostHome, runtimeId })) publishedRuntimeId = runtimeId;
+}
+
+function unpublishRuntime() {
+  if (!hostHome) return;
+  attach.unpublishRuntimeProfile({ home: hostHome, runtimeId: publishedRuntimeId });
+  publishedRuntimeId = null;
+}
+
+// How many terminals the runtime this shell started holds, or null (not ours, or
+// the CLI did not answer).
+function terminalCount() {
+  return new Promise((resolve) => {
+    if (!serveChild || !canAutoStart) return resolve(null);
+    const env = childEnv();
+    env.ORCA_USER_DATA_PATH = env.ORCA_USER_DATA;
+    execFile(config.orca, ['terminal', 'list', '--json'], { env, timeout: 5000 }, (error, stdout) => {
+      if (error) return resolve(null);
+      try {
+        const total = JSON.parse(stdout).result.totalCount;
+        resolve(Number.isInteger(total) ? total : null);
+      } catch {
+        resolve(null);
+      }
+    });
+  });
+}
+
+// Tray "退出应用". The runtime this shell started ends with the app (it lives in
+// the app's cgroup), so ask first when it holds terminals. Anything that goes wrong
+// while asking (no answer, no dialog) quits as before.
+let confirming = false;
+async function confirmQuit() {
+  // A second click while the question is still open means "quit anyway"; it also
+  // keeps the menu from getting stuck if the dialog never shows.
+  if (confirming) {
+    stopServer();
+    app.exit(0);
+    return;
+  }
+  confirming = true;
+  try {
+    const count = await terminalCount();
+    if (count && count > 0) {
+      let proceed = true;
+      try {
+        tray.showWindow();
+        const parent = shellWindow && !shellWindow.isDestroyed() ? shellWindow : undefined;
+        const { response } = await dialog.showMessageBox(parent, {
+          type: 'warning',
+          title: '退出 Orca',
+          message: `有 ${count} 个终端正在运行`,
+          detail: '退出应用会同时结束由本应用启动的 Orca 运行时，其中的终端会被关闭。' +
+            '要让它们在退出后继续，请先在终端里运行 orca-app serve。',
+          buttons: ['取消', '仍然退出'], defaultId: 0, cancelId: 0,
+        });
+        proceed = response === 1;
+      } catch (error) {
+        console.error('ORCA_DESKTOP quit dialog failed: ' + String(error));
+      }
+      if (!proceed) return;
+    }
+    stopServer();
+    // The shell's ArkTS windowStageClose handler refuses to close the window, so a
+    // regular app.quit() would be vetoed; exit the process directly.
+    app.exit(0);
+  } finally {
+    confirming = false;
+  }
 }
 
 function showWaiting(win, state) {
@@ -258,8 +390,16 @@ async function drive(win) {
         fs.appendFileSync(serveLogPath(), `[attach] ${sinceIso} kind=${target.kind} reason=${target.reason}` +
           `${target.runtimeId ? ' runtime=' + target.runtimeId : ''}\n`);
       } catch {}
+      const state = attachStateFile ? attach.readState(attachStateFile) : {};
+      if (target.kind !== 'plain' && attach.needsFreshSavedServer({ url: target.url, state })) {
+        await clearSavedServer(win);
+      }
       await win.loadURL(target.url);
-      if (target.kind === 'link') trackPairing(target.runtimeId, sinceIso);
+      if (target.kind === 'link') trackPairing({ runtimeId: target.runtimeId, hostId: target.hostId, sinceIso });
+      if (target.kind === 'own') {
+        trackPairing({ runtimeId: target.runtimeId, hostId: target.hostId, sinceIso, own: true });
+        publishRuntime(target.runtimeId);
+      }
       return;
     }
     const now = Date.now();
@@ -296,7 +436,7 @@ app.whenReady().then(() => {
       tray.create({
         tooltip: 'Orca',
         iconPath: path.join(__dirname, 'tray-icon.png'),
-        onQuit: stopServer,
+        onQuitRequest: confirmQuit,
       });
       trayReady = true;
     } catch (error) {

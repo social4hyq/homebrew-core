@@ -6,7 +6,7 @@ class ClaudeCodeApp < Formula
   version "6.28899.6"
   sha256 "239c20d218456cacc656d48382fd59116325ac679aa4e476377af1456ac85715"
   license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
-  revision 3
+  revision 4
 
   livecheck do
     url "https://downloads.claude.ai/claude-desktop/apt/stable/dists/stable/main/binary-arm64/Packages"
@@ -14,9 +14,8 @@ class ClaudeCodeApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-app-v6.28899.6-r5"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2bb1f34570de89b66d06e6fb465c070c82596d04daa1ac05b6940e21226e9c30"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-app-v6.28899.6-r4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a8f287816a56f714184989a5cd0ec031c1e794bb312ee770f20f1a27473085d5"
   end
 
   depends_on "app-installer"
@@ -202,16 +201,16 @@ class ClaudeCodeApp < Formula
       install injects the host paths into a private signed HAP, and ACL permissions
       let it spawn the CLI. `claude-code-app start` opens the app.
 
-      The app and a terminal `claude` share what is on disk: the sessions the app
-      starts are transcripts under ~/.claude/projects (so `claude --resume` finds them
-      and the app's own session list and delete use the same folder), and its CLI
-      child now uses the config a terminal `claude` uses without any variable,
-      including ~/.claude.json (user-scope MCP servers, workspace trust). It does not
-      share a live process: the official app talks to its own `claude` child over
-      stdio, which has nothing to attach to. Closing the window hides the app (the
-      official app's tray); reinstall with `claude-code-app install` after upgrading.
-      `claude-code-app uninstall` removes the app but keeps its data; only
-      `claude-code-app uninstall --purge` deletes the app data.
+      The app and a terminal `claude` share what is on disk, not a live process (the
+      official app talks to its own `claude` child over stdio, which has nothing to
+      attach to). Sessions the app starts are transcripts under ~/.claude/projects,
+      so a terminal `claude --resume <id>` continues them. Sessions started in a
+      terminal do not show up in the app's own session list. The app's main process
+      uses ~/.claude as its config folder when it can use it, and its CLI child runs
+      without CLAUDE_CONFIG_DIR for the default folder, as a terminal `claude` does,
+      which should put its global state in ~/.claude.json. Closing the window hides
+      the app (the official app's tray, whose menu restores it); reinstall with
+      `claude-code-app install` after upgrading.
     EOS
   end
 
@@ -235,8 +234,10 @@ class ClaudeCodeApp < Formula
       #!/bin/sh
       printf '%s\\n' "$*" >> #{hdc_log}
       if [ "$1" = "shell" ] && [ "$2" = "ps -ef" ]; then
-        [ -n "${FAKE_STOPPED:-}" ] ||
-          printf '%s\\n' "a com.social4hyq.claudecode" "b com.other.app"
+        if [ -z "${FAKE_STOPPED:-}" ]; then
+          printf '%s\\n' "u 1 1 1 1 ? 00:00:00 com.social4hyq.claudecode"
+        fi
+        printf '%s\\n' "u 1 1 1 1 ? 00:00:00 sh -c echo com.social4hyq.claudecode"
       fi
     SH
     chmod 0755, fake_bin/"hdc"

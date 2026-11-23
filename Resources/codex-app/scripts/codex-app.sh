@@ -192,10 +192,12 @@ case ${1:-} in
         printf 'codex-app: stopped %s\n' "$APP_BUNDLE_ID"
         ;;
       status)
-        # hdc shell does not reliably pass the remote exit status through, so
-        # grep the process list instead of trusting an exit code.
+        # Match only app command names; unrelated shell arguments may mention the bundle.
         processes="$("$HDC" "${hdc_args[@]}" shell "ps -ef" 2>/dev/null || true)"
-        if printf '%s\n' "$processes" | grep -q "$APP_BUNDLE_ID"; then
+        if printf '%s\n' "$processes" | awk -v bundle="$APP_BUNDLE_ID" '
+          $8 == bundle || index($8, bundle ":") == 1 { found = 1 }
+          END { exit !found }
+        '; then
           printf 'codex-app: running (%s)\n' "$APP_BUNDLE_ID"
         else
           printf 'codex-app: not running (%s)\n' "$APP_BUNDLE_ID" >&2

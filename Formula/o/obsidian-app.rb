@@ -7,7 +7,7 @@ class ObsidianApp < Formula
   # host payload in Resources/obsidian-app is version-independent. The asar is
   # fetched at install time and never put in the bottle.
   license :cannot_represent
-  revision 11
+  revision 12
 
   # desktop-releases.json carries the latest desktop version, asar URL and
   # sha256.
@@ -19,8 +19,8 @@ class ObsidianApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/obsidian-app-v1.15.1-r13"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "927c449fa1fa12ae74381ee7e5a230bbc1162c04184c11353bbe39a15616888c"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/obsidian-app-v1.15.1-r14"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a988dccd6f8800c9bc0b1f0276a8f948688999b114be04042498a5f24f4ff2f3"
   end
 
   depends_on "app-installer"
@@ -420,7 +420,12 @@ class ObsidianApp < Formula
       printf '%s\\n' "$*" >> #{hdc_log}
       case "$*" in
         *"list targets"*) printf '127.0.0.1:34561\\n' ;;
-        *"ps -ef | grep -q"*) exit 0 ;;
+        *"ps -ef"*)
+          if [ -z "${FAKE_STOPPED:-}" ]; then
+            printf '%s\\n' "u 1 1 1 1 ? 00:00:00 com.social4hyq.obsidiandesktop"
+          fi
+          printf '%s\\n' "u 1 1 1 1 ? 00:00:00 sh -c echo com.social4hyq.obsidiandesktop"
+          ;;
         *) exit 0 ;;
       esac
     SH
@@ -430,6 +435,9 @@ class ObsidianApp < Formula
     shell_output("#{bin}/obsidian-app stop")
     assert_match "shell aa force-stop com.social4hyq.obsidiandesktop", (testpath/"cli-hdc-log").read
     assert_equal "running\n", shell_output("#{bin}/obsidian-app status")
+    with_env("FAKE_STOPPED" => "1") do
+      assert_equal "stopped\n", shell_output("#{bin}/obsidian-app status")
+    end
     shell_output("#{bin}/obsidian-app uninstall --purge --device tablet-1")
     assert_equal %w[uninstall --bundle-id com.social4hyq.obsidiandesktop --device tablet-1 --purge],
                  installer_args.read.lines(chomp: true)
