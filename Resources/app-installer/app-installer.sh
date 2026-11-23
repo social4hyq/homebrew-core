@@ -145,7 +145,7 @@ while (($#)); do
     --sign-only) sign_only=1; shift ;;
     --network) network_probe=1; shift ;;
     --purge) purge=1; shift ;;
-    --no-start) start_app=0; ability=; shift ;;
+    --no-start) start_app=0; shift ;;
     --no-browser) open_browser=0; shift ;;
     -h|--help) usage; exit 0 ;;
     *) printf 'app-installer: unknown option: %s\n' "$1" >&2; usage >&2; exit 2 ;;
@@ -154,7 +154,6 @@ done
 
 if [[ "${HAP_INSTALLER_NO_START:-0}" != "0" ]]; then
   start_app=0
-  ability=
 fi
 [[ "$login_timeout" =~ ^[0-9]+$ ]] || die "invalid --timeout: $login_timeout" 2
 
@@ -362,7 +361,7 @@ install_via_sideload() {
 install_via_hdc() {
   # parts and remote stay global: the EXIT trap below runs after this function
   # has returned, when locals no longer exist.
-  local tmp_parent name part install_output start_output
+  local tmp_parent name part install_output start_output restart_app=0
   local -a remote_parts=()
   tmp_parent="${TMPDIR:-$home/.cache}"
   mkdir -p "$tmp_parent"
@@ -385,6 +384,12 @@ install_via_hdc() {
   # Concatenate the parts we just sent by explicit name. A glob that matches
   # nothing makes the device's cat read stdin and fail with "cat: -: Broken pipe".
   hdc_cmd shell "cat ${remote_parts[*]} > /data/local/tmp/$remote.hap"
+  if ((!start_app)) && [[ "${HAP_INSTALLER_RESTART_IF_RUNNING:-0}" != "0" ]]; then
+    if hdc_cmd shell "ps -ef" | awk -v bundle="$bundle_id" \
+      '$8 == bundle || index($8, bundle ":") == 1 { found = 1 } END { exit !found }'; then
+      restart_app=1
+    fi
+  fi
   stop_output="$(hdc_cmd shell "aa force-stop $bundle_id" 2>&1)" || true
   if [[ -n "$stop_output" ]] &&
      ! printf '%s' "$stop_output" | grep -qiE 'force stop process successfully|not installed|10104002'; then
@@ -401,7 +406,7 @@ install_via_hdc() {
     record_result install device "$install_output"
     die 'device did not report successful installation.'
   fi
-  if ((start_app)); then
+  if ((start_app || restart_app)); then
     start_output=$(hdc_cmd shell "aa start -a $ability -b $bundle_id -m $module" 2>&1) || {
       printf '%s\n' "$start_output" >&2
       printf '%s\n' 'WARN: app start failed (the screen may be locked); start it manually.' >&2
