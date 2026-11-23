@@ -40,7 +40,8 @@ class Magpie < Formula
            "-tags=nogui", "."
     # `magpie web` runs through magpie-web.js, which records the page's port and key for
     # the Magpie desktop app; every other command is the binary itself.
-    libexec.install tap_root/"Resources/magpie/magpie.sh", tap_root/"Resources/magpie/magpie-web.js"
+    cp tap_root/"Resources/magpie/magpie.sh", libexec/"magpie.sh"
+    cp tap_root/"Resources/magpie/magpie-web.js", libexec/"magpie-web.js"
     chmod 0755, libexec/"magpie.sh"
     (bin/"magpie").write_env_script libexec/"magpie.sh",
                                     MAGPIE_BUN:  "${MAGPIE_BUN:-#{formula_opt_bin("bun")}/bun}",
