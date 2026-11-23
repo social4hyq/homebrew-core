@@ -359,20 +359,49 @@ install_via_sideload() {
   die 'system sideloading is not available in this version; use --method hdc (or auto).'
 }
 
+# Size in bytes of a file on the device. "missing" when the device says there is no such
+# file; empty when the size cannot be read at all (hdc refused the command: newer hdc
+# builds intercept some commands with "[E00C002] Execution intercepted ..." and no error
+# status). `stat` first, then `ls`.
+remote_size() {
+  local path="$1" out size
+  out="$(hdc_cmd shell "stat -c %s $path" 2>&1)" || true
+  out="$(printf '%s\n' "$out" | tr -d '\r')"
+  size="$(printf '%s\n' "$out" | awk '/^[0-9]+$/ {print; exit}')"
+  if [[ -z "$size" ]] && printf '%s\n' "$out" | grep -qi 'no such file'; then
+    printf 'missing'
+    return
+  fi
+  if [[ -z "$size" ]]; then
+    out="$(hdc_cmd shell "ls -ln $path" 2>&1)" || true
+    out="$(printf '%s\n' "$out" | tr -d '\r')"
+    size="$(printf '%s\n' "$out" | awk '$1 ~ /^[-l]/ && $5 ~ /^[0-9]+$/ {print $5; exit}')"
+    if [[ -z "$size" ]] && printf '%s\n' "$out" | grep -qi 'no such file'; then
+      printf 'missing'
+      return
+    fi
+  fi
+  printf '%s' "$size"
+}
+
 install_via_hdc() {
-  # parts and remote stay global: the EXIT trap below runs after this function
-  # has returned, when locals no longer exist.
+  # parts, remote and remote_hap stay global: the EXIT trap below runs after this
+  # function has returned, when locals no longer exist.
   local tmp_parent name part install_output start_output
+  local expected actual join_output send_output
+  local direct_send_done=0 install_rc=0
   local -a remote_parts=()
   tmp_parent="${TMPDIR:-$home/.cache}"
   mkdir -p "$tmp_parent"
   parts=$(mktemp -d "$tmp_parent/app-installer.XXXXXX")
   remote="app-installer-$$"
+  remote_hap="/data/local/tmp/$remote.hap"
   cleanup() {
-    hdc_cmd shell "rm -f /data/local/tmp/$remote-part-* /data/local/tmp/$remote.hap" >/dev/null 2>&1 || true
+    hdc_cmd shell "rm -f /data/local/tmp/$remote-part-* $remote_hap" >/dev/null 2>&1 || true
     rm -rf "$parts"
   }
   trap cleanup EXIT
+  expected="$(wc -c <"$signed_hap" | tr -d ' ')"
   split -b 10000000 "$signed_hap" "$parts/part-"
   progress upload
   printf 'Uploading %s to %s\n' "$(basename "$signed_hap")" "$device"
@@ -384,7 +413,39 @@ install_via_hdc() {
   done
   # Concatenate the parts we just sent by explicit name. A glob that matches
   # nothing makes the device's cat read stdin and fail with "cat: -: Broken pipe".
-  hdc_cmd shell "cat ${remote_parts[*]} > /data/local/tmp/$remote.hap"
+  # hdc can refuse the command without failing, so what the device ends up with is
+  # checked, not the exit status: the size has to be the signed HAP's.
+  join_output="$(hdc_cmd shell "cat ${remote_parts[*]} > $remote_hap" 2>&1)" || true
+  actual="$(remote_size "$remote_hap")"
+  if [[ -n "$actual" && "$actual" != "$expected" ]]; then
+    printf 'WARN: the device has %s of the HAP, expected %s bytes; joining the parts again.\n' "${actual/missing/no file}" "$expected" >&2
+    [[ -z "$join_output" ]] || printf '%s\n' "$join_output" >&2
+    join_output="$(hdc_cmd shell "rm -f $remote_hap; cat ${remote_parts[*]} > $remote_hap" 2>&1)" || true
+    actual="$(remote_size "$remote_hap")"
+  fi
+  if [[ -z "$actual" ]]; then
+    # Nothing to compare with: either the join was refused or the size cannot be read.
+    printf 'WARN: could not read the HAP back from the device (%s); the install will tell.\n' "$remote_hap" >&2
+    [[ -z "$join_output" ]] || printf '%s\n' "$join_output" >&2
+  fi
+  # Without the join: send the whole file in one go. Used when the join did not give the
+  # right file, and when bm install says the file is not there.
+  send_whole_hap() {
+    direct_send_done=1
+    printf '%s\n' 'Sending the HAP to the device in one piece instead.' >&2
+    hdc_cmd shell "rm -f /data/local/tmp/$remote-part-* $remote_hap" >/dev/null 2>&1 || true
+    send_output="$(hdc_cmd file send "$signed_hap" "$remote_hap" 2>&1)" || true
+    actual="$(remote_size "$remote_hap")"
+  }
+  if [[ -n "$actual" && "$actual" != "$expected" ]]; then
+    send_whole_hap
+    if [[ -n "$actual" && "$actual" != "$expected" ]]; then
+      record_result install device "the HAP on the device has ${actual/missing/no file}, expected $expected bytes: $send_output"
+      printf '%s\n' "error: the HAP did not reach the device intact: expected $expected bytes, the device has ${actual/missing/no file} (after joining the parts and after sending the file whole)." >&2
+      [[ -z "$send_output" ]] || printf '%s\n' "hdc said: $send_output" >&2
+      exit 1
+    fi
+  fi
   stop_output="$(hdc_cmd shell "aa force-stop $bundle_id" 2>&1)" || true
   if [[ -n "$stop_output" ]] &&
      ! printf '%s' "$stop_output" | grep -qiE 'force stop process successfully|not installed|10104002'; then
@@ -392,7 +453,20 @@ install_via_hdc() {
   fi
   progress install
   printf '%s\n' 'Installing the signed HAP on the device.'
-  if ! install_output=$(hdc_cmd shell "bm install -p /data/local/tmp/$remote.hap" 2>&1); then
+  install_rc=0
+  install_output=$(hdc_cmd shell "bm install -p $remote_hap" 2>&1) || install_rc=$?
+  if ((! direct_send_done)) && [[ "$actual" != "$expected" ]] &&
+     printf '%s\n' "$install_output" | grep -qiE '9568269|install file path invalid'; then
+    # The file the join should have made is not there, although its size could not be checked
+    # (a file that is there with the right size is not sent again).
+    printf '%s\n' "$install_output" >&2
+    send_whole_hap
+    if [[ -z "$actual" || "$actual" == "$expected" ]]; then
+      install_rc=0
+      install_output=$(hdc_cmd shell "bm install -p $remote_hap" 2>&1) || install_rc=$?
+    fi
+  fi
+  if ((install_rc != 0)); then
     record_result install device "$install_output"
     printf '%s\n' "$install_output" >&2; exit 1
   fi

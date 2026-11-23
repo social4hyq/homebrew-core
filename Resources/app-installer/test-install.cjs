@@ -57,9 +57,58 @@ function fixture(t) {
   const hdc = tool("hdc", prelude + `
     if (args[0] === 'list') console.log(process.env.RECONNECT && fs.existsSync(process.env.HOME + '/connected') ? 'local TCP Connected localhost hdc' : (process.env.TEST_TARGETS || 'local TCP Connected localhost hdc'));
     if (args[0] === 'tconn') { fs.writeFileSync(process.env.HOME + '/connected', ''); console.log('connected'); }
+    // A device's /data/local/tmp, as far as the installer uses it.
+    const dev = process.env.HOME + '/device';
+    const onDevice = remote => path.join(dev, remote.replace(/^\\/data\\/local\\/tmp\\//, ''));
+    const intercepted = () => console.log('[F][2026-11-23 09:36:42][20020073] [E00C002]Execution intercepted due to inaccessibility of reporting command event.');
+    const once = name => { const marker = process.env.HOME + '/' + name; if (fs.existsSync(marker)) return false; fs.writeFileSync(marker, ''); return true; };
+    fs.mkdirSync(dev, { recursive: true });
+    const fileAt = args.indexOf('file');
+    if (fileAt >= 0 && args[fileAt + 1] === 'send') {
+      const [local, remote] = [args[fileAt + 2], args[fileAt + 3]];
+      const whole = remote.endsWith('.hap');
+      if (whole && process.env.DIRECT_SEND_BROKEN) { intercepted(); }
+      else fs.copyFileSync(local, onDevice(remote));
+    }
     if (args.includes('shell')) {
       const cmd = args.slice(args.indexOf('shell') + 1).join(' ');
-      if (cmd.includes('bm install')) { console.log(process.env.INSTALL_FAIL ? 'error: failed' : 'install bundle successfully'); }
+      let handled = false;
+      for (const piece of cmd.split(';').map(x => x.trim())) {
+        let m;
+        if ((m = /^rm -f (.+)$/.exec(piece))) {
+          handled = true;
+          for (const target of m[1].split(' ')) {
+            const base = path.basename(target);
+            const wildcard = base.endsWith('*');
+            for (const name of fs.readdirSync(dev)) if (wildcard ? name.startsWith(base.slice(0, -1)) : name === base) fs.rmSync(path.join(dev, name));
+          }
+        } else if ((m = /^cat (.+) > ([^ ]+)$/.exec(piece))) {
+          handled = true;
+          const mode = process.env.INTERCEPT_CAT;
+          if (mode === 'always' || (mode === 'once' && once('cat-intercepted'))) { intercepted(); continue; }
+          let data = Buffer.concat(m[1].split(' ').map(file => fs.readFileSync(onDevice(file))));
+          const cut = process.env.TRUNCATE_JOIN;
+          if (cut === 'always' || (cut === 'once' && once('join-truncated'))) data = data.subarray(0, data.length - 1000);
+          fs.writeFileSync(onDevice(m[2]), data);
+        } else if ((m = /^stat -c %s ([^ ]+)$/.exec(piece))) {
+          handled = true;
+          if (process.env.STAT_INTERCEPT) intercepted();
+          else if (process.env.NO_STAT) console.log('stat: not found');
+          else if (!fs.existsSync(onDevice(m[1]))) console.log("stat: '" + m[1] + "': No such file or directory");
+          else console.log(String(fs.statSync(onDevice(m[1])).size));
+        } else if ((m = /^ls -ln ([^ ]+)$/.exec(piece))) {
+          handled = true;
+          if (process.env.STAT_INTERCEPT) intercepted();
+          else if (!fs.existsSync(onDevice(m[1]))) console.log('ls: ' + m[1] + ': No such file or directory');
+          else console.log('-rw------- 1 2000 2000 ' + fs.statSync(onDevice(m[1])).size + ' 2026-11-23 10:00 ' + m[1]);
+        }
+      }
+      if (cmd.includes('bm install')) {
+        const target = /-p ([^ ]+)/.exec(cmd)[1];
+        if (process.env.INSTALL_FAIL) console.log('error: failed');
+        else if (!fs.existsSync(onDevice(target))) console.log('error: failed to install bundle.\\nError Code:9568269  Error Message:install file path invalid.');
+        else { fs.writeFileSync(process.env.HOME + '/installed-size', String(fs.statSync(onDevice(target)).size)); console.log('install bundle successfully'); }
+      }
       if (cmd.includes('aa force-stop') && process.env.STOP_MISSING) { console.log('error: failed to force stop process.'); console.log('Error Code:10104002  Error Message:Failed to retrieve specified package information.'); }
       if (cmd.includes('aa start')) { console.log(process.env.START_FAIL ? 'screen locked' : 'start ability successfully'); }
       if (cmd.includes('bm uninstall')) {
@@ -599,4 +648,100 @@ test('doctor --network reports an untrusted certificate chain', t => {
   });
   assert.match(r.stdout + r.stderr, /TLS trust probe/);
   assert.match(r.stdout + r.stderr, /tls_ca=/);
+});
+
+// The upload to the device: the parts are joined on the device, and what the device ends up
+// with is checked, because hdc can refuse a command (E00C002) without failing.
+function bigHap(f) {
+  // More than two 10 MB parts of data that does not compress.
+  const zip = new AdmZip();
+  zip.addFile("module.json", Buffer.from(JSON.stringify({app:{bundleName:bundle}, module:{name:'electron', requestPermissions:acl}})));
+  zip.addFile("payload.bin", require("node:crypto").randomBytes(25 * 1000 * 1000));
+  zip.writeZip(f.hap);
+  return fs.statSync(f.hap).size;
+}
+const shellCalls = f => f.calls().map(c => (Array.isArray(c) ? c : c.args || []).join(' '));
+const installs = f => shellCalls(f).filter(c => c.includes('bm install'));
+const wholeSends = f => shellCalls(f).filter(c => / file send /.test(' ' + c + ' ') && /\.hap( |$)/.test(c) && !/part-/.test(c.split(' file send ')[1] || ''));
+function deviceLeftovers(f) {
+  const dir = path.join(f.root, 'device');
+  return fs.existsSync(dir) ? fs.readdirSync(dir) : [];
+}
+
+test('the HAP that reaches the device is checked against the signed one before bm install', t => {
+  const f = fixture(t); const size = bigHap(f);
+  const r = f.run(['--no-start']); assert.equal(r.status, 0, r.stdout + r.stderr);
+  assert.equal(fs.readFileSync(path.join(f.root, 'installed-size'), 'utf8'), String(size), 'bm install got the whole HAP');
+  assert.ok(shellCalls(f).some(c => c.includes('stat -c %s')), 'the size was read back');
+  assert.doesNotMatch(r.stderr, /WARN|in one piece/);
+  assert.deepEqual(deviceLeftovers(f), [], 'nothing is left on the device');
+});
+
+test('a join that was refused once is repeated', t => {
+  const f = fixture(t); const size = bigHap(f);
+  const r = f.run(['--no-start'], {INTERCEPT_CAT:'once'}); assert.equal(r.status, 0, r.stdout + r.stderr);
+  assert.match(r.stderr, /the device has no file of the HAP, expected \d+ bytes; joining the parts again/);
+  assert.equal(fs.readFileSync(path.join(f.root, 'installed-size'), 'utf8'), String(size));
+  assert.equal(wholeSends(f).length, 0, 'the file was not sent again');
+});
+
+test('a join that keeps being refused falls back to sending the file whole', t => {
+  const f = fixture(t); const size = bigHap(f);
+  const r = f.run(['--no-start'], {INTERCEPT_CAT:'always'}); assert.equal(r.status, 0, r.stdout + r.stderr);
+  assert.match(r.stderr, /Sending the HAP to the device in one piece instead/);
+  assert.equal(fs.readFileSync(path.join(f.root, 'installed-size'), 'utf8'), String(size));
+  assert.equal(wholeSends(f).length, 1);
+  assert.equal(installs(f).length, 1, 'bm install ran once, on the intact file');
+});
+
+test('a join that gives a short file is repeated, then the file is sent whole', t => {
+  const f = fixture(t); const size = bigHap(f);
+  const once = f.run(['--no-start'], {TRUNCATE_JOIN:'once'}); assert.equal(once.status, 0, once.stdout + once.stderr);
+  assert.match(once.stderr, /the device has \d+ of the HAP, expected \d+ bytes; joining the parts again/);
+  assert.equal(fs.readFileSync(path.join(f.root, 'installed-size'), 'utf8'), String(size));
+  fs.rmSync(path.join(f.root, 'installed-size')); fs.rmSync(path.join(f.root, 'join-truncated'), {force:true});
+  const always = f.run(['--no-start'], {TRUNCATE_JOIN:'always'}); assert.equal(always.status, 0, always.stdout + always.stderr);
+  assert.match(always.stderr, /in one piece/);
+  assert.equal(fs.readFileSync(path.join(f.root, 'installed-size'), 'utf8'), String(size));
+});
+
+test('when the HAP cannot be made whole on the device the error says what was expected and what is there', t => {
+  const f = fixture(t); const size = bigHap(f);
+  const result = path.join(f.root, 'result.json');
+  const r = f.run(['--no-start'], {INTERCEPT_CAT:'always', DIRECT_SEND_BROKEN:'1', HAP_INSTALLER_RESULT_FILE:result});
+  assert.notEqual(r.status, 0);
+  assert.match(r.stderr, new RegExp(`the HAP did not reach the device intact: expected ${size} bytes, the device has no file`));
+  assert.match(r.stderr, /E00C002/, 'what hdc said is shown');
+  assert.equal(installs(f).length, 0, 'bm install is never run on a broken file');
+  assert.match(fs.readFileSync(result, 'utf8'), /expected \d+ bytes/);
+  assert.deepEqual(deviceLeftovers(f), [], 'nothing is left on the device');
+});
+
+test('when the size cannot be read the install goes on, and a missing file is then sent whole', t => {
+  const f = fixture(t); const size = bigHap(f);
+  const fine = f.run(['--no-start'], {STAT_INTERCEPT:'1'}); assert.equal(fine.status, 0, fine.stdout + fine.stderr);
+  assert.match(fine.stderr, /could not read the HAP back from the device/);
+  assert.equal(wholeSends(f).length, 0, 'a good join is not sent again');
+  assert.equal(fs.readFileSync(path.join(f.root, 'installed-size'), 'utf8'), String(size));
+  fs.rmSync(path.join(f.root, 'installed-size'));
+  const broken = f.run(['--no-start'], {STAT_INTERCEPT:'1', INTERCEPT_CAT:'always'}); assert.equal(broken.status, 0, broken.stdout + broken.stderr);
+  assert.match(broken.stderr, /9568269|install file path invalid/);
+  assert.match(broken.stderr, /in one piece/);
+  assert.equal(fs.readFileSync(path.join(f.root, 'installed-size'), 'utf8'), String(size));
+});
+
+test('ls is used for the size when stat is not there', t => {
+  const f = fixture(t); const size = bigHap(f);
+  const r = f.run(['--no-start'], {NO_STAT:'1'}); assert.equal(r.status, 0, r.stdout + r.stderr);
+  assert.ok(shellCalls(f).some(c => c.includes('ls -ln')));
+  assert.doesNotMatch(r.stderr, /WARN/);
+  assert.equal(fs.readFileSync(path.join(f.root, 'installed-size'), 'utf8'), String(size));
+});
+
+test('a genuine install error with the right file on the device is not retried by sending it again', t => {
+  const f = fixture(t); bigHap(f);
+  const r = f.run(['--no-start'], {INSTALL_FAIL:'1'});
+  assert.notEqual(r.status, 0);
+  assert.equal(installs(f).length, 1);
+  assert.equal(wholeSends(f).length, 0);
 });
