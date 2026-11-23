@@ -182,28 +182,6 @@ class MagpieApp < Formula
         must_succeed: false, print_stdout: true, network_access: true
   end
 
-  def caveats
-    <<~EOS
-      `brew install` and `brew upgrade` try to install the HAP when a device is
-      connected and Huawei Developer login is ready. If queued, check
-      `hap-app status`, then run `hap-app install-pending`.
-      Manual install: `magpie-app install`. See docs/hap-app-formulae.md.
-
-      `magpie-app uninstall` removes the app but keeps its data; only
-      `magpie-app uninstall --purge` deletes the app data.
-
-      Shares the installed Magpie CLI's settings. To use one gateway and one web UI
-      with the terminal, run `magpie-app web` there (`magpie web` on 127.0.0.1:3431,
-      `--port N` to change it, with a key kept in `~/.config/magpie-app/web-key`; a plain
-      `magpie web` gets a new key each run, so the app cannot open it):
-      while it answers the app opens it instead of starting its own, and closing the
-      app leaves it running. Without it the app starts its own, which ends with the
-      app, as before. Needs a debug profile for READ_PASTEBOARD (paste). Without
-      ACLs: `magpie-app install --no-acl`, then run
-      `magpie web --addr 127.0.0.1:3430 --no-open` yourself.
-    EOS
-  end
-
   test do
     hap = libexec/"magpie-desktop-unsigned.hap"
     entry = "resources/resfile/resources/app"

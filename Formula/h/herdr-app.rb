@@ -205,22 +205,6 @@ class HerdrApp < Formula
         must_succeed: false, print_stdout: true, network_access: true
   end
 
-  def caveats
-    <<~EOS
-      `brew install` and `brew upgrade` try to install the HAP when a device is
-      connected and Huawei Developer login is ready. If queued, check
-      `hap-app status`, then run `hap-app install-pending`.
-      Manual install: `herdr-app install`. See docs/hap-app-formulae.md.
-
-      The app cannot start the host `hc`, so a loopback bridge is used
-      (`herdr-app bridge status|stop|restart`). Install and start run it; the token
-      lives in ~/.config/herdr-app/bridge.conf (0600) and is baked into the
-      app (`install --new-token` rotates it). Open with `herdr-app start`.
-      `herdr-app uninstall` removes the app but keeps its data; only
-      `herdr-app uninstall --purge` deletes the app data.
-    EOS
-  end
-
   test do
     hap = libexec/"herdr-app-unsigned.hap"
     manifest = JSON.parse(shell_output("unzip -p #{hap} module.json"))

@@ -215,60 +215,6 @@ class OrcaApp < Formula
         must_succeed: false, print_stdout: true, network_access: true
   end
 
-  def caveats
-    <<~EOS
-      `brew install` and `brew upgrade` try to install the HAP when a device is
-      connected and Huawei Developer login is ready. If queued, check
-      `hap-app status`, then run `hap-app install-pending`.
-      Manual install: `orca-app install`. See docs/hap-app-formulae.md.
-
-      The shell starts its host `orca serve` runtime on launch and reads the pairing
-      link itself, so the app icon opens a working workbench. Weak-sandbox ACLs
-      (CUSTOM_SANDBOX, READ_WRITE_USER_FILE) let it spawn `orca`; the local debug
-      profile grants them. `orca-app serve` runs a separate host-side runtime in
-      ~/.orca for browser/CLI use:
-
-        orca-app start      # open the app
-        orca-app status     # host-side runtime
-        orca-app stop
-        orca-app uninstall  # keeps the app's data; --purge also deletes it
-
-      The `orca` CLI finds a runtime through the profile named by ORCA_USER_DATA_PATH
-      (default $XDG_CONFIG_HOME/orca), not through ~/.orca. To see the same projects
-      and terminals from the CLI as in `orca-app serve`, set it in that shell:
-
-        export ORCA_USER_DATA_PATH=$HOME/.orca
-
-      The runtime the app starts itself keeps its data and the Unix socket the orca
-      CLI needs in the app sandbox, which the terminal cannot reach, so the app
-      serves a small relay on 127.0.0.1 while that runtime runs and registers it in
-      ~/.config/orca-app/app-runtime/relay.json (with a token, removed when the
-      runtime ends). `orca-app cli <command>` runs the orca CLI against the runtime
-      in use through it (the app's while it is running, else the one `orca-app
-      serve` started) and prints what it printed, with its exit code; it runs from
-      the folder you are in when the app can see it, and takes no standard input.
-      `eval "$(orca-app env)"` defines an `orca` function for that while the app's
-      runtime runs, else sets ORCA_USER_DATA_PATH. `orca-app serve` and `status`
-      report that runtime instead of starting a second one.
-
-      When a runtime is already serving on the app's port (for example one started
-      with `orca-app serve`), the app connects to it, using the pairing link in
-      ~/.config/orca-app/server.ready.json, and never stops it; switching between
-      that runtime and the app's own needs no confirmation (the app drops the web
-      client's saved server first). With no runtime serving, the app starts its
-      own, which ends when the app exits: quitting from the tray asks first when it
-      holds terminals.
-
-      A runtime killed instead of stopped with `orca-app stop`, or left behind when the
-      terminal app was updated (its uid changes), leaves ~/.orca/orcad.lock and the
-      next `orca-app serve` fails with a message saying so. `orca-app serve --reclaim`
-      removes that lock when the pid it names is gone and no orcad process is running.
-
-      `install --no-acl` installs the strong-sandbox variant (no JIT/paste; it waits
-      for `orca-app serve` instead of spawning the runtime).
-    EOS
-  end
-
   test do
     # The launcher keeps state in ~/.config/orca-app; HOME is the test sandbox.
     ENV["HOME"] = testpath/"home"

@@ -609,19 +609,6 @@ class SnowShotApp < Formula
         must_succeed: false, print_stdout: true, network_access: true
   end
 
-  def caveats
-    <<~EOS
-      `brew install` and `brew upgrade` try to install the HAP when a device is
-      connected and Huawei Developer login is ready. If queued, check
-      `hap-app status`, then run `hap-app install-pending`.
-      Manual install: `snow-shot-app install`. See docs/hap-app-formulae.md.
-
-      The HAP is unsigned in the bottle; install signs it with a local debug profile
-      (Huawei Developer login on first run). `snow-shot-app uninstall` removes the
-      app but keeps its data; only `snow-shot-app uninstall --purge` deletes it.
-    EOS
-  end
-
   test do
     hap = libexec/"snow-shot-unsigned.hap"
     assert_predicate bin/"snow-shot", :symlink?

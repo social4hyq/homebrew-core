@@ -268,28 +268,6 @@ class ObsidianApp < Formula
         must_succeed: false, print_stdout: true, network_access: true
   end
 
-  def caveats
-    <<~EOS
-      `brew install` and `brew upgrade` try to install the HAP when a device is
-      connected and Huawei Developer login is ready. If queued, check
-      `hap-app status`, then run `hap-app install-pending`.
-      Manual install: `obsidian-app install`. See docs/hap-app-formulae.md.
-
-      It downloads Obsidian #{version} from the official release, verifies the
-      sha256, injects it into the HAP and signs with a local debug profile;
-      `--asar PATH` uses a local copy (offline). Vaults default to
-      `~/Obsidian/Obsidian Vault`; paste and WebAssembly work. `--no-acl` gives the
-      strong-sandbox variant (vaults in the app sandbox, no paste/JIT).
-
-      CLI: enable Settings -> General -> Command line interface, then
-      `obsidian-app cli <command>` (try `cli help`). Desktop self-update is disabled;
-      upgrade with `brew upgrade`.
-
-      `obsidian-app uninstall` removes the app but keeps its data; only
-      `obsidian-app uninstall --purge` deletes the app data.
-    EOS
-  end
-
   test do
     home = testpath/"home"
     home.mkpath

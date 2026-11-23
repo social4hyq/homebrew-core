@@ -200,42 +200,6 @@ class CodexApp < Formula
         must_succeed: false, print_stdout: true, network_access: true
   end
 
-  def caveats
-    <<~EOS
-      `brew install` and `brew upgrade` try to install the HAP when a device is
-      connected and Huawei Developer login is ready. If queued, check
-      `hap-app status`, then run `hap-app install-pending`.
-      Manual install: `codex-app install`. See docs/hap-app-formulae.md.
-
-      `codex-app uninstall` removes the app but keeps its data; only
-      `codex-app uninstall --purge` deletes the app data.
-
-      The bottle ships only the tap-authored shell; the first install asks
-      OpenAI for the official ChatGPT package (~519 MB, sha256-checked) and
-      caches it in ~/.cache/codex-app/vendor/ for reinstalls. Use
-      `codex-app install --deb PATH` for an offline copy, and `--clean-cache`
-      to remove the cached package and assembled HAP.
-
-      The app starts the Homebrew `codex` CLI; install injects host paths into a
-      private signed HAP (ACLs are needed to reach host projects). `--no-acl` gives a
-      strong-sandbox variant without host Codex features. Install keeps
-      `[desktop] projectlessWorkspaceRoot` in `$CODEX_HOME/config.toml` (original
-      saved as `config.toml.pre-owl`) and, when missing, writes the shell's proxy
-      variables to `~/.config/codex-app/env.json` (never overwritten).
-
-      The app and the terminal share one codex app-server on a loopback WebSocket
-      (default port 14288, capability token in `~/.config/codex-app/ws-token`).
-      Start it from the terminal with `codex-app serve` and the app attaches to it
-      (it keeps running after the app exits); open the app first and it starts the
-      server itself, which ends with the app, and `codex-app serve` or
-      `codex-app tui` (the Codex terminal UI on the same server) then use that one.
-      `codex-app serve --stop` stops it; while the app is open it starts one again.
-      Closing the window hides it to the system tray (the tray menu restores it or
-      quits; quitting asks first when the app started the server). The tray needs
-      the HAP rebuilt from this bottle: run `codex-app install` after upgrading.
-    EOS
-  end
-
   test do
     tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
     hap = libexec/"codex-app-shell-unsigned.hap"

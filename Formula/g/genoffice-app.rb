@@ -228,23 +228,6 @@ class GenofficeApp < Formula
         must_succeed: false, print_stdout: true, network_access: true
   end
 
-  def caveats
-    <<~EOS
-      `brew install` and `brew upgrade` try to install the HAP when a device is
-      connected and Huawei Developer login is ready. If queued, check
-      `hap-app status`, then run `hap-app install-pending`.
-      Manual install: `genoffice-app install`. See docs/hap-app-formulae.md.
-
-      `genoffice-app uninstall` removes the app but keeps its data; only
-      `genoffice-app uninstall --purge` deletes the app data.
-
-      The app runs entirely in its own sandbox: CUSTOM_SANDBOX, READ_WRITE_USER_FILE
-      and READ_PASTEBOARD come from the local debug profile, and the kernel ACLs keep
-      WebAssembly working. The `genoffice` CLI is a separate tool that cannot reach
-      the app.
-    EOS
-  end
-
   test do
     assert_match "Usage: genoffice-app", shell_output("#{bin}/genoffice-app --help")
 

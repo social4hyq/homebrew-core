@@ -200,5 +200,20 @@ commit "shared: edit lib"
 expect "a shared Resources change after the write-back rebuilds the formula using it" \
   "gamma-app" "$(detect "$MAIN9B" "$(git rev-parse HEAD)")"
 
+# 10. caveats is user-facing hint text that never lands in the bottle.
+#     Adding/removing it alone must not rebuild; a caveats edit together with
+#     a real code change still must (the strip must not hide real changes).
+git checkout -q main
+MAIN10=$(git rev-parse HEAD)
+git checkout -q -b pr-caveats "$MAIN10"
+sed -i 's/^  def install$/  def caveats\n    <<~EOS\n      hint text\n    EOS\n  end\n\n  def install/' Formula/a/alpha-app.rb
+commit "alpha-app: add caveats"
+CAVEATS=$(git rev-parse HEAD)
+expect "a caveats-only change builds nothing" "" "$(detect "$MAIN10" "$CAVEATS")"
+sed -i 's/revision 7/revision 8/' Formula/a/alpha-app.rb
+commit "alpha-app: change (revision 8)"
+CAVEATS_PLUS=$(git rev-parse HEAD)
+expect "caveats plus a real code change still rebuilds" "alpha-app" "$(detect "$MAIN10" "$CAVEATS_PLUS")"
+
 printf '\n%s passed, %s failed\n' "$PASS" "$FAILED"
 [ "$FAILED" -eq 0 ]

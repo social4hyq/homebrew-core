@@ -198,30 +198,6 @@ class OpencodeApp < Formula
         must_succeed: false, print_stdout: true, network_access: true
   end
 
-  def caveats
-    <<~EOS
-      `brew install` and `brew upgrade` try to install the HAP when a device is
-      connected and Huawei Developer login is ready. If queued, check
-      `hap-app status`, then run `hap-app install-pending`.
-      Manual install: `opencode-app install`. See docs/hap-app-formulae.md.
-
-      The shell connects to the background service that `opencode` runs for the
-      terminal (`opencode service`), so the TUI and the app show the same sessions.
-      It starts that service on launch when it is not running, but a service the
-      app starts ends when the app exits (quit or `aa force-stop`); the tray's
-      quit asks first when tasks are running. To keep tasks
-      running after the app is closed, start the service from a terminal first:
-      `opencode-app serve` (or `opencode service start`; `opencode-app start
-      --serve-only` in a shell startup file). A service started there survives
-      the app, and `opencode-app stop` stops it. The weak-sandbox ACLs (CUSTOM_SANDBOX,
-      READ_WRITE_USER_FILE) come from the local debug profile. READ_PASTEBOARD
-      enables paste and the kernel ACLs keep WebAssembly/markdown rendering.
-      `--no-acl` installs the strong-sandbox HAP and waits for `opencode-app serve`.
-      `opencode-app uninstall` removes the app but keeps its data; only
-      `opencode-app uninstall --purge` deletes the app data.
-    EOS
-  end
-
   test do
     ENV["HOME"] = testpath/"home"
     assert_match "Usage: opencode-app", shell_output("#{bin}/opencode-desktop --help")
