@@ -60,7 +60,8 @@ Usage: zcode-app <command>
   start [--no-serve]  Bring the installed app to the foreground; start the
                       backing service first when it is not healthy
                       (--no-serve skips that).
-  status              Show whether the backing service is healthy.
+  status              Show whether the backing service is healthy; when it is
+                      not, say why.
   stop                Stop the CLI-managed backing service.
   uninstall [--device ID] [--purge]
                       Remove the app from the device. The default keeps the
@@ -114,15 +115,6 @@ load_token() {
   TOKEN="$(tr -d ' \r\n' 2>/dev/null < "$TOKEN_FILE" || true)"
 }
 
-# GET /api/server-info with the token. The header goes through curl's config on
-# stdin so the token never shows up in a process list.
-server_info() {
-  [ -n "$TOKEN" ] || load_token
-  [ -n "$TOKEN" ] || return 1
-  printf 'header = "Authorization: Bearer %s"\n' "$TOKEN" |
-    curl -s -m 3 -K - -w '\n%{http_code}' "http://127.0.0.1:$PORT/api/server-info" 2>/dev/null
-}
-
 json_escape() {
   printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g'
 }
@@ -153,22 +145,65 @@ read_config() {
   [ -n "$WORKSPACE" ] || WORKSPACE="$HOME"
 }
 
-# Healthy means: it answers our token with 200 and reports that it requires
-# authentication. A server started before the token existed answers 200 with
-# authRequired false; reusing it would leave the loopback API open.
+# Why the last probe was not healthy (empty when it was) and the answer it got.
+# Only `status` prints the reason; the other callers stay quiet.
+PROBE_REASON=""
+PROBE_BODY=""
+
+# GET /api/server-info with the token. The header goes through curl's config on
+# stdin so the token never shows up in a process list. Healthy means: it answers
+# our token with 200 and reports that it requires authentication. A server
+# started before the token existed answers 200 with authRequired false; reusing
+# it would leave the loopback API open.
 healthy() {
-  local out code body
-  out="$(server_info)" || return 1
+  PROBE_REASON=""
+  PROBE_BODY=""
+  [ -n "$TOKEN" ] || load_token
+  if [ -z "$TOKEN" ]; then
+    PROBE_REASON="no service token at $TOKEN_FILE yet; run: zcode-app serve"
+    return 1
+  fi
+  local out rc=0 code body first
+  # curl's stderr stays in the output (2>&1): a curl that cannot run says why
+  # there, and hiding it once cost a long search (Homebrew's curl shim refuses to
+  # run without its environment and says so only on stderr).
+  out="$(printf 'header = "Authorization: Bearer %s"\n' "$TOKEN" |
+    curl -sS -m 3 -K - -w '\n%{http_code}' "http://127.0.0.1:$PORT/api/server-info" 2>&1)" || rc=$?
+  if [ "$rc" -ne 0 ]; then
+    first="$(printf '%s' "$out" | head -n 1 | cut -c1-160)"
+    case "$rc" in
+      7) PROBE_REASON="nothing is listening on port $PORT (curl exit 7)" ;;
+      28) PROBE_REASON="the service on port $PORT did not answer within 3 seconds (curl exit 28)" ;;
+      *) PROBE_REASON="curl failed (exit $rc)${first:+: $first}" ;;
+    esac
+    return 1
+  fi
   code="${out##*$'\n'}"
   body="${out%$'\n'*}"
-  [ "$code" = "200" ] || return 1
-  printf '%s' "$body" | grep -q '"authRequired"[[:space:]]*:[[:space:]]*true'
+  PROBE_BODY="$body"
+  case "$code" in
+    200) ;;
+    401)
+      PROBE_REASON="the service on port $PORT answered 401: the token in $TOKEN_FILE is not the one it was started with; run: zcode-app serve"
+      return 1 ;;
+    *)
+      PROBE_REASON="the service on port $PORT answered HTTP $code"
+      return 1 ;;
+  esac
+  if printf '%s' "$body" | grep -q '"authRequired"[[:space:]]*:[[:space:]]*true'; then
+    return 0
+  fi
+  if printf '%s' "$body" | grep -q '"authRequired"[[:space:]]*:[[:space:]]*false'; then
+    PROBE_REASON="the service on port $PORT does not require authentication (started by an older version); run: zcode-app serve"
+  else
+    PROBE_REASON="unexpected answer from port $PORT (no authRequired in /api/server-info)"
+  fi
+  return 1
 }
 
+# The version in the answer of the last healthy probe.
 server_version() {
-  local out
-  out="$(server_info)" || return 0
-  printf '%s' "${out%$'\n'*}" |
+  printf '%s' "$PROBE_BODY" |
     sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1
 }
 
@@ -493,6 +528,7 @@ cmd_status() {
     printf 'zcode-desktop: healthy at http://127.0.0.1:%s (zcode %s)\n' "$PORT" "$(server_version)"
   else
     printf 'zcode-desktop: server not healthy at http://127.0.0.1:%s\n' "$PORT" >&2
+    [ -z "$PROBE_REASON" ] || printf 'zcode-desktop: reason: %s\n' "$PROBE_REASON" >&2
     exit 1
   fi
 }
