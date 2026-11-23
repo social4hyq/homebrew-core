@@ -51,7 +51,8 @@ together, passwords are read from the environment, never from the command line):
 doctor --network also probes https://developer.huawei.com with the configured TLS
 settings (SKIP when an HTTPS proxy is set: the DevEco client may route differently).
 ready prints one line for the caller: `ok <device>`, `no-device`, `no-login`,
-`no-hdc` or `multiple-devices`, and exits 0 only for `ok`. `login` runs the
+`no-hdc` or `multiple-devices`, and exits 0 only for `ok`. When hdc refuses the
+local target, the reason is printed on stderr. `login` runs the
 DevEco CLI login (optionally bounded by --timeout). `permissions` reads the
 installed bundle from the device and checks that every permission the installer
 grants at install time (system_grant, the ACL ones) is granted; user_grant
@@ -185,26 +186,56 @@ connected_targets() {
   "$hdc_bin" list targets -v 2>/dev/null | awk '{for (i=2; i<=NF; i++) if ($i == "Connected") {print $1; break}}'
 }
 
+last_line() {
+  printf '%s\n' "$1" | awk 'NF { line=$0 } END { print line }'
+}
+
+# Fills local_targets with the connected targets, trying the local device first.
+# On a HarmonyOS PC hdc only lists 127.0.0.1 after a TCP connect to
+# persist.hdc.port, so a fresh boot or a restarted server otherwise looks like an
+# unplugged device. hdc_error keeps hdc's reason when that connect fails, for
+# example E00C001 "Operation restricted by the organization".
+local_targets=
+hdc_error=
+attach_local_target() {
+  local output local_port
+  local_targets="$(connected_targets || true)"
+  hdc_error=
+  if [[ -n "$local_targets" ]]; then
+    return 0
+  fi
+  if ! command -v param >/dev/null 2>&1; then
+    return 0
+  fi
+  local_port="$(param get persist.hdc.port 2>/dev/null | tr -d ' \r\n' || true)"
+  if [[ ! "$local_port" =~ ^[0-9]+$ ]] || ((10#$local_port < 1 || 10#$local_port > 65535)); then
+    return 0
+  fi
+  output="$("$hdc_bin" tconn "127.0.0.1:$local_port" 2>&1 || true)"
+  local_targets="$(connected_targets || true)"
+  if [[ -n "$local_targets" ]] || [[ "$output" == *"Connect OK"* ]]; then
+    return 0
+  fi
+  hdc_error="$(last_line "$output")"
+  if [[ -z "$hdc_error" ]]; then
+    hdc_error="hdc tconn 127.0.0.1:$local_port failed"
+  fi
+  return 0
+}
+
 # Sets $device to the one connected hdc target. 0 one target, 1 none, 2 several.
 pick_device() {
   [[ -z "$device" ]] || return 0
-  local targets count local_port
-  targets="$(connected_targets || true)"
-  if [[ -z "$targets" ]] && command -v param >/dev/null 2>&1; then
-    local_port="$(param get persist.hdc.port 2>/dev/null | tr -d ' \r\n' || true)"
-    if [[ "$local_port" =~ ^[0-9]+$ ]] && ((10#$local_port > 0 && 10#$local_port <= 65535)); then
-      "$hdc_bin" tconn "127.0.0.1:$local_port" >/dev/null 2>&1 || true
-      targets="$(connected_targets || true)"
-    fi
-  fi
-  count=$(printf '%s\n' "$targets" | awk 'NF' | wc -l | tr -d ' ')
+  local count
+  attach_local_target
+  count=$(printf '%s\n' "$local_targets" | awk 'NF' | wc -l | tr -d ' ')
   if ((count == 0)); then
     return 1
   elif ((count > 1)); then
-    device_targets="$targets"
+    device_targets="$local_targets"
     return 2
   fi
-  device="$targets"
+  device="$local_targets"
 }
 
 # Sets $device, or exits with guidance.
@@ -213,7 +244,12 @@ resolve_device() {
   pick_device || rc=$?
   case "$rc" in
     0) return 0 ;;
-    1) die 'no connected hdc target; connect and unlock the device, or pass --device.' ;;
+    1)
+      if [[ -n "$hdc_error" ]]; then
+        printf 'app-installer: %s\n' "$hdc_error" >&2
+      fi
+      die 'no connected hdc target; connect and unlock the device, or pass --device.'
+      ;;
     2)
       printf 'app-installer: %s hdc targets attached; pass --device <connect-key>:\n' \
         "$(printf '%s\n' "$device_targets" | awk 'NF' | wc -l | tr -d ' ')" >&2
@@ -509,7 +545,12 @@ case "$cmd" in
     case "$rc" in
       0) ;;
       2) printf 'multiple-devices\n'; exit 1 ;;
-      *) printf 'no-device\n'; exit 1 ;;
+      *)
+        if [[ -n "$hdc_error" ]]; then
+          printf 'app-installer: %s\n' "$hdc_error" >&2
+        fi
+        printf 'no-device\n'; exit 1
+        ;;
     esac
     rc=0; login_state || rc=$?
     case "$rc" in
@@ -607,10 +648,17 @@ case "$cmd" in
     rc=0; command -v "$hdc_bin" >/dev/null 2>&1 || [[ -x "$hdc_bin" ]] || rc=1
     check "hdc available ($hdc_bin)" "$rc" 'brew reinstall ohos-sdk-toolchains'
     if ((rc == 0)); then
-      targets="$(connected_targets || true)"
-      n=$(printf '%s\n' "$targets" | awk 'NF' | wc -l | tr -d ' ')
+      attach_local_target
+      n=$(printf '%s\n' "$local_targets" | awk 'NF' | wc -l | tr -d ' ')
       rc=0; ((n >= 1)) || rc=1
-      check "hdc target connected ($n)" "$rc" 'turn on developer mode and wireless debugging, unlock the device, or pass --device'
+      target_hint='enable developer mode and HDC/USB debugging, unlock the device, or pass --device'
+      if [[ -n "$hdc_error" ]]; then
+        target_hint="$hdc_error"
+        case "$hdc_error" in
+          *E00C001*) target_hint="$hdc_error (hdc debugging is disabled by the organization; contact its device administrator)" ;;
+        esac
+      fi
+      check "hdc target connected ($n)" "$rc" "$target_hint"
     fi
     if [[ -n "$network_config_error" ]]; then
       check 'TLS config' 1 "$network_config_error"

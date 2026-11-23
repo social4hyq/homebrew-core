@@ -109,7 +109,7 @@ reason_hint() {
     tls) printf '%s' '在 ~/.app-installer/config 设置 tls_ca=/path/to/ca.pem 后运行 hap-app install-pending' ;;
     network) printf '%s' '检查网络/代理后运行 hap-app install-pending' ;;
     login) printf '%s' '运行 hap-app install-pending 完成华为开发者登录' ;;
-    device) printf '%s' '连接并解锁设备后运行 hap-app install-pending' ;;
+    device) printf '%s' '连接并解锁设备后运行 hap-app install-pending；若提示 E00C001，需联系组织设备管理员放开 hdc 调试' ;;
     permissions) printf '%s' '运行 hap-app status 查看缺失权限' ;;
     *) printf '%s' '查看日志或运行 hap-app status' ;;
   esac
@@ -325,12 +325,26 @@ acl_file_for() {
   sed -n 's/^.*_MODULE_ACL="\([^"]*\)".*$/\1/p' "$wrapper" | head -n 1
 }
 
+# Sets ready_state to the first line of `app-installer ready` and ready_detail
+# to the last stderr line, so auto-install can show why hdc is unavailable
+# (for example E00C001 when the organization disables hdc debugging).
+ready_state=
+ready_detail=
 probe_ready() {
   local -a args=()
   [ -n "${device_arg:-}" ] && args+=(--device "$device_arg")
-  local out
-  out="$("$app_installer" ready "${args[@]}" 2>/dev/null)" || true
-  printf '%s' "${out%%$'\n'*}"
+  local out err_file="$cache_dir/ready-$$.err"
+  mkdir -p "$cache_dir" 2>/dev/null || true
+  out="$("$app_installer" ready "${args[@]}" 2>"$err_file")" || true
+  ready_state="${out%%$'\n'*}"
+  if [ -f "$err_file" ]; then
+    ready_detail="$(<"$err_file")"
+    ready_detail="${ready_detail##*$'\n'}"
+    ready_detail="${ready_detail:0:300}"
+  else
+    ready_detail=
+  fi
+  rm -f "$err_file" 2>/dev/null || true
 }
 
 login_recently_attempted() {
@@ -396,7 +410,8 @@ install_one() {
     local reason
     reason="$(result_reason "$result_file")"
     [ -z "$reason" ] && reason=install-failed
-    [ "$(probe_ready)" = "no-login" ] && reason=login
+    probe_ready
+    [ "$ready_state" = "no-login" ] && reason=login
     queue_add "$command" "$bundle" "$reason" "$(result_detail "$result_file")"
     [ "$reason" = tls ] && mark_tls_blocked
     printf 'hap-app: ✖ %s 装机失败：%s（已登记，共 %s 个待装）\n' \
@@ -498,13 +513,15 @@ cmd_auto_install() {
 
   local login_attempted=0
   local ready
-  ready="$(probe_ready)"
+  probe_ready
+  ready="$ready_state"
   if [ "$ready" = "no-login" ] && enabled "$(auto_login_setting)" && ! login_recently_attempted; then
     mark_login_attempt
     login_attempted=1
     log "需要登录华为开发者，正在打开浏览器（最多 ${HAP_APP_LOGIN_TIMEOUT:-120}s）"
     "$app_installer" login --timeout "${HAP_APP_LOGIN_TIMEOUT:-120}" >&2 || true
-    ready="$(probe_ready)"
+    probe_ready
+    ready="$ready_state"
   fi
 
   local device="" stream=0
@@ -517,8 +534,11 @@ cmd_auto_install() {
       exit 0
       ;;
     *)
-      queue_add "$command" "$bundle" device
+      queue_add "$command" "$bundle" device "$ready_detail"
       say "$command: 设备未就绪（${ready:-unknown}），已登记待装（共 $(pending_count) 个）；运行 hap-app install-pending 修复"
+      if [ -n "$ready_detail" ]; then
+        printf 'hap-app:   原因：%s\n' "$ready_detail"
+      fi
       exit 0
       ;;
   esac
@@ -550,17 +570,22 @@ cmd_install_pending() {
 
   clear_tls_blocked
   local ready selected=""
-  ready="$(probe_ready)"
+  probe_ready
+  ready="$ready_state"
   case "$ready" in
     no-login)
       log "需要登录华为开发者，正在打开浏览器…"
       "$app_installer" login >&2 || { log "登录未完成，未装机"; return 1; }
-      ready="$(probe_ready)"
+      probe_ready
+      ready="$ready_state"
       ;;
   esac
   case "$ready" in
     ok\ *) selected="${ready#ok }" ;;
-    *) log "设备未就绪（${ready:-unknown}）"; return 1 ;;
+    *)
+      log "设备未就绪（${ready:-unknown}）${ready_detail:+：$ready_detail}"
+      return 1
+      ;;
   esac
   [ -n "${device_arg:-}" ] && selected="$device_arg"
 
