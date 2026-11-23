@@ -103,15 +103,56 @@ bridge_check() {
   "${HERDR_APP_PYTHON:-python3}" "${HERDR_APP_BRIDGE:?formula did not set the bridge path}" --check --config "$CONF" 2>/dev/null
 }
 
+# The core binds its socket under $TMPDIR: on OHOS the user-storage mount
+# holding $HOME refuses socket nodes. A TMPDIR on that mount (a configured
+# ~/tmp, for example) therefore breaks hc even though ordinary files work.
+# Probe a real UNIX socket and fall back to the terminal app's data directory.
+ensure_socket_tmpdir() {
+  local candidate
+  for candidate in "${TMPDIR:-}" "${XDG_CACHE_HOME:-$HOME/.cache}" "$HOME/.cache" "/data/storage/el2/base/cache" "/data/storage/el2/base/files" "/tmp"; do
+    [ -n "$candidate" ] || continue
+    mkdir -p "$candidate" 2>/dev/null || continue
+    if "${HERDR_APP_PYTHON:-python3}" - "$candidate" 2>/dev/null <<'PY'
+import os, socket, sys
+path = os.path.join(sys.argv[1], f".herdr-socket-{os.getpid()}")
+sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+try:
+    sock.bind(path)
+finally:
+    sock.close()
+    try:
+        os.unlink(path)
+    except OSError:
+        pass
+PY
+    then
+      export TMPDIR="$candidate"
+      return 0
+    fi
+  done
+  return 1
+}
+
 bridge_start() {
+  ensure_socket_tmpdir ||
+    die "no directory that can hold a UNIX socket; set TMPDIR to the terminal app's cache (for example /data/storage/el2/base/cache)"
   ensure_conf
   if [[ -n "$(bridge_pid)" ]]; then
-    bridge_check || die "the bridge is running (pid $(bridge_pid)) but does not accept this token; run: herdr-app bridge restart"
-    return 0
+    local recorded
+    recorded="$(cat "$STATE/bridge.tmpdir" 2>/dev/null || true)"
+    if [[ "$recorded" == "$TMPDIR" ]]; then
+      bridge_check || die "the bridge is running (pid $(bridge_pid)) but does not accept this token; run: herdr-app bridge restart"
+      return 0
+    fi
+    # Started under a different TMPDIR (typically the broken one an older
+    # install picked up): restart it so hc binds under the socket-capable one.
+    bridge_stop
   fi
   local hc="${HERDR_APP_HC:-hc}"
   : > "$LOGFILE"
   chmod 600 "$LOGFILE" 2>/dev/null || true
+  printf '%s\n' "$TMPDIR" > "$STATE/bridge.tmpdir" 2>/dev/null || true
+  chmod 600 "$STATE/bridge.tmpdir" 2>/dev/null || true
   # Its own session when setsid exists, so closing the terminal that ran this does not end the bridge.
   local detach=(nohup)
   command -v setsid >/dev/null 2>&1 && detach=(setsid nohup)
