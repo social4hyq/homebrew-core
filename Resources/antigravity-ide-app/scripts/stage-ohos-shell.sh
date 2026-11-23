@@ -18,7 +18,7 @@ printf -v version_digits '%02d%04d%05d' "$major" "$minor" "$patch"
 version_code=$((10#$version_digits / 100))
 
 cp -a "$template" "$dest"
-python3 - "$dest" "$version" "$version_code" "$script_dir/../assets/icon.png" "$script_dir/../app/antigravity-ide-bootstrap.cjs" <<'PY'
+python3 - "$dest" "$version" "$version_code" "$script_dir/../assets/icon.png" "$script_dir/../app/antigravity-ide-app-bootstrap.cjs" <<'PY'
 import json
 import re
 import shutil
@@ -87,8 +87,8 @@ if app.exists():
     shutil.rmtree(app)
 app.mkdir(parents=True)
 (app / "package.json").write_text(
-    '{"name":"antigravity-ide-ohos-shell","productName":"Antigravity IDE",'
-    f'"version":"{version}","main":"antigravity-ide-bootstrap.cjs"}}\n'
+    '{"name":"antigravity-ide-app-ohos-shell","productName":"Antigravity IDE",'
+    f'"version":"{version}","main":"antigravity-ide-app-bootstrap.cjs"}}\n'
 )
-shutil.copyfile(bootstrap, app / "antigravity-ide-bootstrap.cjs")
+shutil.copyfile(bootstrap, app / "antigravity-ide-app-bootstrap.cjs")
 PY

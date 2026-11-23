@@ -16,7 +16,7 @@ const main = path.join(__dirname, 'vendor', 'out', 'main.js');
 import(pathToFileURL(main).href).catch((error) => {
   try {
     require('node:fs').appendFileSync(
-      path.join(require('node:os').homedir(), 'antigravity-ide-shell.log'),
+      path.join(require('node:os').homedir(), 'antigravity-ide-app-shell.log'),
       `${new Date().toISOString()} ${error && error.stack ? error.stack : error}\n`
     );
   } catch (_) {

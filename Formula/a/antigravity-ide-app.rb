@@ -1,11 +1,11 @@
-class AntigravityIde < Formula
+class AntigravityIdeApp < Formula
   desc "Google Antigravity IDE shell for OpenHarmony/HarmonyOS PC"
   homepage "https://antigravity.google/download"
   url "https://edgedl.me.gvt1.com/edgedl/release2/j0qc3/antigravity/stable/" \
       "2.8.0-6733682917113856/linux-arm/Antigravity%20IDE.tar.gz"
   sha256 "d8f85ce40306587a80a7478af4de85cb10b83cf26dd9179b902afa9933fcf9f2"
   license :cannot_represent # Google Terms of Service; closed-source prebuilt desktop app
-  revision 2
+  revision 3
 
   livecheck do
     url :homepage
@@ -13,7 +13,7 @@ class AntigravityIde < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/antigravity-ide-v2.8.0-r2"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/antigravity-ide-app-v2.8.0-r2"
     sha256 cellar: :any_skip_relocation, arm64_ohos: "7643c00c4a06d3277b4cdd501a83763c44b70e0df2772367efe7e46751022f03"
   end
 
@@ -30,16 +30,16 @@ class AntigravityIde < Formula
   end
 
   # The bottle ships the tap-authored HAP shell only. The official IDE app tree
-  # is downloaded and injected on the user's device by `antigravity-ide install`.
+  # is downloaded and injected on the user's device by `antigravity-ide-app install`.
   RESOURCE_FILES = %w[
     Resources/_shared/hap-app/enable-cookie-encryption.py
     Resources/_shared/hap-app/install-lib.sh
-    Resources/antigravity-ide/app/antigravity-ide-bootstrap.cjs
-    Resources/antigravity-ide/assets/icon.png
-    Resources/antigravity-ide/scripts/antigravity-ide.sh
-    Resources/antigravity-ide/scripts/install-antigravity-ide.sh
-    Resources/antigravity-ide/scripts/stage-ohos-shell.sh
-    Resources/antigravity-ide/support/assemble-local-hap.py
+    Resources/antigravity-ide-app/app/antigravity-ide-app-bootstrap.cjs
+    Resources/antigravity-ide-app/assets/icon.png
+    Resources/antigravity-ide-app/scripts/antigravity-ide-app.sh
+    Resources/antigravity-ide-app/scripts/install-antigravity-ide-app.sh
+    Resources/antigravity-ide-app/scripts/stage-ohos-shell.sh
+    Resources/antigravity-ide-app/support/assemble-local-hap.py
   ].freeze
 
   def patch
@@ -53,20 +53,20 @@ class AntigravityIde < Formula
     tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
     RESOURCE_FILES.each { |file| odie "missing tap resource: #{file}" unless (tap_root/file).exist? }
 
-    support = buildpath/"antigravity-ide-support"
+    support = buildpath/"antigravity-ide-app-support"
     support.mkpath
     RESOURCE_FILES.grep(%r{/app/|/support/}).each do |file|
       cp tap_root/file, support/File.basename(file)
     end
 
     shell = buildpath/"libelectron/ohos_hap"
-    project = buildpath/"antigravity-ide-ohos-shell"
-    system "bash", tap_root/"Resources/antigravity-ide/scripts/stage-ohos-shell.sh",
+    project = buildpath/"antigravity-ide-app-ohos-shell"
+    system "bash", tap_root/"Resources/antigravity-ide-app/scripts/stage-ohos-shell.sh",
            shell, project, version.to_s
 
     clt = Pathname.new("/opt/electron-ohos-clt")
     unless (clt/"hvigor/bin/hvigorw.js").exist?
-      odie "antigravity-ide builds only in electron-ohos-ci; configure OHOS_CI_IMAGE_OVERRIDES"
+      odie "antigravity-ide-app builds only in electron-ohos-ci; configure OHOS_CI_IMAGE_OVERRIDES"
     end
 
     ENV["DEVECO_SDK_HOME"] = (clt/"sdk").to_s
@@ -88,7 +88,7 @@ class AntigravityIde < Formula
     system "python3", tap_root/"Resources/_shared/hap-app/enable-cookie-encryption.py",
            shell_hap, encrypted_hap
 
-    libexec.install encrypted_hap => "antigravity-ide-shell-unsigned.hap"
+    libexec.install encrypted_hap => "antigravity-ide-app-shell-unsigned.hap"
     (libexec/"vendor.json").write JSON.generate(
       "url"     => stable.url.to_s,
       "sha256"  => stable.checksum.hexdigest,
@@ -97,15 +97,15 @@ class AntigravityIde < Formula
     )
 
     pkgshare.mkpath
-    cp tap_root/"Resources/antigravity-ide/scripts/antigravity-ide.sh", libexec/"antigravity-ide.sh"
-    cp tap_root/"Resources/antigravity-ide/scripts/antigravity-ide.sh", pkgshare/"antigravity-ide.sh"
-    cp tap_root/"Resources/antigravity-ide/scripts/install-antigravity-ide.sh", pkgshare/"install-desktop.sh"
+    cp tap_root/"Resources/antigravity-ide-app/scripts/antigravity-ide-app.sh", libexec/"antigravity-ide-app.sh"
+    cp tap_root/"Resources/antigravity-ide-app/scripts/antigravity-ide-app.sh", pkgshare/"antigravity-ide-app.sh"
+    cp tap_root/"Resources/antigravity-ide-app/scripts/install-antigravity-ide-app.sh", pkgshare/"install-desktop.sh"
     cp tap_root/"Resources/_shared/hap-app/install-lib.sh", pkgshare/"hap-app-install-lib.sh"
-    cp tap_root/"Resources/antigravity-ide/scripts/stage-ohos-shell.sh", pkgshare/"stage-ohos-shell.sh"
+    cp tap_root/"Resources/antigravity-ide-app/scripts/stage-ohos-shell.sh", pkgshare/"stage-ohos-shell.sh"
     assemble_dir = pkgshare/"assemble"
     assemble_dir.mkpath
     cp support/"assemble-local-hap.py", assemble_dir
-    cp support/"antigravity-ide-bootstrap.cjs", assemble_dir
+    cp support/"antigravity-ide-app-bootstrap.cjs", assemble_dir
 
     verify_script = assemble_dir/"assemble-local-hap.py"
     verify_pin = (libexec/"vendor.json").to_s
@@ -122,7 +122,7 @@ class AntigravityIde < Formula
     PYTHON
 
     module_json = JSON.parse(
-      Utils.safe_popen_read("unzip", "-p", libexec/"antigravity-ide-shell-unsigned.hap", "module.json"),
+      Utils.safe_popen_read("unzip", "-p", libexec/"antigravity-ide-app-shell-unsigned.hap", "module.json"),
     )
     requested = module_json.fetch("module").fetch("requestPermissions")
     %w[ohos.permission.CUSTOM_SANDBOX ohos.permission.READ_WRITE_USER_FILE
@@ -132,7 +132,7 @@ class AntigravityIde < Formula
     end
     (pkgshare/"module-acl.json").write JSON.generate(module_json)
 
-    chmod 0755, [libexec/"antigravity-ide.sh", pkgshare/"antigravity-ide.sh",
+    chmod 0755, [libexec/"antigravity-ide-app.sh", pkgshare/"antigravity-ide-app.sh",
                  pkgshare/"install-desktop.sh", pkgshare/"hap-app-install-lib.sh",
                  pkgshare/"stage-ohos-shell.sh"]
 
@@ -143,16 +143,14 @@ class AntigravityIde < Formula
       formula_opt_prefix("python@3.15")/"bin",
       "$PATH",
     ].join(":")
-    (bin/"antigravity-ide").write_env_script libexec/"antigravity-ide.sh",
-      ANTIGRAVITY_IDE_HDC_DEFAULT:    formula_opt_prefix("ohos-sdk-toolchains")/"hdc",
-      ANTIGRAVITY_IDE_UNSIGNED_HAP:   libexec/"antigravity-ide-shell-unsigned.hap",
-      ANTIGRAVITY_IDE_VENDOR_JSON:    libexec/"vendor.json",
-      ANTIGRAVITY_IDE_LIBEXEC:        assemble_dir,
-      ANTIGRAVITY_IDE_MODULE_ACL:     pkgshare/"module-acl.json",
-      ANTIGRAVITY_IDE_INSTALL_SCRIPT: pkgshare/"install-desktop.sh",
-      PATH:                           runtime_path
-    # hap-app validates auto-install command names as <name>-app.
-    bin.install_symlink "antigravity-ide" => "antigravity-ide-app"
+    (bin/"antigravity-ide-app").write_env_script libexec/"antigravity-ide-app.sh",
+      ANTIGRAVITY_IDE_APP_HDC_DEFAULT:    formula_opt_prefix("ohos-sdk-toolchains")/"hdc",
+      ANTIGRAVITY_IDE_APP_UNSIGNED_HAP:   libexec/"antigravity-ide-app-shell-unsigned.hap",
+      ANTIGRAVITY_IDE_APP_VENDOR_JSON:    libexec/"vendor.json",
+      ANTIGRAVITY_IDE_APP_LIBEXEC:        assemble_dir,
+      ANTIGRAVITY_IDE_APP_MODULE_ACL:     pkgshare/"module-acl.json",
+      ANTIGRAVITY_IDE_APP_INSTALL_SCRIPT: pkgshare/"install-desktop.sh",
+      PATH:                               runtime_path
   end
 
   post_install_steps do
@@ -165,8 +163,7 @@ class AntigravityIde < Formula
     vendor = JSON.parse((libexec/"vendor.json").read)
     assert_equal version.to_s, vendor.fetch("version")
     assert_match(/\A[0-9a-f]{64}\z/, vendor.fetch("sha256"))
-    assert_match "Usage: antigravity-ide", shell_output("#{bin}/antigravity-ide --help")
-    assert_path_exists libexec/"antigravity-ide-shell-unsigned.hap"
-    assert_path_exists bin/"antigravity-ide-app"
+    assert_match "Usage: antigravity-ide-app", shell_output("#{bin}/antigravity-ide-app --help")
+    assert_path_exists libexec/"antigravity-ide-app-shell-unsigned.hap"
   end
 end
