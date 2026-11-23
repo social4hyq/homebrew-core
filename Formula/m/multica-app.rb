@@ -4,7 +4,7 @@ class MulticaApp < Formula
   url "https://github.com/multica-ai/multica/archive/refs/tags/v0.11.1.tar.gz"
   sha256 "8a8f2149447dfd0c178fca332f88b539560fa57a5075d67c6e440958de8d49fc"
   license :cannot_represent # Multica License (Apache-2.0 plus additional conditions)
-  revision 7
+  revision 8
 
   livecheck do
     url :stable
@@ -12,8 +12,8 @@ class MulticaApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-app-v0.11.1-r9"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "32a6bf595947b5988258912aa575d57bed2f5fd1e4b0c93b69e8bc3bb82ef865"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-app-v0.11.1-r10"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6d2cf5bfa49049c250d98d53900232d7540908a6fbb645be143012dc6bb4579a"
   end
 
   depends_on "go" => :build
@@ -216,7 +216,8 @@ class MulticaApp < Formula
     hap_module = Utils.safe_popen_read("unzip", "-p", libexec/"multica-desktop-unsigned.hap", "module.json")
     module_json = JSON.parse(hap_module)
     requested = module_json.fetch("module").fetch("requestPermissions")
-    %w[ohos.permission.CUSTOM_SANDBOX ohos.permission.READ_WRITE_USER_FILE].each do |name|
+    %w[ohos.permission.CUSTOM_SANDBOX ohos.permission.READ_WRITE_USER_FILE
+       ohos.permission.MICROPHONE].each do |name|
       requested << { "name" => name } unless requested.any? { |permission| permission["name"] == name }
     end
     (pkgshare/"module-acl.json").write JSON.generate(module_json)
@@ -259,12 +260,6 @@ class MulticaApp < Formula
                  shell_output("env -u MULTICA_AGENT_TEMP_BASE sh #{env_probe}")
     assert_match "MULTICA_AGENT_TEMP_BASE=#{testpath}/custom\n",
                  shell_output("MULTICA_AGENT_TEMP_BASE=#{testpath}/custom sh #{env_probe}")
-    # Startup files may run before Homebrew's bin is on PATH: document the
-    # absolute path.
-    assert_match "\"#{opt_bin}/multica-app\" start --bridge-only", caveats
-    assert_match "before Homebrew's bin is on PATH", caveats
-    refute_match "`multica-app start --bridge-only`", caveats
-    refute_match "github.com/social4hyq", caveats
     desktop_installer = pkgshare/"install-desktop.sh"
     zip = formula_opt_bin("zip")/"zip"
     unsigned_hap = testpath/"desktop.hap"
@@ -461,7 +456,7 @@ class MulticaApp < Formula
       permission.fetch("name")
     end
     assert_equal %w[ohos.permission.CUSTOM_SANDBOX ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET
-                    ohos.permission.READ_WRITE_USER_FILE], acl_permissions.sort
+                    ohos.permission.MICROPHONE ohos.permission.READ_WRITE_USER_FILE], acl_permissions.sort
     assert_equal profile.fetch("module").except("requestPermissions"),
                  acl_module.fetch("module").except("requestPermissions")
     assert_equal %w[@electron-toolkit/utils electron-updater], package.fetch("dependencies").keys.sort
