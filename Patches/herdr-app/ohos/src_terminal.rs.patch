@@ -1,5 +1,5 @@
 diff --git a/src/terminal.rs b/src/terminal.rs
-index d480e5d..b65596a 100644
+index d480e5d..c8de16d 100644
 --- a/src/terminal.rs
 +++ b/src/terminal.rs
 @@ -136,6 +136,10 @@ struct Grid {
@@ -21,7 +21,7 @@ index d480e5d..b65596a 100644
                  thumb: None,
                  track: None,
                  painted: Vec::new(),
-@@ -763,8 +768,37 @@ impl TerminalView {
+@@ -763,8 +768,36 @@ impl TerminalView {
      /// Text as a paste; copied files (Finder, a clipboard manager's image) as
      /// if dropped; an image alone (a screenshot) as Ctrl+V pastes it.
      pub fn paste(&mut self, cx: &mut Context<Self>) {
@@ -32,24 +32,23 @@ index d480e5d..b65596a 100644
 +            return;
 +        }
 +        // On HarmonyOS the synchronous read is always None when clipboard access
-+        // is permission-gated. An async read distinguishes "empty" from "denied":
-+        // guide the person to Settings when the permission was turned off.
++        // is permission-gated. Fall back to the async read: when it finds nothing,
++        // guide the person to Settings (a denied permission appears as empty here).
 +        if cfg!(target_env = "ohos") {
 +            let read = cx.read_from_clipboard_async();
 +            cx.spawn(async move |this, cx| {
 +                match read.await {
-+                    Err(ClipboardReadError::Denied(_)) => {
-+                        let _ = this.update(cx, |_, cx| {
-+                            cx.emit(TerminalEvent::Notice {
-+                                title: "Clipboard access is off".into(),
-+                                body: "Go to Settings > Apps > Herdr > Permissions and enable Read clipboard, then paste again.".into(),
-+                            });
-+                        });
-+                    }
 +                    Ok(Some(item)) => {
 +                        let _ = this.update(cx, |this, cx| this.paste_item(&item, cx));
 +                    }
-+                    _ => {}
++                    _ => {
++                        let _ = this.update(cx, |_, cx| {
++                            cx.emit(TerminalEvent::Notice {
++                                title: "Clipboard unavailable".into(),
++                                body: "Nothing to paste. If clipboard access is off, go to Settings > Apps > Herdr > Permissions and enable Read clipboard.".into(),
++                            });
++                        });
++                    }
 +                }
 +            }).detach();
 +        }
@@ -61,7 +60,7 @@ index d480e5d..b65596a 100644
              self.dropped(paths, cx);
          } else if let Some(text) = item.text() {
              let bytes = self.grid.borrow().vt.paste_bytes(&text);
-@@ -2307,6 +2341,15 @@ fn paint_grid(bounds: Bounds<Pixels>, grid: &Rc<RefCell<Grid>>, focused: bool, w
+@@ -2307,6 +2340,15 @@ fn paint_grid(bounds: Bounds<Pixels>, grid: &Rc<RefCell<Grid>>, focused: bool, w
      {
          let mut g = grid.borrow_mut();
          g.cursor_at = frame.cursor_cell.map(|(x, y)| Bounds::new(at(x as usize, y as usize), cell));
