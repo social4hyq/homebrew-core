@@ -13,9 +13,9 @@ usage() {
 Usage: antigravity-ide <command>
 
   install     Download the official engine, prepare it for OHOS, sign and install.
-  start       Start the installed Antigravity app.
+  start       Start the installed Antigravity IDE.
   stop        Force-stop the app on the selected device.
-  status      Show whether the app is running on the selected device.
+  status      Show whether the IDE is running on the selected device.
   uninstall   Remove the app from the selected device (keeps data unless --purge).
 
 Device options (start/stop/status/uninstall):
