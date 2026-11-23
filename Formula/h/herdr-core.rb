@@ -1,10 +1,9 @@
 class HerdrCore < Formula
   desc "Terminal and agent core behind the Herdr desktop app"
   homepage "https://herdr.dev"
-  url "https://github.com/herdrdev/herdr-core/archive/refs/tags/v0.1.21.tar.gz"
-  sha256 "28bffdc1eecd5526e93590f20c8e78d3ebc2a11b19a39821beddc74e8988edd9"
+  url "https://github.com/herdrdev/herdr-core/archive/refs/tags/v0.1.22.tar.gz"
+  sha256 "f85c123cddca40e8e4fae7ea1b416fe8a022323ea956862759a9750f76154b53"
   license "Apache-2.0"
-  revision 3
   head "https://github.com/herdrdev/herdr-core.git", branch: "master"
 
   livecheck do
