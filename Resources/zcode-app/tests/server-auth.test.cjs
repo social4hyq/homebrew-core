@@ -207,7 +207,9 @@ test('status does not create the token and reports an unhealthy service without 
   try {
     const result = await run(sb, ['status']);
     assert.equal(result.status, 1);
-    assert.match(result.stderr, /not healthy/);
+    // Only the verdict: a missing token file must not leak a shell error line.
+    assert.equal(result.stderr, `zcode-desktop: server not healthy at http://127.0.0.1:${port}\n`);
+    assert.equal(result.stdout, '');
     assert.equal(fs.existsSync(sb.tokenFile), false);
   } finally {
     cleanup(sb);

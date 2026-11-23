@@ -109,7 +109,9 @@ ensure_token() {
 # Load TOKEN without creating anything (status and the health probe must not
 # change state). Empty when the file is missing or unreadable.
 load_token() {
-  TOKEN="$(tr -d ' \r\n' < "$TOKEN_FILE" 2>/dev/null || true)"
+  # 2>/dev/null comes first: the shell reports a failed `<` on the stderr that is
+  # current when it opens the file, so after it the message would still print.
+  TOKEN="$(tr -d ' \r\n' 2>/dev/null < "$TOKEN_FILE" || true)"
 }
 
 # GET /api/server-info with the token. The header goes through curl's config on
