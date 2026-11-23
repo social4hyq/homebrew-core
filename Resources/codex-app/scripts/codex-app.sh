@@ -52,6 +52,18 @@ share_field() {
   "$NODE" -e 'const d = JSON.parse(require("node:fs").readFileSync(process.argv[1], "utf8")); process.stdout.write(String(d[process.argv[2]] ?? ""))' "$SHARE_FILE" "$1" 2>/dev/null || true
 }
 
+# Remove the registration when the server it names is gone. The app can be killed outright
+# (aa force-stop), which leaves no chance to clean up, so the next command does it. A
+# registration without a pid, or a system without /proc, is left alone.
+share_drop_stale() {
+  [[ -f "$SHARE_FILE" && -d /proc/self ]] || return 0
+  local pid command_line=""
+  pid="$(share_field pid)"
+  [[ "$pid" =~ ^[0-9]+$ ]] || return 0
+  command_line="$(tr '\0' ' ' <"/proc/$pid/cmdline" 2>/dev/null || true)"
+  [[ "$command_line" == *app-server* ]] || rm -f "$SHARE_FILE"
+}
+
 share_ready() {
   # Asked through Node, which this script needs anyway, so a stand-in curl on PATH cannot answer for it.
   "$NODE" -e 'const request = require("node:http").get({ host: "127.0.0.1", port: Number(process.argv[1]), path: "/readyz", timeout: 2000 }, (response) => { response.resume(); process.exit(response.statusCode === 200 ? 0 : 1); }); request.on("timeout", () => request.destroy()); request.on("error", () => process.exit(1));' "$1" >/dev/null 2>&1
@@ -70,6 +82,7 @@ share_serve() {
     esac
   done
   local current="" pid=""
+  share_drop_stale
   if [[ -f "$SHARE_FILE" ]]; then
     current="$(share_field port)"
     pid="$(share_field pid)"
@@ -143,6 +156,7 @@ share_serve() {
 
 share_tui() {
   local current=""
+  share_drop_stale
   [[ ! -f "$SHARE_FILE" ]] || current="$(share_field port)"
   if [[ -z "$current" ]] || ! share_ready "$current"; then
     printf 'codex-app: shared server not running; run: codex-app serve\n' >&2
@@ -190,6 +204,12 @@ case ${1:-} in
         ;;
       stop)
         "$HDC" "${hdc_args[@]}" shell aa force-stop "$APP_BUNDLE_ID"
+        # The server the app started dies with it, but its registration stays: clear it.
+        for _ in 1 2 3 4 5 6; do
+          share_drop_stale
+          [[ -f "$SHARE_FILE" ]] || break
+          sleep 0.5
+        done
         printf 'codex-app: stopped %s\n' "$APP_BUNDLE_ID"
         ;;
       status)

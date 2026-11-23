@@ -153,6 +153,34 @@ test('releaseAppServer survives a kill or an unlink that fails', () => {
   assert.equal(share.releaseAppServer(endpoint, files, { kill: () => { throw new Error('no such process'); }, alive: () => true, listening: () => true }), true);
 });
 
+test('dropStaleEndpoint removes a registration whose server is gone or whose pid was reused', () => {
+  for (const hooks of [{ alive: () => false, listening: () => true }, { alive: () => true, listening: () => false }]) {
+    const files = fakeFs({ [endpoint]: JSON.stringify({ ...JSON.parse(goodEndpoint), owner: 'app', pid: 42 }) });
+    const removed = [];
+    files.unlinkSync = (file) => removed.push(file);
+    assert.equal(share.dropStaleEndpoint(endpoint, files, hooks), true);
+    assert.deepEqual(removed, [endpoint]);
+  }
+});
+
+test('dropStaleEndpoint keeps a live server\'s registration, one without a pid, and anything unusable', () => {
+  const removed = [];
+  const track = (files) => { files.unlinkSync = (file) => removed.push(file); return files; };
+  const hooks = { alive: () => true, listening: () => true };
+  const withPid = JSON.stringify({ ...JSON.parse(goodEndpoint), pid: 42 });
+  assert.equal(share.dropStaleEndpoint(endpoint, track(fakeFs({ [endpoint]: withPid })), hooks), false);
+  assert.equal(share.dropStaleEndpoint(endpoint, track(fakeFs({ [endpoint]: goodEndpoint })), { alive: () => false, listening: () => false }), false);
+  assert.equal(share.dropStaleEndpoint(endpoint, track(fakeFs({})), hooks), false);
+  assert.equal(share.dropStaleEndpoint(endpoint, track(fakeFs({ [endpoint]: 'junk' })), hooks), false);
+  assert.deepEqual(removed, []);
+});
+
+test('dropStaleEndpoint survives an unlink that fails', () => {
+  const files = fakeFs({ [endpoint]: JSON.stringify({ ...JSON.parse(goodEndpoint), pid: 42 }) });
+  files.unlinkSync = () => { throw new Error('EACCES'); };
+  assert.equal(share.dropStaleEndpoint(endpoint, files, { alive: () => false, listening: () => false }), true);
+});
+
 test('isListeningServer recognises a codex app-server with a listener from /proc', () => {
   const proc = (words) => ({ readFileSync: () => words.join('\0') + '\0' });
   assert.equal(share.isListeningServer(7, proc(['codex', '-c', 'x=1', 'app-server', '--listen', 'ws://127.0.0.1:1'])), true);

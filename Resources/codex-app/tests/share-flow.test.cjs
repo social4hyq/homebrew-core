@@ -118,6 +118,67 @@ test('serve replaces a registration left by a server that is gone', async (t) =>
   assert.equal(JSON.parse(fs.readFileSync(path.join(home, '.config/codex-app/server.json'), 'utf8')).port, port);
 });
 
+// A registration naming a pid, as the app writes one.
+function writeRegistration(home, pid, extra = {}) {
+  const file = writeEndpoint(home, 1);
+  const data = JSON.parse(fs.readFileSync(file, 'utf8'));
+  fs.writeFileSync(file, JSON.stringify({ ...data, owner: 'app', pid, ...extra }));
+  return file;
+}
+const deadPid = () => childProcess.spawnSync(process.execPath, ['-e', '0']).pid;
+
+test('status clears a registration left by an app that was killed outright', async (t) => {
+  const home = tempHome(t);
+  const file = writeRegistration(home, deadPid());
+  const result = run(home, ['serve', '--status']);
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /not running/);
+  assert.equal(fs.existsSync(file), false);
+});
+
+test('a registration naming a pid that something else now uses is cleared too', async (t) => {
+  const home = tempHome(t);
+  const file = writeRegistration(home, process.pid); // alive, but not an app-server
+  assert.notEqual(run(home, ['serve', '--status']).status, 0);
+  assert.equal(fs.existsSync(file), false);
+});
+
+test('tui clears a stale registration and says to run serve', async (t) => {
+  const home = tempHome(t);
+  const file = writeRegistration(home, deadPid());
+  const result = run(home, ['tui']);
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /run: codex-app serve/);
+  assert.equal(fs.existsSync(file), false);
+});
+
+test('a registration without a pid is left for the readiness check, and a live server\'s is kept', async (t) => {
+  const home = tempHome(t);
+  const file = writeEndpoint(home, await freePort());
+  run(home, ['serve', '--status']);
+  assert.equal(fs.existsSync(file), true);
+  const port = await freePort();
+  assert.equal(run(home, ['serve', '--port', String(port)]).status, 0);
+  const live = registration(home);
+  assert.equal(run(home, ['serve', '--status']).status, 0);
+  assert.equal(registration(home).pid, live.pid);
+});
+
+test('the registration of an app that was killed together with its server is cleared by the next command', async (t) => {
+  const home = tempHome(t);
+  const port = await freePort();
+  const first = holdBridge(t, home, { port });
+  await first.connected;
+  const pid = registration(home).pid;
+  first.child.kill('SIGKILL'); // the app is gone with no chance to clean up ...
+  await first.exited;
+  process.kill(pid, 'SIGKILL'); // ... and its server with it
+  await until(async () => !(await portOpen(port)), 'the server to stop');
+  assert.equal(fs.existsSync(first.endpoint), true, 'the registration is stale');
+  assert.notEqual(run(home, ['serve', '--status']).status, 0);
+  assert.equal(fs.existsSync(first.endpoint), false, 'the next command removed it');
+});
+
 test('tui needs the shared server and passes the token and extra arguments to codex', async (t) => {
   const home = tempHome(t);
   const port = await freePort();

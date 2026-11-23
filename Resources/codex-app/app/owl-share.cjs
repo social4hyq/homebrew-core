@@ -100,6 +100,23 @@ function releaseAppServer(file, fileSystem, { kill = process.kill, alive = proce
   return true;
 }
 
+// For a registration whose server is gone. A process that is killed outright (aa
+// force-stop, SIGKILL) runs no code, so whoever looks at the registration next is the one
+// that clears it: remove it when it names a pid that is dead or no longer a listening
+// app-server (a reused pid). A registration without a pid cannot be judged and stays.
+// Returns whether a registration was removed.
+function dropStaleEndpoint(file, fileSystem, { alive = processAlive, listening = isListeningServer } = {}) {
+  const endpoint = readEndpoint(file, fileSystem);
+  if (!endpoint || !endpoint.pid) return false;
+  if (alive(endpoint.pid) && listening(endpoint.pid, fileSystem)) return false;
+  try {
+    fileSystem.unlinkSync(file);
+  } catch {
+    // Already removed.
+  }
+  return true;
+}
+
 function processAlive(pid) {
   try {
     process.kill(pid, 0);
@@ -236,6 +253,6 @@ async function startSharedServer({ codex, args, endpoint, defaultPort }, deps) {
 }
 
 module.exports = {
-  appOwnedServer, endpointFile, ensureToken, isDesktopAppServerArgs, isListeningServer, listenArgs, planRedirect,
+  appOwnedServer, dropStaleEndpoint, endpointFile, ensureToken, isDesktopAppServerArgs, isListeningServer, listenArgs, planRedirect,
   processAlive, readEndpoint, releaseAppServer, startSharedServer,
 };
