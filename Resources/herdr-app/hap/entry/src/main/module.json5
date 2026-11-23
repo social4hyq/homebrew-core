@@ -13,6 +13,11 @@
     "requestPermissions": [
       { "name": "ohos.permission.INTERNET" },
       {
+        "name": "ohos.permission.READ_PASTEBOARD",
+        "reason": "$string:clipboard_permission_reason",
+        "usedScene": { "abilities": ["EntryAbility"], "when": "inuse" }
+      },
+      {
         "name": "ohos.permission.kernel.ALLOW_WRITABLE_CODE_MEMORY",
         "reason": "$string:reason_writable_code",
         "usedScene": { "abilities": ["EntryAbility"], "when": "inuse" }
