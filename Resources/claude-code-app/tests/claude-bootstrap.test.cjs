@@ -210,7 +210,7 @@ test('a config folder that is not the default is still passed to the child', () 
 test('the main process is given the host config folder to use when it can', () => {
   const state = runLaunch('spawn');
   assert.equal(state.configCalls.length, 1);
-  assert.deepEqual({ ...state.configCalls[0].options }, { hostConfigDir: `${HOST_HOME}/.claude` });
+  assert.deepEqual({ ...state.configCalls[0].options }, { hostConfigDir: `${HOST_HOME}/.claude`, defaultConfigDir: `${HOST_HOME}/.claude` });
   assert.equal(state.configCalls[0].env, state.processStub.env);
   const custom = runLaunch('spawn', { claudeConfigDir: `${HOST_HOME}/work/claude-config` });
   assert.equal(custom.configCalls[0].options.hostConfigDir, `${HOST_HOME}/work/claude-config`);

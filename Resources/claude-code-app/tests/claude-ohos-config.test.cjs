@@ -37,6 +37,29 @@ test('with a usable host folder the main process shares it with the CLI and the 
   assert.equal(env.TMPDIR, path.join(userData, 'tmp'), 'temporary files stay private');
 });
 
+test('the default host folder leaves CLAUDE_CONFIG_DIR unset, so the main process reads ~/.claude.json like the CLI and a terminal', (t) => {
+  const userData = tempDir(t, 'claude-ohos-config-');
+  const hostDir = path.join(tempDir(t, 'claude-ohos-host-'), '.claude');
+  // An inherited value must not survive either: it would send the main process elsewhere.
+  const env = { CLAUDE_CONFIG_DIR: '/inherited/elsewhere' };
+  const result = configureClaudeConfigDir({ getPath: () => userData }, env, { hostConfigDir: hostDir, defaultConfigDir: hostDir });
+  assert.equal('CLAUDE_CONFIG_DIR' in env, false);
+  assert.equal(result.shared, true);
+  assert.equal(result.configDir, hostDir, 'the folder transcripts live in is still the host folder');
+  assert.equal(env.TMPDIR, path.join(userData, 'tmp'), 'temporary files stay private');
+});
+
+test('a host folder other than the default is still given to the main process as CLAUDE_CONFIG_DIR, as the CLI child gets it', (t) => {
+  const userData = tempDir(t, 'claude-ohos-config-');
+  const hostDir = path.join(tempDir(t, 'claude-ohos-host-'), 'work-config');
+  const defaultDir = path.join(tempDir(t, 'claude-ohos-home-'), '.claude');
+  const env = {};
+  const result = configureClaudeConfigDir({ getPath: () => userData }, env, { hostConfigDir: hostDir, defaultConfigDir: defaultDir });
+  assert.equal(env.CLAUDE_CONFIG_DIR, hostDir);
+  assert.equal(result.configDir, hostDir);
+  assert.equal(result.shared, true);
+});
+
 test('a host folder the app cannot use falls back to userData', (t) => {
   const userData = tempDir(t, 'claude-ohos-config-');
   const denied = Object.assign(new Error('denied'), { code: 'EACCES' });

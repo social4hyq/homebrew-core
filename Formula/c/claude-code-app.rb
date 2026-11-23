@@ -6,7 +6,7 @@ class ClaudeCodeApp < Formula
   version "6.28899.6"
   sha256 "239c20d218456cacc656d48382fd59116325ac679aa4e476377af1456ac85715"
   license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
-  revision 4
+  revision 5
 
   livecheck do
     url "https://downloads.claude.ai/claude-desktop/apt/stable/dists/stable/main/binary-arm64/Packages"
@@ -14,8 +14,8 @@ class ClaudeCodeApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-app-v6.28899.6-r6"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3d93c7c2e7b76ab3bc43d918c37ef38f239554de687acbe95cab0dd58897f5d7"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-app-v6.28899.6-r8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "389479431aa80e97837fabb8df70dddf19d8d1adbf0b108e577e698d51f2ceca"
   end
 
   depends_on "app-installer"
