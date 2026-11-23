@@ -14,6 +14,11 @@ class CmuxProbe < Formula
     strategy :git
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/cmux-probe-v0.2.0-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fdf3a92ab2139149d1ed40e692ff32b6d2e4a57c643b134a324616a44e230f09"
+  end
+
   # 探针 HAP 源码随 tap 分发（纯 ArkTS，无 upstream tarball）。
   depends_on "node" => :build # hvigorw.js is a node script
   depends_on "app-installer"
