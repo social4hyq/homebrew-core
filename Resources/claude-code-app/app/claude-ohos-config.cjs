@@ -23,8 +23,16 @@ function usableConfigDir(dir, fileSystem = fs) {
   }
 }
 
-// options.hostConfigDir  the host's Claude config folder, when there is one
-// options.fs             file system, for tests
+// options.hostConfigDir     the host's Claude config folder, when there is one
+// options.defaultConfigDir  the folder a terminal's `claude` uses without any variable
+// options.fs                file system, for tests
+//
+// The official main process reads its global state (workspace trust, the session
+// list's trust checks) from $CLAUDE_CONFIG_DIR/.claude.json, or from ~/.claude.json
+// when the variable is unset. The CLI child and a terminal use ~/.claude.json for the
+// default folder, so for that folder the variable must stay unset here too; setting
+// it made the main process read ~/.claude/.claude.json, which lists no trusted
+// workspace, and the import of terminal sessions skipped them as untrusted folders.
 function configureClaudeConfigDir(app, env = process.env, options = {}) {
   const userData = app.getPath('userData');
   if (typeof userData !== 'string' || !path.isAbsolute(userData)) {
@@ -33,9 +41,15 @@ function configureClaudeConfigDir(app, env = process.env, options = {}) {
   const tempDir = path.join(userData, 'tmp');
   fs.mkdirSync(tempDir, { recursive: true, mode: 0o700 });
   const shared = usableConfigDir(options.hostConfigDir, options.fs);
-  env.CLAUDE_CONFIG_DIR = shared ? options.hostConfigDir : userData;
+  if (!shared) {
+    env.CLAUDE_CONFIG_DIR = userData;
+  } else if (options.hostConfigDir === options.defaultConfigDir) {
+    delete env.CLAUDE_CONFIG_DIR;
+  } else {
+    env.CLAUDE_CONFIG_DIR = options.hostConfigDir;
+  }
   env.TMPDIR = tempDir;
-  return { userData, tempDir, configDir: env.CLAUDE_CONFIG_DIR, shared };
+  return { userData, tempDir, configDir: shared ? options.hostConfigDir : userData, shared };
 }
 
 module.exports = { configureClaudeConfigDir, usableConfigDir };

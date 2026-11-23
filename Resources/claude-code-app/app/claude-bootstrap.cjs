@@ -34,7 +34,7 @@ const hostConfigDir = typeof hostConfig.claudeConfigDir === 'string' && path.isA
 // So the child gets the variable only for a folder that is not the default.
 const hostDefaultConfigDir = path.join(hostHome, '.claude');
 // The main process uses the same folder when the app may (see claude-ohos-config.cjs).
-const appPaths = claudeConfig.configureClaudeConfigDir(app, process.env, { hostConfigDir });
+const appPaths = claudeConfig.configureClaudeConfigDir(app, process.env, { hostConfigDir, defaultConfigDir: hostDefaultConfigDir });
 
 // Code Desktop's manager consumes this override when resolving its local CLI.
 // Only the spawned CLI receives host HOME/PATH/config: Electron itself keeps
