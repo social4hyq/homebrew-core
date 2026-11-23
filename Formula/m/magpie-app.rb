@@ -4,7 +4,7 @@ class MagpieApp < Formula
   url "https://github.com/yetone/magpie/archive/refs/tags/v0.1.4661.tar.gz"
   sha256 "eacabbef905695537e60b7ed41271a2c89c9f83014d4817ab3cf8aba6379dd42"
   license :cannot_represent
-  revision 4
+  revision 5
 
   livecheck do
     url :stable

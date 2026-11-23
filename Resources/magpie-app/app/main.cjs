@@ -27,7 +27,7 @@ function stopBackend() {
 }
 
 function readyLink(line, key) {
-  const match = /magpie web on (http:\/\/127\.0\.0\.1:[1-9]\d{0,4}\/\?k=[a-f0-9]{64})\s*$/.exec(
+  const match = /magpie web on (http:\/\/127\.0\.0\.1:[1-9]\d{0,4}\/\?k=[A-Za-z0-9._~-]{16,128})\s*$/.exec(
     line.replace(/\x1b\[[0-9;]*m/g, ""),
   );
   if (!match) return;
