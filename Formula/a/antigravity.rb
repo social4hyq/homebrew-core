@@ -13,6 +13,11 @@ class Antigravity < Formula
     regex(/"version"\s*:\s*"(\d+(?:\.\d+)+)"/i)
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/antigravity-v1.5.15-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "84ab492052d3816a1fecd5c45c6371858d7bb0c15a0d2214cf7390fd29ef7286"
+  end
+
   depends_on "glibc"
   depends_on "ohos-selfsign"
   depends_on "patchelf"
