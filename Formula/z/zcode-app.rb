@@ -9,7 +9,7 @@ class ZcodeApp < Formula
   # Tap-authored shell scripts (MIT) on the CPF-Electron runtime (mixed
   # MIT/BSD/LGPL).
   license :cannot_represent
-  revision 28
+  revision 29
 
   livecheck do
     url "https://raw.githubusercontent.com/zai-org/ZCode/main/package.json"

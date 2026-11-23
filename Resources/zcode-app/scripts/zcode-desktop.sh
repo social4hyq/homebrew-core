@@ -191,6 +191,29 @@ proc_foreign() {
   proc_alive "${1:-}" && ! kill -0 "$1" 2>/dev/null
 }
 
+# One line in the service log naming who asked for the service: the chain of
+# parent processes, each as pid:command line. A service nobody meant to start
+# (for example one left behind by an upgrade) can then be traced to its caller.
+# The command lines are cleaned before they are cut, so a token that a caller
+# passed in its arguments is never written in full or in part.
+log_caller() {
+  local what="$1" pid="$$" chain="" depth=0 raw ppid
+  [ -n "$TOKEN" ] || load_token
+  mkdir -p "$CONFIG_DIR" 2>/dev/null || return 0
+  while [ "$depth" -lt 6 ] && [ -n "$pid" ] && [ "$pid" -gt 1 ] 2>/dev/null; do
+    raw="$(tr '\0' ' ' < "/proc/$pid/cmdline" 2>/dev/null || true)"
+    [ -z "$TOKEN" ] || raw="${raw//"$TOKEN"/<redacted>}"
+    raw="$(printf '%s' "$raw" | sed -E 's/(token=|Bearer )[^ ]+/\1<redacted>/g')"
+    raw="${raw% }"
+    chain="${chain}${chain:+ < }${pid}:${raw:0:160}"
+    ppid=""
+    read -r _ _ _ ppid _ < <(sed 's/^.*) //; s/^/x x /' "/proc/$pid/stat" 2>/dev/null) || break
+    pid="$ppid"
+    depth=$((depth + 1))
+  done
+  printf '[%s] zcode-desktop: %s requested by %s\n' "$(date '+%F %T')" "$what" "$chain" >> "$LOG_FILE" 2>/dev/null || true
+}
+
 foreign_note() {
   log "the managed server (pid $1) belongs to the desktop app's user, so it cannot be stopped from here"
   log "quit the app from its tray menu, or run: hdc shell aa force-stop $BUNDLE_ID"
@@ -374,6 +397,7 @@ cmd_install() {
 }
 
 cmd_serve() {
+  log_caller serve || true
   local workspace=""
   while [ $# -gt 0 ]; do
     case "$1" in
@@ -442,6 +466,7 @@ cmd_login() {
 }
 
 cmd_start() {
+  log_caller start || true
   local serve=1
   while [ $# -gt 0 ]; do
     case "$1" in

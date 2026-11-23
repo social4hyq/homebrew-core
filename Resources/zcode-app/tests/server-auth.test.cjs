@@ -359,3 +359,58 @@ test('serve replaces its own older unauthenticated service', async () => {
     cleanup(sb);
   }
 });
+
+// --- who asked for the service -----------------------------------------------
+
+function runStandIn(sb, extraEnv, ...argv) {
+  return new Promise((resolve) => {
+    const child = spawn('bash', argv, { env: { ...sb.env, ...extraEnv } });
+    let stderr = '';
+    child.stderr.on('data', (chunk) => { stderr += chunk; });
+    child.on('close', (status) => resolve({ status, stderr }));
+  });
+}
+
+test('start writes one line naming its parent chain and never the token', async () => {
+  const port = await freePort();
+  const sb = sandbox(port);
+  fs.mkdirSync(path.dirname(sb.tokenFile), { recursive: true });
+  fs.writeFileSync(sb.tokenFile, TOKEN);
+  const hdc = path.join(sb.root, 'hdc');
+  fs.writeFileSync(hdc, '#!/bin/sh\nexit 0\n', { mode: 0o755 });
+  try {
+    // The stand-in launcher carries the token in its own command line, both bare
+    // and as a URL query, the way a careless caller could.
+    const result = await runStandIn(sb, { ZCODE_DESKTOP_HDC: hdc },
+      '-c', 'bash "$1" start --no-serve; :', `https://example.invalid/?token=${TOKEN}`, SCRIPT, TOKEN);
+    assert.equal(result.status, 0, result.stderr);
+    const log = fs.readFileSync(path.join(sb.config, 'web.log'), 'utf8');
+    const lines = log.split('\n').filter((line) => line.includes('start requested by'));
+    assert.equal(lines.length, 1, log);
+    assert.match(lines[0], /^\[\d{4}-\d\d-\d\d \d\d:\d\d:\d\d\] zcode-desktop: start requested by \d+:bash .*zcode-desktop\.sh start --no-serve < \d+:bash -c /);
+    assert.ok(lines[0].includes(`< ${process.pid}:`), lines[0]);
+    assert.ok(lines[0].includes('<redacted>'), lines[0]);
+    assert.equal(log.includes(TOKEN), false);
+    assert.equal(result.stderr, '');
+  } finally {
+    cleanup(sb);
+  }
+});
+
+test('serve writes one line naming its parent chain, and nothing reaches the terminal', async () => {
+  const port = await freePort();
+  const sb = sandbox(port);
+  try {
+    const result = await run(sb, ['serve']);
+    assert.equal(result.status, 0, result.stderr + result.stdout);
+    assert.doesNotMatch(result.stdout + result.stderr, /requested by/);
+    const log = fs.readFileSync(path.join(sb.config, 'web.log'), 'utf8');
+    const lines = log.split('\n').filter((line) => line.includes('serve requested by'));
+    assert.equal(lines.length, 1, log);
+    assert.match(lines[0], /zcode-desktop: serve requested by \d+:bash .*zcode-desktop\.sh serve < \d+:/);
+    assert.ok(lines[0].includes(`< ${process.pid}:`), lines[0]);
+    assert.equal(log.includes(fs.readFileSync(sb.tokenFile, 'utf8')), false);
+  } finally {
+    cleanup(sb);
+  }
+});
