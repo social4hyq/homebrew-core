@@ -4,6 +4,7 @@ class SnowShotApp < Formula
   url "https://github.com/mg-chao/snow-shot/archive/refs/tags/v1.6.3_snow-shot.tar.gz"
   sha256 "f6c9cbf1ce2fa309364b581404272f1d93de3ab1230c0d2e0b490a264f7b5bf0"
   license "GPL-3.0-or-later"
+  revision 1
 
   livecheck do
     url "https://github.com/mg-chao/snow-shot.git"
@@ -689,6 +690,7 @@ class SnowShotApp < Formula
     assert_equal "QAbility", manifest.dig("module", "abilities", 0, "name")
     permissions = manifest.dig("module", "requestPermissions").map { |item| item["name"] }
     assert_includes permissions, "ohos.permission.CUSTOM_SCREEN_CAPTURE"
+    assert_includes permissions, "ohos.permission.MICROPHONE"
     assert_includes permissions, "ohos.permission.INTERNET"
     assert_includes permissions, "ohos.permission.GET_NETWORK_INFO"
     assert_equal "$media:app_icon", manifest.dig("module", "abilities", 0, "icon")
