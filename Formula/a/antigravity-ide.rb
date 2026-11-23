@@ -13,8 +13,8 @@ class AntigravityIde < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/antigravity-ide-v2.8.0-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ba119477a1d8fea3696a19286524b0fdc9b97344653139bdde3044bad9f238cd"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/antigravity-ide-v2.8.0-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7643c00c4a06d3277b4cdd501a83763c44b70e0df2772367efe7e46751022f03"
   end
 
   depends_on "app-installer"
