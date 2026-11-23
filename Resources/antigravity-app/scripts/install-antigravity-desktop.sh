@@ -115,19 +115,20 @@ app_prepare() {
 # Write the host engine's absolute path so the shell can spawn it.
 stage_tree() {
   local dest="$2/resources/resfile/resources/app/antigravity-host-config.json"
+  local vendor_json="${ANTIGRAVITY_APP_VENDOR_JSON:?missing vendor.json}"
+  local brew_prefix="${ANTIGRAVITY_APP_BREW_PREFIX:-${HOMEBREW_PREFIX:-}}"
   mkdir -p "$(dirname "$dest")"
-  node - "$dest" <<'JS'
+  node - "$dest" "$vendor_json" "$brew_prefix" <<'JS'
 const fs = require("node:fs");
 const path = require("node:path");
-const destination = process.argv[1];
-const required = (name, value) => {
-  if (typeof value !== "string" || !path.isAbsolute(value)) throw new Error(`invalid host config: ${name}`);
-  return value;
-};
+const [destination, vendorJson, brewPrefix] = process.argv.slice(2);
+const version = JSON.parse(fs.readFileSync(vendorJson, "utf8")).version;
+const engine = path.join(brewPrefix, "var", "antigravity-app", version, "language-server.bin");
+if (!path.isAbsolute(brewPrefix) || !version) throw new Error("invalid host config inputs");
 fs.writeFileSync(destination, JSON.stringify({
-  home: required("home", process.env.ANTIGRAVITY_APP_HOST_HOME),
-  engine: required("engine", process.env.ANTIGRAVITY_APP_ENGINE),
-  path: process.env.ANTIGRAVITY_APP_HOST_PATH || "",
+  home: process.env.HOME || "",
+  engine,
+  path: process.env.PATH || "",
 }) + "\n", { mode: 0o600 });
 JS
 }
