@@ -101,3 +101,62 @@ test('listenArgs adds the WebSocket listener right after app-server', () => {
     '--analytics-default-enabled',
   ]);
 });
+
+test('releaseAppServer stops the server the app started and removes its registration', () => {
+  const owned = JSON.stringify({ ...JSON.parse(goodEndpoint), owner: 'app', pid: 42 });
+  const files = fakeFs({ [endpoint]: owned });
+  const killed = [];
+  const removed = [];
+  files.unlinkSync = (file) => removed.push(file);
+  const released = share.releaseAppServer(endpoint, files, {
+    kill: (pid, signal) => killed.push([pid, signal]), alive: () => true, listening: () => true,
+  });
+  assert.equal(released, true);
+  assert.deepEqual(killed, [[42, 'SIGTERM']]);
+  assert.deepEqual(removed, [endpoint]);
+});
+
+test('releaseAppServer removes a stale registration without signalling anything', () => {
+  const owned = JSON.stringify({ ...JSON.parse(goodEndpoint), owner: 'app', pid: 42 });
+  const files = fakeFs({ [endpoint]: owned });
+  const killed = [];
+  const removed = [];
+  files.unlinkSync = (file) => removed.push(file);
+  assert.equal(share.releaseAppServer(endpoint, files, { kill: (...a) => killed.push(a), alive: () => false, listening: () => true }), true);
+  assert.deepEqual(killed, []);
+  assert.deepEqual(removed, [endpoint]);
+});
+
+test('releaseAppServer never signals a pid that is not a listening app-server', () => {
+  const owned = JSON.stringify({ ...JSON.parse(goodEndpoint), owner: 'app', pid: 42 });
+  const files = fakeFs({ [endpoint]: owned });
+  const killed = [];
+  files.unlinkSync = () => {};
+  share.releaseAppServer(endpoint, files, { kill: (...a) => killed.push(a), alive: () => true, listening: () => false });
+  assert.deepEqual(killed, [], 'a reused pid is left alone');
+});
+
+test('releaseAppServer leaves a terminal\'s server and a missing or unusable registration alone', () => {
+  const touched = [];
+  const track = (files) => { files.unlinkSync = (file) => touched.push(file); return files; };
+  const hooks = { kill: (...a) => touched.push(a), alive: () => true, listening: () => true };
+  assert.equal(share.releaseAppServer(endpoint, track(fakeFs({ [endpoint]: goodEndpoint })), hooks), false);
+  assert.equal(share.releaseAppServer(endpoint, track(fakeFs({})), hooks), false);
+  assert.equal(share.releaseAppServer(endpoint, track(fakeFs({ [endpoint]: 'junk' })), hooks), false);
+  assert.deepEqual(touched, []);
+});
+
+test('releaseAppServer survives a kill or an unlink that fails', () => {
+  const owned = JSON.stringify({ ...JSON.parse(goodEndpoint), owner: 'app', pid: 42 });
+  const files = fakeFs({ [endpoint]: owned });
+  files.unlinkSync = () => { throw new Error('gone'); };
+  assert.equal(share.releaseAppServer(endpoint, files, { kill: () => { throw new Error('no such process'); }, alive: () => true, listening: () => true }), true);
+});
+
+test('isListeningServer recognises a codex app-server with a listener from /proc', () => {
+  const proc = (words) => ({ readFileSync: () => words.join('\0') + '\0' });
+  assert.equal(share.isListeningServer(7, proc(['codex', '-c', 'x=1', 'app-server', '--listen', 'ws://127.0.0.1:1'])), true);
+  assert.equal(share.isListeningServer(7, proc(['codex', 'app-server'])), false, 'a stdio app-server');
+  assert.equal(share.isListeningServer(7, proc(['node', 'something.js'])), false);
+  assert.equal(share.isListeningServer(7, { readFileSync: () => { throw new Error('EACCES'); } }), false);
+});

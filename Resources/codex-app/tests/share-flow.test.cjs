@@ -217,6 +217,39 @@ test('a terminated bridge takes the server it started with it', async (t) => {
   assert.equal(fs.existsSync(bridge.endpoint), false);
 });
 
+// What the tray's quit does: the app process ends at once, so the bridge it started is killed
+// without a chance to clean up, and the main process releases the server first.
+test('the tray\'s quit releases the server the app started although the bridge is killed at once', async (t) => {
+  const home = tempHome(t);
+  const port = await freePort();
+  const bridge = holdBridge(t, home, { port });
+  await bridge.connected;
+  await bridge.ask();
+  assert.equal(await portOpen(port), true);
+  const released = childProcess.spawnSync(process.execPath, ['-e', `
+    const share = require(${JSON.stringify(path.join(__dirname, '..', 'app', 'owl-share.cjs'))});
+    process.stdout.write(String(share.releaseAppServer(${JSON.stringify(bridge.endpoint)}, require('node:fs'))));
+  `], { encoding: 'utf8' });
+  assert.equal(released.stdout, 'true');
+  bridge.child.kill('SIGKILL');
+  await bridge.exited;
+  await until(async () => !(await portOpen(port)), 'the server to stop');
+  assert.equal(fs.existsSync(bridge.endpoint), false, 'no stale registration is left');
+});
+
+test('without the release a killed bridge leaves a stale registration (what the tray\'s quit used to do)', async (t) => {
+  const home = tempHome(t);
+  const port = await freePort();
+  const bridge = holdBridge(t, home, { port });
+  await bridge.connected;
+  const pid = registration(home).pid;
+  bridge.child.kill('SIGKILL');
+  await bridge.exited;
+  assert.equal(fs.existsSync(bridge.endpoint), true);
+  try { process.kill(pid, 'SIGTERM'); } catch { /* already gone */ }
+  await until(async () => !(await portOpen(port)), 'the orphan to stop');
+});
+
 test('a second bridge attaches to the running server and leaves it running when it ends', async (t) => {
   const home = tempHome(t);
   const port = await freePort();

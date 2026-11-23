@@ -18,7 +18,8 @@ const MESSAGE = '退出应用会同时结束由本应用启动的共享 Codex �
   '要让服务独立于应用运行，请先在终端里运行 codex-app serve（应用重启后会直接使用它）。';
 
 // electron  the module (stubbed in tests)
-// options   { iconPath, ownedServer() -> truthy while this app's shared server runs, log }
+// options   { iconPath, ownedServer() -> truthy while this app's shared server runs,
+//             onQuit() -> runs just before the process exits, log }
 function install(electron, options = {}) {
   const { app, BrowserWindow, Menu, Tray, nativeImage, dialog } = electron;
   const log = options.log || ((message) => console.error(message));
@@ -49,12 +50,23 @@ function install(electron, options = {}) {
     });
   });
 
+  // app.exit() ends the process without letting the bridge, the app's child that started
+  // the shared server, clean up after itself, so the caller's hook does it first.
+  function exit() {
+    quitting = true;
+    try {
+      if (options.onQuit) options.onQuit();
+    } catch (error) {
+      log('OWL_TRAY quit hook failed: ' + String(error));
+    }
+    app.exit(0);
+  }
+
   async function quit() {
     // A second click while the question is open means "quit anyway", and keeps the
     // menu from sticking if the dialog never shows.
     if (confirming) {
-      quitting = true;
-      app.exit(0);
+      exit();
       return;
     }
     confirming = true;
@@ -79,9 +91,8 @@ function install(electron, options = {}) {
         }
         if (!proceed) return;
       }
-      quitting = true;
       // The ArkTS close handler keeps the ability alive, so app.quit() would be vetoed.
-      app.exit(0);
+      exit();
     } finally {
       confirming = false;
     }

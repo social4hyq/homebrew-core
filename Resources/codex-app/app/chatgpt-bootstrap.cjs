@@ -13,15 +13,27 @@ require('./owl-compat.cjs');
 // Resident in the system tray: closing the last window hides it, the tray menu
 // restores or quits. Created before the vendor code opens its first window.
 const share = require('./owl-share.cjs');
+// The shared server's registration lives under the host home, which the installer wrote
+// into the host config; read at the time it is needed.
+function endpointOfHost() {
+  try {
+    const home = JSON.parse(fs.readFileSync(path.join(__dirname, 'chatgpt-host-config.json'), 'utf8')).home;
+    return share.endpointFile(home);
+  } catch {
+    return null;
+  }
+}
 require('./owl-tray.cjs').install(require('electron'), {
   iconPath: path.join(__dirname, 'tray-icon.png'),
   ownedServer: () => {
-    try {
-      const home = JSON.parse(fs.readFileSync(path.join(__dirname, 'chatgpt-host-config.json'), 'utf8')).home;
-      return share.appOwnedServer(share.endpointFile(home), fs);
-    } catch {
-      return null;
-    }
+    const file = endpointOfHost();
+    return file ? share.appOwnedServer(file, fs) : null;
+  },
+  // The tray's quit ends the process at once: stop the shared server the app started and
+  // take its registration away, which the bridge would otherwise do itself.
+  onQuit: () => {
+    const file = endpointOfHost();
+    if (file) share.releaseAppServer(file, fs);
   },
 });
 const hostConfigPath = path.join(__dirname, 'chatgpt-host-config.json');
