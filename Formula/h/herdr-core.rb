@@ -4,6 +4,7 @@ class HerdrCore < Formula
   url "https://github.com/herdrdev/herdr-core/archive/refs/tags/v0.1.22.tar.gz"
   sha256 "f85c123cddca40e8e4fae7ea1b416fe8a022323ea956862759a9750f76154b53"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/herdrdev/herdr-core.git", branch: "master"
 
   livecheck do
@@ -66,14 +67,33 @@ class HerdrCore < Formula
   def install
     resource("ghostty").stage(buildpath/"vendor/ghostty")
     system "cargo", "install", *std_cargo_args(path: "crates/herdr-core")
-    bin.install_symlink "herdr-core" => "hc"
+    # Brew's post_install has no XDG_RUNTIME_DIR while later shells do, so the
+    # core and `hc` could pick different sockets. Reuse the socket that already
+    # exists, otherwise default to $TMPDIR, so every hc invocation agrees.
+    (bin/"hc").write <<~SH
+      #!/bin/sh
+      if [ -z "${HC_SOCKET:-}" ]; then
+        session="${HC_SESSION:-default}"
+        socket="${TMPDIR:-/tmp}/herdr-core/${session}.sock"
+        if [ ! -S "$socket" ] && [ -n "${XDG_RUNTIME_DIR:-}" ] &&
+           [ -S "${XDG_RUNTIME_DIR}/herdr-core/${session}.sock" ]; then
+          socket="${XDG_RUNTIME_DIR}/herdr-core/${session}.sock"
+        fi
+        HC_SOCKET="$socket"
+        export HC_SOCKET
+      fi
+      exec "#{bin}/herdr-core" "$@"
+    SH
+    chmod 0755, bin/"hc"
   end
 
   def caveats
     <<~EOS
       The core binds its socket under $TMPDIR: on OHOS the user-storage mount
-      holding $HOME cannot hold socket files. Terminals keep running after the
-      shell that started them closes; `hc server stop` ends them.
+      holding $HOME cannot hold socket files. `hc` reuses the running core's
+      socket and falls back to $TMPDIR; set HC_SOCKET to override it.
+      Terminals keep running after the shell that started them closes;
+      `hc server stop` ends them.
     EOS
   end
 
@@ -93,6 +113,11 @@ class HerdrCore < Formula
     # The core's socket follows $TMPDIR: the OHOS user-storage mount cannot hold
     # socket nodes and /run/user/<uid> does not exist.
     assert_path_exists tmpdir/"herdr-core/brew-test.sock"
+    # A shell that later gets XDG_RUNTIME_DIR must still find the core that was
+    # started without it (brew's post_install has none).
+    (testpath/"run").mkpath
+    ENV["XDG_RUNTIME_DIR"] = (testpath/"run").to_s
+    ENV.delete("HC_SOCKET")
     assert_match version.to_s, shell_output("#{bin}/hc server status")
   ensure
     system bin/"hc", "server", "stop"
