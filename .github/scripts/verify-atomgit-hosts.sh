@@ -64,6 +64,27 @@ tail -30 "$log" || true
 say '```'
 
 hr
+say "### 4b. Real bottle redirect chain (from the runner, with pin applied in container)"
+ROOT=$(cexec "grep -m1 'root_url' $TAP_IN_CONTAINER/Formula/c/claude-code.rb | sed -E 's/.*\\"([^\\"]+)\\".*/\\1/'")
+TAG=${ROOT##*/}
+say "- root_url: \`$ROOT\`"
+ASSET=$(curl -sS --max-time 30 "https://atomgit.com/api/v5/repos/social4hyq/homebrew-core/releases/tags/$TAG" 2>/dev/null | python3 -c 'import json,sys; d=json.load(sys.stdin); print(next((a["name"] for a in d.get("assets",[]) if "bottle.tar.gz" in a["name"]), ""))' 2>/dev/null || true)
+say "- asset: \`$ASSET\`"
+if [ -n "$ASSET" ]; then
+  BURL="$ROOT/$ASSET"
+  say "- redirect Location:"
+  curl -sSL -r 0-0 -D - -o /dev/null --max-time 40 "$BURL" 2>/dev/null | grep -i '^location:' | tail -1 | sed 's/^/  /' || true
+  say "- final hop (default DNS):"
+  curl -sSL -r 0-0 -o /dev/null --max-time 40 -w '  ip=%{remote_ip} code=%{http_code}\n' "$BURL" 2>/dev/null || true
+  CDNHOST=$(curl -sSL -r 0-0 -D - -o /dev/null --max-time 40 "$BURL" 2>/dev/null | grep -i '^location:' | tail -1 | tr -d '\r' | awk '{print $2}' | sed -E 's#https://([^/]+)/.*#\1#')
+  say "- CDN host actually used by the download: \`$CDNHOST\`"
+  if [ -n "$CDNHOST" ]; then
+    say "- same object pinned to 159.138.147.37 (HK) on that CDN host:"
+    curl -sSL -r 0-0 -o /dev/null --max-time 40 --resolve "$CDNHOST:443:159.138.147.37" -w '  ip=%{remote_ip} code=%{http_code}\n' "$BURL" 2>/dev/null || true
+  fi
+fi
+
+hr
 say "### 5. Interpretation"
 say "- If brew's download URLs contain neither \`api.atomgit.com\` nor \`file.atomgit.com\`, the two hosts entries cannot affect brew install."
 say "- If the pinned hosts return a different IP but brew never contacts them, the pin is inert for brew."
