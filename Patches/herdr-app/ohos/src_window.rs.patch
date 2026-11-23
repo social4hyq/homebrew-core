@@ -1,0 +1,109 @@
+OHOS: confirm closing while agents or foreground programs are running
+--- a/src/window.rs
++++ b/src/window.rs
+@@ -599,6 +599,13 @@
+                 cx.hide();
+                 return false;
+             }
++            #[cfg(all(target_os = "linux", target_env = "ohos"))]
++            {
++                let allowed = closing.update(cx, |this, cx| this.quit_allowed("window.close", false, window, cx)).unwrap_or(false);
++                if !allowed {
++                    return false;
++                }
++            }
+             let _ = closing.update(cx, |this, cx| {
+                 this.drain_documents(window, cx);
+                 this.close_mods_now(std::time::Instant::now() + Duration::from_millis(250), window, cx);
+@@ -3577,7 +3584,13 @@
+                 });
+                 self.write_person(|p| p.zoom = zoom, window, cx);
+             }
+-            "app.quit" => cx.quit(),
++            "app.quit" => {
++                #[cfg(all(target_os = "linux", target_env = "ohos"))]
++                if !self.quit_allowed("app.quit", a.get("confirmed").and_then(Value::as_bool) == Some(true), window, cx) {
++                    return;
++                }
++                cx.quit()
++            }
+             "app.update" => {
+                 match crate::update::apply() {
+                     Ok(true) => {}
+@@ -3591,7 +3604,13 @@
+                 crate::update::relaunch();
+                 cx.quit();
+             }
+-            "window.close" | "window.minimize" | "window.maximize" => return self.window_command(name, window, cx),
++            "window.close" | "window.minimize" | "window.maximize" => {
++                #[cfg(all(target_os = "linux", target_env = "ohos"))]
++                if name == "window.close" && !self.quit_allowed("window.close", a.get("confirmed").and_then(Value::as_bool) == Some(true), window, cx) {
++                    return;
++                }
++                return self.window_command(name, window, cx);
++            }
+             // Hiding apps is macOS's (bound natively there).
+             "app.hide" | "app.hide_others" | "app.show_all" => return,
+             other => {
+@@ -3679,6 +3698,28 @@
+ 
+     // ---- overlays ----------------------------------------------------------
+ 
++    #[cfg(all(target_os = "linux", target_env = "ohos"))]
++    fn quit_allowed(&mut self, command: &str, confirmed: bool, window: &mut Window, cx: &mut Context<Self>) -> bool {
++        let active = active_terminal_count(&self.live);
++        if confirmed || active == 0 {
++            return true;
++        }
++        // A second close while a dialog is open must not stack another one.
++        if self.overlays.iter().any(|overlay| overlay.kind.modal_keys()) {
++            return false;
++        }
++        let title = if active == 1 { "1 agent or program is still running".into() } else { format!("{active} agents or programs are still running") };
++        self.confirm(
++            &title,
++            "Closing the window will not stop them. herdr-core keeps their terminals running; reopening Herdr reconnects to them.",
++            command,
++            json!({ "confirmed": true }),
++            window,
++            cx,
++        );
++        false
++    }
++
+     fn confirm(&mut self, title: &str, detail: &str, command: &str, args: Value, window: &mut Window, cx: &mut Context<Self>) {
+         let spec = json!({ "mod": "confirm", "kind": "dialog", "width": 380,
+             "props": { "title": title, "detail": detail, "command": { "name": command, "args": args } } });
+@@ -4862,6 +4903,11 @@
+     rec["status"] == "working" || !(program("shell") || program("agent"))
+ }
+ 
++#[cfg(any(all(target_os = "linux", target_env = "ohos"), test))]
++fn active_terminal_count(live: &HashMap<String, Value>) -> usize {
++    live.values().filter(|record| busy(record)).count()
++}
++
+ /// Whether to ask a terminal's folder for its repo and branch again: only when
+ /// the answer could have changed. It moved, a command or an agent's turn just
+ /// ended there (a checkout, a commit), or a repo's fallback is due.
+@@ -7170,6 +7216,20 @@
+     }
+ 
+     #[test]
++    fn quit_confirmation_counts_agents_and_foreground_programs() {
++        let rec = |status: &str, shell: bool, agent: bool| {
++            serde_json::json!({ "status": status, "program": { "shell": shell, "agent": agent } })
++        };
++        let live = std::collections::HashMap::from([
++            ("t1".into(), rec("working", false, true)),
++            ("t2".into(), rec("done", false, true)),
++            ("t3".into(), rec("", false, false)),
++            ("t4".into(), rec("", true, false)),
++        ]);
++        assert_eq!(super::active_terminal_count(&live), 2);
++    }
++
++    #[test]
+     fn shipped_layouts_parse_and_show_what_they_promise() {
+         let main = super::default_layout("main");
+         assert!(main.find("main").is_some() && main.find("sidebar").is_some());

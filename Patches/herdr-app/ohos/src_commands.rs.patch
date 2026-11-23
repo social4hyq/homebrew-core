@@ -1,0 +1,34 @@
+OHOS: add confirmed arguments to the quit commands
+--- a/src/commands.rs
++++ b/src/commands.rs
+@@ -101,7 +101,7 @@
+     cmd("app.zoom_out", &[], "Make everything smaller."),
+     cmd("app.zoom_reset", &[], "Back to normal size."),
+     cmd("app.update", &[], "Restart into the update Herdr downloaded (your terminals keep running)."),
+-    cmd("app.quit", &[], "Quit (macOS)."),
++    cmd("app.quit", &[opt("confirmed")], "Quit (macOS); OHOS asks while agents or foreground programs are busy unless confirmed."),
+     cmd("app.hide", &[], "Hide the app (macOS)."),
+     cmd("app.hide_others", &[], "Hide other apps (macOS)."),
+     cmd("app.show_all", &[], "Show all apps (macOS)."),
+@@ -108,4 +108,4 @@
+-    cmd("window.close", &[], "Close the window (on Linux, quits)."),
++    cmd("window.close", &[opt("confirmed")], "Close the window (on Linux, quits); OHOS asks while agents or foreground programs are busy unless confirmed."),
+     cmd("window.minimize", &[], "Minimize the window."),
+     cmd("window.maximize", &[], "Maximize the window, or back."),
+ ];
+@@ -216,6 +216,15 @@
+     }
+ 
+     #[test]
++    fn quit_commands_accept_confirmation() {
++        for name in ["app.quit", "window.close"] {
++            let command = find(name).unwrap();
++            assert_eq!(validate_args(command, &json!({ "confirmed": true })), Ok(()));
++            assert!(validate_args(command, &json!({ "confirm": true })).is_err());
++        }
++    }
++
++    #[test]
+     fn names_are_unique_and_shorthand_fills_the_first_argument() {
+         let mut names: Vec<&str> = COMMANDS.iter().map(|c| c.name).collect();
+         names.sort();
