@@ -51,15 +51,16 @@ hr
 say "### 4. Bottle download — which host does brew actually contact?"
 say "- formula: \`$FORMULA\`"
 log=$(mktemp)
-cexec "env HOMEBREW_CACHE=/tmp/hb-ab-cache HOMEBREW_NO_AUTO_UPDATE=1 brew fetch --bottle-tag=arm64_ohos $FORMULA" >"$log" 2>&1 || true
-say "- \`brew fetch\` exit: $(cexec "env HOMEBREW_CACHE=/tmp/hb-ab-cache HOMEBREW_NO_AUTO_UPDATE=1 brew fetch --bottle-tag=arm64_ohos $FORMULA >/dev/null 2>&1; echo \$?")"
+cexec "env HOMEBREW_CACHE=/tmp/hb-ab-cache2 HOMEBREW_NO_AUTO_UPDATE=1 brew fetch -v --bottle-tag=arm64_ohos $FORMULA" >"$log" 2>&1
+rc=$?
+say "- \`brew fetch\` exit: $rc"
 say ""
 say "URLs brew resolved for this fetch:"
-grep -oE 'https://[^ ]+' "$log" | sed -E 's#(https://[^/]+).*#\1#' | sort -u | while read -r u; do say "- \`$u\`"; done
+{ grep -oE 'https://[^ ]+' "$log" || true; } | sed -E 's#(https://[^/]+).*#\1#' | sort -u | while read -r u; do say "- \`$u\`"; done
 say ""
 say "Raw fetch log (tail):"
 say '```'
-tail -20 "$log" || true
+tail -30 "$log" || true
 say '```'
 
 hr
