@@ -185,35 +185,6 @@ class ClaudeCodeApp < Formula
         must_succeed: false, print_stdout: true, network_access: true
   end
 
-  def caveats
-    <<~EOS
-      `brew install` and `brew upgrade` try to install the HAP when a device is
-      connected and Huawei Developer login is ready. If queued, check
-      `hap-app status`, then run `hap-app install-pending`.
-      Manual install: `claude-code-app install`. See docs/hap-app-formulae.md.
-
-      The bottle ships only the tap-authored shell; the first install asks
-      Anthropic for the official package (sha256-checked) and caches it in
-      ~/.cache/claude-code-app/vendor/. Use `claude-code-app install --deb PATH`
-      for an offline copy, and `--clean-cache` to remove the cached package.
-
-      The app needs the host `claude-code.latest` CLI installed and logged in;
-      install injects the host paths into a private signed HAP, and ACL permissions
-      let it spawn the CLI. `claude-code-app start` opens the app.
-
-      The app and a terminal `claude` share what is on disk, not a live process (the
-      official app talks to its own `claude` child over stdio, which has nothing to
-      attach to). Sessions the app starts are transcripts under ~/.claude/projects,
-      so a terminal `claude --resume <id>` continues them. Sessions started in a
-      terminal do not show up in the app's own session list. The app's main process
-      uses ~/.claude as its config folder when it can use it, and its CLI child runs
-      without CLAUDE_CONFIG_DIR for the default folder, as a terminal `claude` does,
-      which should put its global state in ~/.claude.json. Closing the window hides
-      the app (the official app's tray, whose menu restores it); reinstall with
-      `claude-code-app install` after upgrading.
-    EOS
-  end
-
   test do
     tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
     hap = libexec/"claude-code-shell-unsigned.hap"

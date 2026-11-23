@@ -224,34 +224,6 @@ class ZcodeApp < Formula
         must_succeed: false, print_stdout: true, network_access: true
   end
 
-  def caveats
-    <<~EOS
-      `brew install` and `brew upgrade` try to install the HAP when a device is
-      connected and Huawei Developer login is ready. If queued, check
-      `hap-app status`, then run `hap-app install-pending`.
-      Manual install: `zcode-app install`. See docs/hap-app-formulae.md.
-
-      Install does not start `zcode --web`; the shell starts its own copy on launch
-      (weak-sandbox ACLs from the local debug profile). A service the shell starts
-      ends when the app exits (quit or `aa force-stop`), even though it is spawned
-      detached; the tray's quit asks first. A service you start yourself from a
-      terminal outlives the app, and the app connects to it instead:
-
-        zcode-app serve
-        zcode-app status
-        zcode-app stop
-
-      State is shared in `~/.config/zcode-desktop`. `zcode-app login
-      [zai|bigmodel]` runs the browser OAuth flow. `--no-acl` gives the
-      strong-sandbox variant (no JIT/paste, cannot start the service).
-      The embedded terminal is unavailable (node-pty cannot spawn under
-      bun on HarmonyOS).
-
-      `zcode-app uninstall` removes the app but keeps its data; only
-      `zcode-app uninstall --purge` deletes the app data.
-    EOS
-  end
-
   test do
     ENV["HOME"] = testpath/"home"
     assert_match "Usage: zcode-app", shell_output("#{bin}/zcode-desktop --help")
