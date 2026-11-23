@@ -4,7 +4,7 @@ class AppInstaller < Formula
   url "https://registry.npmjs.org/@deveco/deveco-cli-openharmony-arm64/-/deveco-cli-openharmony-arm64-1.3.12.tgz"
   sha256 "eaa29900d4892e89b2ae6156733ffa97597971b7a26fa1df6c686cc5934a02fb"
   license "MIT"
-  revision 8
+  revision 9
 
   livecheck do
     url :stable
@@ -12,8 +12,8 @@ class AppInstaller < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/app-installer-v1.3.12-r11"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2e9bfa976b7711e68ee255e01fb75043cf491988dced84a55a04034dc60e58a1"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/app-installer-v1.3.12-r12"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c33af00e50b5d8d932482ef8d304a93f0185c1301d8a3309913a36d2f731bc5c"
   end
 
   depends_on "bash"

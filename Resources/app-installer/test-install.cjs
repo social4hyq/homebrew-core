@@ -56,7 +56,11 @@ function fixture(t) {
   `);
   const hdc = tool("hdc", prelude + `
     if (args[0] === 'list') console.log(process.env.RECONNECT && fs.existsSync(process.env.HOME + '/connected') ? 'local TCP Connected localhost hdc' : (process.env.TEST_TARGETS || 'local TCP Connected localhost hdc'));
-    if (args[0] === 'tconn') { fs.writeFileSync(process.env.HOME + '/connected', ''); console.log('connected'); }
+    if (args[0] === 'tconn') {
+      if (process.env.HDC_TCONN_ERROR) { console.error(process.env.HDC_TCONN_ERROR); process.exit(1); }
+      fs.writeFileSync(process.env.HOME + '/connected', '');
+      console.log('Connect OK');
+    }
     // A device's /data/local/tmp, as far as the installer uses it.
     const dev = process.env.HOME + '/device';
     const onDevice = remote => path.join(dev, remote.replace(/^\\/data\\/local\\/tmp\\//, ''));
@@ -294,6 +298,15 @@ test('doctor reports problems with a hint and exits non-zero when no device is c
   assert.equal(r.status,1,r.stdout+r.stderr); assert.match(r.stdout,/PROBLEM  hdc target connected \(0\)/);
   assert.match(r.stdout,/system sideloading not available/);
 });
+test('doctor shows why hdc refused the local target', t => {
+  const f=fixture(t);
+  const reason='[200220077] [E00C001] Operation restricted by the organization';
+  const r=spawnSync('bash',[script,'doctor','--hdc',f.hdc],{env:{...f.env,TEST_TARGETS:'[Empty] hdc',HDC_TCONN_ERROR:reason},encoding:'utf8'});
+  assert.equal(r.status,1,r.stdout+r.stderr);
+  assert.match(r.stdout,/PROBLEM  hdc target connected \(0\)/);
+  assert.match(r.stdout,/E00C001/);
+  assert.match(r.stdout,/device administrator/);
+});
 test('the legacy project directory is reused only while the new one is absent', t => {
   const f=fixture(t); fs.mkdirSync(path.join(f.root,'.hap-installer/projects/'+bundle+'/AppScope'),{recursive:true});
   fs.writeFileSync(path.join(f.root,'.hap-installer/projects/'+bundle+'/AppScope/app.json5'),'{}');
@@ -497,6 +510,14 @@ test('ready reports one device and the login state without touching anything', t
   r=spawnSync('bash',[script,'ready','--hdc','/nonexistent/hdc'],{env:f.env,encoding:'utf8'});
   assert.equal(r.status,1); assert.equal(r.stdout.trim(),'no-hdc');
   assert.ok(!f.calls().some(c=>c[0]==='signer'||c.join(' ').includes('bm install')), 'ready must not sign or install');
+});
+test('ready explains why hdc refused the local target', t => {
+  const f=fixture(t);
+  const reason='[200220077] [E00C001] Operation restricted by the organization';
+  const r=spawnSync('bash',[script,'ready'],{env:{...f.env,TEST_TARGETS:'[Empty] hdc',HDC_TCONN_ERROR:reason},encoding:'utf8'});
+  assert.equal(r.status,1,r.stdout+r.stderr);
+  assert.equal(r.stdout.trim(),'no-device');
+  assert.match(r.stderr,/E00C001/);
 });
 test('login runs the DevEco login once and reports the result', t => {
   const f=fixture(t);

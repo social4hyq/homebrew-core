@@ -28,6 +28,7 @@ function fixture(t) {
       const out = logged ? (process.env.READY_AFTER || process.env.READY || 'ok local')
                          : (process.env.READY_BEFORE || process.env.READY || 'ok local');
       console.log(out);
+      if (process.env.READY_STDERR) console.error(process.env.READY_STDERR);
       process.exit(out.startsWith('ok') ? 0 : 1);
     }
     if (args[0] === 'login') {
@@ -134,6 +135,20 @@ test('a missing device queues the app instead of failing', t => {
   assert.deepEqual(f.queued(), ["orca-app.json"]);
   assert.equal(f.queuedEntry("orca-app").reason, "device");
   assert.ok(!f.calls().some(c => c[0] === "orca-app"));
+});
+
+test('a missing device keeps the hdc reason in the output, queue and status', t => {
+  const f = fixture(t);
+  const reason = "[200220077] [E00C001] Operation restricted by the organization";
+  const r = f.run(["auto-install", "orca-app", "com.example.desktop"],
+    { READY: "no-device", READY_STDERR: reason });
+  assert.equal(r.status, 0, r.stdout + r.stderr);
+  assert.match(r.stdout, /设备未就绪（no-device）/);
+  assert.match(r.stdout, /原因：\[200220077\] \[E00C001\] Operation restricted by the organization/);
+  assert.equal(f.queuedEntry("orca-app").detail, reason);
+  const status = f.run(["status"]);
+  assert.match(status.stdout, /最近失败：.*E00C001/);
+  assert.match(status.stdout, /联系组织设备管理员/);
 });
 
 test('a missing login opens the browser once by default and then installs', t => {
@@ -316,6 +331,16 @@ test('install-pending installs the queued apps and empties the queue', t => {
   assert.match(r.stdout, /已装机 com\.example\.desktop（设备 local）/);
   assert.match(r.stdout, /补装完成：1 个成功/);
   assert.deepEqual(f.queued(), []);
+});
+
+test('install-pending shows the hdc reason when the device stays unavailable', t => {
+  const f = fixture(t);
+  const reason = "[200220077] [E00C001] Operation restricted by the organization";
+  assert.equal(f.run(["auto-install", "orca-app", "com.example.desktop"],
+    { READY: "no-device", READY_STDERR: reason }).status, 0);
+  const r = f.run(["install-pending"], { READY: "no-device", READY_STDERR: reason });
+  assert.equal(r.status, 1, r.stdout + r.stderr);
+  assert.match(r.stderr, /设备未就绪（no-device）：.*E00C001/);
 });
 
 test('empty status still shows configuration and log locations', t => {
