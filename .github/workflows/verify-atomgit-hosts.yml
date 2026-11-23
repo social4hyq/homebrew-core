@@ -1,0 +1,35 @@
+name: verify atomgit hosts acceleration
+
+# Temporary A/B verification for a draft PR: does pinning api.atomgit.com and
+# file.atomgit.com to 159.138.147.37 (Huawei Cloud HK) inside the OHOS CI
+# container change where brew's traffic lands, and does it speed anything up?
+#
+# Verification only. It does not modify any production workflow or formula;
+# hosts entries are applied inside this job's throwaway container and restored
+# on exit.
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/verify-atomgit-hosts.yml'
+      - '.github/scripts/verify-atomgit-hosts.sh'
+  workflow_dispatch:
+
+concurrency:
+  group: verify-atomgit-hosts-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  IMAGE: ${{ vars.OHOS_CI_IMAGE }}
+  TAP_IN_CONTAINER: /storage/Users/currentUser/.harmonybrew/Homebrew/Library/Taps/social4hyq/homebrew-core
+
+jobs:
+  ab:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Start OHOS container
+        run: .github/scripts/setup-container.sh
+      - name: A/B verification
+        run: .github/scripts/verify-atomgit-hosts.sh
