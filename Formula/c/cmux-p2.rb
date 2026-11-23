@@ -74,7 +74,7 @@ class CmuxP2 < Formula
     index = (Pathname(__FILE__).expand_path.dirname.parent.parent/
              "Resources/cmux-p2-hap/hap/entry/src/main/ets/pages/Index.ets").read
     assert_match "TerminalSurface", index
-    assert_match "terminalController", index
+    assert_match "termController", index
     assert_match "Web({", index
     assert_match "setWebDebuggingAccess(true)", index
     ohpkg = (Pathname(__FILE__).expand_path.dirname.parent.parent/
