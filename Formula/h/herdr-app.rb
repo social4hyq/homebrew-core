@@ -4,7 +4,7 @@ class HerdrApp < Formula
   url "https://github.com/herdrdev/herdr-app/archive/refs/tags/v0.1.16.tar.gz"
   sha256 "fea3d920607f2199ed330eb3cdcb1fa3626dcea5080c92a97a296d983d6bc681"
   license "Apache-2.0"
-  revision 13
+  revision 14
 
   livecheck do
     url "https://github.com/herdrdev/herdr-app.git"
@@ -13,8 +13,8 @@ class HerdrApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/herdr-app-v0.1.16-r19"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "88194cd4f70c0822b95df10d5ca2ee71dde600fa9b4d425b270b82f7776db596"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/herdr-app-v0.1.16-r21"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6697022d20cf1ee397f9ea5a5aa7bd4b44580b58c14daacd765a21157c5dbc3d"
   end
 
   depends_on "node" => :build
@@ -284,6 +284,7 @@ class HerdrApp < Formula
       assert_match "addr=127.0.0.1:#{port}", conf
       assert_equal conf, shell_output("unzip -p #{testpath}/injected.hap resources/rawfile/bridge.conf")
       assert_empty Dir[testpath/"tmp/*"], "the staged HAP that holds the token was not removed"
+      assert_equal (testpath/"tmp").to_s, (testpath/"state/bridge.tmpdir").read.strip
 
       # A TMPDIR that cannot hold a directory must not fail the install: the
       # stage falls back to the app's cache (hmdfs inherits the parent owner).
@@ -293,6 +294,7 @@ class HerdrApp < Formula
       end
       assert_equal conf, shell_output("unzip -p #{testpath}/injected.hap resources/rawfile/bridge.conf")
       assert_empty Dir[testpath/"cache/herdr-app-inject.*"], "the fallback stage was not removed"
+      assert_equal (testpath/"cache").to_s, (testpath/"state/bridge.tmpdir").read.strip
 
       check = <<~'PY'
         import socket, sys
