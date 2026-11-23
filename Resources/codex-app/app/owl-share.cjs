@@ -67,6 +67,39 @@ function appOwnedServer(file, fs, isAlive = processAlive) {
   return endpoint && endpoint.owner === 'app' && endpoint.pid && isAlive(endpoint.pid) ? endpoint : null;
 }
 
+// True when the process is a codex app-server listening for the shared clients, so a
+// pid that was reused by something else is never signalled.
+function isListeningServer(pid, fileSystem) {
+  try {
+    const words = fileSystem.readFileSync(`/proc/${pid}/cmdline`, 'utf8').split('\0');
+    return words.includes('app-server') && words.includes('--listen');
+  } catch {
+    return false;
+  }
+}
+
+// For an exit that gives the bridge no chance to clean up after itself (the tray's quit
+// ends the process at once): stop the server this app started and remove its
+// registration. A server a terminal started, and a registration that is not the app's,
+// are left alone. Returns whether a registration of the app's was removed.
+function releaseAppServer(file, fileSystem, { kill = process.kill, alive = processAlive, listening = isListeningServer } = {}) {
+  const endpoint = readEndpoint(file, fileSystem);
+  if (!endpoint || endpoint.owner !== 'app') return false;
+  if (endpoint.pid && alive(endpoint.pid) && listening(endpoint.pid, fileSystem)) {
+    try {
+      kill(endpoint.pid, 'SIGTERM');
+    } catch {
+      // Already gone.
+    }
+  }
+  try {
+    fileSystem.unlinkSync(file);
+  } catch {
+    // Already removed.
+  }
+  return true;
+}
+
 function processAlive(pid) {
   try {
     process.kill(pid, 0);
@@ -203,6 +236,6 @@ async function startSharedServer({ codex, args, endpoint, defaultPort }, deps) {
 }
 
 module.exports = {
-  appOwnedServer, endpointFile, ensureToken, isDesktopAppServerArgs, listenArgs, planRedirect, processAlive, readEndpoint,
-  startSharedServer,
+  appOwnedServer, endpointFile, ensureToken, isDesktopAppServerArgs, isListeningServer, listenArgs, planRedirect,
+  processAlive, readEndpoint, releaseAppServer, startSharedServer,
 };

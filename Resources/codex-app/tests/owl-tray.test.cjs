@@ -28,7 +28,7 @@ class FakeWindow extends EventEmitter {
   }
 }
 
-function setup({ owned = null, trayThrows = false, emptyIcon = false, dialogResponse = 1, dialogThrows = false, dialogHeld = false } = {}) {
+function setup({ owned = null, trayThrows = false, emptyIcon = false, dialogResponse = 1, dialogThrows = false, dialogHeld = false, onQuit = null } = {}) {
   const app = new EventEmitter();
   const calls = { exit: [], menus: [], trays: [], dialogs: [], logs: [], windowsCreated: 0 };
   const ready = [];
@@ -59,7 +59,7 @@ function setup({ owned = null, trayThrows = false, emptyIcon = false, dialogResp
       },
     },
   };
-  const controller = install(electron, { iconPath: '/app/tray-icon.png', ownedServer: () => owned, log: (m) => calls.logs.push(m) });
+  const controller = install(electron, { iconPath: '/app/tray-icon.png', ownedServer: () => owned, onQuit, log: (m) => calls.logs.push(m) });
   const open = (name, visible = true) => {
     const win = new FakeWindow(name, visible);
     windows.push(win);
@@ -216,4 +216,71 @@ test('an unreadable icon is reported but the tray is still created', () => {
   start();
   assert.equal(calls.trays.length, 1);
   assert.ok(calls.logs.some((message) => /icon unreadable/.test(message)));
+});
+
+// The order matters: the hook has to run before app.exit(), which ends the process.
+function recordedQuit(extra = {}) {
+  const order = [];
+  const setupResult = setup({ ...extra, onQuit: () => { order.push('hook'); if (extra.hookThrows) throw new Error('hook failed'); } });
+  const originalExit = setupResult.app.exit;
+  setupResult.app.exit = (code) => { order.push('exit'); originalExit(code); };
+  return { ...setupResult, order };
+}
+
+test('quit runs the hook before the process exits', async () => {
+  const { calls, start, open, order } = recordedQuit();
+  start();
+  open('main');
+  calls.menus[0].find((item) => item.label === '退出应用').click();
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.deepEqual(order, ['hook', 'exit']);
+});
+
+test('confirming the question runs the hook before the exit', async () => {
+  const { calls, start, open, order } = recordedQuit({ owned: { pid: 42 }, dialogResponse: 1 });
+  start();
+  open('main');
+  calls.menus[0].find((item) => item.label === '退出应用').click();
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.deepEqual(order, ['hook', 'exit']);
+});
+
+test('cancelling the question runs no hook and keeps the app', async () => {
+  const { calls, start, open, order } = recordedQuit({ owned: { pid: 42 }, dialogResponse: 0 });
+  start();
+  open('main');
+  calls.menus[0].find((item) => item.label === '退出应用').click();
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.deepEqual(order, []);
+  assert.deepEqual(calls.exit, []);
+});
+
+test('a second click while the question is open runs the hook and exits', async () => {
+  const { calls, start, open, order } = recordedQuit({ owned: { pid: 42 }, dialogHeld: true });
+  start();
+  open('main');
+  const quit = () => calls.menus[0].find((entry) => entry.label === '退出应用').click();
+  quit();
+  await new Promise((resolve) => setImmediate(resolve));
+  quit();
+  assert.deepEqual(order, ['hook', 'exit']);
+});
+
+test('a hook that fails does not keep the app from exiting', async () => {
+  const { calls, start, open, order } = recordedQuit({ hookThrows: true });
+  start();
+  open('main');
+  calls.menus[0].find((item) => item.label === '退出应用').click();
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.deepEqual(order, ['hook', 'exit']);
+  assert.ok(calls.logs.some((message) => /quit hook failed/.test(message)));
+});
+
+test('quit without a hook exits as before', async () => {
+  const { calls, start, open } = setup();
+  start();
+  open('main');
+  calls.menus[0].find((item) => item.label === '退出应用').click();
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.deepEqual(calls.exit, [0]);
 });

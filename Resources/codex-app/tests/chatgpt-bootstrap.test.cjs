@@ -24,6 +24,7 @@ function boot(packageVersion = '26.1117.41037', shellVersion = packageVersion) {
     loaded: null,
     compatLoaded: false,
     order: [],
+    released: [],
     tray: null,
     name: null,
     paths: {},
@@ -60,6 +61,7 @@ function boot(packageVersion = '26.1117.41037', shellVersion = packageVersion) {
       return {
         endpointFile: (home) => `${home}/.config/codex-app/server.json`,
         appOwnedServer: (file) => ({ file }),
+        releaseAppServer: (file) => { state.released.push(file); return true; },
       };
     }
     if (id === './owl-tray.cjs') {
@@ -104,6 +106,12 @@ test('installs the tray before the vendor code can open a window', () => {
 test('the tray asks about the shared server registered under the host home', () => {
   const state = boot();
   assert.deepEqual({ ...state.tray.options.ownedServer() }, { file: `${hostConfig.home}/.config/codex-app/server.json` });
+});
+
+test('the tray\'s quit hook releases the shared server registered under the host home', () => {
+  const state = boot();
+  state.tray.options.onQuit();
+  assert.deepEqual(state.released, [`${hostConfig.home}/.config/codex-app/server.json`]);
 });
 
 test('launches Codex with host HOME, CODEX_HOME and PATH while preserving workspace cwd', () => {
