@@ -4,7 +4,7 @@ class MagpieApp < Formula
   url "https://github.com/yetone/magpie/archive/refs/tags/v0.1.4661.tar.gz"
   sha256 "eacabbef905695537e60b7ed41271a2c89c9f83014d4817ab3cf8aba6379dd42"
   license :cannot_represent
-  revision 5
+  revision 6
 
   livecheck do
     url :stable
@@ -95,7 +95,8 @@ class MagpieApp < Formula
               <<~JSON5.chomp
                 "requestPermissions": [
                       { "name": "ohos.permission.INTERNET" },
-                      { "name": "ohos.permission.GET_NETWORK_INFO" }
+                      { "name": "ohos.permission.GET_NETWORK_INFO" },
+                      { "name": "ohos.permission.MICROPHONE", "reason": "$string:microphone", "usedScene": { "abilities": ["EntryAbility"], "when": "inuse" } }
                     ],
               JSON5
 
@@ -270,7 +271,7 @@ class MagpieApp < Formula
     assert_equal "com.social4hyq.magpiedesktop", acl.fetch("app").fetch("bundleName")
     permissions = acl.fetch("module").fetch("requestPermissions").map { |permission| permission.fetch("name") }
     assert_equal %w[ohos.permission.CUSTOM_SANDBOX ohos.permission.GET_NETWORK_INFO
-                    ohos.permission.INTERNET ohos.permission.READ_PASTEBOARD
+                    ohos.permission.INTERNET ohos.permission.MICROPHONE ohos.permission.READ_PASTEBOARD
                     ohos.permission.READ_WRITE_USER_FILE
                     ohos.permission.kernel.ALLOW_WRITABLE_CODE_MEMORY
                     ohos.permission.kernel.DISABLE_CODE_MEMORY_PROTECTION].sort,
@@ -280,7 +281,8 @@ class MagpieApp < Formula
     assert_equal config, JSON.parse(shell_output("unzip -p #{staged} #{entry}/config.json"))
     plain = JSON.parse(shell_output("unzip -p #{staged} module.json"))
     permissions = plain.fetch("module").fetch("requestPermissions").map { |permission| permission.fetch("name") }
-    assert_equal %w[ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET], permissions.sort
+    assert_equal %w[ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET
+                    ohos.permission.MICROPHONE], permissions.sort
 
     keep_tmp = testpath/"keep"
     keep_tmp.mkpath
