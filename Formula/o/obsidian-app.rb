@@ -7,7 +7,7 @@ class ObsidianApp < Formula
   # host payload in Resources/obsidian-app is version-independent. The asar is
   # fetched at install time and never put in the bottle.
   license :cannot_represent
-  revision 12
+  revision 13
 
   # desktop-releases.json carries the latest desktop version, asar URL and
   # sha256.
@@ -19,8 +19,8 @@ class ObsidianApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/obsidian-app-v1.15.1-r14"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a988dccd6f8800c9bc0b1f0276a8f948688999b114be04042498a5f24f4ff2f3"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/obsidian-app-v1.15.1-r15"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3b8b09cb2dd845daf4027d3c2bb89de8b2649fcd825b318872610175da6cfeb5"
   end
 
   depends_on "app-installer"
@@ -199,7 +199,8 @@ class ObsidianApp < Formula
               <<~JSON5.chomp
                 "requestPermissions": [
                       { "name": "ohos.permission.INTERNET" },
-                      { "name": "ohos.permission.GET_NETWORK_INFO" }
+                      { "name": "ohos.permission.GET_NETWORK_INFO" },
+                      { "name": "ohos.permission.MICROPHONE", "reason": "$string:microphone", "usedScene": { "abilities": ["EntryAbility"], "when": "inuse" } }
                     ],
               JSON5
 
@@ -289,7 +290,7 @@ class ObsidianApp < Formula
     acl = JSON.parse((pkgshare/"module-acl.json").read)
     acl_permissions = acl.fetch("module").fetch("requestPermissions").map { |permission| permission.fetch("name") }
     assert_equal %w[ohos.permission.CUSTOM_SANDBOX ohos.permission.GET_NETWORK_INFO
-                    ohos.permission.INTERNET ohos.permission.READ_PASTEBOARD
+                    ohos.permission.INTERNET ohos.permission.MICROPHONE ohos.permission.READ_PASTEBOARD
                     ohos.permission.READ_WRITE_USER_FILE
                     ohos.permission.kernel.ALLOW_WRITABLE_CODE_MEMORY
                     ohos.permission.kernel.DISABLE_CODE_MEMORY_PROTECTION].sort,
@@ -348,7 +349,7 @@ class ObsidianApp < Formula
     assert_equal fake_hdc.to_s, installer[installer.index("--hdc") + 1]
     assert_match "installed", shell_output("#{bin}/obsidian-app install --asar #{asar} --no-acl 2>&1")
     strong = JSON.parse(shell_output("unzip -p #{injected} module.json"))
-    assert_equal %w[ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET],
+    assert_equal %w[ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET ohos.permission.MICROPHONE],
                  strong.fetch("module").fetch("requestPermissions").map { |entry| entry.fetch("name") }.sort
     system "unzip", "-tq", injected
 

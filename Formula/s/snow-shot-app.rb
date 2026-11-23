@@ -4,6 +4,7 @@ class SnowShotApp < Formula
   url "https://github.com/mg-chao/snow-shot/archive/refs/tags/v1.6.3_snow-shot.tar.gz"
   sha256 "f6c9cbf1ce2fa309364b581404272f1d93de3ab1230c0d2e0b490a264f7b5bf0"
   license "GPL-3.0-or-later"
+  revision 1
 
   livecheck do
     url "https://github.com/mg-chao/snow-shot.git"
@@ -12,8 +13,8 @@ class SnowShotApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-app-v1.6.3-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "28b3fd3c87e791f764b37f95be2e58e51ce2a33b1651fe988196e42f491e7ff6"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-app-v1.6.3-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d7c39e78a773b6dc7bad23e5422fb8b993a2a8722de8179e13268f074b33a211"
   end
 
   depends_on "brotli" => :build
@@ -689,6 +690,7 @@ class SnowShotApp < Formula
     assert_equal "QAbility", manifest.dig("module", "abilities", 0, "name")
     permissions = manifest.dig("module", "requestPermissions").map { |item| item["name"] }
     assert_includes permissions, "ohos.permission.CUSTOM_SCREEN_CAPTURE"
+    assert_includes permissions, "ohos.permission.MICROPHONE"
     assert_includes permissions, "ohos.permission.INTERNET"
     assert_includes permissions, "ohos.permission.GET_NETWORK_INFO"
     assert_equal "$media:app_icon", manifest.dig("module", "abilities", 0, "icon")

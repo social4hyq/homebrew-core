@@ -58,7 +58,9 @@ edit('electron/src/main/module.json5',
 def permission(s):
     s, n = re.subn(r'"requestPermissions": \[.*?\n    \]',
                    '"requestPermissions": [{"name":"ohos.permission.INTERNET"},'
-                   '{"name":"ohos.permission.GET_NETWORK_INFO"}]', s, flags=re.S)
+                   '{"name":"ohos.permission.GET_NETWORK_INFO"},'
+                   '{"name":"ohos.permission.MICROPHONE","reason":"$string:microphone",'
+                   '"usedScene":{"abilities":["EntryAbility"],"when":"inuse"}}]', s, flags=re.S)
     if n != 1:
         raise ValueError('expected one requestPermissions in web_engine template')
     return s
