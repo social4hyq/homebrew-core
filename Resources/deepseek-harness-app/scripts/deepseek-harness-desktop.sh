@@ -14,7 +14,7 @@ ABILITY="EntryAbility"
 
 usage() {
   cat <<'EOF'
-Usage: dsh-app <command>
+Usage: deepseek-harness-app <command>
 
 Commands:
   start     Open the desktop app (it starts dsh web itself)
@@ -47,12 +47,12 @@ ensure_config() {
       port=$((port + 1))
       tries=$((tries + 1))
       if ((tries > 30)); then
-        printf 'dsh-app: no free loopback port near %s\n' "$DEFAULT_PORT" >&2
+        printf 'deepseek-harness-app: no free loopback port near %s\n' "$DEFAULT_PORT" >&2
         exit 1
       fi
     done
     (umask 077; printf '{"port":%s}\n' "$port" > "$CONFIG_FILE")
-    printf 'dsh-app: wrote %s (port %s)\n' "$CONFIG_FILE" "$port" >&2
+    printf 'deepseek-harness-app: wrote %s (port %s)\n' "$CONFIG_FILE" "$port" >&2
   fi
 }
 
@@ -60,7 +60,7 @@ read_config() {
   ensure_config
   PORT="$(sed -n 's/.*"port":\([0-9][0-9]*\).*/\1/p' "$CONFIG_FILE")"
   if [[ -z "$PORT" ]]; then
-    printf 'dsh-app: cannot parse %s\n' "$CONFIG_FILE" >&2
+    printf 'deepseek-harness-app: cannot parse %s\n' "$CONFIG_FILE" >&2
     exit 1
   fi
 }
@@ -129,7 +129,7 @@ save_printed_url() {
 ensure_serve() {
   read_config
   if healthy; then
-    printf 'dsh-app: server already healthy at http://127.0.0.1:%s\n' "$PORT"
+    printf 'deepseek-harness-app: server already healthy at http://127.0.0.1:%s\n' "$PORT"
     return 0
   fi
   rm -f "$URL_FILE"
@@ -137,14 +137,14 @@ ensure_serve() {
     local stale_pid
     stale_pid="$(cat "$PID_FILE" 2>/dev/null || true)"
     if is_managed_serve "$stale_pid"; then
-      printf 'dsh-app: stale server process (pid %s) is not responding; stopping it\n' "$stale_pid" >&2
+      printf 'deepseek-harness-app: stale server process (pid %s) is not responding; stopping it\n' "$stale_pid" >&2
       kill "$stale_pid" 2>/dev/null || true
       wait_gone "$stale_pid"
     fi
     rm -f "$PID_FILE"
   fi
   if port_busy "$PORT"; then
-    printf 'dsh-app: port %s is in use by another process; edit %s to pick another port\n' "$PORT" "$CONFIG_FILE" >&2
+    printf 'deepseek-harness-app: port %s is in use by another process; edit %s to pick another port\n' "$PORT" "$CONFIG_FILE" >&2
     return 1
   fi
   setsid nohup "$(dsh_bin)" web --host 127.0.0.1 --no-open --port "$PORT" >"$LOG_FILE" 2>&1 </dev/null &
@@ -154,11 +154,11 @@ ensure_serve() {
     sleep 1
     waited=$((waited + 1))
     if ((waited > 30)); then
-      printf 'dsh-app: server did not become healthy; see %s\n' "$LOG_FILE" >&2
+      printf 'deepseek-harness-app: server did not become healthy; see %s\n' "$LOG_FILE" >&2
       return 1
     fi
   done
-  printf 'dsh-app: serving at http://127.0.0.1:%s (log: %s)\n' "$PORT" "$LOG_FILE"
+  printf 'deepseek-harness-app: serving at http://127.0.0.1:%s (log: %s)\n' "$PORT" "$LOG_FILE"
 }
 
 warn_version_mismatch() {
@@ -166,7 +166,7 @@ warn_version_mismatch() {
   local actual
   actual="$("$(dsh_bin)" --version 2>/dev/null || true)"
   if [[ -n "$actual" && "$actual" != "$DSH_DESKTOP_VERSION" ]]; then
-    printf 'dsh-app: warning: desktop %s with CLI %s; matching upstream versions are recommended\n' \
+    printf 'deepseek-harness-app: warning: desktop %s with CLI %s; matching upstream versions are recommended\n' \
       "$DSH_DESKTOP_VERSION" "$actual" >&2
   fi
 }
@@ -177,7 +177,7 @@ cmd_start() {
     case "$1" in
       --serve-only) serve_only=1 ;;
       -h|--help) usage; exit 0 ;;
-      *) printf 'dsh-app: unknown option: %s\n' "$1" >&2; usage >&2; exit 2 ;;
+      *) printf 'deepseek-harness-app: unknown option: %s\n' "$1" >&2; usage >&2; exit 2 ;;
     esac
     shift
   done
@@ -191,16 +191,16 @@ cmd_start() {
   # here is not fatal -- the shell starts its own backend when it can reach
   # none.
   if ! ensure_serve; then
-    printf 'dsh-app: warning: host backend unavailable; the shell will start its own\n' >&2
+    printf 'deepseek-harness-app: warning: host backend unavailable; the shell will start its own\n' >&2
   fi
   local hdc="${DSH_DESKTOP_HDC:-${DSH_DESKTOP_HDC_DEFAULT:-}}"
   if [[ -z "$hdc" ]]; then hdc="$(command -v hdc || true)"; fi
   if [[ -z "$hdc" || ! -x "$hdc" ]]; then
-    printf 'dsh-app: hdc not found; install ohos-sdk-toolchains\n' >&2
+    printf 'deepseek-harness-app: hdc not found; install ohos-sdk-toolchains\n' >&2
     exit 1
   fi
   "$hdc" shell aa start -a "$ABILITY" -b "$BUNDLE_ID" -m "$MODULE" >/dev/null
-  printf 'dsh-app: opened %s\n' "$BUNDLE_ID"
+  printf 'deepseek-harness-app: opened %s\n' "$BUNDLE_ID"
 }
 
 cmd_stop() {
@@ -209,9 +209,9 @@ cmd_stop() {
   if is_managed_serve "$pid"; then
     kill "$pid" 2>/dev/null || true
     wait_gone "$pid"
-    printf 'dsh-app: stopped\n'
+    printf 'deepseek-harness-app: stopped\n'
   else
-    printf 'dsh-app: no managed server running\n'
+    printf 'deepseek-harness-app: no managed server running\n'
   fi
   rm -f "$PID_FILE" "$URL_FILE"
 }
@@ -219,9 +219,9 @@ cmd_stop() {
 cmd_status() {
   read_config
   if healthy; then
-    printf 'dsh-app: healthy at http://127.0.0.1:%s\n' "$PORT"
+    printf 'deepseek-harness-app: healthy at http://127.0.0.1:%s\n' "$PORT"
   else
-    printf 'dsh-app: server not healthy at http://127.0.0.1:%s\n' "$PORT" >&2
+    printf 'deepseek-harness-app: server not healthy at http://127.0.0.1:%s\n' "$PORT" >&2
     exit 1
   fi
 }
@@ -243,10 +243,10 @@ cmd_uninstall() {
     case "$1" in
       --purge) purge=1 ;;
       --device)
-        [[ $# -ge 2 && -n "$2" ]] || { printf 'dsh-app: --device needs an id\n' >&2; exit 2; }
+        [[ $# -ge 2 && -n "$2" ]] || { printf 'deepseek-harness-app: --device needs an id\n' >&2; exit 2; }
         device="$2"; shift ;;
       -h|--help) usage; exit 0 ;;
-      *) printf 'dsh-app: unknown option: %s\n' "$1" >&2; exit 2 ;;
+      *) printf 'deepseek-harness-app: unknown option: %s\n' "$1" >&2; exit 2 ;;
     esac
     shift
   done
@@ -266,5 +266,5 @@ case "${1:-}" in
   uninstall) shift; cmd_uninstall "$@" ;;
   -h|--help|help) usage ;;
   "") usage >&2; exit 2 ;;
-  *) printf 'dsh-app: unknown command: %s\n' "$1" >&2; usage >&2; exit 2 ;;
+  *) printf 'deepseek-harness-app: unknown command: %s\n' "$1" >&2; usage >&2; exit 2 ;;
 esac

@@ -61,10 +61,12 @@ case "${1:-}" in
   status)
     shift
     parse_device "$@"
-    # hdc shell does not reliably pass the remote exit status through, so
-    # grep the process list instead of trusting an exit code.
+    # Match only app command names; unrelated shell arguments may mention the bundle.
     processes="$("${hdc}" "${device_args[@]}" shell "ps -ef" 2>/dev/null || true)"
-    if printf '%s\n' "$processes" | grep -q "$bundle"; then
+    if printf '%s\n' "$processes" | awk -v bundle="$bundle" '
+      $8 == bundle || index($8, bundle ":") == 1 { found = 1 }
+      END { exit !found }
+    '; then
       printf 'magpie-app: running (%s)\n' "$bundle"
     else
       printf 'magpie-app: not running (%s)\n' "$bundle" >&2

@@ -4,7 +4,7 @@ class SnowShotApp < Formula
   url "https://github.com/mg-chao/snow-shot/archive/refs/tags/v1.6.2_snow-shot.tar.gz"
   sha256 "ab84c57dfafb13ae9cbcc48af39fde6c27b5804f718b37c4d3d5ca3e157f1549"
   license "GPL-3.0-or-later"
-  revision 1
+  revision 2
 
   livecheck do
     url "https://github.com/mg-chao/snow-shot.git"
@@ -13,8 +13,8 @@ class SnowShotApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-app-v1.6.2-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8e1e53f7f6509e5b789894a86d387b25ed37ce48e2c8552f0988dba9138f4345"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-app-v1.6.2-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "46871d7bfb4df7398971e35d850fc95d2c33f0331226d9ffedc5d6872b13daa5"
   end
 
   depends_on "brotli" => :build
@@ -657,8 +657,10 @@ class SnowShotApp < Formula
       #!/bin/sh
       printf '%s\\n' "$*" >> #{hdc_log}
       if [ "$1" = "shell" ] && [ "$2" = "ps -ef" ]; then
-        [ -n "${FAKE_STOPPED:-}" ] ||
-          printf '%s\\n' "a com.social4hyq.snowshot" "b com.other.app"
+        if [ -z "${FAKE_STOPPED:-}" ]; then
+          printf '%s\\n' "u 1 1 1 1 ? 00:00:00 com.social4hyq.snowshot"
+        fi
+        printf '%s\\n' "u 1 1 1 1 ? 00:00:00 sh -c echo com.social4hyq.snowshot"
       fi
     SH
     chmod 0755, fake_bin/"hdc"

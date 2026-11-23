@@ -34,6 +34,11 @@ Commands:
             token, so an app installed earlier stops being accepted until it is installed again.
   start [--device <hdc serial>]
             Make sure the bridge is running, then open the installed app
+  stop      Stop the core bridge (the app window stays open)
+  status    Print the bridge state; exit 1 when it is stopped
+  uninstall [--device <hdc serial>] [--purge]
+            Remove the app from the device. The default keeps the app's data;
+            --purge also deletes it.
   bridge start|stop|restart|status
             Run the core bridge by itself. It listens on 127.0.0.1 only and answers only the
             app that carries the token.
@@ -185,7 +190,7 @@ PY
 command_name="${1:-}"
 case "$command_name" in
   -h|--help|help|"") usage; [[ -n "$command_name" ]] || exit 2; exit 0 ;;
-  install|start|bridge) shift ;;
+  install|start|stop|status|uninstall|bridge) shift ;;
   *) usage >&2; exit 2 ;;
 esac
 
@@ -204,6 +209,7 @@ fi
 
 device=
 new_token=0
+purge=0
 while (($#)); do
   case "$1" in
     --device)
@@ -213,6 +219,10 @@ while (($#)); do
     --new-token)
       [[ "$command_name" == install ]] || { usage >&2; exit 2; }
       new_token=1
+      shift ;;
+    --purge)
+      [[ "$command_name" == uninstall ]] || { usage >&2; exit 2; }
+      purge=1
       shift ;;
     *) usage >&2; exit 2 ;;
   esac
@@ -244,5 +254,20 @@ case "$command_name" in
     conf_ok || die "no bridge set up yet; run: herdr-app install"
     bridge_start
     "$hdc" ${hdc_args[@]+"${hdc_args[@]}"} shell aa start -b "$BUNDLE_ID" -a "$ABILITY"
+    ;;
+  stop)
+    bridge_stop
+    ;;
+  status)
+    bridge_status
+    ;;
+  uninstall)
+    # app-installer runs 'bm uninstall -k' unless --purge is given, so the
+    # app's data survives a plain uninstall.
+    device="${device:-${HDC_TARGET:-}}"
+    install_args=(uninstall --bundle-id "$BUNDLE_ID")
+    [[ -z "$device" ]] || install_args+=(--device "$device")
+    ((purge)) && install_args+=(--purge)
+    "${APP_INSTALLER:-app-installer}" "${install_args[@]}"
     ;;
 esac
