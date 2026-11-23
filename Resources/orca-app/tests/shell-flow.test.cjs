@@ -2,7 +2,7 @@
 
 // The shell's real main.cjs against a stand-in for electron and a fake orca: which page it
 // opens for a terminal's runtime and for its own, when it drops the web client's saved
-// server (so no "different server" question appears), what it publishes for the terminal's
+// server (so no "different server" question appears), what it registers for the terminal's
 // CLI, and what quitting does.
 const assert = require('node:assert/strict');
 const childProcess = require('node:child_process');
@@ -50,7 +50,7 @@ async function setup(t) {
   const stateFile = path.join(home, '.cache/orca-desktop/attach.json');
   return {
     dir, app, home, port, stateFile,
-    profileFile: path.join(home, '.config/orca-app/app-runtime/orca-runtime.json'),
+    profileFile: path.join(home, '.config/orca-app/app-runtime/relay.json'),
     setState: (state) => { fs.mkdirSync(path.dirname(stateFile), { recursive: true }); fs.writeFileSync(stateFile, JSON.stringify(state)); },
     // A runtime a terminal started: serving on the port, with its ready record in server.ready.json.
     terminalRuntime: async ({ installation = 'terminal-host', runtimeId = 'runtime-terminal-1' } = {}) => {
@@ -157,16 +157,26 @@ test('the pairing is recorded once the runtime logs a connection, with the host 
   assert.equal(attach.readState(ctx.stateFile).pairedHostId, 'installation:terminal-host');
 });
 
-test('with nothing serving the shell starts its own runtime, opens its link and publishes it for the CLI', async (t) => {
+test('with nothing serving the shell starts its own runtime, opens its link and registers a relay for the CLI', async (t) => {
   const ctx = await setup(t);
   const run = ctx.start();
   const link = await until(() => run.events.find(isLink), 'the link');
   assert.match(link.url, new RegExp(`^http://127\\.0\\.0\\.1:${ctx.port}/web-index\\.html#pairing=`));
   assert.equal(attach.hostIdOf(link.url), 'installation:own-host');
-  const published = await until(() => fs.existsSync(ctx.profileFile) && JSON.parse(fs.readFileSync(ctx.profileFile, 'utf8')), 'the profile');
-  assert.equal(published.runtimeId, 'runtime-own-1');
-  assert.equal(published.authToken, 'secret-token');
-  assert.equal(published.transports[0].port, ctx.port);
+  const registered = await until(() => fs.existsSync(ctx.profileFile) && JSON.parse(fs.readFileSync(ctx.profileFile, 'utf8')), 'the relay registration');
+  assert.equal(registered.version, 1);
+  assert.equal(registered.runtimeId, 'runtime-own-1');
+  assert.ok(registered.port > 0 && registered.port !== ctx.port);
+  assert.match(registered.token, /^[0-9a-f]{48}$/);
+  assert.ok(registered.pid > 0);
+  // The terminal's side: a command run through the relay reaches the runtime's own data root.
+  const response = await fetch(`http://127.0.0.1:${registered.port}/run`, {
+    method: 'POST', headers: { authorization: 'Bearer ' + registered.token, 'content-type': 'application/json' },
+    body: JSON.stringify({ args: ['status', '--json'] }),
+  });
+  const result = await response.json();
+  assert.equal(result.code, 0);
+  assert.match(result.stdout, /fake-orca status --json profile=.*orca-data/, 'the CLI is pointed at the runtime the shell started');
   run.send('end');
   await run.exited;
 });
@@ -194,20 +204,21 @@ test('the shell\'s own runtime on the same host keeps the saved server, and a te
   await run.exited;
 });
 
-test('the runtime profile is not published when orca-runtime.json is another runtime\'s', async (t) => {
+test('the relay is gone with the shell and refuses requests afterwards', async (t) => {
   const ctx = await setup(t);
-  const run = ctx.start({ FAKE_RUNTIME_JSON_ID: 'someone-else' });
-  await until(() => run.events.some(isLink), 'the link');
-  await new Promise((resolve) => setTimeout(resolve, 500));
-  assert.equal(fs.existsSync(ctx.profileFile), false);
-  run.send('end');
+  const run = ctx.start();
+  const registered = await until(() => fs.existsSync(ctx.profileFile) && JSON.parse(fs.readFileSync(ctx.profileFile, 'utf8')), 'the relay registration');
+  run.send('quit');
   await run.exited;
+  assert.equal(fs.existsSync(ctx.profileFile), false);
+  const refused = await fetch(`http://127.0.0.1:${registered.port}/health`, { headers: { authorization: 'Bearer ' + registered.token } }).then(() => 'answered', () => 'refused');
+  assert.equal(refused, 'refused');
 });
 
 test('quitting without terminals in the shell\'s own runtime exits at once and takes the profile away', async (t) => {
   const ctx = await setup(t);
   const run = ctx.start({ FAKE_TERMINALS: '0' });
-  await until(() => fs.existsSync(ctx.profileFile), 'the profile');
+  await until(() => fs.existsSync(ctx.profileFile), 'the relay registration');
   run.send('quit');
   await run.exited;
   assert.equal(run.events.some((event) => event.type === 'dialog'), false);
@@ -218,7 +229,7 @@ test('quitting without terminals in the shell\'s own runtime exits at once and t
 test('quitting asks first when the shell\'s own runtime holds terminals; cancel keeps everything', async (t) => {
   const ctx = await setup(t);
   const run = ctx.start({ FAKE_TERMINALS: '2', DIALOG_RESPONSE: '0' });
-  await until(() => fs.existsSync(ctx.profileFile), 'the profile');
+  await until(() => fs.existsSync(ctx.profileFile), 'the relay registration');
   run.send('quit');
   const dialog = await until(() => run.events.find((event) => event.type === 'dialog'), 'the question');
   assert.match(dialog.options.message, /2 个终端/);
@@ -233,7 +244,7 @@ test('quitting asks first when the shell\'s own runtime holds terminals; cancel 
 test('confirming the question quits and ends the runtime', async (t) => {
   const ctx = await setup(t);
   const run = ctx.start({ FAKE_TERMINALS: '3', DIALOG_RESPONSE: '1' });
-  await until(() => fs.existsSync(ctx.profileFile), 'the profile');
+  await until(() => fs.existsSync(ctx.profileFile), 'the relay registration');
   run.send('quit');
   await run.exited;
   assert.ok(run.events.some((event) => event.type === 'dialog'));
@@ -244,7 +255,7 @@ test('confirming the question quits and ends the runtime', async (t) => {
 test('a second click while the question is open quits anyway', async (t) => {
   const ctx = await setup(t);
   const run = ctx.start({ FAKE_TERMINALS: '1', DIALOG_HOLD: '1' });
-  await until(() => fs.existsSync(ctx.profileFile), 'the profile');
+  await until(() => fs.existsSync(ctx.profileFile), 'the relay registration');
   run.send('quit');
   await until(() => run.events.some((event) => event.type === 'dialog'), 'the question');
   run.send('quit');
@@ -255,7 +266,7 @@ test('a second click while the question is open quits anyway', async (t) => {
 test('a CLI that does not answer does not block quitting', async (t) => {
   const ctx = await setup(t);
   const run = ctx.start({ FAKE_TERMINALS: 'fail' });
-  await until(() => fs.existsSync(ctx.profileFile), 'the profile');
+  await until(() => fs.existsSync(ctx.profileFile), 'the relay registration');
   run.send('quit');
   await run.exited;
   assert.equal(run.events.some((event) => event.type === 'dialog'), false);

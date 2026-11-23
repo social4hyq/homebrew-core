@@ -8,7 +8,7 @@ class OrcaApp < Formula
   # Tap-authored shell scripts (MIT) on the CPF-Electron runtime (mixed
   # MIT/BSD/LGPL).
   license :cannot_represent
-  revision 6
+  revision 7
 
   livecheck do
     url :stable
@@ -35,6 +35,7 @@ class OrcaApp < Formula
     Resources/orca-app/app/config.json
     Resources/orca-app/app/main.cjs
     Resources/orca-app/app/package.json
+    Resources/orca-app/app/relay.cjs
     Resources/orca-app/app/tray.cjs
     Resources/orca-app/app/waiting.html
     Resources/orca-app/assets/icon.png
@@ -45,6 +46,7 @@ class OrcaApp < Formula
     Resources/orca-app/tests/cli-env.test.cjs
     Resources/orca-app/tests/close-handler.test.cjs
     Resources/orca-app/tests/fake-orca.cjs
+    Resources/orca-app/tests/relay.test.cjs
     Resources/orca-app/tests/shell-flow.test.cjs
     Resources/orca-app/tests/shell-harness.cjs
   ].freeze
@@ -67,7 +69,7 @@ class OrcaApp < Formula
     app = shell/"web_engine/src/main/resources/resfile/resources/app"
     rm_r app if app.exist?
     app.mkpath
-    %w[main.cjs attach.cjs tray.cjs package.json config.json waiting.html].each do |name|
+    %w[main.cjs attach.cjs relay.cjs tray.cjs package.json config.json waiting.html].each do |name|
       cp res/"app"/name, app/name
     end
 
@@ -237,14 +239,17 @@ class OrcaApp < Formula
 
         export ORCA_USER_DATA_PATH=$HOME/.orca
 
-      The runtime the app starts itself keeps its data in the app sandbox, which the
-      terminal cannot read, so the app publishes that runtime's orca-runtime.json
-      (port and auth token) to ~/.config/orca-app/app-runtime while it runs.
-      `orca-app cli <command>` runs the orca CLI against the runtime in use (the
-      app's while it is running, else the one `orca-app serve` started), and
-      `eval "$(orca-app env)"` sets ORCA_USER_DATA_PATH for plain `orca` commands.
-      `orca-app serve` and `status` report that runtime instead of starting a
-      second one.
+      The runtime the app starts itself keeps its data and the Unix socket the orca
+      CLI needs in the app sandbox, which the terminal cannot reach, so the app
+      serves a small relay on 127.0.0.1 while that runtime runs and registers it in
+      ~/.config/orca-app/app-runtime/relay.json (with a token, removed when the
+      runtime ends). `orca-app cli <command>` runs the orca CLI against the runtime
+      in use through it (the app's while it is running, else the one `orca-app
+      serve` started) and prints what it printed, with its exit code; it runs from
+      the folder you are in when the app can see it, and takes no standard input.
+      `eval "$(orca-app env)"` defines an `orca` function for that while the app's
+      runtime runs, else sets ORCA_USER_DATA_PATH. `orca-app serve` and `status`
+      report that runtime instead of starting a second one.
 
       When a runtime is already serving on the app's port (for example one started
       with `orca-app serve`), the app connects to it, using the pairing link in
@@ -571,7 +576,7 @@ class OrcaApp < Formula
     system "node", "--check", tap_root/"Resources/orca-app/app/main.cjs"
     tests = tap_root/"Resources/orca-app/tests"
     system "node", "--test", tests/"attach.test.cjs", tests/"close-handler.test.cjs", tests/"cli-env.test.cjs",
-           tests/"shell-flow.test.cjs"
+           tests/"relay.test.cjs", tests/"shell-flow.test.cjs"
     placeholder = JSON.parse(shell_output("unzip -p #{hap} resources/resfile/resources/app/config.json"))
     assert_equal 0, placeholder.fetch("port")
     refute placeholder.key?("url")
