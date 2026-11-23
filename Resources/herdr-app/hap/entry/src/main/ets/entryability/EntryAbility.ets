@@ -18,6 +18,7 @@ export default class EntryAbility extends NativeAbility {
   public bridgePlugins = [
     new LazyPlugin(() => new AppControlPlugin()),
     new LazyPlugin(() => new ClipboardPlugin()),
+    new LazyPlugin(() => new PermissionPlugin()),
     new LazyPlugin(() => new FilesPlugin()),
     new LazyPlugin(() => new MenuPlugin()),
     new LazyPlugin(() => new NotificationPlugin({ scheme: "gpui-notification" })),
