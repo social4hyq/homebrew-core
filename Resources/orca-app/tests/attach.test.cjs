@@ -145,10 +145,10 @@ test('chooseTarget tolerates a missing state object', () => {
 test('state round trip, and a missing or corrupt file reads as empty', (t) => {
   const dir = tempDir(t);
   const file = path.join(dir, 'nested', 'attach.json');
-  const empty = { lastPairedRuntimeId: null, lastTriedRuntimeId: null };
+  const empty = { lastPairedRuntimeId: null, lastTriedRuntimeId: null, pairedHostId: null };
   assert.deepEqual(attach.readState(file), empty);
-  assert.equal(attach.writeState(file, { lastPairedRuntimeId: 'runtime-a', lastTriedRuntimeId: 'runtime-b' }), true);
-  assert.deepEqual(attach.readState(file), { lastPairedRuntimeId: 'runtime-a', lastTriedRuntimeId: 'runtime-b' });
+  assert.equal(attach.writeState(file, { lastPairedRuntimeId: 'runtime-a', lastTriedRuntimeId: 'runtime-b', pairedHostId: 'installation:h' }), true);
+  assert.deepEqual(attach.readState(file), { lastPairedRuntimeId: 'runtime-a', lastTriedRuntimeId: 'runtime-b', pairedHostId: 'installation:h' });
   fs.writeFileSync(file, '{not json');
   assert.deepEqual(attach.readState(file), empty);
   fs.writeFileSync(file, JSON.stringify({ lastPairedRuntimeId: 42, lastTriedRuntimeId: '' }));
@@ -160,4 +160,69 @@ test('writeState reports failure instead of throwing', (t) => {
   const blocker = path.join(dir, 'file');
   fs.writeFileSync(blocker, 'x');
   assert.equal(attach.writeState(path.join(blocker, 'sub', 'attach.json'), {}), false);
+});
+
+// A web client link as the runtime prints it.
+function linkFor(payload) {
+  const code = Buffer.from(JSON.stringify(payload)).toString('base64url');
+  return `${origin}/web-index.html#pairing=${encodeURIComponent('orca://pair?code=' + code)}`;
+}
+
+test('hostIdOf names the host a link is for, by installation id first, else by key', () => {
+  assert.equal(attach.hostIdOf(linkFor({ v: 2, publicKeyB64: 'k1', hostDescriptor: { installationId: 'i1' } })), 'installation:i1');
+  assert.equal(attach.hostIdOf(linkFor({ v: 2, publicKeyB64: 'k1' })), 'key:k1');
+  assert.equal(attach.hostIdOf(`${origin}/web-index.html#pairing=code-a`), null, 'not a readable code');
+  assert.equal(attach.hostIdOf(`${origin}/web-index.html`), null);
+  assert.equal(attach.hostIdOf('not a url'), null);
+  const raw = Buffer.from(JSON.stringify({ v: 2, hostDescriptor: { installationId: 'i2' } })).toString('base64url');
+  assert.equal(attach.hostIdOf(`${origin}/web-index.html#pairing=${raw}`), 'installation:i2', 'a bare code works too');
+  assert.equal(attach.hostIdOf(`${origin}/web-index.html?code=${raw}`), 'installation:i2', 'and so does a query');
+});
+
+test('needsFreshSavedServer is true only for a link for another or unknown host', () => {
+  const link = linkFor({ v: 2, hostDescriptor: { installationId: 'i1' } });
+  assert.equal(attach.needsFreshSavedServer({ url: link, state: { pairedHostId: 'installation:i2' } }), true);
+  assert.equal(attach.needsFreshSavedServer({ url: link, state: { pairedHostId: null } }), true);
+  assert.equal(attach.needsFreshSavedServer({ url: link, state: {} }), true);
+  assert.equal(attach.needsFreshSavedServer({ url: link }), true);
+  assert.equal(attach.needsFreshSavedServer({ url: link, state: { pairedHostId: 'installation:i1' } }), false);
+  assert.equal(attach.needsFreshSavedServer({ url: `${origin}/web-index.html`, state: {} }), false, 'a plain page has no link');
+});
+
+test('chooseTarget gives the link target the host it is for', () => {
+  const ready = attach.parseReadyRecord(readyLine({
+    pairing: { available: true, webClientUrl: linkFor({ v: 2, hostDescriptor: { installationId: 'i9' } }) },
+  }));
+  const target = attach.chooseTarget({ origin, ready, state: {} });
+  assert.equal(target.kind, 'link');
+  assert.equal(target.hostId, 'installation:i9');
+});
+
+test('publishRuntimeProfile copies orca-runtime.json for the runtime that announced itself', (t) => {
+  const root = tempDir(t);
+  const home = path.join(root, 'home');
+  const dataRoot = path.join(root, 'data');
+  fs.mkdirSync(dataRoot);
+  const record = JSON.stringify({ runtimeId: 'r1', pid: 12, transports: [], authToken: 'tok' });
+  fs.writeFileSync(path.join(dataRoot, 'orca-runtime.json'), record);
+  assert.equal(attach.publishRuntimeProfile({ dataRoot, home, runtimeId: 'r1' }), true);
+  const copy = path.join(attach.profileDir(home), 'orca-runtime.json');
+  assert.equal(fs.readFileSync(copy, 'utf8'), record);
+  assert.equal(attach.publishRuntimeProfile({ dataRoot, home, runtimeId: 'r2' }), false, 'another runtime\'s file');
+  assert.equal(attach.publishRuntimeProfile({ dataRoot: path.join(root, 'nope'), home, runtimeId: 'r1' }), false);
+  fs.writeFileSync(path.join(dataRoot, 'orca-runtime.json'), 'junk');
+  assert.equal(attach.publishRuntimeProfile({ dataRoot, home, runtimeId: 'r1' }), false);
+});
+
+test('unpublishRuntimeProfile removes only the profile of the runtime it is told', (t) => {
+  const root = tempDir(t);
+  const home = path.join(root, 'home');
+  const dir = attach.profileDir(home);
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, 'orca-runtime.json'), JSON.stringify({ runtimeId: 'r1' }));
+  assert.equal(attach.unpublishRuntimeProfile({ home, runtimeId: 'r2' }), false);
+  assert.equal(fs.existsSync(path.join(dir, 'orca-runtime.json')), true);
+  assert.equal(attach.unpublishRuntimeProfile({ home, runtimeId: 'r1' }), true);
+  assert.equal(fs.existsSync(path.join(dir, 'orca-runtime.json')), false);
+  assert.equal(attach.unpublishRuntimeProfile({ home, runtimeId: 'r1' }), false, 'already gone');
 });
