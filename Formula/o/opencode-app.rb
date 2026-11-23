@@ -6,7 +6,7 @@ class OpencodeApp < Formula
   # Tap-authored shell sources (MIT) on the CPF-Electron runtime (mixed
   # MIT/BSD/LGPL).
   license :cannot_represent
-  revision 6
+  revision 7
 
   livecheck do
     url :stable
@@ -106,7 +106,8 @@ class OpencodeApp < Formula
               <<~JSON5.chomp
                 "requestPermissions": [
                       { "name": "ohos.permission.INTERNET" },
-                      { "name": "ohos.permission.GET_NETWORK_INFO" }
+                      { "name": "ohos.permission.GET_NETWORK_INFO" },
+                      { "name": "ohos.permission.MICROPHONE", "reason": "$string:microphone", "usedScene": { "abilities": ["EntryAbility"], "when": "inuse" } }
                     ],
               JSON5
 
@@ -258,7 +259,7 @@ class OpencodeApp < Formula
     acl_requested = acl_module.fetch("module").fetch("requestPermissions")
     acl_permissions = acl_requested.map { |permission| permission.fetch("name") }
     assert_equal %w[ohos.permission.CUSTOM_SANDBOX ohos.permission.GET_NETWORK_INFO
-                    ohos.permission.INTERNET ohos.permission.READ_PASTEBOARD
+                    ohos.permission.INTERNET ohos.permission.MICROPHONE ohos.permission.READ_PASTEBOARD
                     ohos.permission.READ_WRITE_USER_FILE
                     ohos.permission.kernel.ALLOW_WRITABLE_CODE_MEMORY
                     ohos.permission.kernel.DISABLE_CODE_MEMORY_PROTECTION].sort,
@@ -270,7 +271,7 @@ class OpencodeApp < Formula
     refute_path_exists Pathname.new(Dir.home)/".hap-installer"
     assert_match "installed", shell_output("#{bin}/opencode-app install --no-acl")
     strong = JSON.parse(shell_output("unzip -p #{injected_copy} module.json"))
-    assert_equal %w[ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET],
+    assert_equal %w[ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET ohos.permission.MICROPHONE],
                  strong.fetch("module").fetch("requestPermissions").map { |entry| entry.fetch("name") }.sort
 
     # uninstall goes through app-installer and keeps the app's data unless
@@ -368,7 +369,8 @@ class OpencodeApp < Formula
     assert_equal version.to_s, package.fetch("version")
     profile = JSON.parse(shell_output("unzip -p #{hap} module.json"))
     permissions = profile.fetch("module").fetch("requestPermissions").map { |permission| permission.fetch("name") }
-    assert_equal %w[ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET], permissions.sort
+    assert_equal %w[ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET
+                    ohos.permission.MICROPHONE], permissions.sort
     system "unzip", "-tq", hap
   end
 end
