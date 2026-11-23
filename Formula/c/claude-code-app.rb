@@ -6,7 +6,7 @@ class ClaudeCodeApp < Formula
   version "6.28899.6"
   sha256 "239c20d218456cacc656d48382fd59116325ac679aa4e476377af1456ac85715"
   license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
-  revision 3
+  revision 4
 
   livecheck do
     url "https://downloads.claude.ai/claude-desktop/apt/stable/dists/stable/main/binary-arm64/Packages"
@@ -14,8 +14,8 @@ class ClaudeCodeApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-app-v6.28899.6-r4"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a8f287816a56f714184989a5cd0ec031c1e794bb312ee770f20f1a27473085d5"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-app-v6.28899.6-r6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3d93c7c2e7b76ab3bc43d918c37ef38f239554de687acbe95cab0dd58897f5d7"
   end
 
   depends_on "app-installer"
@@ -52,6 +52,7 @@ class ClaudeCodeApp < Formula
     Resources/_shared/hap-app/enable-cookie-encryption.py
     Resources/claude-code-app/support/patch-code-runtime-hap.py
     Resources/claude-code-app/tests/claude-bootstrap.test.cjs
+    Resources/claude-code-app/tests/close-handler.test.cjs
     Resources/claude-code-app/tests/claude-code-platform-patch.test.cjs
     Resources/claude-code-app/tests/claude-launch-bridge.test.cjs
     Resources/claude-code-app/tests/claude-ohos-config.test.cjs
@@ -199,8 +200,17 @@ class ClaudeCodeApp < Formula
       The app needs the host `claude-code.latest` CLI installed and logged in;
       install injects the host paths into a private signed HAP, and ACL permissions
       let it spawn the CLI. `claude-code-app start` opens the app.
-      `claude-code-app uninstall` removes the app but keeps its data; only
-      `claude-code-app uninstall --purge` deletes the app data.
+
+      The app and a terminal `claude` share what is on disk, not a live process (the
+      official app talks to its own `claude` child over stdio, which has nothing to
+      attach to). Sessions the app starts are transcripts under ~/.claude/projects,
+      so a terminal `claude --resume <id>` continues them. Sessions started in a
+      terminal do not show up in the app's own session list. The app's main process
+      uses ~/.claude as its config folder when it can use it, and its CLI child runs
+      without CLAUDE_CONFIG_DIR for the default folder, as a terminal `claude` does,
+      which should put its global state in ~/.claude.json. Closing the window hides
+      the app (the official app's tray, whose menu restores it); reinstall with
+      `claude-code-app install` after upgrading.
     EOS
   end
 
@@ -269,7 +279,10 @@ class ClaudeCodeApp < Formula
     RESOURCE_FILES.grep(%r{/app/|/tests/}).each do |file|
       cp tap_root/file, test_sources/File.basename(file)
     end
-    system "node", "--test", *test_sources.glob("*.test.cjs")
+    # The tests are copied flat; the close handler test needs the staging script itself.
+    with_env("CLAUDE_STAGE_SCRIPT" => (tap_root/"Resources/claude-code-app/scripts/stage-ohos-shell.sh").to_s) do
+      system "node", "--test", *test_sources.glob("*.test.cjs")
+    end
 
     module_json = JSON.parse(shell_output("unzip -p #{hap} module.json"))
     assert_equal "com.social4hyq.claudecode", module_json.dig("app", "bundleName")
