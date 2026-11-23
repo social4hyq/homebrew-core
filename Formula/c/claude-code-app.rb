@@ -14,8 +14,9 @@ class ClaudeCodeApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-app-v6.28899.6-r8"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "389479431aa80e97837fabb8df70dddf19d8d1adbf0b108e577e698d51f2ceca"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-app-v6.28899.6-r9"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "843102ac05c3fad9355456624bf52055122f4d1149e3becec8ece5527e051de4"
   end
 
   depends_on "app-installer"
@@ -264,6 +265,15 @@ class ClaudeCodeApp < Formula
     assert_includes permissions, "ohos.permission.INTERNET"
     refute_includes permissions, "ohos.permission.CUSTOM_SANDBOX"
     assert_empty module_json.dig("module", "executableBinaryPaths") || []
+
+    # The install-time ACL variant must request the microphone so voice input can
+    # prompt for access; the strong-sandbox bottle intentionally excludes it.
+    acl_probe = "import importlib.util,sys; " \
+                "it=importlib.util.spec_from_file_location('p',sys.argv[1]); " \
+                "m=importlib.util.module_from_spec(it); it.loader.exec_module(m); " \
+                "print(chr(10).join(m.ACL_PERMISSIONS))"
+    acl_permissions = shell_output("python3 -c #{Shellwords.escape(acl_probe)} #{pkgshare}/patch-code-runtime-hap.py")
+    assert_includes acl_permissions.lines(chomp: true), "ohos.permission.MICROPHONE"
 
     resource_strings = shell_output("unzip -p #{hap} resources.index | strings")
     assert_match "Claude Code", resource_strings
