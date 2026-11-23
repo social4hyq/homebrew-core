@@ -4,7 +4,7 @@ class HerdrApp < Formula
   url "https://github.com/herdrdev/herdr-app/archive/refs/tags/v0.1.16.tar.gz"
   sha256 "fea3d920607f2199ed330eb3cdcb1fa3626dcea5080c92a97a296d983d6bc681"
   license "Apache-2.0"
-  revision 11
+  revision 12
 
   livecheck do
     url "https://github.com/herdrdev/herdr-app.git"
@@ -13,8 +13,8 @@ class HerdrApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/herdr-app-v0.1.16-r17"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "27f0536b66530660f989d1825549f2af4d139f88512f633f5325970d67b5de22"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/herdr-app-v0.1.16-r18"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "335f2a199bf9311d5b517d9d2bb64c8a06260eea326fdeb4661abdcc5faa4824"
   end
 
   depends_on "node" => :build
@@ -240,7 +240,7 @@ class HerdrApp < Formula
     # A link clicked in the terminal opens the system browser through the host's aa, so the library names it.
     library = shell_output("unzip -p #{hap} libs/arm64-v8a/libopenharmony_ability.so").b
     assert_includes library, "com.huawei.hmos.browser".b
-    assert_includes library, "herdr-core keeps their terminals running".b
+    assert_includes library, "herdr-core keeps them running".b
 
     assert_match "Usage: herdr-app", shell_output("#{bin}/herdr-app --help")
 
