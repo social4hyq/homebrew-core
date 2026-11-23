@@ -106,4 +106,24 @@ fs.writeFileSync(process.argv[1], JSON.stringify({languageServerSha256:process.a
   shell_hap="$assembled"
 }
 
+
+# install-lib.sh injects everything written under $2 into a copy of the HAP.
+# The official engine reads its own config, so this is only a host-path marker
+# (and keeps the injected tree non-empty even with --no-acl).
+stage_tree() {
+  local dest="$2/resources/resfile/resources/app/antigravity-ohos-host.json"
+  mkdir -p "$(dirname "$dest")"
+  node - "$dest" <<'JS'
+const fs = require("node:fs");
+const destination = process.argv[1];
+fs.writeFileSync(destination, JSON.stringify({
+  home: process.env.HOME || "",
+  path: process.env.PATH || "",
+  xdgConfigHome: process.env.XDG_CONFIG_HOME || "",
+  xdgCacheHome: process.env.XDG_CACHE_HOME || "",
+  xdgDataHome: process.env.XDG_DATA_HOME || "",
+}) + "\n");
+JS
+}
+
 . "$(dirname "${BASH_SOURCE[0]}")/hap-app-install-lib.sh"
