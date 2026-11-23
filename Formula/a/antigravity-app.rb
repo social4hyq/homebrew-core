@@ -12,6 +12,11 @@ class AntigravityApp < Formula
     regex(%r{antigravity-hub/(\d+(?:\.\d+)+)-\d+}i)
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/antigravity-app-v2.34.0-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0b544f5f459a1f46622ba8a01a0dbb2621dac15108f3e85be4a8e2bf1d0812fd"
+  end
+
   depends_on "app-installer"
   depends_on "glibc"
   depends_on "node"
