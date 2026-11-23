@@ -14,8 +14,9 @@ class ClaudeCodeApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-app-v6.28899.6-r8"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "389479431aa80e97837fabb8df70dddf19d8d1adbf0b108e577e698d51f2ceca"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-app-v6.28899.6-r9"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "843102ac05c3fad9355456624bf52055122f4d1149e3becec8ece5527e051de4"
   end
 
   depends_on "app-installer"
