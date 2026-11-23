@@ -45,7 +45,7 @@ OHOS: confirm closing while agents or foreground programs are running
              // Hiding apps is macOS's (bound natively there).
              "app.hide" | "app.hide_others" | "app.show_all" => return,
              other => {
-@@ -3679,6 +3698,28 @@
+@@ -3679,6 +3698,24 @@
  
      // ---- overlays ----------------------------------------------------------
  
@@ -60,21 +60,17 @@ OHOS: confirm closing while agents or foreground programs are running
 +            return false;
 +        }
 +        let title = if active == 1 { "1 agent or program is still running".into() } else { format!("{active} agents or programs are still running") };
-+        self.confirm(
-+            &title,
-+            "Closing the window will not stop them. herdr-core keeps their terminals running; reopening Herdr reconnects to them.",
-+            command,
-+            json!({ "confirmed": true }),
-+            window,
-+            cx,
-+        );
++        let spec = json!({ "mod": "confirm", "kind": "dialog", "width": 420, "height": 170,
++            "props": { "title": title, "detail": "Closing the window will not stop them; herdr-core keeps them running.",
++                "command": { "name": command, "args": { "confirmed": true } } } });
++        self.open_overlay(mods::new_overlay_id(), spec, window, cx);
 +        false
 +    }
 +
      fn confirm(&mut self, title: &str, detail: &str, command: &str, args: Value, window: &mut Window, cx: &mut Context<Self>) {
          let spec = json!({ "mod": "confirm", "kind": "dialog", "width": 380,
              "props": { "title": title, "detail": detail, "command": { "name": command, "args": args } } });
-@@ -4862,6 +4903,11 @@
+@@ -4862,6 +4899,11 @@
      rec["status"] == "working" || !(program("shell") || program("agent"))
  }
  
@@ -86,7 +82,7 @@ OHOS: confirm closing while agents or foreground programs are running
  /// Whether to ask a terminal's folder for its repo and branch again: only when
  /// the answer could have changed. It moved, a command or an agent's turn just
  /// ended there (a checkout, a commit), or a repo's fallback is due.
-@@ -7170,6 +7216,20 @@
+@@ -7170,6 +7212,20 @@
      }
  
      #[test]
