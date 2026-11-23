@@ -8,7 +8,7 @@ class OrcaApp < Formula
   # Tap-authored shell scripts (MIT) on the CPF-Electron runtime (mixed
   # MIT/BSD/LGPL).
   license :cannot_represent
-  revision 9
+  revision 10
 
   livecheck do
     url :stable
@@ -115,7 +115,8 @@ class OrcaApp < Formula
               <<~JSON5.chomp
                 "requestPermissions": [
                       { "name": "ohos.permission.INTERNET" },
-                      { "name": "ohos.permission.GET_NETWORK_INFO" }
+                      { "name": "ohos.permission.GET_NETWORK_INFO" },
+                      { "name": "ohos.permission.MICROPHONE", "reason": "$string:microphone", "usedScene": { "abilities": ["EntryAbility"], "when": "inuse" } }
                     ],
               JSON5
 
@@ -226,7 +227,10 @@ class OrcaApp < Formula
     fake_hap = testpath/"shell.hap"
     hap_tree = testpath/"hap-tree"
     (hap_tree/"resources/resfile/resources/app").mkpath
-    fake_module = { "name" => "electron", "requestPermissions" => [{ "name" => "ohos.permission.INTERNET" }] }
+    fake_module = { "name" => "electron", "requestPermissions" => [
+      { "name" => "ohos.permission.INTERNET" },
+      { "name" => "ohos.permission.MICROPHONE" },
+    ] }
     (hap_tree/"module.json").write JSON.generate(
       "app"    => { "bundleName" => "com.social4hyq.orca" },
       "module" => fake_module,
@@ -290,7 +294,7 @@ class OrcaApp < Formula
     module_json = JSON.parse(shell_output("unzip -p #{injected_copy} module.json"))
     acl_permissions = module_json.dig("module", "requestPermissions").map { |permission| permission.fetch("name") }
     assert_equal %w[ohos.permission.CUSTOM_SANDBOX ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET
-                    ohos.permission.READ_PASTEBOARD ohos.permission.READ_WRITE_USER_FILE
+                    ohos.permission.MICROPHONE ohos.permission.READ_PASTEBOARD ohos.permission.READ_WRITE_USER_FILE
                     ohos.permission.kernel.ALLOW_WRITABLE_CODE_MEMORY
                     ohos.permission.kernel.DISABLE_CODE_MEMORY_PROTECTION].sort,
                  acl_permissions.sort
@@ -305,7 +309,7 @@ class OrcaApp < Formula
                  shell_output("#{bin}/orca-app install --hap #{fake_hap} --config #{host_config} --no-acl --no-serve")
     strong_permissions = JSON.parse(shell_output("unzip -p #{injected_copy} module.json"))
                              .dig("module", "requestPermissions").map { |permission| permission.fetch("name") }
-    assert_equal %w[ohos.permission.INTERNET], strong_permissions
+    assert_equal %w[ohos.permission.INTERNET ohos.permission.MICROPHONE], strong_permissions
 
     keep_tmp = testpath/"keep-tmp"
     keep_tmp.mkpath
@@ -528,11 +532,12 @@ class OrcaApp < Formula
     refute placeholder.key?("url")
     permissions = JSON.parse(shell_output("unzip -p #{hap} module.json"))
                       .fetch("module").fetch("requestPermissions").map { |permission| permission.fetch("name") }
-    assert_equal %w[ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET], permissions.sort
+    assert_equal %w[ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET
+                    ohos.permission.MICROPHONE], permissions.sort
     acl = JSON.parse((pkgshare/"module-acl.json").read)
     acl_requested = acl.fetch("module").fetch("requestPermissions").map { |permission| permission.fetch("name") }
     assert_equal %w[ohos.permission.CUSTOM_SANDBOX ohos.permission.GET_NETWORK_INFO ohos.permission.INTERNET
-                    ohos.permission.READ_PASTEBOARD ohos.permission.READ_WRITE_USER_FILE
+                    ohos.permission.MICROPHONE ohos.permission.READ_PASTEBOARD ohos.permission.READ_WRITE_USER_FILE
                     ohos.permission.kernel.ALLOW_WRITABLE_CODE_MEMORY
                     ohos.permission.kernel.DISABLE_CODE_MEMORY_PROTECTION].sort,
                  acl_requested.sort
