@@ -4,7 +4,7 @@ class MagpieApp < Formula
   url "https://github.com/yetone/magpie/archive/refs/tags/v0.1.4661.tar.gz"
   sha256 "eacabbef905695537e60b7ed41271a2c89c9f83014d4817ab3cf8aba6379dd42"
   license :cannot_represent
-  revision 4
+  revision 5
 
   livecheck do
     url :stable
@@ -12,8 +12,8 @@ class MagpieApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/magpie-app-v0.1.4661-r7"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "efab95a20db4efac57f3c377d8315fd6e65dd57ba2961aa699971fcebffaba8d"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/magpie-app-v0.1.4661-r8"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fd05efa3a19d556304d3f36cf25b8971b0cfeeed4495e6d661ffdcf14c4e906e"
   end
 
   depends_on "app-installer"

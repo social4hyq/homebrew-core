@@ -180,3 +180,18 @@ test('the strong-sandbox variant (no backend) still asks for the key by hand', a
   assert.match(result.loaded.at(-1), /connect\.html#manual$/);
   assert.deepEqual(ctx.starts(), []);
 });
+
+test('starts its own backend with a key that is not 64 hex digits, as a plain magpie web leaves in web-key', async (t) => {
+  const ctx = setup(t);
+  const port = await freePort();
+  fs.mkdirSync(path.join(ctx.home, '.config/magpie-app'), { recursive: true });
+  fs.writeFileSync(path.join(ctx.home, '.config/magpie-app/web.json'), JSON.stringify({ version: 1, port, pid: 1 }));
+  // magpie itself picks a 32-character key; magpie web records it in web-key.
+  const key = 'Qk3xV9mZp2LwA7sTn8RbY4uHc6JdE1fG';
+  fs.writeFileSync(path.join(ctx.home, '.config/magpie-app/web-key'), key + '\n');
+  const { result, after } = await ctx.hold();
+  assert.equal(result.loaded.at(-1), `http://127.0.0.1:${port}/?k=${key}`, 'the backend is recognised as ready');
+  assert.equal(result.registration.port, port, 'and registered for the terminal');
+  assert.deepEqual(ctx.starts(), [['serve', `--web=127.0.0.1:${port}`]]);
+  await after();
+});
