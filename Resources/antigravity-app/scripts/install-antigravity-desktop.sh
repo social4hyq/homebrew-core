@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
-# Download the official Antigravity engine, prepare it for OHOS, assemble a HAP
-# copy and sign/install it locally. The bottle ships only the tap-authored shell.
+# Download the official Antigravity language server onto the HOST, prepare it
+# for OHOS, write its absolute path into the HAP config, then sign/install the
+# HAP shell. The HAP never carries the 216 MB vendor binary: the HAP sandbox
+# cannot exec binaries under libs/, so the engine runs on the host and the
+# shell connects to it over loopback (the codex-app/claude-code-app pattern).
 set -euo pipefail
 
 APP_CMD=antigravity-app
@@ -20,7 +23,7 @@ log() { printf '%s\n' "$*" >&2; }
 app_usage_extra() {
   cat <<'EOF'
   --tarball PATH  Official Antigravity .tar.gz to use instead of downloading.
-  --clean-cache   Remove the cached vendor package and assembled HAP first.
+  --clean-cache   Remove the cached vendor package and prepared engine first.
 EOF
 }
 
@@ -49,11 +52,13 @@ process.stdout.write(String(v[process.argv[2]]||""));
 app_prepare() {
   local cache_dir="${HOME}/.cache/antigravity-app"
   local vendor_json="${ANTIGRAVITY_APP_VENDOR_JSON:?missing vendor.json}"
-  local shell_libexec="${ANTIGRAVITY_APP_LIBEXEC:?missing libexec path}"
-  local url sha version tarfile prepared assembled unpack
-  mkdir -p "$cache_dir/vendor" "$cache_dir/assembled"
-  [ "$CLEAN_CACHE" != 1 ] || rm -rf "$cache_dir/vendor" "$cache_dir/assembled"
-  mkdir -p "$cache_dir/vendor" "$cache_dir/assembled"
+  local brew_prefix="${ANTIGRAVITY_APP_BREW_PREFIX:-${HOMEBREW_PREFIX:-}}"
+  [ -n "$brew_prefix" ] || { log "error: missing Homebrew prefix"; exit 1; }
+
+  local url sha version tarfile unpack engine
+  mkdir -p "$cache_dir/vendor"
+  [ "$CLEAN_CACHE" != 1 ] || rm -rf "$cache_dir/vendor"
+  mkdir -p "$cache_dir/vendor"
 
   url=$(vendor_value "$vendor_json" url)
   sha=$(vendor_value "$vendor_json" sha256)
@@ -84,45 +89,46 @@ app_prepare() {
   rm -rf "$unpack"; mkdir -p "$unpack"
   tar -xzf "$tarfile" -C "$unpack" \
     "Antigravity-arm64/resources/bin/language_server"
-  prepared="$cache_dir/assembled/language-server.bin"
-  cp "$unpack/Antigravity-arm64/resources/bin/language_server" "$prepared"
-  local brew_prefix="${ANTIGRAVITY_APP_BREW_PREFIX:-${HOMEBREW_PREFIX:-}}"
-  [ -n "$brew_prefix" ] || { log "error: missing Homebrew prefix"; exit 1; }
-  patchelf --set-interpreter "$brew_prefix/opt/glibc/lib/ld-linux-aarch64.so.1" "$prepared"
-  selfsign "$prepared"
 
-  local prepared_sha
-  prepared_sha=$(sha256sum "$prepared" | awk '{print $1}')
-  local assemble_pin="$cache_dir/assembled/vendor-pin.json"
-  node -e '
-const fs=require("node:fs");
-fs.writeFileSync(process.argv[1], JSON.stringify({languageServerSha256:process.argv[2]})+"\n");
-' "$assemble_pin" "$prepared_sha"
+  # Stable HOST path (never a versioned Cellar path: brew upgrade must not
+  # break a running shell). Prepared once, reused across reinstalls.
+  local engine_dir="$brew_prefix/var/antigravity-app/$version"
+  engine="$engine_dir/language-server.bin"
+  mkdir -p "$engine_dir"
+  local pending=""
+  pending=$(mktemp "$engine_dir/.language-server.XXXXXX")
+  trap 'rm -rf "$unpack"; [ -z "$pending" ] || rm -f "$pending"' EXIT
+  cp "$unpack/Antigravity-arm64/resources/bin/language_server" "$pending"
+  patchelf --set-interpreter "$brew_prefix/opt/glibc/lib/ld-linux-aarch64.so.1" "$pending"
+  selfsign "$pending"
+  chmod +x "$pending"
+  mv -f "$pending" "$engine"
+  rm -rf "$unpack"
 
-  assembled="$cache_dir/assembled/antigravity-app.hap"
-  rm -f "$assembled"
-  python3 "$shell_libexec/assemble-local-hap.py" \
-    "$shell_hap" "$prepared" "$assemble_pin" "$assembled"
-  shell_hap="$assembled"
+  export ANTIGRAVITY_APP_ENGINE="$engine"
+  export ANTIGRAVITY_APP_HOST_HOME="${ANTIGRAVITY_APP_HOST_HOME:-$HOME}"
+  export ANTIGRAVITY_APP_HOST_PATH="$brew_prefix/bin:$brew_prefix/sbin:/system/bin:/system/xbin:/usr/bin:/bin:/vendor/bin"
+  log "prepared host language server at $engine"
 }
 
-
 # install-lib.sh injects everything written under $2 into a copy of the HAP.
-# The official engine reads its own config, so this is only a host-path marker
-# (and keeps the injected tree non-empty even with --no-acl).
+# Write the host engine's absolute path so the shell can spawn it.
 stage_tree() {
-  local dest="$2/resources/resfile/resources/app/antigravity-ohos-host.json"
+  local dest="$2/resources/resfile/resources/app/antigravity-host-config.json"
   mkdir -p "$(dirname "$dest")"
   node - "$dest" <<'JS'
 const fs = require("node:fs");
+const path = require("node:path");
 const destination = process.argv[1];
+const required = (name, value) => {
+  if (typeof value !== "string" || !path.isAbsolute(value)) throw new Error(`invalid host config: ${name}`);
+  return value;
+};
 fs.writeFileSync(destination, JSON.stringify({
-  home: process.env.HOME || "",
-  path: process.env.PATH || "",
-  xdgConfigHome: process.env.XDG_CONFIG_HOME || "",
-  xdgCacheHome: process.env.XDG_CACHE_HOME || "",
-  xdgDataHome: process.env.XDG_DATA_HOME || "",
-}) + "\n");
+  home: required("home", process.env.ANTIGRAVITY_APP_HOST_HOME),
+  engine: required("engine", process.env.ANTIGRAVITY_APP_ENGINE),
+  path: process.env.ANTIGRAVITY_APP_HOST_PATH || "",
+}) + "\n", { mode: 0o600 });
 JS
 }
 
