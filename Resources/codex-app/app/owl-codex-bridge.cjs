@@ -117,6 +117,8 @@ async function main() {
   process.stdin.pause();
   let socket;
   let reason = 'no registered server';
+  // An app that was killed outright left its registration behind; clear it first.
+  if (share.dropStaleEndpoint(endpoint, fs)) say('removed a registration whose server is gone');
   const registered = share.readEndpoint(endpoint, fs);
   if (registered) {
     try {
