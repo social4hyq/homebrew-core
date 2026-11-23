@@ -1,8 +1,20 @@
-diff --git a/src/terminal.rs b/src/terminal.rs
-index d480e5d..c8de16d 100644
+OHOS: IME cursor tracking, clipboard permission guidance with Settings shortcut
+
 --- a/src/terminal.rs
 +++ b/src/terminal.rs
-@@ -136,6 +136,10 @@ struct Grid {
+@@ -77,8 +77,9 @@ pub enum TerminalEvent {
+     Ended,
+     /// Right-click where the program doesn't take the mouse: the pane menu.
+     ContextMenu(Point<Pixels>),
+-    /// Something the person asked for failed: an error toast.
+-    Notice { title: String, body: String },
++    /// Something the person asked for failed: an error toast. `action` is an
++    /// optional command name the toast runs when clicked (e.g. open Settings).
++    Notice { title: String, body: String, action: Option<String> },
+ }
+ 
+ /// Rows of scrollback history as Ghostty's scrollbar reports them. `from_bottom`
+@@ -136,6 +137,10 @@ struct Grid {
      /// The cursor's cell in window coordinates, from the last paint: where the
      /// input method puts its candidate window.
      cursor_at: Option<Bounds<Pixels>>,
@@ -13,7 +25,7 @@ index d480e5d..c8de16d 100644
      /// The scroll thumb's grabbable lane from the last paint, in window
      /// coordinates (wider than the few px drawn).
      thumb: Option<Bounds<Pixels>>,
-@@ -329,6 +333,7 @@ impl TerminalView {
+@@ -329,6 +334,7 @@ impl TerminalView {
                  link_spans: Vec::new(),
                  marked: None,
                  cursor_at: None,
@@ -21,7 +33,16 @@ index d480e5d..c8de16d 100644
                  thumb: None,
                  track: None,
                  painted: Vec::new(),
-@@ -763,8 +768,36 @@ impl TerminalView {
+@@ -753,7 +759,7 @@ impl TerminalView {
+                     this.paste_paths(there);
+                 }
+                 if let Some((title, body)) = refusal_notice(&refused) {
+-                    cx.emit(TerminalEvent::Notice { title, body });
++                    cx.emit(TerminalEvent::Notice { title, body, action: None });
+                 }
+             });
+         })
+@@ -763,8 +769,37 @@ impl TerminalView {
      /// Text as a paste; copied files (Finder, a clipboard manager's image) as
      /// if dropped; an image alone (a screenshot) as Ctrl+V pastes it.
      pub fn paste(&mut self, cx: &mut Context<Self>) {
@@ -44,8 +65,9 @@ index d480e5d..c8de16d 100644
 +                    _ => {
 +                        let _ = this.update(cx, |_, cx| {
 +                            cx.emit(TerminalEvent::Notice {
-+                                title: "Clipboard unavailable".into(),
-+                                body: "Nothing to paste. If clipboard access is off, go to Settings > Apps > Herdr > Permissions and enable Read clipboard.".into(),
++                                title: "Clipboard access is off".into(),
++                                body: "Tap to open Settings and enable Read clipboard for Herdr.".into(),
++                                action: Some("app.open_permissions".into()),
 +                            });
 +                        });
 +                    }
@@ -60,7 +82,7 @@ index d480e5d..c8de16d 100644
              self.dropped(paths, cx);
          } else if let Some(text) = item.text() {
              let bytes = self.grid.borrow().vt.paste_bytes(&text);
-@@ -2307,6 +2340,15 @@ fn paint_grid(bounds: Bounds<Pixels>, grid: &Rc<RefCell<Grid>>, focused: bool, w
+@@ -2307,6 +2342,15 @@ fn paint_grid(bounds: Bounds<Pixels>, grid: &Rc<RefCell<Grid>>, focused: bool, w
      {
          let mut g = grid.borrow_mut();
          g.cursor_at = frame.cursor_cell.map(|(x, y)| Bounds::new(at(x as usize, y as usize), cell));

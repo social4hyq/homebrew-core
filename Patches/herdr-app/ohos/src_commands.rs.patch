@@ -1,7 +1,16 @@
-OHOS: add confirmed arguments to the quit commands
+OHOS: add confirmed arguments to the quit commands and an OS permissions shortcut
+
 --- a/src/commands.rs
 +++ b/src/commands.rs
-@@ -101,7 +101,7 @@
+@@ -93,6 +93,7 @@ pub const COMMANDS: &[Command] = &[
+     cmd("app.feedback", &[opt("message"), opt("from")], "Draft feedback for the person to review and send (from: person or agent)."),
+     cmd("app.palette", &[], "Toggle the command palette: every command by name, with its key; calling again closes it."),
+     cmd("app.settings", &[opt("section")], "Open the settings (section: look, alerts, updates)."),
++    cmd("app.open_permissions", &[], "Open the OS app-info settings for Herdr (OHOS)."),
+     cmd("app.check_updates", &[], "Look for a newer Herdr and herdr-core now."),
+     cmd("app.update_core", &[], "Update herdr-core to its latest release of this generation; terminals keep running."),
+     cmd("app.reset", &[], "The escape hatch: set the shown layout and keys aside, back to the default screen."),
+@@ -101,11 +102,11 @@ pub const COMMANDS: &[Command] = &[
      cmd("app.zoom_out", &[], "Make everything smaller."),
      cmd("app.zoom_reset", &[], "Back to normal size."),
      cmd("app.update", &[], "Restart into the update Herdr downloaded (your terminals keep running)."),
@@ -10,16 +19,16 @@ OHOS: add confirmed arguments to the quit commands
      cmd("app.hide", &[], "Hide the app (macOS)."),
      cmd("app.hide_others", &[], "Hide other apps (macOS)."),
      cmd("app.show_all", &[], "Show all apps (macOS)."),
-@@ -108,4 +108,4 @@
 -    cmd("window.close", &[], "Close the window (on Linux, quits)."),
 +    cmd("window.close", &[opt("confirmed")], "Close the window (on Linux, quits); OHOS asks while agents or foreground programs are busy unless confirmed."),
      cmd("window.minimize", &[], "Minimize the window."),
      cmd("window.maximize", &[], "Maximize the window, or back."),
  ];
-@@ -216,6 +216,15 @@
+@@ -215,6 +216,15 @@ mod tests {
+         }
      }
  
-     #[test]
++    #[test]
 +    fn quit_commands_accept_confirmation() {
 +        for name in ["app.quit", "window.close"] {
 +            let command = find(name).unwrap();
@@ -28,7 +37,6 @@ OHOS: add confirmed arguments to the quit commands
 +        }
 +    }
 +
-+    #[test]
+     #[test]
      fn names_are_unique_and_shorthand_fills_the_first_argument() {
          let mut names: Vec<&str> = COMMANDS.iter().map(|c| c.name).collect();
-         names.sort();
