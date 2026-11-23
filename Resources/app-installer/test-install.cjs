@@ -72,6 +72,11 @@ function fixture(t) {
     }
     if (args.includes('shell')) {
       const cmd = args.slice(args.indexOf('shell') + 1).join(' ');
+      if (cmd.includes('ps -ef')) {
+        console.log('UID PID PPID C STIME TTY TIME CMD');
+        console.log('20020101 999 1 0 09:00:00 ? 00:00:00 sh -c echo com.example.desktop');
+        if (process.env.APP_RUNNING) console.log('20020101 123 1 0 09:00:00 ? 00:00:00 com.example.desktop');
+      }
       let handled = false;
       for (const piece of cmd.split(';').map(x => x.trim())) {
         let m;
@@ -536,6 +541,20 @@ test('permissions with --expect-acl proves the ACL variant was installed', t => 
 test('HAP_INSTALLER_NO_START installs without starting the app', t => {
   const f=fixture(t); const r=f.run([],{HAP_INSTALLER_NO_START:'1'});
   assert.equal(r.status,0,r.stdout+r.stderr);
+  assert.ok(!f.calls().some(c=>c.join(' ').includes('aa start')));
+});
+test('automatic installation restores an app that was running', t => {
+  const f=fixture(t);
+  const r=f.run([],{HAP_INSTALLER_NO_START:'1',HAP_INSTALLER_RESTART_IF_RUNNING:'1',APP_RUNNING:'1'});
+  assert.equal(r.status,0,r.stdout+r.stderr);
+  const start=f.calls().find(c=>c.join(' ').includes('aa start'));
+  assert.ok(start, JSON.stringify(f.calls())); assert.ok(start.join(' ').includes('-a EntryAbility'));
+});
+test('automatic installation leaves a stopped app stopped and ignores bundle names in command arguments', t => {
+  const f=fixture(t);
+  const r=f.run([],{HAP_INSTALLER_NO_START:'1',HAP_INSTALLER_RESTART_IF_RUNNING:'1'});
+  assert.equal(r.status,0,r.stdout+r.stderr);
+  assert.ok(f.calls().some(c=>c.join(' ').includes('ps -ef')));
   assert.ok(!f.calls().some(c=>c.join(' ').includes('aa start')));
 });
 test('HAP_INSTALLER_DEVICE is used for every device operation', t => {

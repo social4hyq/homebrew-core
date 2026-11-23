@@ -5,8 +5,9 @@
 # Developer login is missing, the app is queued instead and
 # `hap-app install-pending` finishes it later.
 #
-# The auto path never starts the app or fails the brew install. It waits for
-# one bounded Huawei Developer login by default; HAP_APP_AUTO_LOGIN=0 disables
+# The auto path restores an app that was running, leaves a stopped app stopped,
+# and never fails the brew install. It waits for one bounded Huawei Developer
+# login by default; HAP_APP_AUTO_LOGIN=0 disables
 # that. Configuration lives in $XDG_CONFIG_HOME/hap-app/config
 # (`auto_install=0`, `auto_login=0`).
 
@@ -352,7 +353,7 @@ install_one() {
   acl_file="$(acl_file_for "$command")"
 
   local -a env_args=(HAP_INSTALLER_NO_LOGIN=1)
-  ((start)) || env_args+=(HAP_INSTALLER_NO_START=1)
+  ((start)) || env_args+=(HAP_INSTALLER_NO_START=1 HAP_INSTALLER_RESTART_IF_RUNNING=1)
   [ -n "$device" ] && env_args+=(HAP_INSTALLER_DEVICE="$device")
   local -a timeout_args=()
   command -v timeout >/dev/null 2>&1 &&

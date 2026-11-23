@@ -14,7 +14,7 @@ function fixture(t) {
   fs.mkdirSync(bin);
   const log = path.join(root, "calls.jsonl");
   const prelude = `const fs=require('node:fs');const path=require('node:path');const args=process.argv.slice(2);` +
-    `fs.appendFileSync(process.env.TEST_LOG, JSON.stringify([process.env.HAP_APP_TEST_NAME||path.basename(process.argv[1]),...args,{noStart:process.env.HAP_INSTALLER_NO_START||'',noLogin:process.env.HAP_INSTALLER_NO_LOGIN||'',device:process.env.HAP_INSTALLER_DEVICE||'',httpsProxy:process.env.HTTPS_PROXY||'',noProxy:process.env.NO_PROXY||'',tlsInsecure:process.env.HAP_INSTALLER_TLS_INSECURE||'',progress:process.env.HAP_APP_PROGRESS||''}])+'\\n');`;
+    `fs.appendFileSync(process.env.TEST_LOG, JSON.stringify([process.env.HAP_APP_TEST_NAME||path.basename(process.argv[1]),...args,{noStart:process.env.HAP_INSTALLER_NO_START||'',restartRunning:process.env.HAP_INSTALLER_RESTART_IF_RUNNING||'',noLogin:process.env.HAP_INSTALLER_NO_LOGIN||'',device:process.env.HAP_INSTALLER_DEVICE||'',httpsProxy:process.env.HTTPS_PROXY||'',noProxy:process.env.NO_PROXY||'',tlsInsecure:process.env.HAP_INSTALLER_TLS_INSECURE||'',progress:process.env.HAP_APP_PROGRESS||''}])+'\\n');`;
   const tool = (name, code) => {
     const file = path.join(bin, name);
     fs.writeFileSync(file, `#!${process.execPath}\n${prelude}\n${code}\n`);
@@ -108,14 +108,15 @@ function fixture(t) {
   return { root, bin, acl, env, run, calls, queued, queuedEntry, configDir };
 }
 
-test('auto-install signs, installs and verifies permissions without starting the app', t => {
+test('auto-install signs, installs and verifies permissions without unconditionally starting the app', t => {
   const f = fixture(t);
   const r = f.run(["auto-install", "orca-app", "com.example.desktop"]);
   assert.equal(r.status, 0, r.stdout + r.stderr);
   assert.match(r.stdout, /已装机 com\.example\.desktop（设备 local）/);
   const install = f.calls().find(c => c[0] === "orca-app");
   assert.ok(install, "the app install must run");
-  assert.equal(install[2].noStart, "1", "the auto path must not start the app");
+  assert.equal(install[2].noStart, "1", "the auto path must not unconditionally start the app");
+  assert.equal(install[2].restartRunning, "1", "the auto path must restore an app that was running");
   assert.equal(install[2].noLogin, "1", "the auto path must not block on a login");
   const permissions = f.calls().find(c => c[0] === "app-installer" && c[1] === "permissions");
   assert.ok(permissions, "permissions must be checked after installing");
