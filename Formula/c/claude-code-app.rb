@@ -294,6 +294,15 @@ class ClaudeCodeApp < Formula
     refute_includes permissions, "ohos.permission.CUSTOM_SANDBOX"
     assert_empty module_json.dig("module", "executableBinaryPaths") || []
 
+    # The install-time ACL variant must request the microphone so voice input can
+    # prompt for access; the strong-sandbox bottle intentionally excludes it.
+    acl_probe = "import importlib.util,sys; " \
+                "it=importlib.util.spec_from_file_location('p',sys.argv[1]); " \
+                "m=importlib.util.module_from_spec(it); it.loader.exec_module(m); " \
+                "print(chr(10).join(m.ACL_PERMISSIONS))"
+    acl_permissions = shell_output("python3 -c #{Shellwords.escape(acl_probe)} #{pkgshare}/patch-code-runtime-hap.py")
+    assert_includes acl_permissions.lines(chomp: true), "ohos.permission.MICROPHONE"
+
     resource_strings = shell_output("unzip -p #{hap} resources.index | strings")
     assert_match "Claude Code", resource_strings
     refute_match "Claude PoC", resource_strings

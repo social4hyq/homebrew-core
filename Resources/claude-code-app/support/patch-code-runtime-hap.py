@@ -51,6 +51,7 @@ ACL_PERMISSIONS = [
     "ohos.permission.CUSTOM_SANDBOX",
     "ohos.permission.READ_WRITE_USER_FILE",
     "ohos.permission.READ_PASTEBOARD",
+    "ohos.permission.MICROPHONE",
     "ohos.permission.kernel.ALLOW_WRITABLE_CODE_MEMORY",
     "ohos.permission.kernel.DISABLE_CODE_MEMORY_PROTECTION",
 ]
