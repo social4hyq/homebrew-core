@@ -13,6 +13,11 @@ class CmuxP2 < Formula
     strategy :git
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/cmux-p2-v0.2.0-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "07a04df74a8299b450d3b4b72d5af2dd80c96af90783c93afe308991293ee96d"
+  end
+
   depends_on "node" => :build # hvigorw.js / pm-cli.js are node scripts
   depends_on "app-installer"
 
