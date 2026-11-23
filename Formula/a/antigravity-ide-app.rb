@@ -5,7 +5,7 @@ class AntigravityIdeApp < Formula
       "2.8.0-6733682917113856/linux-arm/Antigravity%20IDE.tar.gz"
   sha256 "d8f85ce40306587a80a7478af4de85cb10b83cf26dd9179b902afa9933fcf9f2"
   license :cannot_represent # Google Terms of Service; closed-source prebuilt desktop app
-  revision 3
+  revision 4
 
   livecheck do
     url :homepage
