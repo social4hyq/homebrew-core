@@ -4,7 +4,7 @@ class HerdrApp < Formula
   url "https://github.com/herdrdev/herdr-app/archive/refs/tags/v0.1.16.tar.gz"
   sha256 "fea3d920607f2199ed330eb3cdcb1fa3626dcea5080c92a97a296d983d6bc681"
   license "Apache-2.0"
-  revision 14
+  revision 15
 
   livecheck do
     url "https://github.com/herdrdev/herdr-app.git"
@@ -13,8 +13,8 @@ class HerdrApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/herdr-app-v0.1.16-r21"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6697022d20cf1ee397f9ea5a5aa7bd4b44580b58c14daacd765a21157c5dbc3d"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/herdr-app-v0.1.16-r22"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "98f1fc2bc9e4dd7a9bb39494dc5f37e8402dd1136c6ace44f14c97350935d643"
   end
 
   depends_on "node" => :build
@@ -211,6 +211,7 @@ class HerdrApp < Formula
     assert_equal "entry", manifest.dig("module", "name")
     permissions = manifest.dig("module", "requestPermissions").map { |permission| permission["name"] }
     assert_includes permissions, "ohos.permission.INTERNET"
+    assert_includes permissions, "ohos.permission.READ_PASTEBOARD"
     assert_equal "com.social4hyq.herdrapp", manifest.dig("app", "bundleName")
 
     system "unzip", "-o", hap, "resources/base/media/example_icon.png", "-d", testpath/"icon"
