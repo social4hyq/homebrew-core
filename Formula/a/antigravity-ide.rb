@@ -12,6 +12,11 @@ class AntigravityIde < Formula
     regex(%r{antigravity/stable/(\d+(?:\.\d+)+)-\d+}i)
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/antigravity-ide-v2.8.0-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "ba119477a1d8fea3696a19286524b0fdc9b97344653139bdde3044bad9f238cd"
+  end
+
   depends_on "app-installer"
   depends_on "node"
   depends_on "ohos-sdk-toolchains"
