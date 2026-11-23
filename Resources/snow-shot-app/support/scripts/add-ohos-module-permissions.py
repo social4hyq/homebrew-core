@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
-"""Declare the screen-capture and network permissions in the HAP's module.json.
+"""Declare the screen-capture, microphone and network permissions in module.json.
 
-QAbility requests ohos.permission.CUSTOM_SCREEN_CAPTURE at runtime, and QtNetwork
-needs INTERNET for translation requests. The Qt template leaves requestPermissions
-empty, so capture fails with PermissionDenied and HTTPS requests cannot resolve
-their hosts. GET_NETWORK_INFO lets the app inspect connectivity before requests.
+QAbility requests ohos.permission.CUSTOM_SCREEN_CAPTURE at runtime, and the native
+audio recorder requests ohos.permission.MICROPHONE when recording a microphone
+track. QtNetwork needs INTERNET for translation requests. The Qt template leaves
+requestPermissions empty, so capture fails with PermissionDenied and HTTPS
+requests cannot resolve their hosts. GET_NETWORK_INFO lets the app inspect
+connectivity before requests.
 """
 import json
 import os
@@ -15,6 +17,7 @@ import zipfile
 PERMISSIONS = (
     ('ohos.permission.CUSTOM_SCREEN_CAPTURE',
      'Capture the screen for screenshots and annotations'),
+    ('ohos.permission.MICROPHONE', 'Record microphone audio in screen recordings'),
     ('ohos.permission.INTERNET', 'Send text translation requests'),
     ('ohos.permission.GET_NETWORK_INFO', 'Check network availability for translation'),
 )

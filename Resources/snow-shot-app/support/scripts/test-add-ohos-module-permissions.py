@@ -38,6 +38,7 @@ class AddOhosModulePermissionsTest(unittest.TestCase):
                 self.assertEqual(archive.read('libs/arm64-v8a/libsnow_shot.so'), b'elf')
             names = [item['name'] for item in permissions]
             self.assertEqual(names.count('ohos.permission.CUSTOM_SCREEN_CAPTURE'), 1)
+            self.assertEqual(names.count('ohos.permission.MICROPHONE'), 1)
             self.assertEqual(names.count('ohos.permission.INTERNET'), 1)
             self.assertEqual(names.count('ohos.permission.GET_NETWORK_INFO'), 1)
             self.assertEqual(permissions[0]['reason'], 'Existing capture reason')
