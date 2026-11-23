@@ -1,8 +1,18 @@
 class CmuxProbe < Formula
   desc "P0 probe HAP: ArkTS Web + XComponent side-by-side (cmux-like OHOS)"
   homepage "https://github.com/manaflow-ai/cmux"
-  version "0.1.0"
+  # url/sha256 satisfy brew audit; the probe HAP itself is built from the
+  # tap's Resources (this upstream tarball is not used by install), same
+  # pattern as herdr-app.
+  url "https://github.com/manaflow-ai/cmux/archive/refs/tags/v0.2.0.tar.gz"
+  sha256 "3f665dc6d7bb2d09057457721fbd6584906bf00c95732d3cb3e5c4f3392a4608"
   license "Apache-2.0"
+
+  livecheck do
+    url "https://github.com/manaflow-ai/cmux.git"
+    regex(/^v?(\d+(?:\.\d+)+)$/i)
+    strategy :git
+  end
 
   # 探针 HAP 源码随 tap 分发（纯 ArkTS，无 upstream tarball）。
   depends_on "node" => :build # hvigorw.js is a node script
