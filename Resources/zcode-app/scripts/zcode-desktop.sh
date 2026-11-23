@@ -33,6 +33,11 @@ DEFAULT_PORT=14299
 ZCODE_BIN="${ZCODE_DESKTOP_ZCODE:-zcode}"
 HDC="${ZCODE_DESKTOP_HDC:-${ZCODE_DESKTOP_HDC_DEFAULT:-hdc}}"
 SECRET_FILE="${ZCODE_DESKTOP_SECRET_FILE:-$HOME/.zcode/v2/credential-secret}"
+# The token the service requires for /api and /ws. It lives next to the
+# credential secret under $HOME, so the desktop shell and a terminal read the
+# same file; the shell derives the same path from its install-time HOME.
+TOKEN_FILE="${ZCODE_DESKTOP_TOKEN_FILE:-$HOME/.zcode/v2/desktop-token}"
+TOKEN=""
 ZCODE_ROOT="${ZCODE_DESKTOP_ZCODE_ROOT:-}"
 BUN_BIN="${ZCODE_DESKTOP_BUN:-}"
 
@@ -86,6 +91,36 @@ ensure_secret() {
   fi
 }
 
+# Create the service token on first use (64 hex characters, mode 600 under the
+# umask, see the note above CONFIG_FILE) and load it into TOKEN.
+ensure_token() {
+  local dir
+  dir="$(dirname "$TOKEN_FILE")"
+  mkdir -p "$dir"
+  # No-op on hmdfs, see the note above CONFIG_FILE; kept for ordinary file systems.
+  chmod 700 "$dir" 2>/dev/null || true
+  if [ ! -s "$TOKEN_FILE" ] || [ "$(wc -c < "$TOKEN_FILE")" -lt 32 ]; then
+    (umask 077; head -c 32 /dev/urandom | od -An -tx1 | tr -d ' \n' > "$TOKEN_FILE")
+    log "generated service token at $TOKEN_FILE"
+  fi
+  load_token
+}
+
+# Load TOKEN without creating anything (status and the health probe must not
+# change state). Empty when the file is missing or unreadable.
+load_token() {
+  TOKEN="$(tr -d ' \r\n' < "$TOKEN_FILE" 2>/dev/null || true)"
+}
+
+# GET /api/server-info with the token. The header goes through curl's config on
+# stdin so the token never shows up in a process list.
+server_info() {
+  [ -n "$TOKEN" ] || load_token
+  [ -n "$TOKEN" ] || return 1
+  printf 'header = "Authorization: Bearer %s"\n' "$TOKEN" |
+    curl -s -m 3 -K - -w '\n%{http_code}' "http://127.0.0.1:$PORT/api/server-info" 2>/dev/null
+}
+
 json_escape() {
   printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g'
 }
@@ -116,13 +151,28 @@ read_config() {
   [ -n "$WORKSPACE" ] || WORKSPACE="$HOME"
 }
 
+# Healthy means: it answers our token with 200 and reports that it requires
+# authentication. A server started before the token existed answers 200 with
+# authRequired false; reusing it would leave the loopback API open.
 healthy() {
-  [ "$(curl -s -o /dev/null -w '%{http_code}' -m 3 "http://127.0.0.1:$PORT/api/server-info" 2>/dev/null)" = "200" ]
+  local out code body
+  out="$(server_info)" || return 1
+  code="${out##*$'\n'}"
+  body="${out%$'\n'*}"
+  [ "$code" = "200" ] || return 1
+  printf '%s' "$body" | grep -q '"authRequired"[[:space:]]*:[[:space:]]*true'
 }
 
 server_version() {
-  curl -s -m 3 "http://127.0.0.1:$PORT/api/server-info" 2>/dev/null |
+  local out
+  out="$(server_info)" || return 0
+  printf '%s' "${out%$'\n'*}" |
     sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1
+}
+
+# True when something on the port answers /api/server-info without a token.
+open_server_on_port() {
+  [ "$(curl -s -o /dev/null -w '%{http_code}' -m 3 "http://127.0.0.1:$PORT/api/server-info" 2>/dev/null)" = "200" ]
 }
 
 # True when the process exists. kill -0 also fails (EPERM) for a live process
@@ -226,7 +276,7 @@ start_server() {
     (
       cd "$WORKSPACE" 2>/dev/null || cd "$HOME"
       ZCODE_SERVER_HOST=127.0.0.1 PORT="$PORT" ZCODE_SERVER_WORKSPACE="$WORKSPACE" \
-        ZCODE_WEB_STATIC_ROOT="$ZCODE_ROOT/web" ZCODE_SERVER_AUTH_TOKEN="" \
+        ZCODE_WEB_STATIC_ROOT="$ZCODE_ROOT/web" ZCODE_SERVER_AUTH_TOKEN="$TOKEN" \
         ZCODE_AGENT_SERVER_ARGS_JSON="[\"$ZCODE_ROOT/agent/zcode.cjs\",\"app-server\",\"--stdio\"]" \
         ZCODE_AGENT_SERVER_COMMAND="$BUN_BIN" \
         ZCODE_CREDENTIAL_SECRET_FILE="$SECRET_FILE" \
@@ -238,7 +288,7 @@ start_server() {
     log "warning: project creation will fail with project.host-offline on this build"
     (
       cd "$WORKSPACE" 2>/dev/null || cd "$HOME"
-      ZCODE_CREDENTIAL_SECRET_FILE="$SECRET_FILE" nohup "$ZCODE_BIN" --web \
+      ZCODE_SERVER_AUTH_TOKEN="$TOKEN" ZCODE_CREDENTIAL_SECRET_FILE="$SECRET_FILE" nohup "$ZCODE_BIN" --web \
         --workspace "$WORKSPACE" --port "$PORT" --no-open >>"$LOG_FILE" 2>&1 &
       echo $! > "$PID_FILE"
     )
@@ -247,6 +297,7 @@ start_server() {
 
 ensure_serve() {
   read_config
+  ensure_token
   if healthy; then
     printf 'zcode-desktop: server already healthy at http://127.0.0.1:%s\n' "$PORT"
     return 0
@@ -269,6 +320,9 @@ ensure_serve() {
     rm -f "$PID_FILE"
   fi
   if port_busy "$PORT"; then
+    if open_server_on_port; then
+      die "port $PORT is served without authentication (started by an older version); stop it (quit the app, or kill that process) and run serve again"
+    fi
     die "port $PORT is in use by another process; remove $CONFIG_FILE and re-run install"
   fi
   ensure_secret

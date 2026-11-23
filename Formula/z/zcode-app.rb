@@ -9,7 +9,7 @@ class ZcodeApp < Formula
   # Tap-authored shell scripts (MIT) on the CPF-Electron runtime (mixed
   # MIT/BSD/LGPL).
   license :cannot_represent
-  revision 26
+  revision 27
 
   livecheck do
     url "https://raw.githubusercontent.com/zai-org/ZCode/main/package.json"
@@ -42,6 +42,7 @@ class ZcodeApp < Formula
     Resources/zcode-app/app/lifecycle.cjs
     Resources/zcode-app/app/main.cjs
     Resources/zcode-app/app/package.json
+    Resources/zcode-app/app/server-auth.cjs
     Resources/zcode-app/app/tray.cjs
     Resources/zcode-app/app/waiting.json
     Resources/zcode-app/assets/icon.png
@@ -50,6 +51,7 @@ class ZcodeApp < Formula
     Resources/zcode-app/scripts/zcode-desktop.sh
     Resources/zcode-app/tests/close-handler.test.cjs
     Resources/zcode-app/tests/lifecycle.test.cjs
+    Resources/zcode-app/tests/server-auth.test.cjs
     Resources/zcode-app/tests/tray.test.cjs
   ].freeze
 
@@ -71,7 +73,7 @@ class ZcodeApp < Formula
     app = shell/"web_engine/src/main/resources/resfile/resources/app"
     rm_r app if app.exist?
     app.mkpath
-    %w[main.cjs lifecycle.cjs tray.cjs package.json config.json].each do |name|
+    %w[main.cjs lifecycle.cjs server-auth.cjs tray.cjs package.json config.json].each do |name|
       cp res/"app"/name, app/name
     end
     system "node", tap_root/"Resources/_shared/waiting-page/render-waiting.cjs",
@@ -222,6 +224,16 @@ class ZcodeApp < Formula
     run "{{HOMEBREW_PREFIX}}/bin/hap-app",
         args: ["auto-install", "zcode-app", "com.social4hyq.zcodedesktop"],
         must_succeed: false, print_stdout: true, network_access: true
+  end
+
+  def caveats
+    <<~EOS
+      The backing service now requires a token for its API and websocket. It is
+      created at ~/.zcode/v2/desktop-token and read by both zcode-app and the
+      desktop app. A service started by an older version answers without it and
+      is not reused: quit the app (or stop that process) and run
+      `zcode-app serve` once after upgrading.
+    EOS
   end
 
   test do
@@ -375,10 +387,12 @@ class ZcodeApp < Formula
     hap = libexec/"zcode-desktop-unsigned.hap"
     assert_match "libs/arm64-v8a/libelectron.so", shell_output("unzip -Z1 #{hap}")
     assert_match "resources/resfile/resources/app/lifecycle.cjs", shell_output("unzip -Z1 #{hap}")
+    assert_match "resources/resfile/resources/app/server-auth.cjs", shell_output("unzip -Z1 #{hap}")
     assert_match "onQuitRequest", shell_output("unzip -p #{hap} resources/resfile/resources/app/tray.cjs")
     tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
     system "node", "--check", tap_root/"Resources/zcode-app/app/main.cjs"
     system "node", "--test", tap_root/"Resources/zcode-app/tests/lifecycle.test.cjs"
+    system "node", "--test", tap_root/"Resources/zcode-app/tests/server-auth.test.cjs"
     system "node", "--test", tap_root/"Resources/zcode-app/tests/tray.test.cjs"
     system "node", "--test", tap_root/"Resources/zcode-app/tests/close-handler.test.cjs"
     waiting_source = shell_output("unzip -p #{hap} resources/resfile/resources/app/waiting.html")

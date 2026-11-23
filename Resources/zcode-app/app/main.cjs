@@ -16,6 +16,7 @@ const fs = require('node:fs');
 const http = require('node:http');
 const path = require('node:path');
 const lifecycle = require('./lifecycle.cjs');
+const serverAuth = require('./server-auth.cjs');
 const tray = require('./tray.cjs');
 
 let config = { port: 0, workspace: '' };
@@ -30,6 +31,13 @@ const origin = configured ? `http://127.0.0.1:${config.port}` : null;
 // HOME/PATH/XDG values it needs. Without a launcher (strong-sandbox install, or a
 // config written by an older `zcode-app install`) the shell only waits.
 const canAutoStart = configured && typeof config.launcher === 'string' && config.launcher.length > 0;
+// The service rejects /api and /ws without its token. The wrapper creates the
+// token file when it starts the service, so it is read on every probe rather
+// than once at startup.
+const tokenPath = serverAuth.tokenFile(config.host, process.env);
+function currentToken() {
+  return serverAuth.readToken(fs, tokenPath);
+}
 let serveChild = null;
 let serveSpawnError = '';
 // True once this shell had to start the service (it was not up when the shell
@@ -69,12 +77,20 @@ for (const arg of process.argv.slice(1)) {
 function serverUp(timeoutMs) {
   return new Promise((resolve) => {
     if (!configured) return resolve(false);
+    // Without a token there is nothing to authenticate with yet: the service is
+    // not usable until the wrapper has created it and started a protected one.
+    const token = currentToken();
+    if (!token) return resolve(false);
     const req = http.get({
       host: '127.0.0.1', port: config.port, path: '/api/server-info',
+      headers: serverAuth.infoHeaders(token),
       timeout: timeoutMs, agent: false,
     }, (res) => {
-      res.resume();
-      resolve(res.statusCode === 200);
+      let body = '';
+      res.setEncoding('utf8');
+      res.on('data', (chunk) => { if (body.length < 65536) body += chunk; });
+      res.on('end', () => resolve(serverAuth.acceptServerInfo(res.statusCode, body)));
+      res.on('error', () => resolve(false));
     });
     req.on('timeout', () => { req.destroy(); resolve(false); });
     req.on('error', () => resolve(false));
@@ -165,7 +181,7 @@ async function drive(win) {
       try {
         fs.appendFileSync(serveLogPath(), `[attach] ${new Date().toISOString()} ${lifecycle.attachLine({ startedService })}\n`);
       } catch {}
-      await win.loadURL(origin + '/');
+      await win.loadURL(serverAuth.authedUrl(origin, currentToken()));
       return;
     }
     // Start the service ourselves. A finished attempt is retried at most every
