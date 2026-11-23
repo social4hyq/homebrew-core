@@ -163,6 +163,27 @@ bridge_status() {
   fi
 }
 
+# mktemp -d creates a 0700 directory. On hmdfs a new directory inherits its
+# parent's owner, so when TMPDIR points at a directory owned by another uid (a
+# configured ~/tmp, for example) the stage belongs to that owner and the desktop
+# user cannot write the HAP into it. Probe each candidate and use the first one
+# this process can actually write.
+make_stage() {
+  local root stage
+  for root in "${TMPDIR:-}" "${XDG_CACHE_HOME:-$HOME/.cache}" "$HOME/.cache" "$STATE/tmp"; do
+    [ -n "$root" ] || continue
+    mkdir -p "$root" 2>/dev/null || continue
+    stage="$(umask 077; mktemp -d "$root/herdr-app-inject.XXXXXX" 2>/dev/null)" || continue
+    if (umask 077; : > "$stage/.write-test") 2>/dev/null; then
+      rm -f "$stage/.write-test" 2>/dev/null || true
+      printf '%s' "$stage"
+      return 0
+    fi
+    rm -rf "$stage" 2>/dev/null || true
+  done
+  return 1
+}
+
 # Copy the HAP and add the bridge's address and token as rawfile/bridge.conf; the app reads it at start-up.
 inject_conf() { # inject_conf <unsigned hap> <output hap>
   "${HERDR_APP_PYTHON:-python3}" - "$1" "$2" "$CONF" <<'PY'
@@ -242,8 +263,11 @@ case "$command_name" in
       make_conf 1
     fi
     bridge_start
-    stage="$(umask 077; mktemp -d "${TMPDIR:-$HOME/.cache}/herdr-app-inject.XXXXXX")"
+    stage="$(make_stage)" || die "no writable staging directory; set TMPDIR to a directory this user can write (current TMPDIR=${TMPDIR:-unset})"
     trap 'rm -rf "$stage"' EXIT
+    # Child tools (app-installer, python, split) use TMPDIR too; keep them inside
+    # the stage that was just proven writable.
+    export TMPDIR="$stage"
     inject_conf "$hap" "$stage/herdr-app.hap"
     install_args=(--hap "$stage/herdr-app.hap" --signed-hap "$stage/signed.hap" --bundle-id "$BUNDLE_ID" --app-name Herdr --module entry --ability "$ABILITY" --hdc "$hdc")
     [[ -z "$device" ]] || install_args+=(--device "$device")

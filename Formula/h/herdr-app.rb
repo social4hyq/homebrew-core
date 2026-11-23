@@ -4,7 +4,7 @@ class HerdrApp < Formula
   url "https://github.com/herdrdev/herdr-app/archive/refs/tags/v0.1.16.tar.gz"
   sha256 "fea3d920607f2199ed330eb3cdcb1fa3626dcea5080c92a97a296d983d6bc681"
   license "Apache-2.0"
-  revision 12
+  revision 13
 
   livecheck do
     url "https://github.com/herdrdev/herdr-app.git"
@@ -269,6 +269,7 @@ class HerdrApp < Formula
       "HERDR_APP_HAP"    => hap.to_s,
       "APP_INSTALLER"    => (testpath/"bin/app-installer").to_s,
       "TMPDIR"           => (testpath/"tmp").to_s,
+      "XDG_CACHE_HOME"   => (testpath/"cache").to_s,
       "PATH"             => "#{testpath}/bin:#{ENV["PATH"]}",
     }
     script = libexec/"herdr-app.sh"
@@ -283,6 +284,15 @@ class HerdrApp < Formula
       assert_match "addr=127.0.0.1:#{port}", conf
       assert_equal conf, shell_output("unzip -p #{testpath}/injected.hap resources/rawfile/bridge.conf")
       assert_empty Dir[testpath/"tmp/*"], "the staged HAP that holds the token was not removed"
+
+      # A TMPDIR that cannot hold a directory must not fail the install: the
+      # stage falls back to the app's cache (hmdfs inherits the parent owner).
+      (testpath/"bad-tmp").write "not a directory"
+      with_env(env.merge("TMPDIR" => (testpath/"bad-tmp").to_s)) do
+        system script, "install"
+      end
+      assert_equal conf, shell_output("unzip -p #{testpath}/injected.hap resources/rawfile/bridge.conf")
+      assert_empty Dir[testpath/"cache/herdr-app-inject.*"], "the fallback stage was not removed"
 
       check = <<~'PY'
         import socket, sys
