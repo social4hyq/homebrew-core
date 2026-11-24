@@ -54,8 +54,8 @@ def main():
         # mirror that layout in a temp dir for the test.
         assemble_dir = tmp / "assemble"
         assemble_dir.mkdir()
-        (assemble_dir / "postman-bootstrap.cjs").write_bytes(
-            (WORK / "app" / "postman-bootstrap.cjs").read_bytes())
+        for helper in ("postman-bootstrap.cjs", "starship-shim.cjs"):
+            (assemble_dir / helper).write_bytes((WORK / "app" / helper).read_bytes())
         assemble.WORK = assemble_dir
         tarball = tmp / "postman.tar.gz"
         make_tarball(tarball, base_members())
@@ -92,6 +92,7 @@ def main():
             assert assemble.APP_ROOT + "postman-bootstrap.cjs" in names
             assert assemble.APP_ROOT + "vendor/main.js" in names
             assert assemble.APP_ROOT + "vendor/js/runtime.js" in names
+            assert assemble.APP_ROOT + "vendor/node_modules/starship/index.js" in names
             wrapper = json.loads(z.read(assemble.APP_ROOT + "package.json"))
             assert wrapper["main"] == "postman-bootstrap.cjs"
             assert not any("keytar.node" in n for n in names)

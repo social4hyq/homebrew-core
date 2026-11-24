@@ -138,6 +138,13 @@ def assemble(shell, tarball, output):
                            "version": vendor_pin()[0], "main": "postman-bootstrap.cjs"}
                 dst.writestr(APP_ROOT+'package.json', json.dumps(wrapper))
                 dst.write(WORK/'postman-bootstrap.cjs', APP_ROOT+'postman-bootstrap.cjs')
+                # Postman's Electron fork exposes `starship` as a built-in; the
+                # OHOS Electron shell does not, so ship a pure-JS shim that
+                # main.js can resolve from app/vendor/node_modules/.
+                starship = APP_ROOT+'vendor/node_modules/starship/'
+                dst.writestr(starship+'package.json',
+                             json.dumps({"name": "starship", "version": "0.0.0", "main": "index.js"}))
+                dst.write(WORK/'starship-shim.cjs', starship+'index.js')
                 # Inject the trimmed vendor app tree under app/vendor/.
                 for path in sorted(stage.rglob('*')):
                     if not path.is_file():
