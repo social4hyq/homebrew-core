@@ -11,8 +11,9 @@ class HarborApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/harbor-app-v0.1.0-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0bc8c0ddfbf01aec66e9021d5134861489d89c4ebc4fb3a1b28a66f6c719d5b8"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/harbor-app-v0.1.0-r3"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a134c4f8cc0cb3cfb72050f26195f0efca17c41b3e027eb79be82595cc163f2d"
   end
 
   depends_on "node" => :build
@@ -64,6 +65,21 @@ class HarborApp < Formula
 
     libexec.install hap => "harbor-unsigned.hap"
     bin.install "harbor"
+
+    # `hap-app auto-install` requires a real command named after the formula
+    # (`*-app`) that accepts `install`. This is that installer entry point:
+    # it simply forwards to app-installer, which honours the HAP_INSTALLER_*
+    # environment variables set by hap-app.
+    installer = formula_opt_bin("app-installer")/"app-installer"
+    (bin/"harbor-app").write <<~SH
+      #!/bin/sh
+      exec "#{installer}" install \\
+        --hap "#{libexec}/harbor-unsigned.hap" \\
+        --bundle-id org.social4hyq.harbor \\
+        --module entry --ability EntryAbility "$@"
+    SH
+    chmod 0755, bin/"harbor-app"
+
     (pkgshare/"apps.json.default").write <<~JSON
       {
         "autoHideOnLaunch": true,
@@ -82,7 +98,7 @@ class HarborApp < Formula
 
   post_install_steps do
     run "{{HOMEBREW_PREFIX}}/bin/hap-app",
-        args: ["auto-install", "harbor", "org.social4hyq.harbor"],
+        args: ["auto-install", "harbor-app", "org.social4hyq.harbor"],
         must_succeed: false, print_stdout: true, network_access: true
   end
 
@@ -90,6 +106,7 @@ class HarborApp < Formula
     help = shell_output("#{bin}/harbor --help")
     assert_match "brew services", help
     assert_match "discover", help
+    assert_path_exists bin/"harbor-app"
     assert_path_exists libexec/"harbor-unsigned.hap"
     assert_path_exists pkgshare/"apps.json.default"
     module_json = JSON.parse(Utils.safe_popen_read("unzip", "-p", libexec/"harbor-unsigned.hap", "module.json"))
