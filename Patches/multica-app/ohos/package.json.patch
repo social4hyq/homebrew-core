@@ -3,10 +3,10 @@ tailwindcss oxide and lightningcss native packages to the @ohos-npm-ports
 builds, which carry OpenHarmony bindings.
 
 diff --git a/package.json b/package.json
-index 42074db..5e074ea 100644
+index 889ce52..f962f24 100644
 --- a/package.json
 +++ b/package.json
-@@ -35,7 +35,8 @@
+@@ -39,7 +39,8 @@
      "ui:add": "cd packages/ui && npx shadcn@latest add",
      "generate:brand": "node scripts/brand/generate.mjs",
      "generate:attachment-text-preview": "node scripts/generate-attachment-text-preview.mjs",
@@ -16,7 +16,7 @@ index 42074db..5e074ea 100644
    },
    "engines": {
      "node": ">=22"
-@@ -57,7 +58,9 @@
+@@ -61,7 +62,9 @@
        "minimatch@5>brace-expansion": "2.1.4",
        "minimatch@9>brace-expansion": "2.1.4",
        "minimatch@10>brace-expansion": "5.0.9",
@@ -26,12 +26,12 @@ index 42074db..5e074ea 100644
 +      "lightningcss": "npm:@ohos-npm-ports/lightningcss@1.32.0-4"
      },
      "patchedDependencies": {
-       "expo-modules-core@57.0.21": "apps/mobile/patches/expo-modules-core@57.0.21.patch"
-@@ -69,6 +72,7 @@
+       "expo-modules-core@57.0.21": "apps/mobile/patches/expo-modules-core@57.0.21.patch",
+@@ -74,6 +77,7 @@
      "@types/node": "catalog:",
      "@types/pg": "^8.20.0",
      "knip": "^6.32.2",
-+    "ohos-signpost": "^1.1.2",
++    "ohos-signpost": "1.1.2",
      "pg": "^8.20.0",
      "postcss": "catalog:",
      "turbo": "^2.5.4",
