@@ -4,12 +4,11 @@ class ZcodeApp < Formula
   # Same upstream pin as `zcode`: the shell only provides the window, the
   # workbench comes from the installed CLI.
   url "https://github.com/zai-org/ZCode.git",
-      revision: "fec975905a2abd4c07e35c40d51fa097a2258ec9"
-  version "3.18.2"
+      revision: "a4b4445141eb7d3b3e99eada9292775383bfc44e"
+  version "4.0.0"
   # Tap-authored shell scripts (MIT) on the CPF-Electron runtime (mixed
   # MIT/BSD/LGPL).
   license :cannot_represent
-  revision 30
 
   livecheck do
     url "https://raw.githubusercontent.com/zai-org/ZCode/main/package.json"
@@ -19,8 +18,8 @@ class ZcodeApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-app-v3.18.2-r38"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "de06735b8132e0bb6ea42a3b95797f90cd6403499e05b02875b16d8c7888efd4"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-app-v4.0.0-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "886fcbf90729ceb70065611fe1341cd4fb3ac07d94d0e400d94cf34aca4fcaae"
   end
 
   depends_on "app-installer"
