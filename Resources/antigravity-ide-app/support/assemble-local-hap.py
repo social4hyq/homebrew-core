@@ -62,7 +62,7 @@ def selected_app(tarball, scratch):
         raise ValueError("vendor app is missing out/main.js")
 
 
-def assemble(shell, tarball, output, pin_path):
+def assemble(shell, tarball, output, pin_path, native_dir=None, libcxx=None):
     if output.exists():
         raise FileExistsError(f"refusing to overwrite {output}")
     verify_tarball(tarball, pin_path)
@@ -71,11 +71,12 @@ def assemble(shell, tarball, output, pin_path):
         vendor.mkdir()
         selected_app(tarball, vendor)
         # Apply OHOS compatibility rewrites to the extracted vendor tree:
-        # stub glibc .node addons, present linux platform to VS Code, relax
-        # DI strict mode and guard an Electron API absent on OHOS.
+        # stub glibc .node addons, redirect the sqlite3 binding to the OHOS
+        # native module, present linux platform to VS Code via the bootstrap,
+        # relax DI strict mode and guard an Electron API absent on OHOS.
         try:
             import ohos_compat
-            ohos_compat.patch_vendor(vendor)
+            ohos_compat.patch_vendor(vendor, native_dir)
         except ImportError:
             pass  # building from a tree without the compat module
         with zipfile.ZipFile(shell) as source:
@@ -105,6 +106,10 @@ def assemble(shell, tarball, output, pin_path):
                         target.writestr(entry, payload)
                     for path in sorted(vendor.rglob("*")):
                         relative = path.relative_to(vendor).as_posix()
+                        # OHOS-native .node addons go into the HAP libs dir, not
+                        # the vendor app dir (only that namespace permits dlopen).
+                        if relative.startswith("ohos-native/"):
+                            continue
                         zip_path = VENDOR_PARENT + relative
                         if path.is_dir():
                             continue
@@ -113,6 +118,24 @@ def assemble(shell, tarball, output, pin_path):
                         info.external_attr = (0o100000 | (path.stat().st_mode & 0o777)) << 16
                         info.compress_type = zipfile.ZIP_STORED
                         with path.open("rb") as incoming, target.open(info, "w") as outgoing:
+                            shutil.copyfileobj(incoming, outgoing, 1024 * 1024)
+                    # Inject the OHOS-native addons into libs/ (deployed as libs/arm64).
+                    native_stage = vendor / "ohos-native"
+                    if native_stage.is_dir():
+                        for node in sorted(native_stage.glob("*.node")):
+                            info = zipfile.ZipInfo(f"libs/arm64-v8a/{node.name}")
+                            info.create_system = 3
+                            info.external_attr = (0o100000 | 0o755) << 16
+                            info.compress_type = zipfile.ZIP_STORED
+                            with node.open("rb") as incoming, target.open(info, "w") as outgoing:
+                                shutil.copyfileobj(incoming, outgoing, 1024 * 1024)
+                    # libc++_shared.so is required by the NAPI addons.
+                    if libcxx and Path(libcxx).is_file():
+                        info = zipfile.ZipInfo("libs/arm64-v8a/libc++_shared.so")
+                        info.create_system = 3
+                        info.external_attr = (0o100000 | 0o644) << 16
+                        info.compress_type = zipfile.ZIP_STORED
+                        with Path(libcxx).open("rb") as incoming, target.open(info, "w") as outgoing:
                             shutil.copyfileobj(incoming, outgoing, 1024 * 1024)
                 os.replace(tmp_path, output)
             except Exception:
@@ -126,9 +149,15 @@ def main():
     parser.add_argument("tarball", type=Path)
     parser.add_argument("vendor_json", type=Path)
     parser.add_argument("output", type=Path)
+    parser.add_argument("--native-dir", type=Path, default=None,
+                        help="directory with extracted @ohos-npm-ports packages")
+    parser.add_argument("--libcxx", type=Path, default=None,
+                        help="path to OHOS libc++_shared.so")
     args = parser.parse_args()
     assemble(args.shell.resolve(), args.tarball.resolve(),
-             args.output.resolve(), args.vendor_json.resolve())
+             args.output.resolve(), args.vendor_json.resolve(),
+             args.native_dir.resolve() if args.native_dir else None,
+             args.libcxx.resolve() if args.libcxx else None)
 
 
 if __name__ == "__main__":
