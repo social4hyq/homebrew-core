@@ -1,10 +1,10 @@
 OHOS: download native pnpm/bun from the @ohos-npm-ports ports (platform package names and `<upstream>-<N>` versions).
 
 diff --git a/crates/vp_pm_cli/src/package_manager.rs b/crates/vp_pm_cli/src/package_manager.rs
-index 34fb5c1..9975e6e 100644
+index 0ffab61..2acb039 100644
 --- a/crates/vp_pm_cli/src/package_manager.rs
 +++ b/crates/vp_pm_cli/src/package_manager.rs
-@@ -1294,16 +1294,54 @@ async fn fetch_dist_tag_version(
+@@ -1380,16 +1380,54 @@ async fn fetch_dist_tag_version(
      })
  }
  
@@ -63,7 +63,7 @@ index 34fb5c1..9975e6e 100644
  
      // A persisted response authenticated as one user must not be reused by
      // another user of the same registry URL. Avoid storing credential-derived
-@@ -1311,7 +1349,7 @@ async fn resolve_dist_tag(
+@@ -1397,7 +1435,7 @@ async fn resolve_dist_tag(
      // Package managers are public on the default registry, so its responses do
      // not depend on the credential and keep the cache and offline fallback.
      if urls.iter().any(|url| !is_default_registry(url) && npm_config.has_auth_for_origin(url)) {
@@ -72,7 +72,7 @@ index 34fb5c1..9975e6e 100644
      }
  
      let cache_path = dist_tag_cache_path(package_manager_type, &urls);
-@@ -1319,7 +1357,7 @@ async fn resolve_dist_tag(
+@@ -1405,7 +1443,7 @@ async fn resolve_dist_tag(
      if let Some((version, true)) = &cached {
          return Ok(version.clone());
      }
@@ -81,7 +81,7 @@ index 34fb5c1..9975e6e 100644
          Ok(version) => {
              let _ = write_dist_tag_cache(&cache_path, &version);
              Ok(version)
-@@ -1487,6 +1525,14 @@ async fn resolve_latest_satisfying_version(
+@@ -1574,6 +1612,14 @@ async fn resolve_latest_satisfying_version(
      if matches!(package_manager_type, PackageManagerType::Yarn) {
          versions.extend(fetch_registry_versions("@yarnpkg/cli-dist", npm_config).await?);
      }
@@ -96,7 +96,7 @@ index 34fb5c1..9975e6e 100644
  
      let best = versions
          .iter()
-@@ -1856,13 +1902,102 @@ fn open_lock_file(lock_path: &Path) -> io::Result<File> {
+@@ -1963,13 +2009,102 @@ fn open_lock_file(lock_path: &Path) -> io::Result<File> {
      fs::OpenOptions::new().read(true).write(true).create(true).truncate(false).open(lock_path)
  }
  
@@ -200,20 +200,16 @@ index 34fb5c1..9975e6e 100644
          ("linux", "aarch64") => "@oven/bun-linux-aarch64",
          #[cfg(target_env = "musl")]
          ("linux", "x86_64") => "@oven/bun-linux-x64-musl",
-@@ -1947,8 +2082,11 @@ async fn download_bun_package_manager(
+@@ -2035,7 +2170,7 @@ async fn download_bun_package_manager(
+         return Ok((install_dir, package_name, version.clone()));
+     }
  
-     // The declared hash never covers the platform tarball, so verify it
-     // against the registry's `dist.integrity` for the platform package.
-+    let platform_version =
-+        platform_package_version("bun", &platform_package_name, version, npm_config).await?;
-     let platform_hash =
--        fetch_platform_integrity("bun", &platform_package_name, version, npm_config).await?;
-+        fetch_platform_integrity("bun", &platform_package_name, &platform_version, npm_config)
-+            .await?;
- 
-     // Stage the download in a temp directory beside the version directory, not
-     // inside it, so a reader scanning key subdirectories never sees the staging
-@@ -1958,7 +2096,7 @@ async fn download_bun_package_manager(
+-    let platform_hash = verify_pin_and_fetch_platform_integrity(
++    let (platform_version, platform_hash) = verify_pin_and_fetch_platform_integrity(
+         PackageManagerType::Bun,
+         &platform_package_name,
+         version,
+@@ -2052,7 +2187,7 @@ async fn download_bun_package_manager(
      tokio::fs::create_dir_all(manager_dir).await?;
  
      // Download the platform-specific package directly
@@ -222,7 +218,7 @@ index 34fb5c1..9975e6e 100644
      // Keep the TempDir guard alive so a failure path cleans up the temp dir.
      let tmp_dir = tempfile::tempdir_in(manager_dir)?;
      let target_dir_tmp = tmp_dir.path().to_path_buf();
-@@ -2039,7 +2177,9 @@ fn get_pnpm_platform_package_name() -> Result<&'static str, Error> {
+@@ -2132,7 +2267,9 @@ fn get_pnpm_platform_package_name() -> Result<&'static str, Error> {
          ("macos", "x86_64") => "@pnpm/exe.darwin-x64",
          #[cfg(target_env = "musl")]
          ("linux", "aarch64") => "@pnpm/exe.linux-arm64-musl",
@@ -233,20 +229,51 @@ index 34fb5c1..9975e6e 100644
          ("linux", "aarch64") => "@pnpm/exe.linux-arm64",
          #[cfg(target_env = "musl")]
          ("linux", "x86_64") => "@pnpm/exe.linux-x64-musl",
-@@ -2158,8 +2298,11 @@ async fn download_pnpm_native_package_manager(
+@@ -2191,7 +2328,7 @@ async fn verify_pin_and_fetch_platform_integrity(
+     version: &Str,
+     expected_hash: Option<&str>,
+     npm_config: &NpmConfig,
+-) -> Result<Str, Error> {
++) -> Result<(Str, Str), Error> {
+     if let Some(expected_hash) = expected_hash {
+         let main_tgz_url = npm_config.package_tgz_url(&package_manager_type.to_string(), version);
+         let verify_dir = tempfile::tempdir()?;
+@@ -2209,14 +2346,22 @@ async fn verify_pin_and_fetch_platform_integrity(
+         .await
+         .map_err(|error| name_hashed_artifact(error, package_manager_type, version))?;
+     }
+-    fetch_registry_integrity(
+-        package_manager_type,
++    let platform_version = platform_package_version(
++        &package_manager_type.to_string(),
+         platform_package_name,
+         version,
++        npm_config,
++    )
++    .await?;
++    let platform_hash = fetch_registry_integrity(
++        package_manager_type,
++        platform_package_name,
++        &platform_version,
+         PLATFORM_PACKAGE_HINT,
+         npm_config,
+     )
+-    .await
++    .await?;
++    Ok((platform_version, platform_hash))
+ }
  
-     // The declared hash never covers the platform tarball, so verify it
-     // against the registry's `dist.integrity` for the platform package.
-+    let platform_version =
-+        platform_package_version("pnpm", platform_package_name, version, npm_config).await?;
-     let platform_hash =
--        fetch_platform_integrity("pnpm", platform_package_name, version, npm_config).await?;
-+        fetch_platform_integrity("pnpm", platform_package_name, &platform_version, npm_config)
-+            .await?;
+ /// Fetch the registry `dist.integrity` (SRI) of a package version.
+@@ -2305,7 +2450,7 @@ async fn download_pnpm_native_package_manager(
+         return Ok((install_dir, package_name, version.clone()));
+     }
  
-     // Stage the download in a temp directory beside the version directory, not
-     // inside it, so a reader scanning key subdirectories never sees the staging
-@@ -2169,7 +2312,7 @@ async fn download_pnpm_native_package_manager(
+-    let platform_hash = verify_pin_and_fetch_platform_integrity(
++    let (platform_version, platform_hash) = verify_pin_and_fetch_platform_integrity(
+         PackageManagerType::Pnpm,
+         platform_package_name,
+         version,
+@@ -2322,7 +2467,7 @@ async fn download_pnpm_native_package_manager(
      tokio::fs::create_dir_all(manager_dir).await?;
  
      // Download the platform-specific package directly
@@ -255,7 +282,7 @@ index 34fb5c1..9975e6e 100644
      // Keep the TempDir guard alive so a failure path cleans up the temp dir.
      let tmp_dir = tempfile::tempdir_in(manager_dir)?;
      let target_dir_tmp = tmp_dir.path().to_path_buf();
-@@ -2388,7 +2531,7 @@ mod tests {
+@@ -2540,7 +2685,7 @@ mod tests {
          let bin_dir = cwd.join("bin");
          fs::create_dir(&bin_dir).unwrap();
          let npm = bin_dir.join("npm");
@@ -264,7 +291,7 @@ index 34fb5c1..9975e6e 100644
          fs::set_permissions(&npm, fs::Permissions::from_mode(0o755)).unwrap();
  
          EnvConfig::with_vars_async([("PATH", "./bin")], |_| async {
-@@ -2525,9 +2668,40 @@ mod tests {
+@@ -2677,9 +2822,40 @@ mod tests {
          archive.into_inner().unwrap().finish().unwrap()
      }
  
@@ -308,47 +335,30 @@ index 34fb5c1..9975e6e 100644
      fn mount_platform_registry(
          server: &httpmock::MockServer,
          package_manager_type: PackageManagerType,
-@@ -2538,25 +2712,31 @@ mod tests {
-     ) {
-         use httpmock::prelude::*;
-         let bin = package_manager_type.to_string();
--        let (platform_package, prefix) = match package_manager_type {
--            PackageManagerType::Bun => (get_bun_platform_package_name().unwrap(), "@oven/"),
--            PackageManagerType::Pnpm => {
--                (get_pnpm_platform_package_name().unwrap().to_string(), "@pnpm/")
--            }
-+        let platform_package = match package_manager_type {
-+            PackageManagerType::Bun => get_bun_platform_package_name().unwrap(),
-+            PackageManagerType::Pnpm => get_pnpm_platform_package_name().unwrap().to_string(),
+@@ -2695,6 +2871,13 @@ mod tests {
+             PackageManagerType::Pnpm => get_pnpm_platform_package_name().unwrap().to_string(),
              other => panic!("{other} is not a platform-binary manager"),
          };
--        let basename = platform_package.strip_prefix(prefix).unwrap();
-+        let basename = platform_package.rsplit('/').next().unwrap();
 +        let platform_version = test_platform_version(version);
-         server.mock(|when, then| {
-             when.method(GET).path(format!("/{bin}/-/{bin}-{version}.tgz"));
-             then.status(200).body(main_tgz);
-         });
 +        #[cfg(target_env = "ohos")]
-         server.mock(|when, then| {
--            when.method(GET).path(format!("/{platform_package}/{version}"));
++        server.mock(|when, then| {
 +            when.method(GET).path(format!("/{platform_package}"));
 +            then.status(200)
 +                .json_body(serde_json::json!({"versions": {platform_version.clone(): {}}}));
 +        });
-+        server.mock(|when, then| {
-+            when.method(GET).path(format!("/{platform_package}/{platform_version}"));
-             then.status(200)
-                 .json_body(serde_json::json!({"dist": {"integrity": platform_integrity}}));
-         });
          server.mock(|when, then| {
--            when.method(GET).path(format!("/{platform_package}/-/{basename}-{version}.tgz"));
-+            when.method(GET)
-+                .path(format!("/{platform_package}/-/{basename}-{platform_version}.tgz"));
-             then.status(200).body(platform_tgz);
-         });
-     }
-@@ -2726,10 +2906,18 @@ mod tests {
+             when.method(GET).path(format!("/{bin}/-/{bin}-{version}.tgz"));
+             then.status(200).body(main_tgz);
+@@ -2702,7 +2885,7 @@ mod tests {
+         mount_package_with_integrity(
+             server,
+             &platform_package,
+-            version,
++            &platform_version,
+             platform_tgz,
+             platform_integrity,
+         );
+@@ -2932,10 +3115,18 @@ mod tests {
              format!("registry={registry}\n{authority}/:_authToken=SECRET\n"),
          )
          .unwrap();
@@ -367,7 +377,7 @@ index 34fb5c1..9975e6e 100644
  
          let vp_home = create_temp_dir();
          EnvConfig::with_vars_async([(env_vars::VP_HOME, vp_home.path().as_os_str())], |_| async {
-@@ -2881,6 +3069,8 @@ mod tests {
+@@ -3094,6 +3285,8 @@ mod tests {
                  then.status(200).json_body(serde_json::json!({ "version": version }));
              });
          }
@@ -376,7 +386,7 @@ index 34fb5c1..9975e6e 100644
          build_with_registry(builder, &server, vp_home.path()).await
      }
  
-@@ -3007,10 +3197,7 @@ mod tests {
+@@ -3220,10 +3413,7 @@ mod tests {
          let temp_dir = create_temp_dir();
          let vp_home = AbsolutePathBuf::new(temp_dir.path().to_path_buf()).unwrap();
          let server = MockServer::start();
@@ -388,7 +398,7 @@ index 34fb5c1..9975e6e 100644
          let registry = server.base_url();
          EnvConfig::with_vars_async(
              [
-@@ -3032,9 +3219,12 @@ mod tests {
+@@ -3245,9 +3435,12 @@ mod tests {
                  );
                  first.assert_hits(1);
  
@@ -402,7 +412,7 @@ index 34fb5c1..9975e6e 100644
                  );
                  let expire_cache = || {
                      fs::File::options()
-@@ -3047,10 +3237,8 @@ mod tests {
+@@ -3260,10 +3453,8 @@ mod tests {
                  expire_cache();
                  first.delete();
  
@@ -415,7 +425,7 @@ index 34fb5c1..9975e6e 100644
                  assert_eq!(
                      resolve_package_manager_version(PackageManagerType::Bun, "latest")
                          .await
-@@ -3077,10 +3265,7 @@ mod tests {
+@@ -3290,10 +3481,7 @@ mod tests {
          use httpmock::prelude::*;
  
          let server = MockServer::start();
@@ -427,7 +437,7 @@ index 34fb5c1..9975e6e 100644
          let config =
              NpmConfig { values: HashMap::from([("registry".to_string(), server.base_url())]) };
          let vp_home = create_temp_dir();
-@@ -3101,7 +3286,7 @@ mod tests {
+@@ -3314,7 +3502,7 @@ mod tests {
  
              let cache_path = dist_tag_cache_path(
                  PackageManagerType::Pnpm,
@@ -436,7 +446,7 @@ index 34fb5c1..9975e6e 100644
              );
              fs::File::options()
                  .write(true)
-@@ -3124,14 +3309,10 @@ mod tests {
+@@ -3337,14 +3525,10 @@ mod tests {
  
          let first_registry = MockServer::start();
          let second_registry = MockServer::start();
@@ -455,7 +465,7 @@ index 34fb5c1..9975e6e 100644
          let first_config = NpmConfig {
              values: HashMap::from([("registry".to_string(), first_registry.base_url())]),
          };
-@@ -3212,6 +3393,8 @@ mod tests {
+@@ -3425,6 +3609,8 @@ mod tests {
          .await;
      }
  
@@ -464,7 +474,7 @@ index 34fb5c1..9975e6e 100644
      #[tokio::test(flavor = "current_thread")]
      async fn dist_tag_resolution_rejects_a_non_semver_version() {
          use httpmock::prelude::*;
-@@ -3365,14 +3548,32 @@ mod tests {
+@@ -3578,14 +3764,32 @@ mod tests {
          let registry = MockServer::start();
          let registry_url = registry.base_url();
          let authority = registry_url.strip_prefix("http:").unwrap();
@@ -505,7 +515,7 @@ index 34fb5c1..9975e6e 100644
          let config = |token: &str| NpmConfig {
              values: HashMap::from([
                  ("registry".to_string(), registry_url.clone()),
-@@ -3411,18 +3612,44 @@ mod tests {
+@@ -3624,18 +3828,44 @@ mod tests {
          use httpmock::prelude::*;
  
          let registry = MockServer::start();
@@ -562,7 +572,7 @@ index 34fb5c1..9975e6e 100644
          let registry_url = registry.base_url();
          let authority = registry_url.strip_prefix("http:").unwrap();
          let config = |token: &str| NpmConfig {
-@@ -3466,7 +3693,7 @@ mod tests {
+@@ -3679,7 +3909,7 @@ mod tests {
          EnvConfig::with_vars_async([(env_vars::VP_HOME, vp_home.path().as_os_str())], |_| async {
              let cache_path = dist_tag_cache_path(
                  PackageManagerType::Pnpm,
@@ -571,7 +581,93 @@ index 34fb5c1..9975e6e 100644
              );
              write_dist_tag_cache(&cache_path, "10.1.0").unwrap();
              assert_eq!(
-@@ -4602,8 +4829,21 @@ mod tests {
+@@ -4777,7 +5007,7 @@ mod tests {
+         [
+             (
+                 PackageManagerType::Pnpm,
+-                "12.0.0-beta.0",
++                NATIVE_PNPM_TEST_VERSION,
+                 get_pnpm_platform_package_name().unwrap().to_string(),
+                 create_tgz(&[(pnpm_native, b"mock pnpm executable")]),
+             ),
+@@ -4881,15 +5111,29 @@ mod tests {
+         }
+         for ((kind, version, package, tgz), version_doc, package_doc) in cases {
+             let server = httpmock::MockServer::start();
++            let platform_case =
++                matches!(kind, PackageManagerType::Bun | PackageManagerType::Pnpm)
++                    && package != "pnpm";
++            let mock_version =
++                if platform_case { test_platform_version(version) } else { version.to_owned() };
++            #[cfg(target_env = "ohos")]
++            if platform_case && matches!(package_doc, Doc::Missing) {
++                server.mock(|when, then| {
++                    when.method(httpmock::Method::GET).path(format!("/{package}"));
++                    then.status(200).json_body(
++                        serde_json::json!({"versions": {mock_version.clone(): {}}}),
++                    );
++                });
++            }
+             let package_mock = mount_registry_documents(
+                 &server,
+                 &package,
+-                version,
++                &mock_version,
+                 &tgz,
+                 version_doc,
+                 package_doc,
+             );
+-            let tarball = mount_tarball(&server, &package, version, tgz);
++            let tarball = mount_tarball(&server, &package, &mock_version, tgz);
+             let vp_home = create_temp_dir();
+             let result = EnvConfig::with_vars_async(
+                 [
+@@ -4903,7 +5147,12 @@ mod tests {
+             let case = format!("{kind}@{version} version={version_doc:?} package={package_doc:?}");
+             // vp reads the package document only when the version document gives no integrity.
+             if let Some(package_mock) = package_mock {
+-                package_mock.assert_hits(usize::from(version_doc.matches().is_none()));
++                let expected = usize::from(version_doc.matches().is_none());
++                // On OHOS the port version is resolved from the packument, so
++                // a platform case reads it once more than upstream does.
++                #[cfg(target_env = "ohos")]
++                let expected = expected + usize::from(platform_case);
++                package_mock.assert_hits(expected);
+             }
+             match version_doc.matches().or(package_doc.matches()) {
+                 Some(true) => {
+@@ -4958,18 +5207,28 @@ mod tests {
+                 [(Doc::Missing, Doc::Missing), (Doc::NoIntegrity, Doc::NoIntegrity)]
+             {
+                 let server = httpmock::MockServer::start();
++                let platform_version = test_platform_version(version);
+                 let main_tarball =
+                     mount_tarball(&server, &kind.to_string(), version, main_tgz.clone());
++                #[cfg(target_env = "ohos")]
++                if matches!(package_doc, Doc::Missing) {
++                    server.mock(|when, then| {
++                        when.method(httpmock::Method::GET).path(format!("/{platform_package}"));
++                        then.status(200).json_body(
++                            serde_json::json!({"versions": {platform_version.clone(): {}}}),
++                        );
++                    });
++                }
+                 mount_registry_documents(
+                     &server,
+                     &platform_package,
+-                    version,
++                    &platform_version,
+                     &platform_tgz,
+                     version_doc,
+                     package_doc,
+                 );
+                 let platform_tarball =
+-                    mount_tarball(&server, &platform_package, version, platform_tgz.clone());
++                    mount_tarball(&server, &platform_package, &platform_version, platform_tgz.clone());
+                 let vp_home = create_temp_dir();
+                 let (result, verified_entries) = EnvConfig::with_vars_async(
+                     [
+@@ -5061,13 +5320,26 @@ mod tests {
          ] {
              let vp_home = create_temp_dir();
              let server = MockServer::start();
@@ -588,24 +684,20 @@ index 34fb5c1..9975e6e 100644
 +                        .json_body(serde_json::json!({"versions": {platform_version.clone(): {}}}));
 +                });
 +            }
-             server.mock(|when, then| {
--                when.method(GET).path(format!("/{package}/{version}"));
-+                when.method(GET).path(format!("/{package}/{platform_version}"));
-                 then.status(200).json_body(serde_json::json!({"dist": {}}));
-             });
-             let basename = package.rsplit('/').next().unwrap();
-@@ -4614,7 +4854,7 @@ mod tests {
+             let tarball = create_tgz(
+                 &entries
+                     .iter()
+                     .map(|path| (*path, b"mock executable".as_slice()))
                      .collect::<Vec<_>>(),
              );
-             server.mock(|when, then| {
--                when.method(GET).path(format!("/{package}/-/{basename}-{version}.tgz"));
-+                when.method(GET).path(format!("/{package}/-/{basename}-{platform_version}.tgz"));
-                 then.status(200).body(tarball);
-             });
+-            mount_package(&server, &package, version, tarball);
++            mount_package(&server, &package, &platform_version, tarball);
  
-@@ -4679,15 +4919,27 @@ mod tests {
-         let integrity =
-             format!("sha512-{}", base64_simd::STANDARD.encode_to_string(Sha512::digest(&tarball)));
+             EnvConfig::with_vars_async(
+                 [
+@@ -5128,15 +5400,27 @@ mod tests {
+         )]);
+         let integrity = sri(&tarball);
          let platform_package = get_pnpm_platform_package_name().unwrap();
 -        let platform_basename = platform_package.strip_prefix("@pnpm/").unwrap();
 +        let platform_basename = platform_package.rsplit('/').next().unwrap();
@@ -634,7 +726,7 @@ index 34fb5c1..9975e6e 100644
              then.status(200).body(tarball);
          });
  
-@@ -4700,7 +4952,7 @@ mod tests {
+@@ -5149,7 +5433,7 @@ mod tests {
              |_| async {
                  for _ in 0..2 {
                      let (target_dir, package_name, version) =
@@ -643,7 +735,7 @@ index 34fb5c1..9975e6e 100644
                              .await
                              .unwrap();
                      // native binary plus pnpm/pnpx shims, no JS entrypoint
-@@ -4711,9 +4963,11 @@ mod tests {
+@@ -5160,9 +5444,11 @@ mod tests {
                      assert!(is_exists_file(target_dir.join("bin/pnpm.cmd")).unwrap());
                      assert!(is_exists_file(target_dir.join("bin/pnpx")).unwrap());
                      assert_eq!(package_name, "pnpm");
@@ -656,7 +748,7 @@ index 34fb5c1..9975e6e 100644
                  metadata.assert_hits(1);
                  platform_tarball.assert_hits(1);
              },
-@@ -4748,7 +5002,7 @@ mod tests {
+@@ -5191,7 +5477,7 @@ mod tests {
          mount_platform_registry(
              &other_registry,
              PackageManagerType::Pnpm,
@@ -665,7 +757,7 @@ index 34fb5c1..9975e6e 100644
              main_tgz.clone(),
              other_platform,
              &other_integrity,
-@@ -4757,7 +5011,7 @@ mod tests {
+@@ -5200,7 +5486,7 @@ mod tests {
          mount_platform_registry(
              &trusted,
              PackageManagerType::Pnpm,
@@ -674,7 +766,7 @@ index 34fb5c1..9975e6e 100644
              main_tgz,
              genuine_platform,
              &genuine_integrity,
-@@ -4772,7 +5026,7 @@ mod tests {
+@@ -5215,7 +5501,7 @@ mod tests {
              |_| async {
                  download_package_manager(
                      PackageManagerType::Pnpm,
@@ -683,7 +775,7 @@ index 34fb5c1..9975e6e 100644
                      Some(main_pin.as_str()),
                  )
                  .await
-@@ -4789,7 +5043,7 @@ mod tests {
+@@ -5232,7 +5518,7 @@ mod tests {
              |_| async {
                  let (install_dir, _, _) = download_package_manager(
                      PackageManagerType::Pnpm,
@@ -692,7 +784,7 @@ index 34fb5c1..9975e6e 100644
                      Some(main_pin.as_str()),
                  )
                  .await
-@@ -5221,6 +5475,9 @@ mod tests {
+@@ -5664,6 +5950,9 @@ mod tests {
          let result = get_bun_platform_package_name();
          assert!(result.is_ok(), "Should return a platform package name");
          let name = result.unwrap();
@@ -702,9 +794,9 @@ index 34fb5c1..9975e6e 100644
          assert!(
              name.starts_with("@oven/bun-"),
              "Package name should start with @oven/bun-, got: {name}"
-@@ -5265,7 +5522,8 @@ mod tests {
-         let wrong_integrity =
-             format!("sha512-{}", base64_simd::STANDARD.encode_to_string(Sha512::digest(b"other")));
+@@ -5704,7 +5993,8 @@ mod tests {
+         let platform_integrity = sri(&platform_tgz);
+         let wrong_integrity = sri(b"other");
          let platform_package = get_bun_platform_package_name().unwrap();
 -        let platform_basename = platform_package.strip_prefix("@oven/").unwrap();
 +        let platform_basename = platform_package.rsplit('/').next().unwrap();
@@ -712,7 +804,7 @@ index 34fb5c1..9975e6e 100644
          // Keep other tests from borrowing this server while its connections use this runtime.
          let server = MockServer::start();
  
-@@ -5281,13 +5539,20 @@ mod tests {
+@@ -5720,13 +6010,20 @@ mod tests {
                  when.method(GET).path("/bun/-/bun-1.2.0.tgz");
                  then.status(200).body(main_tgz.clone());
              });
@@ -736,7 +828,7 @@ index 34fb5c1..9975e6e 100644
                  then.status(200).body(platform_tgz.clone());
              });
  
-@@ -5575,6 +5840,9 @@ mod tests {
+@@ -6002,6 +6299,9 @@ mod tests {
          let result = get_pnpm_platform_package_name();
          assert!(result.is_ok(), "Should return a platform package name");
          let name = result.unwrap();
@@ -746,7 +838,7 @@ index 34fb5c1..9975e6e 100644
          assert!(
              name.starts_with("@pnpm/exe."),
              "Package name should start with @pnpm/exe., got: {name}"
-@@ -5873,7 +6141,7 @@ mod tests {
+@@ -6380,7 +6680,7 @@ mod tests {
          mount_platform_registry(
              &registry,
              PackageManagerType::Pnpm,
@@ -755,7 +847,7 @@ index 34fb5c1..9975e6e 100644
              main_tgz,
              platform_tgz,
              &platform_integrity,
-@@ -5884,7 +6152,7 @@ mod tests {
+@@ -6391,7 +6691,7 @@ mod tests {
                  (env_vars::NPM_CONFIG_REGISTRY, std::ffi::OsStr::new(&registry.base_url())),
              ],
              |_| async {
