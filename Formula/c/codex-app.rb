@@ -1,12 +1,11 @@
 class CodexApp < Formula
   desc "ChatGPT desktop shell for OpenHarmony/HarmonyOS PC"
   homepage "https://learn.chatgpt.com/docs/linux/linux-app"
-  url "https://persistent.oaistatic.com/codex-app-prod/linux/deb/pool/main/c/chatgpt/chatgpt_26.1117.41037_arm64.deb",
+  url "https://persistent.oaistatic.com/codex-app-prod/linux/deb/pool/main/c/chatgpt/chatgpt_26.1120.41243_arm64.deb",
       using: :nounzip
-  version "26.1117.41037"
-  sha256 "714146e9c667b26a1bd4e57633c544334a9ed47c399989bfd98cf764140bdc53"
+  version "26.1120.41243"
+  sha256 "72b8b9ff2daa7bc750fb2149cec753f5ca06caef2157592777a45475f4292f27"
   license :cannot_represent # OpenAI service and software terms
-  revision 10
 
   livecheck do
     url "https://persistent.oaistatic.com/codex-app-prod/linux/deb/dists/stable/main/binary-arm64/Packages"
@@ -14,8 +13,8 @@ class CodexApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codex-app-v26.1117.41037-r14"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7d09dc509d1c7e7dc9b7113a283e4ac18b507f0e6511ee86ec616c7df8e813bb"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codex-app-v26.1120.41243-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "f25b568a56581c185b6f017222bde98726fb2fc118199039d3f2d3c0c704ebf6"
   end
 
   depends_on "app-installer"
