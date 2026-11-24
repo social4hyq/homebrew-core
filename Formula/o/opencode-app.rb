@@ -1,12 +1,11 @@
 class OpencodeApp < Formula
   desc "Desktop shell for the OpenCode agent (Electron window on opencode service)"
   homepage "https://opencode.ai"
-  url "https://github.com/anomalyco/opencode/archive/refs/tags/v2.3.2.tar.gz"
-  sha256 "de809cbf853ad98374961c525bd124e3e86bd285264b69fae53943a6e2dcdd5d"
+  url "https://github.com/anomalyco/opencode/archive/refs/tags/v2.4.1.tar.gz"
+  sha256 "ee134e3c1fc1a257eae6e2dd809a81a65d2775784afbbc6faa58bfc1638a5de0"
   # Tap-authored shell sources (MIT) on the CPF-Electron runtime (mixed
   # MIT/BSD/LGPL).
   license :cannot_represent
-  revision 7
 
   livecheck do
     url :stable
