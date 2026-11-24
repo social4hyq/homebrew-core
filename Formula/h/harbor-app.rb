@@ -73,7 +73,10 @@ class HarborApp < Formula
     installer = formula_opt_bin("app-installer")/"app-installer"
     (bin/"harbor-app").write <<~SH
       #!/bin/sh
-      exec "#{installer}" install \\
+      # hap-app invokes `<command> install`; app-installer takes no such
+      # subcommand (install is its default action), so swallow it.
+      [ "${1:-}" = "install" ] && shift
+      exec "#{installer}" \\
         --hap "#{libexec}/harbor-unsigned.hap" \\
         --bundle-id org.social4hyq.harbor \\
         --module entry --ability EntryAbility "$@"
