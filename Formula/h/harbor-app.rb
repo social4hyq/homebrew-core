@@ -65,6 +65,20 @@ class HarborApp < Formula
 
     libexec.install hap => "harbor-unsigned.hap"
     bin.install "harbor"
+
+    # `hap-app auto-install` requires a real command named after the formula
+    # (`*-app`) that accepts `install`. This is that installer entry point:
+    # it simply forwards to app-installer, which honours the HAP_INSTALLER_*
+    # environment variables set by hap-app.
+    (bin/"harbor-app").write <<~SH
+      #!/bin/sh
+      exec "#{HOMEBREW_PREFIX}/bin/app-installer" install \\
+        --hap "#{libexec}/harbor-unsigned.hap" \\
+        --bundle-id org.social4hyq.harbor \\
+        --module entry --ability EntryAbility "$@"
+    SH
+    chmod 0755, bin/"harbor-app"
+
     (pkgshare/"apps.json.default").write <<~JSON
       {
         "autoHideOnLaunch": true,
@@ -91,6 +105,7 @@ class HarborApp < Formula
     help = shell_output("#{bin}/harbor --help")
     assert_match "brew services", help
     assert_match "discover", help
+    assert_path_exists bin/"harbor-app"
     assert_path_exists libexec/"harbor-unsigned.hap"
     assert_path_exists pkgshare/"apps.json.default"
     module_json = JSON.parse(Utils.safe_popen_read("unzip", "-p", libexec/"harbor-unsigned.hap", "module.json"))
