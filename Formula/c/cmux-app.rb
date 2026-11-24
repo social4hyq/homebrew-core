@@ -1,5 +1,5 @@
 class CmuxApp < Formula
-  desc "cmux-like agent terminal for OHOS (libghostty terminal + herdr-core bridge + ArkWeb browser)"
+  desc "Cmux-like agent terminal for OHOS with herdr-core bridge"
   homepage "https://github.com/manaflow-ai/cmux"
   url "https://github.com/manaflow-ai/cmux/archive/refs/tags/v0.2.0.tar.gz"
   sha256 "3f665dc6d7bb2d09057457721fbd6584906bf00c95732d3cb3e5c4f3392a4608"
@@ -74,8 +74,8 @@ class CmuxApp < Formula
     cp res/"herdr-bridge.py", libexec/"herdr-bridge.py"
     chmod 0755, [libexec/"cmux-app.sh", libexec/"herdr-bridge.py"]
     (bin/"cmux-app").write_env_script libexec/"cmux-app.sh",
-      CMUX_APP_HAP: libexec/"cmux-app-unsigned.hap",
-      CMUX_APP_HC: formula_opt_bin("herdr-core")/"hc",
+      CMUX_APP_HAP:    libexec/"cmux-app-unsigned.hap",
+      CMUX_APP_HC:     formula_opt_bin("herdr-core")/"hc",
       CMUX_APP_BRIDGE: libexec/"herdr-bridge.py",
       CMUX_APP_PYTHON: formula_opt_bin("python@3.15")/"python3"
   end
