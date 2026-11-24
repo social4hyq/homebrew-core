@@ -141,7 +141,7 @@ export class HcBridge {
             clearTimeout(p.timer);
             const error = msg['error'];
             if (error !== undefined) p.reject(new Error(JSON.stringify(error)));
-            else p.resolve(msg['result'] !== undefined ? msg['result'] : {});
+            else p.resolve(msg['result'] !== undefined ? msg['result'] : new Object());
           }
         }
       } else if (f.kind === 0) { // DATA on a stream channel
@@ -196,9 +196,10 @@ export class HcBridge {
 
   // Attach to a terminal; onData receives raw PTY bytes. Returns the stream channel.
   async attach(terminal: string, rows: number, cols: number, onData: DataCallback): Promise<number> {
-    const result = await this.call('terminal.attach', {
+    const attachParams: Record<string, Object> = {
       'terminal': terminal, 'rows': rows, 'cols': cols
-    } as Object);
+    };
+    const result = await this.call('terminal.attach', attachParams);
     const ch = Number((result as Record<string, Object>)['channel']);
     this.streams.set(ch, onData);
     return ch;
@@ -211,7 +212,8 @@ export class HcBridge {
 
   // Send text + Enter via RPC (works without automatic_input).
   sendTextToTerminal(terminal: string, text: string): Promise<Object> {
-    return this.call('terminal.send', { 'terminal': terminal, 'text': text } as Object);
+    const params: Record<string, Object> = { 'terminal': terminal, 'text': text };
+    return this.call('terminal.send', params);
   }
 
   // Resize a stream (cols, rows as u32 LE).

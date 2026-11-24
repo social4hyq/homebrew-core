@@ -83,7 +83,7 @@ struct Index {
       await bridge.connect(host, port);
       this.bridge = bridge;
 
-      const list = await bridge.call('terminal.list', {}) as Record<string, Object>;
+      const list = await bridge.call('terminal.list', new Object()) as Record<string, Object>;
       const arr = list['terminals'] as Array<Record<string, Object>>;
       const infos: TermInfo[] = [];
       for (const t of arr) {
@@ -108,8 +108,11 @@ struct Index {
     this.currentTerm = address;
     const bridge = this.bridge;
     const ch = await bridge.attach(address, 24, 80, (data: Uint8Array) => {
-      // hc PTY bytes -> ghostty terminal renderer
-      try { this.termController.feed(data); } catch (e) { /* ignore feed races */ }
+      // hc PTY bytes (UTF-8) -> ghostty terminal renderer (feed takes string)
+      try {
+        const text = new util.TextDecoder().decodeToString(data);
+        this.termController.feed(text);
+      } catch (e) { /* ignore feed races */ }
     });
     this.streamChannel = ch;
     hilog.info(0x0000, TAG, 'attached %{public}s ch=%{public}d', address, ch);
