@@ -7,10 +7,28 @@ import { HcBridge } from '../bridge/HcBridge';
 
 const TAG = 'cmuxApp';
 
+// PTY byte <-> char mapping (Latin-1): keeps escape sequences and UTF-8 bytes
+// byte-for-byte intact across the hc bridge <-> libghostty boundary.
+function bytesToString(data: Uint8Array): string {
+  let s = '';
+  for (let i = 0; i < data.length; i++) s += String.fromCharCode(data[i]);
+  return s;
+}
+function stringToBytes(s: string): Uint8Array {
+  const out = new Uint8Array(s.length);
+  for (let i = 0; i < s.length; i++) out[i] = s.charCodeAt(i) & 0xff;
+  return out;
+}
+function lastPath(p: string): string {
+  const i = p.lastIndexOf('/');
+  return i >= 0 ? p.substring(i + 1) : p;
+}
+
 interface TermInfo {
   address: string;
   agent: string;
   status: string;
+  cwd: string;
 }
 
 // cmux-like main UI:
@@ -43,8 +61,8 @@ struct Index {
     this.termController.setTheme('Aizen_Dark');
     this.termController.setInputListener((data: string) => {
       if (this.bridge !== null && this.streamChannel >= 0) {
-        // keystrokes are UTF-8 text from libghostty; send raw bytes on the PTY stream.
-        this.bridge.sendInput(this.streamChannel, new util.TextEncoder().encodeInto(data));
+        // ghostty emits terminal byte streams as strings; send bytes verbatim.
+        this.bridge.sendInput(this.streamChannel, stringToBytes(data));
       }
     });
     this.termReady = true;
@@ -88,10 +106,16 @@ struct Index {
       const infos: TermInfo[] = [];
       for (const t of arr) {
         const fg = t['foreground'] as Record<string, Object> | undefined;
+        let agent = 'shell';
+        if (fg !== undefined && fg['name'] !== undefined) agent = String(fg['name']);
+        let status = '';
+        const sv = t['status'];
+        if (typeof sv === 'string') status = sv;
         infos.push({
           address: String(t['address']),
-          agent: fg !== undefined && fg['name'] !== undefined ? String(fg['name']) : 'shell',
-          status: String(t['status'] !== undefined ? t['status'] : '')
+          agent: agent,
+          status: status,
+          cwd: t['cwd'] !== undefined ? String(t['cwd']) : ''
         });
       }
       this.terms = infos;
@@ -108,52 +132,149 @@ struct Index {
     this.currentTerm = address;
     const bridge = this.bridge;
     const ch = await bridge.attach(address, 24, 80, (data: Uint8Array) => {
-      // hc PTY bytes (UTF-8) -> ghostty terminal renderer (feed takes string)
-      try {
-        const text = new util.TextDecoder().decodeToString(data);
-        this.termController.feed(text);
-      } catch (e) { /* ignore feed races */ }
+      // PTY is a raw byte stream: map each byte to the same-codepoint char so
+      // escape sequences (\x1b[...m) and UTF-8 bytes reach ghostty untouched.
+      // UTF-8 decoding here would mangle control bytes and split multibyte chars.
+      try { this.termController.feed(bytesToString(data)); } catch (e) { /* feed race */ }
     });
     this.streamChannel = ch;
     hilog.info(0x0000, TAG, 'attached %{public}s ch=%{public}d', address, ch);
   }
 
+  @Builder
+  statusDot(s: string) {
+    Circle({ width: 8, height: 8 })
+      .fill(s === 'working' ? '#e5c07b' : (s === 'idle' ? '#61afef' : '#7ec87e'))
+  }
+
+  @Builder
+  agentGlyph(agent: string) {
+    Text(agent === 'opencode' ? '◉' : (agent === 'antigravity' ? '✦' : '›'))
+      .fontSize(15)
+      .fontColor(agent === 'opencode' ? '#7ee2c0' : '#9aa4b2')
+      .width(22)
+      .textAlign(TextAlign.Center)
+  }
+
   build() {
     Row() {
-      // ---- left: vertical tab sidebar ----
+      // ============ left sidebar ============
       Column() {
-        Text('cmux').fontSize(18).fontWeight(FontWeight.Bold).padding(8)
-        Text(this.status).fontSize(11).fontColor(Color.Gray).padding({ left: 8, bottom: 8 })
+        // brand + connection
+        Row() {
+          Text('◧').fontSize(20).fontColor('#4c8bf5').margin({ right: 8 })
+          Text('cmux').fontSize(17).fontWeight(FontWeight.Bold).fontColor('#eef1f5')
+        }
+        .width('100%').padding({ left: 16, top: 18, bottom: 14 })
+
+        Row() {
+          Circle({ width: 7, height: 7 })
+            .fill(this.status === 'connected' ? '#7ec87e' : '#e06c75')
+          Text(this.status === 'connected' ? 'Connected' : this.status)
+            .fontSize(11).fontColor('#8b93a1').margin({ left: 7 })
+        }
+        .width('100%').padding({ left: 16, bottom: 18 })
+
+        // Spaces section label
+        Row() {
+          Text('SPACES').fontSize(10).fontColor('#6b7280').fontWeight(FontWeight.Medium)
+          Text('+').fontSize(14).fontColor('#8b93a1')
+        }
+        .width('100%').justifyContent(FlexAlign.SpaceBetween)
+        .padding({ left: 16, right: 16, bottom: 8 })
+
+        // workspace card (active)
+        Row() {
+          Stack() {
+            Circle({ width: 20, height: 20 }).fill('#3b82f6')
+            Text('W').fontSize(11).fontColor(Color.White).fontWeight(FontWeight.Bold)
+          }
+          Text('Workspace').fontSize(13).fontColor('#eef1f5').margin({ left: 10 })
+        }
+        .width('calc(100% - 20px)').margin({ left: 10, right: 10, bottom: 16 })
+        .padding({ left: 8, top: 8, bottom: 8 })
+        .backgroundColor('#2d2f36').borderRadius(8)
+
+        // Agents section label
+        Row() {
+          Text('AGENTS').fontSize(10).fontColor('#6b7280').fontWeight(FontWeight.Medium)
+          Circle({ width: 14, height: 14 }).fill('#2d2f36')
+        }
+        .width('100%').justifyContent(FlexAlign.SpaceBetween)
+        .padding({ left: 16, right: 16, bottom: 8 })
+
+        // agent tabs
         ForEach(this.terms, (t: TermInfo) => {
           Row() {
-            Text(t.agent).fontSize(13)
-            Text(t.status).fontSize(10).fontColor(t.status === 'working' ? '#e5c07b' : '#61afef')
+            this.agentGlyph(t.agent)
+            Column() {
+              Text(t.agent).fontSize(12).fontColor('#eef1f5').maxLines(1)
+                .textOverflow({ overflow: TextOverflow.Ellipsis })
+              Text(t.address + (t.cwd.length > 0 ? ' · ' + this.lastPath(t.cwd) : ''))
+                .fontSize(9).fontColor('#6b7280').maxLines(1)
+                .textOverflow({ overflow: TextOverflow.Ellipsis })
+            }
+            .layoutWeight(1).alignItems(HorizontalAlign.Start)
+            this.statusDot(t.status)
           }
-          .padding(8)
-          .backgroundColor(t.address === this.currentTerm ? '#3a3f4b' : 'transparent')
+          .width('calc(100% - 20px)').margin({ left: 10, right: 10, bottom: 4 })
+          .padding({ left: 8, right: 10, top: 9, bottom: 9 })
+          .backgroundColor(t.address === this.currentTerm ? '#343844' : 'transparent')
+          .borderRadius(8)
           .onClick(() => { this.openTerm(t.address); })
         })
-      }
-      .width('20%').height('100%').backgroundColor('#21252b')
 
-      // ---- center: terminal pane ----
+        Blank()
+
+        // footer
+        Row() {
+          Text('⚙').fontSize(13).fontColor('#8b93a1').margin({ right: 12 })
+          Text('+  New agent').fontSize(12).fontColor('#8b93a1')
+        }
+        .width('100%').padding({ left: 16, bottom: 18 })
+      }
+      .width(240).height('100%').backgroundColor('#1a1b1e')
+      .border({ width: { right: 1 }, color: '#2a2c31' })
+
+      // ============ center: terminal pane ============
       Column() {
+        // pane header
+        Row() {
+          Text('▣').fontSize(12).fontColor('#4c8bf5').margin({ right: 7 })
+          Text(this.currentTerm.length > 0 ? 'OpenCode · ' + this.currentTerm : 'Terminal')
+            .fontSize(12).fontColor('#c9d1d9')
+          Blank()
+          Text('⌄').fontSize(12).fontColor('#8b93a1')
+        }
+        .width('100%').height(36).padding({ left: 14, right: 14 })
+        .backgroundColor('#202126')
+
         TerminalSurface({
           controller: this.termController,
           surfaceId: 'cmux_main_term',
           surfaceColor: '#0B0D10'
-        }).width('100%').height('100%')
+        })
+          .width('100%').layoutWeight(1)
       }
-      .width('45%').height('100%')
+      .layoutWeight(1).height('100%').backgroundColor('#0B0D10')
 
-      // ---- right: browser pane ----
+      // ============ right: browser pane ============
       Column() {
+        Row() {
+          Text('◍').fontSize(12).fontColor('#4c8bf5').margin({ right: 7 })
+          Text('Browser').fontSize(12).fontColor('#c9d1d9')
+          Blank()
+          Text('⋯').fontSize(14).fontColor('#8b93a1')
+        }
+        .width('100%').height(36).padding({ left: 14, right: 14 })
+        .backgroundColor('#202126')
+
         Web({ src: $rawfile('probe.html'), controller: this.webController })
           .javaScriptAccess(true).fileAccess(true).domStorageAccess(true)
-          .width('100%').height('100%')
+          .width('100%').layoutWeight(1)
           .onPageEnd(() => { this.webReady = true; })
       }
-      .width('35%').height('100%')
+      .width('34%').height('100%').backgroundColor('#141519')
     }
     .width('100%').height('100%')
   }
