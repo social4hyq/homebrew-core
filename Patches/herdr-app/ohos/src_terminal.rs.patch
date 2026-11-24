@@ -1,5 +1,7 @@
-OHOS: IME cursor tracking, clipboard permission guidance with Settings shortcut
+OHOS: IME cursor, clipboard guidance + Settings action, Ctrl+V via system clipboard
 
+diff --git a/src/terminal.rs b/src/terminal.rs
+index d480e5d..ac17751 100644
 --- a/src/terminal.rs
 +++ b/src/terminal.rs
 @@ -77,8 +77,9 @@ pub enum TerminalEvent {
@@ -82,7 +84,22 @@ OHOS: IME cursor tracking, clipboard permission guidance with Settings shortcut
              self.dropped(paths, cx);
          } else if let Some(text) = item.text() {
              let bytes = self.grid.borrow().vt.paste_bytes(&text);
-@@ -2307,6 +2342,15 @@ fn paint_grid(bounds: Bounds<Pixels>, grid: &Rc<RefCell<Grid>>, focused: bool, w
+@@ -776,6 +811,14 @@ impl TerminalView {
+ 
+     /// Ctrl+V: a remote image, clipboard text on Windows, or the key itself.
+     pub fn paste_image(&mut self, cx: &mut Context<Self>) {
++        // On HarmonyOS there is no host clipboard tool for the program in the
++        // terminal (no xclip/wl-clipboard, no X/Wayland). Let Herdr read the
++        // system clipboard and inject it, exactly like terminal.paste, instead
++        // of forwarding Ctrl+V and letting the program fail to read it.
++        if cfg!(target_env = "ohos") {
++            self.paste(cx);
++            return;
++        }
+         if self.send_image(cx) {
+             return;
+         }
+@@ -2307,6 +2350,15 @@ fn paint_grid(bounds: Bounds<Pixels>, grid: &Rc<RefCell<Grid>>, focused: bool, w
      {
          let mut g = grid.borrow_mut();
          g.cursor_at = frame.cursor_cell.map(|(x, y)| Bounds::new(at(x as usize, y as usize), cell));
