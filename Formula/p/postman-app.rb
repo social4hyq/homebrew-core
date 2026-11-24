@@ -9,15 +9,17 @@ class PostmanApp < Formula
   version "12.38.0"
   sha256 "9827724c26a66ecca000ae5f1588e4d63a3e4a50f8cd622b948d307086a498e2"
   license :cannot_represent # Postman Terms / proprietary
+  # Resources-only fix (starship shim) since v12.38.0; bump the package
+  # revision so installed kegs pick up the change on `brew upgrade`.
+  revision 1
 
   livecheck do
     skip "Postman publishes no machine-readable arm64 Linux version index"
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/postman-app-v12.38.0-r2"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "370b44b5c8c173b18ce1ffba343cac889e4b94377e0519d8b89c6ea21352b7fa"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/postman-app-v12.38.0-r4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "146903fbcd397fce770c736835dea3bbc5db1682591603ce1fddaa9b552b1248"
   end
 
   depends_on "app-installer"
@@ -37,6 +39,7 @@ class PostmanApp < Formula
     Resources/_shared/hap-app/enable-cookie-encryption.py
     Resources/_shared/hap-app/install-lib.sh
     Resources/postman-app/app/postman-bootstrap.cjs
+    Resources/postman-app/app/starship-shim.cjs
     Resources/postman-app/assets/icon.png
     Resources/postman-app/scripts/install-postman-desktop.sh
     Resources/postman-app/scripts/postman-app.sh
@@ -44,6 +47,7 @@ class PostmanApp < Formula
     Resources/postman-app/support/assemble-local-hap.py
     Resources/postman-app/tests/assemble-local-hap.test.py
     Resources/postman-app/tests/postman-bootstrap.test.cjs
+    Resources/postman-app/tests/starship-shim.test.cjs
   ].freeze
 
   def patch
@@ -112,6 +116,7 @@ class PostmanApp < Formula
     assemble_dir.mkpath
     cp res/"support/assemble-local-hap.py", assemble_dir
     cp res/"app/postman-bootstrap.cjs", assemble_dir
+    cp res/"app/starship-shim.cjs", assemble_dir
     cp res/"app/postman-bootstrap.cjs", pkgshare
     cp res/"scripts/stage-ohos-shell.sh", pkgshare
     cp tap_root/"Resources/_shared/hap-app/install-lib.sh", pkgshare/"hap-app-install-lib.sh"
@@ -252,5 +257,6 @@ class PostmanApp < Formula
     # Assembler checks: trimmed native addons are rejected, valid layout passes.
     system "python3", tap_root/"Resources/postman-app/tests/assemble-local-hap.test.py"
     system "node", "--test", tap_root/"Resources/postman-app/tests/postman-bootstrap.test.cjs"
+    system "node", "--test", tap_root/"Resources/postman-app/tests/starship-shim.test.cjs"
   end
 end
