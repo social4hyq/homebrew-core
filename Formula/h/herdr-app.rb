@@ -4,7 +4,7 @@ class HerdrApp < Formula
   url "https://github.com/herdrdev/herdr-app/archive/refs/tags/v0.1.16.tar.gz"
   sha256 "fea3d920607f2199ed330eb3cdcb1fa3626dcea5080c92a97a296d983d6bc681"
   license "Apache-2.0"
-  revision 22
+  revision 23
 
   livecheck do
     url "https://github.com/herdrdev/herdr-app.git"
@@ -13,8 +13,8 @@ class HerdrApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/herdr-app-v0.1.16-r29"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "b17ebf3208b039df9cdd0d41907492d0f2995cd96ebffd50612b4b0613af3bde"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/herdr-app-v0.1.16-r30"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "21e36bf72b77b1e64828732d96aa04620f334a7b1aee2b4810eb76d4c9fc238c"
   end
 
   depends_on "node" => :build

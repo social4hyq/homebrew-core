@@ -1,7 +1,7 @@
-OHOS: IME cursor, clipboard diagnostics, Ctrl+V/system paste, image-as-path
+OHOS: IME cursor, clipboard OSC52 read + guidance, Ctrl+V system paste
 
 diff --git a/src/terminal.rs b/src/terminal.rs
-index d480e5d..0b93bae 100644
+index d480e5d..768562c 100644
 --- a/src/terminal.rs
 +++ b/src/terminal.rs
 @@ -77,8 +77,9 @@ pub enum TerminalEvent {
@@ -44,7 +44,7 @@ index d480e5d..0b93bae 100644
                  }
              });
          })
-@@ -763,14 +769,46 @@ impl TerminalView {
+@@ -763,14 +769,52 @@ impl TerminalView {
      /// Text as a paste; copied files (Finder, a clipboard manager's image) as
      /// if dropped; an image alone (a screenshot) as Ctrl+V pastes it.
      pub fn paste(&mut self, cx: &mut Context<Self>) {
@@ -79,13 +79,20 @@ index d480e5d..0b93bae 100644
          } else if let Some(text) = item.text() {
              let bytes = self.grid.borrow().vt.paste_bytes(&text);
              self.send(&bytes);
-         } else if item.entries().iter().any(|e| matches!(e, ClipboardEntry::Image(_))) {
+-        } else if item.entries().iter().any(|e| matches!(e, ClipboardEntry::Image(_))) {
 -            self.paste_image(cx);
++        } else if let Some(image) = item.entries().iter().find_map(|e| match e {
++            ClipboardEntry::Image(i) => Some(i),
++            _ => None,
++        }) {
 +            if cfg!(target_env = "ohos") {
-+                // OHOS has no host clipboard tool; paste the image as a path so
-+                // the terminal program can open it, instead of forwarding Ctrl+V.
-+                if let Some(path) = image_file(item) {
-+                    let bytes = self.grid.borrow().vt.paste_bytes(&path.to_string_lossy());
++                // Stage the image bytes so the program can read them via OSC52/OSC5522
++                // (no host xclip/wl-clipboard on OHOS), then forward Ctrl+V so the
++                // program issues the clipboard-read query that our VT callback answers.
++                let reps = vec![(image.format.mime_type().to_owned(), image.bytes.clone())];
++                self.grid.borrow_mut().vt.set_clipboard_for_read(reps);
++                let bytes = paste_image_fallback(&mut self.grid.borrow_mut().vt, None);
++                if let Some(bytes) = bytes {
 +                    self.send(&bytes);
 +                }
 +            } else {
@@ -94,7 +101,7 @@ index d480e5d..0b93bae 100644
          }
      }
  
-@@ -2307,6 +2345,15 @@ fn paint_grid(bounds: Bounds<Pixels>, grid: &Rc<RefCell<Grid>>, focused: bool, w
+@@ -2307,6 +2351,15 @@ fn paint_grid(bounds: Bounds<Pixels>, grid: &Rc<RefCell<Grid>>, focused: bool, w
      {
          let mut g = grid.borrow_mut();
          g.cursor_at = frame.cursor_cell.map(|(x, y)| Bounds::new(at(x as usize, y as usize), cell));
