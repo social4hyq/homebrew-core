@@ -132,10 +132,10 @@ struct Index {
     this.currentTerm = address;
     const bridge = this.bridge;
     const ch = await bridge.attach(address, 24, 80, (data: Uint8Array) => {
-      // PTY is a raw byte stream: map each byte to the same-codepoint char so
-      // escape sequences (\x1b[...m) and UTF-8 bytes reach ghostty untouched.
-      // UTF-8 decoding here would mangle control bytes and split multibyte chars.
-      try { this.termController.feed(bytesToString(data)); } catch (e) { /* feed race */ }
+      // hc PTY output is UTF-8 text; feed() takes a string. (A per-frame
+      // TextDecoder is what rendered CJK correctly in the verified build.)
+      try { this.termController.feed(new util.TextDecoder().decodeToString(data)); }
+      catch (e) { /* feed race */ }
     });
     this.streamChannel = ch;
     hilog.info(0x0000, TAG, 'attached %{public}s ch=%{public}d', address, ch);
@@ -237,24 +237,16 @@ struct Index {
       .border({ width: { right: 1 }, color: '#2a2c31' })
 
       // ============ center: terminal pane ============
-      Column() {
-        // pane header
-        Row() {
-          Text('▣').fontSize(12).fontColor('#4c8bf5').margin({ right: 7 })
-          Text(this.currentTerm.length > 0 ? 'OpenCode · ' + this.currentTerm : 'Terminal')
-            .fontSize(12).fontColor('#c9d1d9')
-          Blank()
-          Text('⌄').fontSize(12).fontColor('#8b93a1')
-        }
-        .width('100%').height(36).padding({ left: 14, right: 14 })
-        .backgroundColor('#202126')
-
+      // TerminalSurface needs a full-size, stable surface to bind its native
+      // renderer at onLoad; a layoutWeight'd/partial-height parent makes the
+      // native bind fail and libghostty falls back to overlapping plain text.
+      Stack() {
         TerminalSurface({
           controller: this.termController,
           surfaceId: 'cmux_main_term',
           surfaceColor: '#0B0D10'
         })
-          .width('100%').layoutWeight(1)
+          .width('100%').height('100%')
       }
       .layoutWeight(1).height('100%').backgroundColor('#0B0D10')
 
