@@ -1,7 +1,7 @@
-OHOS: IME cursor, clipboard guidance + Settings action, Ctrl+V via system clipboard
+OHOS: IME cursor, clipboard guidance + Settings, Ctrl+V/system paste, image-as-path
 
 diff --git a/src/terminal.rs b/src/terminal.rs
-index d480e5d..ac17751 100644
+index d480e5d..41dea05 100644
 --- a/src/terminal.rs
 +++ b/src/terminal.rs
 @@ -77,8 +77,9 @@ pub enum TerminalEvent {
@@ -44,7 +44,7 @@ index d480e5d..ac17751 100644
                  }
              });
          })
-@@ -763,8 +769,37 @@ impl TerminalView {
+@@ -763,14 +769,52 @@ impl TerminalView {
      /// Text as a paste; copied files (Finder, a clipboard manager's image) as
      /// if dropped; an image alone (a screenshot) as Ctrl+V pastes it.
      pub fn paste(&mut self, cx: &mut Context<Self>) {
@@ -67,8 +67,8 @@ index d480e5d..ac17751 100644
 +                    _ => {
 +                        let _ = this.update(cx, |_, cx| {
 +                            cx.emit(TerminalEvent::Notice {
-+                                title: "Clipboard access is off".into(),
-+                                body: "Tap to open Settings and enable Read clipboard for Herdr.".into(),
++                                title: "Clipboard unavailable".into(),
++                                body: "No readable text on the clipboard. Tap to check Herdr's clipboard permission.".into(),
 +                                action: Some("app.open_permissions".into()),
 +                            });
 +                        });
@@ -84,22 +84,23 @@ index d480e5d..ac17751 100644
              self.dropped(paths, cx);
          } else if let Some(text) = item.text() {
              let bytes = self.grid.borrow().vt.paste_bytes(&text);
-@@ -776,6 +811,14 @@ impl TerminalView {
- 
-     /// Ctrl+V: a remote image, clipboard text on Windows, or the key itself.
-     pub fn paste_image(&mut self, cx: &mut Context<Self>) {
-+        // On HarmonyOS there is no host clipboard tool for the program in the
-+        // terminal (no xclip/wl-clipboard, no X/Wayland). Let Herdr read the
-+        // system clipboard and inject it, exactly like terminal.paste, instead
-+        // of forwarding Ctrl+V and letting the program fail to read it.
-+        if cfg!(target_env = "ohos") {
-+            self.paste(cx);
-+            return;
-+        }
-         if self.send_image(cx) {
-             return;
+             self.send(&bytes);
+         } else if item.entries().iter().any(|e| matches!(e, ClipboardEntry::Image(_))) {
+-            self.paste_image(cx);
++            if cfg!(target_env = "ohos") {
++                // OHOS has no host clipboard tool; paste the image as a path so
++                // the terminal program can open it, instead of forwarding Ctrl+V.
++                if let Some(path) = image_file(item) {
++                    let bytes = self.grid.borrow().vt.paste_bytes(&path.to_string_lossy());
++                    self.send(&bytes);
++                }
++            } else {
++                self.paste_image(cx);
++            }
          }
-@@ -2307,6 +2350,15 @@ fn paint_grid(bounds: Bounds<Pixels>, grid: &Rc<RefCell<Grid>>, focused: bool, w
+     }
+ 
+@@ -2307,6 +2351,15 @@ fn paint_grid(bounds: Bounds<Pixels>, grid: &Rc<RefCell<Grid>>, focused: bool, w
      {
          let mut g = grid.borrow_mut();
          g.cursor_at = frame.cursor_cell.map(|(x, y)| Bounds::new(at(x as usize, y as usize), cell));
