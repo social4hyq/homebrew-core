@@ -5,7 +5,7 @@ class AntigravityIdeApp < Formula
       "2.8.0-6733682917113856/linux-arm/Antigravity%20IDE.tar.gz"
   sha256 "d8f85ce40306587a80a7478af4de85cb10b83cf26dd9179b902afa9933fcf9f2"
   license :cannot_represent # Google Terms of Service; closed-source prebuilt desktop app
-  revision 5
+  revision 6
 
   livecheck do
     url :homepage
@@ -13,8 +13,8 @@ class AntigravityIdeApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/antigravity-ide-app-v2.8.0-r3"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cd96e9222345924ee5e74bbdca12b4468c8441c07786ceb64d8569f906b06592"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/antigravity-ide-app-v2.8.0-r4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "056945ae28e56b228c57014aa7cfeeb4e11dbafd409b34cb94cb23a0d8534c61"
   end
 
   depends_on "app-installer"
@@ -40,6 +40,7 @@ class AntigravityIdeApp < Formula
     Resources/antigravity-ide-app/scripts/install-antigravity-ide-app.sh
     Resources/antigravity-ide-app/scripts/stage-ohos-shell.sh
     Resources/antigravity-ide-app/support/assemble-local-hap.py
+    Resources/antigravity-ide-app/support/ohos_compat.py
   ].freeze
 
   def patch
@@ -105,6 +106,7 @@ class AntigravityIdeApp < Formula
     assemble_dir = pkgshare/"assemble"
     assemble_dir.mkpath
     cp support/"assemble-local-hap.py", assemble_dir
+    cp support/"ohos_compat.py", assemble_dir
     cp support/"antigravity-ide-app-bootstrap.cjs", assemble_dir
 
     verify_script = assemble_dir/"assemble-local-hap.py"
