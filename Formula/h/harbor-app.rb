@@ -4,6 +4,7 @@ class HarborApp < Formula
   url "https://github.com/social4hyq/harbor-app/archive/refs/tags/v0.1.0.tar.gz"
   sha256 "809b8fd7ce35846dc843485b39b2db41e4031c0da76ca4cca9068bac1e29cb35"
   license "MIT"
+  revision 1
 
   livecheck do
     url :stable
