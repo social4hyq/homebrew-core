@@ -70,9 +70,10 @@ class HarborApp < Formula
     # (`*-app`) that accepts `install`. This is that installer entry point:
     # it simply forwards to app-installer, which honours the HAP_INSTALLER_*
     # environment variables set by hap-app.
+    installer = formula_opt_bin("app-installer")/"app-installer"
     (bin/"harbor-app").write <<~SH
       #!/bin/sh
-      exec "#{HOMEBREW_PREFIX}/bin/app-installer" install \\
+      exec "#{installer}" install \\
         --hap "#{libexec}/harbor-unsigned.hap" \\
         --bundle-id org.social4hyq.harbor \\
         --module entry --ability EntryAbility "$@"
