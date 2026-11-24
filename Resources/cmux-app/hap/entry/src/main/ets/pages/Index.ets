@@ -47,6 +47,8 @@ struct Index {
   @State private status: string = 'init';
   @State private webReady: boolean = false;
   @State private termReady: boolean = false;
+  @State private screenText: string = '';
+  private screenTimer: number = -1;
 
   aboutToAppear(): void {
     // setConfig with explicit ARGB colors (verified to paint opencode content
@@ -68,6 +70,17 @@ struct Index {
     });
     this.termReady = true;
 
+    // The libghostty 0.1.1 native surface does not composite pixels on this
+    // device (renderer logic runs, surface stays transparent). Mirror its VT
+    // buffer into an ArkUI Text so the terminal is actually visible; the
+    // transparent surface on top still owns keyboard/IME input.
+    this.screenTimer = setInterval(() => {
+      try {
+        const s = this.termController.getScreenContent();
+        if (s.length > 0) this.screenText = s;
+      } catch (e) { /* not attached yet */ }
+    }, 120) as number;
+
     try {
       webview.WebviewController.setWebDebuggingAccess(true);
     } catch (e) {
@@ -75,6 +88,13 @@ struct Index {
     }
 
     this.connectCore();
+  }
+
+  aboutToDisappear(): void {
+    if (this.screenTimer >= 0) {
+      clearInterval(this.screenTimer);
+      this.screenTimer = -1;
+    }
   }
 
   // Read bridge.conf (addr + token) injected as a rawfile, then connect.
@@ -238,14 +258,28 @@ struct Index {
       .border({ width: { right: 1 }, color: '#2a2c31' })
 
       // ============ center: terminal pane ============
-      // TerminalSurface needs a full-size, stable surface to bind its native
-      // renderer at onLoad; a layoutWeight'd/partial-height parent makes the
-      // native bind fail and libghostty falls back to overlapping plain text.
+      // libghostty 0.1.1's native surface doesn't composite on this device.
+      // Show its VT buffer (getScreenContent) as ArkUI Text underneath, and
+      // keep a transparent TerminalSurface on top for keyboard/IME input.
       Stack() {
+        Scroll() {
+          Text(this.screenText.length > 0 ? this.screenText : 'Connecting to agent…')
+            .fontSize(12)
+            .fontFamily('monospace')
+            .fontColor('#D0D6F0')
+            .lineHeight(17)
+            .padding(10)
+            .width('100%')
+            .textAlign(TextAlign.Start)
+        }
+        .scrollBar(BarState.Off)
+        .width('100%').height('100%')
+        .backgroundColor('#0B0D10')
+
         TerminalSurface({
           controller: this.termController,
           surfaceId: 'cmux_main_term',
-          surfaceColor: '#0B0D10'
+          surfaceColor: '#00000000'
         })
           .width('100%').height('100%')
       }
