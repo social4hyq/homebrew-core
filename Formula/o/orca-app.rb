@@ -3,12 +3,11 @@ class OrcaApp < Formula
   homepage "https://github.com/stablyai/orca"
   # Version follows the Orca release; shell sources live in Resources/orca-app
   # and the host runtime comes from the `orca` formula (same upstream tag).
-  url "https://github.com/stablyai/orca/archive/refs/tags/v1.4.269.tar.gz"
-  sha256 "8b6a065a96401fc94c95cfeb0314bcf30b354d7493af91993472c3aca4cbeda4"
+  url "https://github.com/stablyai/orca/archive/refs/tags/v1.4.272.tar.gz"
+  sha256 "f7eae968825acde3deced239d07f828a04e54e0962a6e4d1d7c8b12129e8221d"
   # Tap-authored shell scripts (MIT) on the CPF-Electron runtime (mixed
   # MIT/BSD/LGPL).
   license :cannot_represent
-  revision 10
 
   livecheck do
     url :stable
@@ -16,8 +15,8 @@ class OrcaApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/orca-app-v1.4.269-r13"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "349920e22bab293223082fd0be1a16321ebf9b5d20dd552615dc0a427cc90225"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/orca-app-v1.4.272-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "08dec990f084c96497e245100f0344cbbbdf797ff300e7a828bef06b6595a774"
   end
 
   depends_on "openjdk" => :build
