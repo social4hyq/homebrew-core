@@ -12,7 +12,7 @@ class HarborApp < Formula
 
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/harbor-app-v0.1.0-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0000000000000000000000000000000000000000000000000000000000000000"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0bc8c0ddfbf01aec66e9021d5134861489d89c4ebc4fb3a1b28a66f6c719d5b8"
   end
 
   depends_on "node" => :build
