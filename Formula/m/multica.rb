@@ -1,8 +1,8 @@
 class Multica < Formula
   desc "CLI and local daemon for the Multica AI agent workspace"
   homepage "https://multica.ai"
-  url "https://github.com/multica-ai/multica/archive/refs/tags/v0.11.1.tar.gz"
-  sha256 "8a8f2149447dfd0c178fca332f88b539560fa57a5075d67c6e440958de8d49fc"
+  url "https://github.com/multica-ai/multica/archive/refs/tags/v0.12.1.tar.gz"
+  sha256 "38cbb77655ae628586abfbb7838a8dd023e51998b5d7d6c1352a110418602dcb"
   license :cannot_represent # Multica License (Apache-2.0 plus additional conditions)
 
   livecheck do
