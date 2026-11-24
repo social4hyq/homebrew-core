@@ -15,8 +15,9 @@ class PostmanApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/postman-app-v12.38.0-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "93cd46c7a36b78d7ac651a93b96f86499177f22ba60f511b297fa7dab9ddfc2e"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/postman-app-v12.38.0-r2"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "370b44b5c8c173b18ce1ffba343cac889e4b94377e0519d8b89c6ea21352b7fa"
   end
 
   depends_on "app-installer"
@@ -119,6 +120,20 @@ class PostmanApp < Formula
     cp res/"scripts/postman-app.sh", libexec/"postman-app.sh"
     chmod 0755, [pkgshare/"install-desktop.sh", libexec/"postman-app.sh"]
 
+    # Postman needs the weak sandbox (host file access + host binary exec). The
+    # shell HAP already declares the four ACL permissions; expose the same
+    # module.json as an ACL variant so install-lib takes the explicit ACL path
+    # and validates bundle consistency before signing.
+    shell_module = JSON.parse(
+      Utils.safe_popen_read("unzip", "-p", libexec/"postman-app-shell-unsigned.hap", "module.json"),
+    )
+    requested = shell_module.fetch("module").fetch("requestPermissions")
+    %w[ohos.permission.CUSTOM_SANDBOX ohos.permission.READ_WRITE_USER_FILE
+       ohos.permission.INTERNET ohos.permission.GET_NETWORK_INFO].each do |name|
+      requested << { "name" => name } unless requested.any? { |permission| permission["name"] == name }
+    end
+    (pkgshare/"module-acl.json").write JSON.generate(shell_module)
+
     # Run the assembler's payload checks against the tarball Homebrew just
     # downloaded: a release that changes the app layout must fail this build,
     # not the user's install.
@@ -148,6 +163,7 @@ class PostmanApp < Formula
       POSTMAN_APP_UNSIGNED_HAP:   libexec/"postman-app-shell-unsigned.hap",
       POSTMAN_APP_VENDOR_JSON:    libexec/"vendor.json",
       POSTMAN_APP_ASSEMBLE_DIR:   assemble_dir,
+      POSTMAN_APP_MODULE_ACL:     pkgshare/"module-acl.json",
       POSTMAN_APP_INSTALL_SCRIPT: pkgshare/"install-desktop.sh",
       POSTMAN_APP_BREW_PREFIX:    formula_opt_prefix("app-installer").parent.parent,
       PATH:                       runtime_path
@@ -219,6 +235,11 @@ class PostmanApp < Formula
     assert_includes permissions, "ohos.permission.INTERNET"
     assert_includes permissions, "ohos.permission.CUSTOM_SANDBOX"
     assert_includes permissions, "ohos.permission.READ_WRITE_USER_FILE"
+    # The wrapper must expose an ACL variant (weak sandbox is required).
+    acl = JSON.parse((pkgshare/"module-acl.json").read)
+    acl_permissions = acl.dig("module", "requestPermissions").map { |item| item.fetch("name") }
+    assert_includes acl_permissions, "ohos.permission.CUSTOM_SANDBOX"
+    assert_includes acl_permissions, "ohos.permission.READ_WRITE_USER_FILE"
     listing = shell_output("unzip -Z1 #{hap}")
     refute_match "resources/resfile/resources/app/vendor/main.js", listing
     system "unzip", "-tq", hap

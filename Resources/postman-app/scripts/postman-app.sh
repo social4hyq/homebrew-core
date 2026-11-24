@@ -53,11 +53,10 @@ case "${1:-}" in
     ;;
   install)
     shift
-    tmp_parent="${TMPDIR:-/data/storage/el2/base/cache}"
-    mkdir -p -- "$tmp_parent"
-    work=$(mktemp -d "$tmp_parent/postman-app.XXXXXX")
-    trap 'rm -rf -- "$work"' EXIT
-    "$POSTMAN_APP_INSTALL_SCRIPT" "$POSTMAN_APP_UNSIGNED_HAP" "$work" "$@"
+    # The install script sources the shared install-lib, which reads the HAP
+    # from POSTMAN_APP_UNSIGNED_HAP and manages its own staging dir. Forward the
+    # user's flags verbatim (do not pass the HAP/workdir as positional args).
+    exec "$POSTMAN_APP_INSTALL_SCRIPT" "$@"
     ;;
   start)
     shift
