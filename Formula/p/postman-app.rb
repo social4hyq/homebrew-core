@@ -15,8 +15,9 @@ class PostmanApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/postman-app-v12.38.0-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "93cd46c7a36b78d7ac651a93b96f86499177f22ba60f511b297fa7dab9ddfc2e"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/postman-app-v12.38.0-r2"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "370b44b5c8c173b18ce1ffba343cac889e4b94377e0519d8b89c6ea21352b7fa"
   end
 
   depends_on "app-installer"
