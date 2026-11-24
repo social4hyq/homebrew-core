@@ -12,8 +12,8 @@ class CmuxApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/cmux-app-v0.2.0-r4"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8c009a6da41f74773bcfbcf7044bd7fd0766ce879828230edaa4bd305415b559"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/cmux-app-v0.2.0-r5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a6ddbd6e8f7ac46d035cde2178d4928a7e7ee8574abb6ff795e14c205e2c6cd8"
   end
 
   depends_on "node" => :build
