@@ -70,6 +70,14 @@ def assemble(shell, tarball, output, pin_path):
         vendor = Path(temp) / "app"
         vendor.mkdir()
         selected_app(tarball, vendor)
+        # Apply OHOS compatibility rewrites to the extracted vendor tree:
+        # stub glibc .node addons, present linux platform to VS Code, relax
+        # DI strict mode and guard an Electron API absent on OHOS.
+        try:
+            import ohos_compat
+            ohos_compat.patch_vendor(vendor)
+        except ImportError:
+            pass  # building from a tree without the compat module
         with zipfile.ZipFile(shell) as source:
             names = source.namelist()
             if len(names) != len(set(names)) or "module.json" not in names:
