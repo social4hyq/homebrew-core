@@ -11,6 +11,11 @@ class CmuxApp < Formula
     strategy :git
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/cmux-app-v0.2.0-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "011af3e9f8f3a9db0853447bd205bc284a4d092702401f10462075c95e7a63a6"
+  end
+
   depends_on "node" => :build
   depends_on "app-installer"
   depends_on "herdr-core"
