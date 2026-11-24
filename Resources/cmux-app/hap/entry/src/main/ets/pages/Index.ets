@@ -2,7 +2,7 @@ import { webview } from '@kit.ArkWeb';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { common } from '@kit.AbilityKit';
 import { util } from '@kit.ArkTS';
-import { DEFAULT_TERMINAL_CONFIG, TerminalController, TerminalSurface } from 'libghostty-ohos';
+import { TerminalController, TerminalSurface } from 'libghostty-ohos';
 import { HcBridge } from '../bridge/HcBridge';
 
 const TAG = 'cmuxApp';
@@ -49,15 +49,10 @@ struct Index {
   @State private termReady: boolean = false;
 
   aboutToAppear(): void {
-    // Terminal controller: input goes back to hc via bridge stream channel.
-    this.termController.setConfig({
-      fontSize: 15,
-      scrollbackLines: 15000,
-      bgColor: DEFAULT_TERMINAL_CONFIG.bgColor,
-      fgColor: DEFAULT_TERMINAL_CONFIG.fgColor,
-      cursorStyle: DEFAULT_TERMINAL_CONFIG.cursorStyle,
-      cursorBlink: DEFAULT_TERMINAL_CONFIG.cursorBlink
-    });
+    // Match libghostty-ohos's own example: updateConfig (lightweight patch) +
+    // setTheme. Passing bg/fg via setConfig before attach doesn't reach native
+    // on this HAR version; the bundled dark theme owns the palette instead.
+    this.termController.updateConfig({ fontSize: 15, scrollbackLines: 15000 });
     this.termController.setTheme('Aizen_Dark');
     this.termController.setInputListener((data: string) => {
       if (this.bridge !== null && this.streamChannel >= 0) {
