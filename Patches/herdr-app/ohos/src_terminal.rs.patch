@@ -1,7 +1,7 @@
-OHOS: IME cursor, clipboard guidance + Settings, Ctrl+V/system paste, image-as-path
+OHOS: IME cursor, clipboard diagnostics, Ctrl+V/system paste, image-as-path
 
 diff --git a/src/terminal.rs b/src/terminal.rs
-index d480e5d..41dea05 100644
+index d480e5d..0b93bae 100644
 --- a/src/terminal.rs
 +++ b/src/terminal.rs
 @@ -77,8 +77,9 @@ pub enum TerminalEvent {
@@ -44,7 +44,7 @@ index d480e5d..41dea05 100644
                  }
              });
          })
-@@ -763,14 +769,52 @@ impl TerminalView {
+@@ -763,14 +769,46 @@ impl TerminalView {
      /// Text as a paste; copied files (Finder, a clipboard manager's image) as
      /// if dropped; an image alone (a screenshot) as Ctrl+V pastes it.
      pub fn paste(&mut self, cx: &mut Context<Self>) {
@@ -62,17 +62,11 @@ index d480e5d..41dea05 100644
 +            cx.spawn(async move |this, cx| {
 +                match read.await {
 +                    Ok(Some(item)) => {
++                        tracing::info!("OHOS clipboard read ok: {} entries", item.entries().len());
 +                        let _ = this.update(cx, |this, cx| this.paste_item(&item, cx));
 +                    }
-+                    _ => {
-+                        let _ = this.update(cx, |_, cx| {
-+                            cx.emit(TerminalEvent::Notice {
-+                                title: "Clipboard unavailable".into(),
-+                                body: "No readable text on the clipboard. Tap to check Herdr's clipboard permission.".into(),
-+                                action: Some("app.open_permissions".into()),
-+                            });
-+                        });
-+                    }
++                    Ok(None) => tracing::info!("OHOS clipboard read: empty"),
++                    Err(error) => tracing::warn!("OHOS clipboard read failed: {error}"),
 +                }
 +            }).detach();
 +        }
@@ -100,7 +94,7 @@ index d480e5d..41dea05 100644
          }
      }
  
-@@ -2307,6 +2351,15 @@ fn paint_grid(bounds: Bounds<Pixels>, grid: &Rc<RefCell<Grid>>, focused: bool, w
+@@ -2307,6 +2345,15 @@ fn paint_grid(bounds: Bounds<Pixels>, grid: &Rc<RefCell<Grid>>, focused: bool, w
      {
          let mut g = grid.borrow_mut();
          g.cursor_at = frame.cursor_cell.map(|(x, y)| Bounds::new(at(x as usize, y as usize), cell));
