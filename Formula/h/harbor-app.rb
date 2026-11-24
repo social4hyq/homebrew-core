@@ -82,7 +82,7 @@ class HarborApp < Formula
 
   post_install_steps do
     run "{{HOMEBREW_PREFIX}}/bin/hap-app",
-        args: ["auto-install", "harbor", "org.social4hyq.harbor"],
+        args: ["auto-install", "harbor-app", "org.social4hyq.harbor"],
         must_succeed: false, print_stdout: true, network_access: true
   end
 
