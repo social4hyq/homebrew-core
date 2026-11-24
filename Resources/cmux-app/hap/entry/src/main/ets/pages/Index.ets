@@ -2,7 +2,7 @@ import { webview } from '@kit.ArkWeb';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { common } from '@kit.AbilityKit';
 import { util } from '@kit.ArkTS';
-import { TerminalController, TerminalSurface } from 'libghostty-ohos';
+import { DEFAULT_TERMINAL_CONFIG, TerminalController, TerminalSurface } from 'libghostty-ohos';
 import { HcBridge } from '../bridge/HcBridge';
 
 const TAG = 'cmuxApp';
@@ -49,10 +49,16 @@ struct Index {
   @State private termReady: boolean = false;
 
   aboutToAppear(): void {
-    // Match libghostty-ohos's own example: updateConfig (lightweight patch) +
-    // setTheme. Passing bg/fg via setConfig before attach doesn't reach native
-    // on this HAR version; the bundled dark theme owns the palette instead.
-    this.termController.updateConfig({ fontSize: 15, scrollbackLines: 15000 });
+    // setConfig with explicit ARGB colors (verified to paint opencode content
+    // on this device) + dark theme; updateConfig alone lost the native paint.
+    this.termController.setConfig({
+      fontSize: 15,
+      scrollbackLines: 15000,
+      bgColor: 0xFF0B0D10,
+      fgColor: 0xFFD0D6F0,
+      cursorStyle: 0,
+      cursorBlink: true
+    });
     this.termController.setTheme('Aizen_Dark');
     this.termController.setInputListener((data: string) => {
       if (this.bridge !== null && this.streamChannel >= 0) {
