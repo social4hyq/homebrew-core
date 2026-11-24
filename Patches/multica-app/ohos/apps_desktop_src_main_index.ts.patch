@@ -3,10 +3,10 @@ PATH probe, and create the status bar item before the first window so closing
 it hides to the tray instead of exiting.
 
 diff --git a/apps/desktop/src/main/index.ts b/apps/desktop/src/main/index.ts
-index 668f77d..c688e88 100644
+index 843bb80..b6d309f 100644
 --- a/apps/desktop/src/main/index.ts
 +++ b/apps/desktop/src/main/index.ts
-@@ -10,6 +10,11 @@ import {
+@@ -10,6 +10,11 @@
  } from "electron";
  import { homedir } from "os";
  import { join } from "path";
@@ -18,7 +18,7 @@ index 668f77d..c688e88 100644
  import { pathToFileURL } from "url";
  import { electronApp, optimizer, is } from "@electron-toolkit/utils";
  import fixPath from "fix-path";
-@@ -30,6 +35,7 @@ import { installNavigationGestures } from "./navigation-gestures";
+@@ -32,6 +37,7 @@
  import { installNavigationGuard } from "./navigation-guard";
  import { installWindowForegroundEvents, windowForeground } from "./window-foreground";
  import { createRendererWebPreferences } from "./renderer-web-preferences";
@@ -26,7 +26,7 @@ index 668f77d..c688e88 100644
  import { getAppVersion } from "./app-version";
  import { loadRuntimeConfig } from "./runtime-config-loader";
  import type { RuntimeConfigResult } from "../shared/runtime-config";
-@@ -138,7 +144,9 @@ const BUNDLED_ICON_PATH = join(__dirname, "../../resources/icon.png").replace(
+@@ -141,7 +147,9 @@
  // before any child_process.spawn / execFile call in the main process —
  // ES module imports are hoisted, so this block executes before createMainWindow
  // or any daemon-manager spawn.
@@ -37,7 +37,7 @@ index 668f77d..c688e88 100644
    fixPath();
    // Fallback: ensure common install locations are on PATH when fix-path came
    // up short (broken shell rc, non-interactive $SHELL, missing entries).
-@@ -164,6 +172,8 @@ function freezeBreadcrumbPath(): string {
+@@ -170,6 +178,8 @@
  }
  
  const mainWindows = new MainWindowRegistry<BrowserWindow>();
@@ -46,8 +46,8 @@ index 668f77d..c688e88 100644
  const issueWindows = new Set<BrowserWindow>();
  const authSessionCoordinator = new AuthSessionCoordinator<BrowserWindow>(
    (window) => {
-@@ -1068,6 +1078,25 @@ if (!gotTheLock) {
-       applyUnreadBadge();
+@@ -1084,6 +1094,25 @@
+       setAppDialogLocale(typeof rawLocale === "string" ? rawLocale : null);
      });
  
 +    // The status bar item must exist before the first BrowserWindow: the shell
@@ -72,7 +72,7 @@ index 668f77d..c688e88 100644
      desktopInitialized = true;
      for (const saved of loadWindowSession(windowStateFile())) {
        createMainWindow(saved);
-@@ -1115,5 +1144,17 @@ if (!gotTheLock) {
+@@ -1132,5 +1161,17 @@
  }
  
  app.on("window-all-closed", () => {

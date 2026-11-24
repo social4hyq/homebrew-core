@@ -7,13 +7,14 @@ started for a user who has signed in, since the renderer's login sync cannot
 reach auto-start while the bridge is down.
 
 diff --git a/apps/desktop/src/main/daemon-manager.ts b/apps/desktop/src/main/daemon-manager.ts
-index 4a6f6b9..b7ff38d 100644
+index f5fea41..e248079 100644
 --- a/apps/desktop/src/main/daemon-manager.ts
 +++ b/apps/desktop/src/main/daemon-manager.ts
-@@ -1,13 +1,5 @@
--import { app, ipcMain, BrowserWindow, shell, dialog, type MessageBoxOptions } from "electron";
+@@ -1,14 +1,6 @@
+ import { app, ipcMain, BrowserWindow, shell, dialog, net, type MessageBoxOptions } from "electron";
 -import { execFile } from "child_process";
--import {
++import { open } from "fs/promises";
+ import {
 -  readFile,
 -  writeFile,
 -  mkdir,
@@ -21,12 +22,11 @@ index 4a6f6b9..b7ff38d 100644
 -  open,
 -  stat,
 -} from "fs/promises";
-+import { app, ipcMain, BrowserWindow, shell, dialog, net, type MessageBoxOptions } from "electron";
-+import { open } from "fs/promises";
- import {
+-import {
    existsSync,
    watchFile,
-@@ -15,6 +7,7 @@ import {
+   unwatchFile,
+@@ -15,6 +7,7 @@
    type StatsListener,
  } from "fs";
  import { join } from "path";
@@ -34,7 +34,7 @@ index 4a6f6b9..b7ff38d 100644
  import { homedir, hostname } from "os";
  import type {
    DaemonStatus,
-@@ -92,6 +85,9 @@ interface ActiveProfile {
+@@ -94,6 +87,9 @@
  
  let statusPollTimer: ReturnType<typeof setInterval> | null = null;
  let logTailWatcher: { path: string; listener: StatsListener } | null = null;
@@ -44,7 +44,7 @@ index 4a6f6b9..b7ff38d 100644
  let logTailOwner: Electron.WebContents | null = null;
  let currentState: DaemonStatus["state"] = "installing_cli";
  let getMainWindow: () => BrowserWindow | null = () => null;
-@@ -139,7 +135,7 @@ let configWriteChain: Promise<void> = Promise.resolve();
+@@ -147,7 +143,7 @@
  
  async function readProfileUserId(profile: string): Promise<string | null> {
    try {
@@ -53,7 +53,7 @@ index 4a6f6b9..b7ff38d 100644
      const trimmed = raw.trim();
      return trimmed || null;
    } catch {
-@@ -151,13 +147,13 @@ async function writeProfileUserId(
+@@ -159,8 +155,8 @@
    profile: string,
    userId: string,
  ): Promise<void> {
@@ -64,13 +64,14 @@ index 4a6f6b9..b7ff38d 100644
  }
  
  async function removeProfileUserId(profile: string): Promise<void> {
+@@ -167,5 +163,5 @@
    try {
 -    await rm(profileUserIdPath(profile));
 +    await host.rm(profileUserIdPath(profile));
    } catch {
      // Already gone — nothing to do.
    }
-@@ -209,9 +205,11 @@ async function fetchHealthAtPort(
+@@ -217,9 +213,11 @@
    const controller = new AbortController();
    const timeout = setTimeout(() => controller.abort(), timeoutMs);
    try {
@@ -85,28 +86,7 @@ index 4a6f6b9..b7ff38d 100644
      if (!res.ok) return null;
      return (await res.json()) as HealthPayload;
    } catch {
-@@ -264,10 +262,16 @@ async function probeTokenValidity(profile: string): Promise<AuthProbeResult> {
-   try {
-     const controller = new AbortController();
-     const timeout = setTimeout(() => controller.abort(), 4_000);
--    const res = await fetch(`${targetApiBaseUrl.replace(/\/+$/, "")}/api/me`, {
--      headers: { Authorization: `Bearer ${token}` },
--      signal: controller.signal,
--    });
-+    const url = `${targetApiBaseUrl.replace(/\/+$/, "")}/api/me`;
-+    const res = await (process.platform === "openharmony"
-+      ? net.fetch(url, {
-+          headers: { Authorization: `Bearer ${token}` },
-+          signal: controller.signal,
-+        })
-+      : fetch(url, {
-+          headers: { Authorization: `Bearer ${token}` },
-+          signal: controller.signal,
-+        }));
-     clearTimeout(timeout);
-     return classifyAuthProbe({ status: res.status });
-   } catch {
-@@ -279,7 +283,7 @@ async function readProfileConfig(
+@@ -287,7 +285,7 @@
    profile: string,
  ): Promise<Record<string, unknown>> {
    try {
@@ -115,7 +95,7 @@ index 4a6f6b9..b7ff38d 100644
      const parsed = JSON.parse(raw);
      return parsed && typeof parsed === "object" ? parsed : {};
    } catch {
-@@ -292,8 +296,8 @@ async function writeProfileConfig(
+@@ -300,8 +298,8 @@
    cfg: Record<string, unknown>,
  ): Promise<void> {
    const op = async () => {
@@ -126,7 +106,7 @@ index 4a6f6b9..b7ff38d 100644
        profileConfigPath(profile),
        JSON.stringify(cfg, null, 2),
        "utf-8",
-@@ -503,7 +507,7 @@ async function probeCliBinary(
+@@ -511,7 +509,7 @@
  ): Promise<string | null> {
    try {
      const stdout = await new Promise<string>((resolve, reject) => {
@@ -135,11 +115,10 @@ index 4a6f6b9..b7ff38d 100644
          bin,
          ["version", "--output", "json"],
          { timeout: 5_000 },
-@@ -527,6 +531,22 @@ async function probeCliBinary(
-   }
+@@ -536,6 +534,22 @@
  }
  
-+/**
+ /**
 + * OpenHarmony: the app sandbox cannot execute binaries, so the CLI lives on the
 + * host and is driven through the desktop bridge (see ohos-host.ts). Only a
 + * positive result is cached — the bridge may simply not be running yet, and the
@@ -155,10 +134,11 @@ index 4a6f6b9..b7ff38d 100644
 +  return HOST_CLI;
 +}
 +
- /**
++/**
   * Returns a usable `multica` binary path. Priority:
   *   1. Cached result from a previous successful resolve.
-@@ -545,6 +565,7 @@ async function probeCliBinary(
+  *   2. Bundled binary shipped with the Desktop app (`bundle-cli.mjs`).
+@@ -553,6 +567,7 @@
   */
  async function resolveCliBinary(): Promise<string | null> {
    if (quitting) return cachedCliBinary ?? null;
@@ -166,42 +146,7 @@ index 4a6f6b9..b7ff38d 100644
    if (cachedCliBinary !== undefined) return cachedCliBinary;
    if (cliResolvePromise) return cliResolvePromise;
  
-@@ -705,15 +726,25 @@ async function mintPat(jwt: string): Promise<string> {
-     throw new Error("mint PAT: target API URL not set");
-   }
-   const url = `${targetApiBaseUrl.replace(/\/+$/, "")}/api/tokens`;
--  const res = await fetch(url, {
--    method: "POST",
--    headers: {
--      "Content-Type": "application/json",
--      Authorization: `Bearer ${jwt}`,
--    },
--    // Omit expires_in_days → server treats as null → non-expiring PAT.
--    body: JSON.stringify({ name: "Multica Desktop" }),
--  });
-+  const res = await (process.platform === "openharmony"
-+    ? net.fetch(url, {
-+        method: "POST",
-+        headers: {
-+          "Content-Type": "application/json",
-+          Authorization: `Bearer ${jwt}`,
-+        },
-+        // Omit expires_in_days → server treats as null → non-expiring PAT.
-+        body: JSON.stringify({ name: "Multica Desktop" }),
-+      })
-+    : fetch(url, {
-+        method: "POST",
-+        headers: {
-+          "Content-Type": "application/json",
-+          Authorization: `Bearer ${jwt}`,
-+        },
-+        // Omit expires_in_days → server treats as null → non-expiring PAT.
-+        body: JSON.stringify({ name: "Multica Desktop" }),
-+      }));
-   if (!res.ok) {
-     const body = await res.text().catch(() => "");
-     // Attach the status so callers can tell a genuine auth rejection (401 — the
-@@ -819,7 +850,7 @@ async function restartDaemonAfterUserSwitch(
+@@ -827,7 +842,7 @@
  
  async function loadPrefs(): Promise<DaemonPrefs> {
    try {
@@ -210,7 +155,7 @@ index 4a6f6b9..b7ff38d 100644
      const parsed = JSON.parse(raw);
      return { ...DEFAULT_PREFS, ...parsed };
    } catch {
-@@ -829,8 +860,8 @@ async function loadPrefs(): Promise<DaemonPrefs> {
+@@ -837,8 +852,8 @@
  
  async function savePrefs(prefs: DaemonPrefs): Promise<void> {
    const dir = join(homedir(), ".multica");
@@ -221,7 +166,7 @@ index 4a6f6b9..b7ff38d 100644
  }
  
  async function clearToken(): Promise<void> {
-@@ -928,7 +959,7 @@ async function probeLocalRuntimes(): Promise<LocalRuntimeProbe> {
+@@ -936,7 +951,7 @@
    const active = await ensureActiveProfile();
    if (!active) return { probeResult: "error" };
    return new Promise((resolve) => {
@@ -230,7 +175,7 @@ index 4a6f6b9..b7ff38d 100644
        bin,
        ["daemon", "probe-runtimes", ...profileArgs(active.name)],
        { timeout: 15_000, env: desktopSpawnEnv(), maxBuffer: 64 * 1024 },
-@@ -1054,7 +1085,7 @@ async function startDaemon(
+@@ -1062,7 +1077,7 @@
    const args = ["daemon", "start", ...profileArgs(active.name)];
  
    return new Promise((resolve) => {
@@ -239,7 +184,7 @@ index 4a6f6b9..b7ff38d 100644
        bin,
        args,
        { timeout: DAEMON_START_EXEC_TIMEOUT_MS, env: desktopSpawnEnv() },
-@@ -1123,7 +1154,7 @@ async function stopDaemon(
+@@ -1131,7 +1146,7 @@
  
    return new Promise((resolve) => {
      // The CLI's forced stop includes the existing 40s shutdown budget.
@@ -248,7 +193,7 @@ index 4a6f6b9..b7ff38d 100644
        if (err) {
          resolve({ success: false, error: err.message });
        } else {
-@@ -1150,7 +1181,7 @@ async function restartDaemon(): Promise<{ success: boolean; error?: string }> {
+@@ -1158,7 +1173,7 @@
  
  async function daemonPidIsConfirmedAbsent(profile: string): Promise<boolean> {
    try {
@@ -257,7 +202,7 @@ index 4a6f6b9..b7ff38d 100644
      const pid = parseDaemonPid(raw);
      if (pid === null) {
        console.warn(
-@@ -1301,11 +1332,72 @@ function startPolling(): void {
+@@ -1309,6 +1324,65 @@
   * stopped/running state machine. Called once at startup and again on
   * user-triggered `daemon:retry-install`.
   */
@@ -323,6 +268,7 @@ index 4a6f6b9..b7ff38d 100644
  async function bootstrapCli(): Promise<void> {
    const bin = await resolveCliBinary();
    if (!bin) {
+@@ -1315,5 +1389,7 @@
      currentState = "cli_not_found";
      sendStatus({ state: "cli_not_found" });
 +    if (process.platform === "openharmony") cliRecoveryPending = true;
@@ -330,7 +276,7 @@ index 4a6f6b9..b7ff38d 100644
      return;
    }
    currentState = "stopped";
-@@ -1313,6 +1405,33 @@ async function bootstrapCli(): Promise<void> {
+@@ -1321,6 +1397,33 @@
    startPolling();
  }
  
@@ -364,7 +310,7 @@ index 4a6f6b9..b7ff38d 100644
  function stopPolling(): void {
    if (statusPollTimer) {
      clearInterval(statusPollTimer);
-@@ -1353,6 +1472,10 @@ function sendLines(win: BrowserWindow, text: string): void {
+@@ -1361,6 +1464,10 @@
  // would silently fail on Windows.
  function startLogTail(win: BrowserWindow, retryCount = 0): void {
    stopLogTail();
@@ -375,7 +321,7 @@ index 4a6f6b9..b7ff38d 100644
  
    void ensureActiveProfile().then(async (active) => {
      // Before the renderer reports its apiUrl there is no Desktop-owned profile
-@@ -1368,7 +1491,7 @@ function startLogTail(win: BrowserWindow, retryCount = 0): void {
+@@ -1376,7 +1483,7 @@
  
      let position = 0;
      try {
@@ -384,7 +330,7 @@ index 4a6f6b9..b7ff38d 100644
        const windowBytes = Math.min(
          initialStats.size,
          LOG_TAIL_INITIAL_WINDOW_BYTES,
-@@ -1414,7 +1537,82 @@ function startLogTail(win: BrowserWindow, retryCount = 0): void {
+@@ -1422,7 +1529,82 @@
    });
  }
  
@@ -467,7 +413,7 @@ index 4a6f6b9..b7ff38d 100644
    if (logTailWatcher) {
      unwatchFile(logTailWatcher.path, logTailWatcher.listener);
      logTailWatcher = null;
-@@ -1469,6 +1667,7 @@ export function setupDaemonManager(
+@@ -1477,6 +1659,7 @@
  ): void {
    getMainWindow = windowGetter;
    getStatusWindows = statusWindowsGetter;
@@ -475,7 +421,7 @@ index 4a6f6b9..b7ff38d 100644
  
    ipcMain.handle("daemon:set-target-api-url", async (_e, url: string) => {
      const normalized = url || null;
-@@ -1541,6 +1740,7 @@ export function setupDaemonManager(
+@@ -1549,6 +1732,7 @@
      // cached version string so the next check re-reads the binary.
      cachedCliBinaryVersion = undefined;
      await lifecycleOperations.runForeground(() => bootstrapCli());
@@ -483,7 +429,7 @@ index 4a6f6b9..b7ff38d 100644
    });
    ipcMain.handle("daemon:get-prefs", () => loadPrefs());
    ipcMain.handle(
-@@ -1554,29 +1754,7 @@ export function setupDaemonManager(
+@@ -1562,29 +1746,7 @@
          return savePrefs(merged).then(() => merged);
        }),
    );

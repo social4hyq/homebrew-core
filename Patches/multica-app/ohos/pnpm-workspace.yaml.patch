@@ -3,11 +3,11 @@ release age gate, and skip the build scripts of dependencies that need no
 native build here.
 
 diff --git a/pnpm-workspace.yaml b/pnpm-workspace.yaml
-index 5b58119..c184103 100644
+index 7bf54fd..0fb49e4 100644
 --- a/pnpm-workspace.yaml
 +++ b/pnpm-workspace.yaml
-@@ -67,3 +67,14 @@ catalog:
-   yaml: ^2.6.0
+@@ -74,3 +74,14 @@
+   yjs: ^13.6.33
    zod: ^4.1.5
    zustand: ^5.0.0
 +
