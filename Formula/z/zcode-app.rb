@@ -4,12 +4,11 @@ class ZcodeApp < Formula
   # Same upstream pin as `zcode`: the shell only provides the window, the
   # workbench comes from the installed CLI.
   url "https://github.com/zai-org/ZCode.git",
-      revision: "fec975905a2abd4c07e35c40d51fa097a2258ec9"
-  version "3.18.2"
+      revision: "a4b4445141eb7d3b3e99eada9292775383bfc44e"
+  version "4.0.0"
   # Tap-authored shell scripts (MIT) on the CPF-Electron runtime (mixed
   # MIT/BSD/LGPL).
   license :cannot_represent
-  revision 30
 
   livecheck do
     url "https://raw.githubusercontent.com/zai-org/ZCode/main/package.json"
