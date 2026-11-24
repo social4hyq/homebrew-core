@@ -13,8 +13,8 @@ class HerdrApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/herdr-app-v0.1.16-r26"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2ed8fbd271ec8ff0141fcc01f9362fcaa181a8a24789bebce1c5d7f68efadf8d"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/herdr-app-v0.1.16-r27"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "281ec12c3f0e2f014adaf1c6e6064a9a5ee3c5d26aa43ae1d065271142899c2a"
   end
 
   depends_on "node" => :build
