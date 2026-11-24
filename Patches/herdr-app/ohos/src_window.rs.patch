@@ -1,8 +1,10 @@
 OHOS: confirm closing, clipboard permission toast with Settings action
 
+diff --git a/src/window.rs b/src/window.rs
+index c7e896b..d22e0d5 100644
 --- a/src/window.rs
 +++ b/src/window.rs
-@@ -599,6 +599,13 @@ impl AppWindow {
+@@ -621,6 +621,13 @@
                  cx.hide();
                  return false;
              }
@@ -16,22 +18,23 @@ OHOS: confirm closing, clipboard permission toast with Settings action
              let _ = closing.update(cx, |this, cx| {
                  this.drain_documents(window, cx);
                  this.close_mods_now(std::time::Instant::now() + Duration::from_millis(250), window, cx);
-@@ -1509,8 +1516,12 @@ impl AppWindow {
+@@ -1587,7 +1594,14 @@
                  TerminalEvent::ContextMenu(at) => {
                      this.open_menu("pane", json!({ "pane": block.trim_end_matches(SWAP), "terminal": addr }), Some(*at), window, cx)
                  }
--                TerminalEvent::Notice { title, body } => {
--                    let spec = json!({"kind":"toast", "notification":{"title":title, "body":body, "level":"error"}});
+-                TerminalEvent::Notice { title, body } => this.error_notice(title, body, window, cx),
 +                TerminalEvent::Notice { title, body, action } => {
 +                    let mut note = json!({"title":title, "body":body, "level":"error"});
 +                    if let Some(name) = action {
 +                        note["action"] = json!({"name": name});
 +                    }
 +                    let spec = json!({"kind":"toast", "notification":note});
-                     this.open_overlay(mods::new_overlay_id(), spec, window, cx)
-                 }
++                    this.open_overlay(mods::new_overlay_id(), spec, window, cx)
++                }
              });
-@@ -3523,6 +3534,18 @@ impl AppWindow {
+             let focus = view.read(cx).focus_handle().clone();
+             if let Some(previous) = self.terms.insert(id, Term { view, address, focus, _sub: sub }) {
+@@ -3692,6 +3706,18 @@
                  self.open_overlay(mods::new_overlay_id(), spec, window, cx);
                  return;
              }
@@ -50,7 +53,7 @@ OHOS: confirm closing, clipboard permission toast with Settings action
              "app.settings" => {
                  // Once: a second press doesn't stack another; asking for a section opens it there.
                  let section = Self::owned(a, "section");
-@@ -3577,7 +3600,13 @@ impl AppWindow {
+@@ -3746,7 +3772,13 @@
                  });
                  self.write_person(|p| p.zoom = zoom, window, cx);
              }
@@ -65,7 +68,7 @@ OHOS: confirm closing, clipboard permission toast with Settings action
              "app.update" => {
                  match crate::update::apply() {
                      Ok(true) => {}
-@@ -3591,7 +3620,13 @@ impl AppWindow {
+@@ -3760,7 +3792,13 @@
                  crate::update::relaunch();
                  cx.quit();
              }
@@ -80,7 +83,7 @@ OHOS: confirm closing, clipboard permission toast with Settings action
              // Hiding apps is macOS's (bound natively there).
              "app.hide" | "app.hide_others" | "app.show_all" => return,
              other => {
-@@ -3679,6 +3714,24 @@ impl AppWindow {
+@@ -3909,6 +3947,24 @@
  
      // ---- overlays ----------------------------------------------------------
  
@@ -105,7 +108,7 @@ OHOS: confirm closing, clipboard permission toast with Settings action
      fn confirm(&mut self, title: &str, detail: &str, command: &str, args: Value, window: &mut Window, cx: &mut Context<Self>) {
          let spec = json!({ "mod": "confirm", "kind": "dialog", "width": 380,
              "props": { "title": title, "detail": detail, "command": { "name": command, "args": args } } });
-@@ -4862,6 +4915,11 @@ fn busy(rec: &Value) -> bool {
+@@ -5232,6 +5288,11 @@
      rec["status"] == "working" || !(program("shell") || program("agent"))
  }
  
@@ -117,11 +120,10 @@ OHOS: confirm closing, clipboard permission toast with Settings action
  /// Whether to ask a terminal's folder for its repo and branch again: only when
  /// the answer could have changed. It moved, a command or an agent's turn just
  /// ended there (a checkout, a commit), or a repo's fallback is due.
-@@ -7169,6 +7227,20 @@ export default class SystemToast extends View {
-         assert!(!super::busy(&rec("", true, false)), "the shell's prompt");
+@@ -7956,6 +8017,20 @@
      }
  
-+    #[test]
+     #[test]
 +    fn quit_confirmation_counts_agents_and_foreground_programs() {
 +        let rec = |status: &str, shell: bool, agent: bool| {
 +            serde_json::json!({ "status": status, "program": { "shell": shell, "agent": agent } })
@@ -135,6 +137,7 @@ OHOS: confirm closing, clipboard permission toast with Settings action
 +        assert_eq!(super::active_terminal_count(&live), 2);
 +    }
 +
-     #[test]
++    #[test]
      fn shipped_layouts_parse_and_show_what_they_promise() {
          let main = super::default_layout("main");
+         assert!(main.find("main").is_some() && main.find("sidebar").is_some());

@@ -1,8 +1,8 @@
 diff --git a/src/main.rs b/src/main.rs
-index d74430e..39ed520 100644
+index 34d47aa..39ed520 100644
 --- a/src/main.rs
 +++ b/src/main.rs
-@@ -1,240 +1,3 @@
+@@ -1,260 +1,3 @@
 -// Windows: a window app, but tests inherit Cargo's console for their child processes.
 -#![cfg_attr(all(windows, not(test)), windows_subsystem = "windows")]
 -
@@ -89,6 +89,12 @@ index d74430e..39ed520 100644
 -    }
 -}
 -
+-fn link_check_path(args: &[String]) -> Option<&std::path::Path> {
+-    let mut paths = args.iter().filter(|arg| !matches!(arg.as_str(), "--print-spec" | "--watch" | "--dev"));
+-    let path = paths.next()?;
+-    (!path.starts_with('-') && paths.next().is_none()).then(|| std::path::Path::new(path))
+-}
+-
  fn main() {
 -    let args: Vec<String> = std::env::args().collect();
 -    #[cfg(target_os = "macos")]
@@ -100,6 +106,20 @@ index d74430e..39ed520 100644
 -    // `herdr-app check <mod>` / `herdr-app types <mod>`: gpui-shell's own checker, with Herdr's module installed.
 -    if matches!(args.get(1).map(String::as_str), Some("check" | "types")) {
 -        mods::install_check_policy();
+-        if args[1] == "check" && let Some(path) = link_check_path(&args[2..]) {
+-            let dir = if path.is_file() { path.parent().unwrap_or(path) } else { path };
+-            match mods::check_link_mod(dir) {
+-                Ok(true) if dir.join("link.js").is_file() && !dir.join("main.js").is_file() => {
+-                    println!("check passed: {}", dir.display());
+-                    return;
+-                }
+-                Ok(_) => {}
+-                Err(error) => {
+-                    eprintln!("herdr-app check: {error:#}");
+-                    std::process::exit(1);
+-                }
+-            }
+-        }
 -        gpui_shell::host::main_with_components(gpui_shell::FrozenComponentRegistry::default());
 -        return;
 -    }
@@ -214,7 +234,8 @@ index d74430e..39ed520 100644
 -                Err(need) => setup::open(need, requests, cx),
 -            }
 -        });
--}
++    herdr_app::main_entry();
+ }
 -
 -/// The main window, on a connected core.
 -pub fn open_main(core: std::sync::Arc<hc::Core>, requests: async_channel::Receiver<mods::Request>, cx: &mut App) {
@@ -242,5 +263,4 @@ index d74430e..39ed520 100644
 -            cx.open_window(options, |window, cx| cx.new(|cx| window::AppWindow::new(core, requests, window, cx)))
 -                .expect("cannot open the Herdr window");
 -            cx.activate(true);
-+    herdr_app::main_entry();
- }
+-}
