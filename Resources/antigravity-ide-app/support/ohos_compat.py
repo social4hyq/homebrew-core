@@ -74,6 +74,21 @@ BINDING_OLD = "require('../build/Release/vscode-sqlite3.node')"
 BINDING_NEW = 'require("/data/storage/el1/bundle/libs/arm64/sqlite3.node")'
 
 
+def keep_editor_visible_during_onboarding(app_root: Path) -> None:
+    workbench = app_root / "out/vs/workbench/workbench.desktop.main.js"
+    source = workbench.read_text(encoding="utf-8")
+    # The vendor lock maximizes the Agent WebView, hiding the editor and status
+    # bar even when the WebView has no content on OHOS. Keep opening the panel
+    # and watching for onboarding completion, but do not lock the layout.
+    old = "lock:()=>this.lockLayout(),restoreLayout:()=>this.restoreLayout()"
+    new = ("lock:()=>{this._layoutService.setAuxiliaryBarMaximized(false);"
+           "return {dispose(){}}},restoreLayout:()=>this.restoreLayout()")
+    if source.count(old) != 1:
+        raise RuntimeError("OHOS onboarding layout patch: expected exactly one vendor lock hook")
+    workbench.write_text(source.replace(old, new), encoding="utf-8")
+    print("ohos-compat: onboarding no longer locks the editor layout")
+
+
 def patch_vendor(app_root: Path, native_dir: Path | None = None) -> None:
     """Apply compatibility rewrites to an extracted vendor app tree.
 
@@ -144,6 +159,8 @@ def patch_vendor(app_root: Path, native_dir: Path | None = None) -> None:
                       'const v=t[k];return typeof v==="function"?v.bind(t):v;}});')
             eh.write_text(inject + e, encoding="utf-8")
             print("ohos-compat: extension host platform proxy injected")
+
+    keep_editor_visible_during_onboarding(app_root)
 
     marker.write_text(json.dumps({
         "native": list(NATIVE.values()), "stubs": list(STUBS),
