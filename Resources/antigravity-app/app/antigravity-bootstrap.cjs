@@ -72,6 +72,8 @@ function startServer() {
     ...process.env,
     HOME: hostHome,
     PATH: cfg.path || process.env.PATH,
+    ...(cfg.proxy ? { HTTPS_PROXY: cfg.proxy, HTTP_PROXY: cfg.proxy,
+                      https_proxy: cfg.proxy, http_proxy: cfg.proxy } : {}),
     ANTIGRAVITY_SERVER_CSRF_TOKEN: csrf,
     AGY_REQUIRE_AUTHENTICATED_UI_BOOTSTRAP: '1',
   };

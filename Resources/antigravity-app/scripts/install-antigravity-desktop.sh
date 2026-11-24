@@ -123,6 +123,14 @@ XDG
   export ANTIGRAVITY_APP_ENGINE="$engine"
   export ANTIGRAVITY_APP_HOST_HOME="${ANTIGRAVITY_APP_HOST_HOME:-$HOME}"
   export ANTIGRAVITY_APP_HOST_PATH="$brew_prefix/bin:$brew_prefix/sbin:/system/bin:/system/xbin:/usr/bin:/bin:/vendor/bin"
+  # The engine must reach oauth2.googleapis.com to exchange the auth code.
+  # On this device direct access times out (IPv6); the host uses a local proxy
+  # recorded in ~/.app-installer/config. Pass it through to the engine.
+  local proxy=""
+  if [ -f "$HOME/.app-installer/config" ]; then
+    proxy=$(sed -n 's/^https_proxy=//p' "$HOME/.app-installer/config" | head -1)
+  fi
+  export ANTIGRAVITY_APP_PROXY="${ANTIGRAVITY_APP_PROXY:-$proxy}"
   log "prepared host language server at $engine"
 }
 
@@ -144,6 +152,7 @@ fs.writeFileSync(destination, JSON.stringify({
   home: process.env.HOME || "",
   engine,
   path: process.env.PATH || "",
+  proxy: process.env.ANTIGRAVITY_APP_PROXY || "",
 }) + "\n", { mode: 0o600 });
 JS
 }
