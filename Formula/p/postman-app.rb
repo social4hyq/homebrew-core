@@ -14,6 +14,11 @@ class PostmanApp < Formula
     skip "Postman publishes no machine-readable arm64 Linux version index"
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/postman-app-v12.38.0-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "93cd46c7a36b78d7ac651a93b96f86499177f22ba60f511b297fa7dab9ddfc2e"
+  end
+
   depends_on "app-installer"
   depends_on "node"
   depends_on "ohos-sdk-toolchains"
