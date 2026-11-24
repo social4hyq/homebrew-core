@@ -82,8 +82,22 @@ app_prepare() {
 
   assembled="$cache_dir/assembled/antigravity-ide-app.hap"
   rm -f "$assembled"
+
+  # Fetch OHOS-native (NAPI) addons that replace the glibc .node files, plus
+  # the C++ runtime they link against. The assembler places them in the HAP's
+  # libs/ directory — the only dlopen namespace that works on OHOS.
+  local native_dir="$cache_dir/vendor/ohos-ports"
+  python3 "$shell_libexec/fetch-ports.py" "$native_dir"
+
+  local libcxx=""
+  for c in "$HOME/.harmonybrew/opt/ohos-sdk-native/share/ohos-sdk/native/llvm/lib/aarch64-linux-ohos/c++/libc++_shared.so" \
+           "$HOME/.harmonybrew/Cellar/ohos-sdk-native/26.0.0.38/llvm/lib/aarch64-linux-ohos/c++/libc++_shared.so"; do
+    [ -f "$c" ] && { libcxx="$c"; break; }
+  done
+
   python3 "$shell_libexec/assemble-local-hap.py" \
-    "$shell_hap" "$tarfile" "$vendor_json" "$assembled"
+    "$shell_hap" "$tarfile" "$vendor_json" "$assembled" \
+    --native-dir "$native_dir" --libcxx "$libcxx"
   shell_hap="$assembled"
 }
 

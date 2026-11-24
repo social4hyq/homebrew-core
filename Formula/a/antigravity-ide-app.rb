@@ -5,7 +5,7 @@ class AntigravityIdeApp < Formula
       "2.8.0-6733682917113856/linux-arm/Antigravity%20IDE.tar.gz"
   sha256 "d8f85ce40306587a80a7478af4de85cb10b83cf26dd9179b902afa9933fcf9f2"
   license :cannot_represent # Google Terms of Service; closed-source prebuilt desktop app
-  revision 6
+  revision 7
 
   livecheck do
     url :homepage
@@ -41,6 +41,7 @@ class AntigravityIdeApp < Formula
     Resources/antigravity-ide-app/scripts/stage-ohos-shell.sh
     Resources/antigravity-ide-app/support/assemble-local-hap.py
     Resources/antigravity-ide-app/support/ohos_compat.py
+    Resources/antigravity-ide-app/support/fetch-ports.py
   ].freeze
 
   def patch
@@ -107,6 +108,7 @@ class AntigravityIdeApp < Formula
     assemble_dir.mkpath
     cp support/"assemble-local-hap.py", assemble_dir
     cp support/"ohos_compat.py", assemble_dir
+    cp support/"fetch-ports.py", assemble_dir
     cp support/"antigravity-ide-app-bootstrap.cjs", assemble_dir
 
     verify_script = assemble_dir/"assemble-local-hap.py"
