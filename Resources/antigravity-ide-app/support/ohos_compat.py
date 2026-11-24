@@ -60,6 +60,11 @@ TITLEBAR_NEW = 'typeof n.setTitleBarOverlay==="function"&&n.setTitleBarOverlay({
 # the uncaught onStateChange exception does not break the main process.
 UPDATE_LISTEN_OLD = 'case"onStateChange":return this.service.onStateChange'
 UPDATE_LISTEN_NEW = 'case"onStateChange":return this.service?.onStateChange||(()=>({dispose(){}}))'
+# The HAP sandbox has no login shell (/bin/bash exit 127); VS Code's
+# resolveShellEnv() spawns one and fails. We already inject host PATH/HOME via
+# the wrapper, so skip shell environment resolution entirely.
+SHELLENV_OLD = 'n["force-disable-user-env"]?(t.trace("resolveShellEnv()'
+SHELLENV_NEW = 'true?(t.trace("resolveShellEnv()'
 # Redirect the sqlite3 binding to the OHOS-native module in the HAP libs dir.
 BINDING_OLD = "require('../build/Release/vscode-sqlite3.node')"
 BINDING_NEW = 'require("/data/storage/el1/bundle/libs/arm64/sqlite3.node")'
@@ -116,6 +121,7 @@ def patch_vendor(app_root: Path, native_dir: Path | None = None) -> None:
         s = s.replace(TITLEBAR_OLD, TITLEBAR_NEW)
         s = s.replace(BINDING_OLD, BINDING_NEW)
         s = s.replace(UPDATE_LISTEN_OLD, UPDATE_LISTEN_NEW)
+        s = s.replace(SHELLENV_OLD, SHELLENV_NEW)
         main.write_text(s, encoding="utf-8")
 
     marker.write_text(json.dumps({
