@@ -210,7 +210,7 @@ struct Index {
             Column() {
               Text(t.agent).fontSize(12).fontColor('#eef1f5').maxLines(1)
                 .textOverflow({ overflow: TextOverflow.Ellipsis })
-              Text(t.address + (t.cwd.length > 0 ? ' · ' + this.lastPath(t.cwd) : ''))
+              Text(t.address + (t.cwd.length > 0 ? ' · ' + lastPath(t.cwd) : ''))
                 .fontSize(9).fontColor('#6b7280').maxLines(1)
                 .textOverflow({ overflow: TextOverflow.Ellipsis })
             }
@@ -219,7 +219,7 @@ struct Index {
           }
           .width('calc(100% - 20px)').margin({ left: 10, right: 10, bottom: 4 })
           .padding({ left: 8, right: 10, top: 9, bottom: 9 })
-          .backgroundColor(t.address === this.currentTerm ? '#343844' : 'transparent')
+          .backgroundColor(t.address === this.currentTerm ? '#0d6efd' : 'transparent')
           .borderRadius(8)
           .onClick(() => { this.openTerm(t.address); })
         })
