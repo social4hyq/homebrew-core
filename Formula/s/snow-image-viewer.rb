@@ -1,8 +1,8 @@
 class SnowImageViewer < Formula
   desc "Color-managed image viewer from Snow Apps, unsigned HAP (sign at install)"
   homepage "https://github.com/mg-chao/snow-shot"
-  url "https://github.com/mg-chao/snow-shot/archive/refs/tags/v1.6.3_snow-shot.tar.gz"
-  sha256 "f6c9cbf1ce2fa309364b581404272f1d93de3ab1230c0d2e0b490a264f7b5bf0"
+  url "https://github.com/mg-chao/snow-shot/archive/refs/tags/v1.6.4_snow-shot.tar.gz"
+  sha256 "8a64e75d9daa4db8d76908da40bae52f63e7af76f04f0beacff05f775470baf0"
   license "GPL-3.0-or-later"
 
   livecheck do
@@ -12,8 +12,8 @@ class SnowImageViewer < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-image-viewer-v1.6.3-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "96e75a236c8e581b6dbf20e7898e1ffce3d511f6016b0183166ea7c64309978c"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-image-viewer-v1.6.4-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "65707f7d2a77809c43b0440078e8c22dba55fbf6b9bdfe785c45e6f4599b7995"
   end
 
   # These libraries are copied into the HAP after their ELF dependency graph
