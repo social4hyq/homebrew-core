@@ -1,8 +1,8 @@
 class MagpieApp < Formula
   desc "Desktop shell for the Magpie model gateway"
   homepage "https://github.com/yetone/magpie"
-  url "https://github.com/yetone/magpie/archive/refs/tags/v0.1.4743.tar.gz"
-  sha256 "6344eed4d1d3a18d21c858e4f7c3da9bf5535b77a5aad37de655c63fa36dca1f"
+  url "https://github.com/yetone/magpie/archive/refs/tags/v0.1.4777.tar.gz"
+  sha256 "c47ccfbf93ba8953ab1b988cf513fe1dfa291eeb56c4bad6b839cc9ae7093361"
   license :cannot_represent
 
   livecheck do
@@ -11,8 +11,8 @@ class MagpieApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/magpie-app-v0.1.4743-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "e38ce57190062042f39c8332b0313d010dd1458c56e767aef7b91892fc1d9e09"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/magpie-app-v0.1.4777-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "afacf90e42da2241c3ff4e7a873e77b904df851205dabcf301db164496fd4704"
   end
 
   depends_on "app-installer"
