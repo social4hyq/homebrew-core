@@ -1,8 +1,8 @@
 class HarborApp < Formula
   desc "Systemd-like service manager for HarmonyOS PC, as a tiny pure-ArkTS HAP"
   homepage "https://github.com/social4hyq/harbor-app"
-  url "https://github.com/social4hyq/harbor-app/archive/refs/tags/v0.1.0.tar.gz"
-  sha256 "809b8fd7ce35846dc843485b39b2db41e4031c0da76ca4cca9068bac1e29cb35"
+  url "https://github.com/social4hyq/harbor-app/archive/refs/tags/v0.2.1.tar.gz"
+  sha256 "af7c6ec26faa75166a9ee1f2a95b3d6b0e5691dcdf8d62bf15e429f07c73b71b"
   license "MIT"
   revision 1
 
@@ -12,9 +12,9 @@ class HarborApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/harbor-app-v0.1.0-r6"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/harbor-app-v0.2.1-r1"
     rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "75702bb7ee0c3d8561faa36effbef46309f96e7778e909682ee339e4c000bb70"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0000000000000000000000000000000000000000000000000000000000000000"
   end
 
   depends_on "node" => :build
@@ -79,7 +79,7 @@ class HarborApp < Formula
       [ "${1:-}" = "install" ] && shift
       exec "#{installer}" \\
         --hap "#{libexec}/harbor-unsigned.hap" \\
-        --bundle-id org.social4hyq.harbor \\
+        --bundle-id com.social4hyq.harbor \\
         --module entry --ability EntryAbility "$@"
     SH
     chmod 0755, bin/"harbor-app"
@@ -102,7 +102,7 @@ class HarborApp < Formula
 
   post_install_steps do
     run "{{HOMEBREW_PREFIX}}/bin/hap-app",
-        args: ["auto-install", "harbor-app", "org.social4hyq.harbor"],
+        args: ["auto-install", "harbor-app", "com.social4hyq.harbor"],
         must_succeed: false, print_stdout: true, network_access: true
   end
 
@@ -114,6 +114,6 @@ class HarborApp < Formula
     assert_path_exists libexec/"harbor-unsigned.hap"
     assert_path_exists pkgshare/"apps.json.default"
     module_json = JSON.parse(Utils.safe_popen_read("unzip", "-p", libexec/"harbor-unsigned.hap", "module.json"))
-    assert_equal "org.social4hyq.harbor", module_json.dig("app", "bundleName")
+    assert_equal "com.social4hyq.harbor", module_json.dig("app", "bundleName")
   end
 end
