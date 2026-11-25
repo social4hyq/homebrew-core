@@ -12,8 +12,9 @@ class HarborApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/harbor-app-v0.1.0-r5"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "41666b4cb5b9a68683efeb61d728df4c4b2d218d6964f47e6f35c5a9cca62aa1"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/harbor-app-v0.1.0-r6"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "75702bb7ee0c3d8561faa36effbef46309f96e7778e909682ee339e4c000bb70"
   end
 
   depends_on "node" => :build
@@ -73,7 +74,10 @@ class HarborApp < Formula
     installer = formula_opt_bin("app-installer")/"app-installer"
     (bin/"harbor-app").write <<~SH
       #!/bin/sh
-      exec "#{installer}" install \\
+      # hap-app invokes `<command> install`; app-installer takes no such
+      # subcommand (install is its default action), so swallow it.
+      [ "${1:-}" = "install" ] && shift
+      exec "#{installer}" \\
         --hap "#{libexec}/harbor-unsigned.hap" \\
         --bundle-id org.social4hyq.harbor \\
         --module entry --ability EntryAbility "$@"
