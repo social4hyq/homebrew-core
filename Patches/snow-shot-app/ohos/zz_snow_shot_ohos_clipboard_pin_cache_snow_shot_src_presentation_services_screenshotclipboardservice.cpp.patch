@@ -1,9 +1,8 @@
 diff --git a/snow_shot/src/presentation/services/screenshotclipboardservice.cpp b/snow_shot/src/presentation/services/screenshotclipboardservice.cpp
-index 5fbb2f0..4527772 100644
 --- a/snow_shot/src/presentation/services/screenshotclipboardservice.cpp
 +++ b/snow_shot/src/presentation/services/screenshotclipboardservice.cpp
-@@ -26,6 +26,14 @@
- #include <QUrl>
+@@ -27,6 +27,14 @@
+ #include <QVarLengthArray>
  #include <QtEndian>
  
 +#if defined(Q_OS_HARMONY)
@@ -17,9 +16,9 @@ index 5fbb2f0..4527772 100644
  #include <algorithm>
  #include <array>
  #include <cstring>
-@@ -34,6 +42,39 @@
- #include <span>
+@@ -36,6 +44,39 @@
  #include <utility>
+ #include <vector>
  
 +#if defined(Q_OS_HARMONY)
 +namespace {
@@ -57,10 +56,16 @@ index 5fbb2f0..4527772 100644
  struct ScreenshotClipboardCommitState {
      std::atomic_bool cancelled{false};
      std::atomic_bool finished{false};
-@@ -98,6 +139,29 @@ bool publishPngClipboard(QClipboard* clipboard, const QByteArray& png, const QBy
+@@ -176,9 +217,33 @@ ClipboardPublishAttempt publishPngClipboard(QClipboard* clipboard, const QByteAr
+                 screenshotClipboardRevision() != *revision, *revision};
+     }
  #endif
-     clipboard->setMimeData(new PngClipboardMimeData(png, placement, appearance, filePath),
-                            QClipboard::Clipboard);
+-    return publishQtMimeData(clipboard,
+-                             new PngClipboardMimeData(png, placement, appearance, filePath),
+-                             ScreenshotClipboardCommitFailure::PublishFailed);
++    auto attempt = publishQtMimeData(clipboard,
++                                     new PngClipboardMimeData(png, placement, appearance, filePath),
++                                     ScreenshotClipboardCommitFailure::PublishFailed);
 +#if defined(Q_OS_HARMONY)
 +    {
 +        using namespace snow_shot::presentation::clipboard_cache;
@@ -84,6 +89,7 @@ index 5fbb2f0..4527772 100644
 +        });
 +    }
 +#endif
-     return true;
++    return attempt;
  }
  #endif
+ 

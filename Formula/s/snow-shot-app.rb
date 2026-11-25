@@ -1,10 +1,9 @@
 class SnowShotApp < Formula
   desc "Screenshot and annotation utility from Snow Apps, unsigned OHOS HAP"
   homepage "https://github.com/mg-chao/snow-shot"
-  url "https://github.com/mg-chao/snow-shot/archive/refs/tags/v1.6.3_snow-shot.tar.gz"
-  sha256 "f6c9cbf1ce2fa309364b581404272f1d93de3ab1230c0d2e0b490a264f7b5bf0"
+  url "https://github.com/mg-chao/snow-shot/archive/refs/tags/v1.6.4_snow-shot.tar.gz"
+  sha256 "8a64e75d9daa4db8d76908da40bae52f63e7af76f04f0beacff05f775470baf0"
   license "GPL-3.0-or-later"
-  revision 1
 
   livecheck do
     url "https://github.com/mg-chao/snow-shot.git"
@@ -13,8 +12,8 @@ class SnowShotApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-app-v1.6.3-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d7c39e78a773b6dc7bad23e5422fb8b993a2a8722de8179e13268f074b33a211"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-app-v1.6.4-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7b88e5b29f0c4b6671eaf5d66ddcbf18092e21ea505d3d8030686a45d0fef983"
   end
 
   depends_on "brotli" => :build
@@ -69,8 +68,8 @@ class SnowShotApp < Formula
   end
 
   resource "ocr-paragraph-model" do
-    url "https://www.modelscope.cn/models/mgchao/SnowShotOCR/resolve/master/line2para/line2para_1.onnx"
-    sha256 "c8cede9a564d9da10cf72d2ca9fe70d1d83ac947566d8cbc546b1ea36402d922"
+    url "https://www.modelscope.cn/models/mgchao/SnowShotOCR/resolve/master/line2para/line2para_1_2-epoch12-signed-1.625.onnx"
+    sha256 "956253efb9eefe81692b5ba88b2923f1a012427933768acd5657c509b7363ac5"
   end
 
   resource "snow-shot-ocr-rs" do
@@ -191,7 +190,7 @@ class SnowShotApp < Formula
       end
     end
     resource("ocr-paragraph-model").stage do
-      model_dir = buildpath/"ocr-models/line2para-1-c8cede9"
+      model_dir = buildpath/"ocr-models/line2para-1-2-956253e"
       mkdir_p model_dir
       filename = Dir.children(".").first
       cp filename, model_dir/filename
@@ -205,7 +204,7 @@ class SnowShotApp < Formula
                     .find { |entry| entry.directory? && (entry/"translations/qtbase_zh_CN.ts").file? }
       end
       odie "could not find Qt base translation catalogs" unless source
-      %w[zh_CN zh_TW].each do |locale|
+      %w[zh_CN zh_TW ru].each do |locale|
         system qt/"libexec/lrelease", source/"translations/qtbase_#{locale}.ts",
                "-qm", qt_translation_dir/"qtbase_#{locale}.qm"
       end
@@ -678,7 +677,7 @@ class SnowShotApp < Formula
       libsnow_shot.so libqohos.so libQt6Widgets.so.6
       rawfile/qrcode/detect.prototxt rawfile/qrcode/detect.caffemodel
       rawfile/qrcode/sr.prototxt rawfile/qrcode/sr.caffemodel
-      rawfile/ocr/models/line2para-1-c8cede9/line2para_1.onnx
+      rawfile/ocr/models/line2para-1-2-956253e/line2para_1_2-epoch12-signed-1.625.onnx
     ].each { |name| assert_match name, listing }
     refute_match "libs/arm64-v8a/libsnow_ocr_process.so", listing
     assert_match "libs/arm64-v8a/tls/libqopensslbackend.so", listing

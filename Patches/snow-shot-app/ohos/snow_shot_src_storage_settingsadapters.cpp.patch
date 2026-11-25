@@ -7,7 +7,6 @@ grouping policy, conflict detection and atomic write semantics are
 unchanged.
 
 diff --git a/snow_shot/src/storage/settingsadapters.cpp b/snow_shot/src/storage/settingsadapters.cpp
-index f19b9ed..2064972 100644
 --- a/snow_shot/src/storage/settingsadapters.cpp
 +++ b/snow_shot/src/storage/settingsadapters.cpp
 @@ -17,6 +17,7 @@
@@ -18,7 +17,7 @@ index f19b9ed..2064972 100644
  
  #include <algorithm>
  #include <array>
-@@ -218,32 +219,20 @@ QString pinToScreenShortcutKey(const QString& actionId) {
+@@ -238,30 +239,27 @@ QString pinToScreenShortcutKey(const QString& actionId) {
  enum class LocalShortcutPolicy : std::uint8_t { Screenshot, Drawing, WindowCommand };
  
  struct LocalShortcutGroup {
@@ -41,15 +40,6 @@ index f19b9ed..2064972 100644
 -         LocalShortcutPolicy::WindowCommand},
 -    }};
 -    return groups;
--}
--
--const LocalShortcutGroup* localShortcutGroup(const QString& key) {
--    for (const auto& group : localShortcutGroups()) {
--        if (key.startsWith(group.prefix) && group.ids.contains(key.mid(group.prefix.size()))) {
--            return &group;
--        }
--    }
--    return nullptr;
 +std::array<LocalShortcutGroup, 4> localShortcutGroups() {
 +    return {{{QLatin1StringView("screenshot_shortcuts/"), &screenshotShortcutActionIds(),
 +              LocalShortcutPolicy::Screenshot},
@@ -61,56 +51,64 @@ index f19b9ed..2064972 100644
 +              LocalShortcutPolicy::WindowCommand}}};
  }
  
- bool setAllLocalShortcutsAtomic(const QString& prefix, const QStringList& ids,
-@@ -1607,11 +1596,16 @@ bool ScreenshotShortcutSettings::isReservedShortcutAllowed(
- bool setLocalShortcutValuesAtomic(const QMap<QString, QJsonValue>& values) {
-     auto& configuration = cache();
-     return configuration.mutateIfRevision(configuration.revision(), [&configuration, &values]() {
-+        const auto groups = localShortcutGroups();
-         QMap<QString, QJsonValue> normalizedValues;
--        QSet<QString> affectedGroups;
-+        QSet<const LocalShortcutGroup*> affectedGroups;
-         for (auto it = values.cbegin(); it != values.cend(); ++it) {
--            const auto* group = localShortcutGroup(it.key());
--            if (group == nullptr) {
-+            const auto group =
-+                std::find_if(groups.cbegin(), groups.cend(), [&](const auto& candidate) {
-+                    return it.key().startsWith(candidate.prefix) &&
-+                           candidate.ids->contains(it.key().mid(candidate.prefix.size()));
-+                });
-+            if (group == groups.cend()) {
-                 return false;
-             }
-             const auto normalized = ConfigurationSchema::normalize(it.key(), it.value());
-@@ -1619,17 +1613,17 @@ bool setLocalShortcutValuesAtomic(const QMap<QString, QJsonValue>& values) {
-                 return false;
-             }
-             normalizedValues.insert(it.key(), normalized.value);
--            affectedGroups.insert(group->prefix);
-+            affectedGroups.insert(&*group);
-         }
+ const LocalShortcutGroup* localShortcutGroup(const QString& key) {
+-    for (const auto& group : localShortcutGroups()) {
+-        if (key.startsWith(group.prefix) && group.ids.contains(key.mid(group.prefix.size()))) {
++    static const auto groups = localShortcutGroups();
++    for (const auto& group : groups) {
++        if (key.startsWith(group.prefix) && group.ids->contains(key.mid(group.prefix.size())))
+             return &group;
+-        }
+     }
+     return nullptr;
+ }
+@@ -1622,7 +1620,8 @@ bool ScreenshotShortcutSettings::isReservedShortcut(const shortcuts::ShortcutBin
+     const auto selectAll = qobject_cast<QGuiApplication*>(QCoreApplication::instance())
+                                ? QKeySequence::keyBindings(QKeySequence::SelectAll)
+                                : QList<QKeySequence>{QKeySequence(Qt::CTRL | Qt::Key_A)};
+-    return std::ranges::any_of(selectAll, [&shortcut](const QKeySequence& sequence) {
++    return std::any_of(selectAll.cbegin(), selectAll.cend(),
++                       [&shortcut](const QKeySequence& sequence) {
+         return shortcuts::bindingsConflict(
+             shortcut,
+             shortcuts::bindingFromPortableText(sequence.toString(QKeySequence::PortableText)),
+@@ -1663,7 +1662,7 @@ bool localShortcutChangesValid(const QMap<QString, QJsonValue>& current,
+         const auto* group = localShortcutGroup(it.key());
+         if (group == nullptr)
+             return false;
+-        affectedGroups.insert(group->prefix);
++        affectedGroups.insert(QString::fromLatin1(group->prefix));
+     }
  
-         const auto current = configuration.snapshot();
--        for (const auto& group : localShortcutGroups()) {
--            if (!affectedGroups.contains(group.prefix)) {
-+        for (const auto& group : groups) {
-+            if (!affectedGroups.contains(&group)) {
-                 continue;
-             }
-             QList<std::pair<QString, shortcuts::ShortcutBinding>> seen;
--            for (const QString& id : group.ids) {
--                const QString key = group.prefix + id;
-+            for (const QString& id : *group.ids) {
-+                const QString key = QString::fromLatin1(group.prefix) + id;
-                 const auto value = normalizedValues.contains(key) ? normalizedValues.value(key)
-                                                                   : current.value(key);
-                 const auto bindings = shortcuts::shortcutBindingsFromJson(
-@@ -1652,7 +1646,7 @@ bool setLocalShortcutValuesAtomic(const QMap<QString, QJsonValue>& values) {
-                                                 shortcuts::screenshotShortcutActionsMayConflict(
-                                                     existing.first, id)) &&
-                                                (group.prefix !=
--                                                    QStringLiteral("pin_to_screen_shortcuts/") ||
-+                                                    QLatin1StringView("pin_to_screen_shortcuts/") ||
-                                                 PinToScreenShortcutSettings::actionsMayConflict(
-                                                     existing.first, id)) &&
-                                                shortcuts::bindingsConflict(
+     struct Assignment {
+@@ -1673,16 +1672,16 @@ bool localShortcutChangesValid(const QMap<QString, QJsonValue>& current,
+     };
+     QList<Assignment> seen;
+     for (const auto& group : localShortcutGroups()) {
+-        const bool checkGroup = affectedGroups.contains(group.prefix);
++        const bool checkGroup = affectedGroups.contains(QString::fromLatin1(group.prefix));
+         const bool sharedScope =
+             (group.policy == LocalShortcutPolicy::Screenshot &&
+              affectedGroups.contains(QStringLiteral("pin_to_screen_shortcuts/"))) ||
+-            (group.prefix == QStringLiteral("pin_to_screen_shortcuts/") &&
++            (group.prefix == QLatin1StringView("pin_to_screen_shortcuts/") &&
+              affectedGroups.contains(QStringLiteral("screenshot_shortcuts/")));
+         if (!checkGroup && !sharedScope)
+             continue;
+-        for (const QString& id : group.ids) {
+-            const QString key = group.prefix + id;
++        for (const QString& id : *group.ids) {
++            const QString key = QString::fromLatin1(group.prefix) + id;
+             const auto previous = current.value(key);
+             const auto value = changes.value(key, previous);
+             const bool affected = (validateUnchanged && checkGroup) || value != previous;
+@@ -1706,7 +1705,8 @@ bool localShortcutChangesValid(const QMap<QString, QJsonValue>& current,
+                             return false;
+                         // Old configurations could explicitly share a key across these scopes.
+                         // Permit unrelated changes while the two assignments are untouched.
+-                        if (!existing.key.startsWith(group.prefix) && !changes.contains(key) &&
++                        if (!existing.key.startsWith(QString::fromLatin1(group.prefix)) &&
++                            !changes.contains(key) &&
+                             !changes.contains(existing.key))
+                             return false;
+                         return shortcuts::localShortcutKeysMayConflict(existing.key, key) &&

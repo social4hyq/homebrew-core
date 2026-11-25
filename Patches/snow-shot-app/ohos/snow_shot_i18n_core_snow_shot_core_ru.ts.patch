@@ -1,0 +1,18 @@
+OHOS: keep the Russian catalog in parity with en_US after the OHOS
+document-picker/export messages were added. Upstream 1.6.4 validates
+message-key parity across locales at CMake configure time; translations
+fall back to the English source until upstream supplies Russian strings.
+
+--- a/snow_shot/i18n/core/snow_shot_core_ru.ts
++++ b/snow_shot/i18n/core/snow_shot_core_ru.ts
+@@ -911,6 +911,10 @@
+     <context>
+         <name>SystemTrayController</name>
+         <message>
++            <source>Choose a destination in Files to save the recording.</source>
++            <translation>Choose a destination in Files to save the recording.</translation>
++        </message>
++        <message>
+             <source>Delete empty groups</source>
+             <translation>Удалить пустые группы</translation>
+         </message>
