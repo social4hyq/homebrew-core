@@ -1,8 +1,8 @@
 class Orca < Formula
   desc "Run coding-agent fleets, each agent in its own git worktree"
   homepage "https://github.com/stablyai/orca"
-  url "https://github.com/stablyai/orca/archive/refs/tags/v1.4.272.tar.gz"
-  sha256 "f7eae968825acde3deced239d07f828a04e54e0962a6e4d1d7c8b12129e8221d"
+  url "https://github.com/stablyai/orca/archive/refs/tags/v1.4.274.tar.gz"
+  sha256 "974d7f5c4d3d30627cf36e2884b61fe0891c6e1be37c5ada406f8e2d0cf94317"
   license "MIT"
 
   livecheck do
@@ -11,8 +11,8 @@ class Orca < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/orca-v1.4.272-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "12f8da31724f07a8e39ef502e30b2273118b8ddd7595b30ea6411894163fda8e"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/orca-v1.4.274-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "164c5cb6f45912e6c60319ef2d23241737c0bc7685a520aff1bf8c0085658019"
   end
 
   depends_on "bun" => :build
@@ -115,12 +115,21 @@ class Orca < Formula
 
     # The pinned bun devDependency installs a platform binary through its
     # postinstall script, which cannot run here; point it at the packaged bun.
+    # orca's build probes `bun --version` and refuses to typecheck unless the
+    # answer equals config/.bun-version. The Homebrew bun build dependency
+    # follows its own release cadence (1.4.5 by orca 1.4.274), so answer that
+    # one probe with the pinned version and delegate real work to the keg bun.
     bun_dir = Pathname(node_output("require('path').dirname(require.resolve('bun/package.json'))"))
+    pinned_bun_version = (buildpath/"config/.bun-version").read.strip
     (bun_dir/"bin").mkpath
     bun_shim = bun_dir/"bin/bun.exe"
     bun_shim.delete if bun_shim.exist?
     bun_shim.write <<~SH
       #!/bin/sh
+      if [ "$1" = "--version" ]; then
+        echo "#{pinned_bun_version}"
+        exit 0
+      fi
       exec "#{formula_opt_bin("bun")}/bun" "$@"
     SH
     chmod 0755, bun_shim
