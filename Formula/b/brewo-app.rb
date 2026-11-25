@@ -1,10 +1,9 @@
 class BrewoApp < Formula
   desc "BrewUI-faithful Homebrew GUI for HarmonyOS PC, as a pure-ArkTS HAP"
   homepage "https://github.com/social4hyq/brewo-app"
-  url "https://github.com/social4hyq/brewo-app/archive/refs/tags/v0.2.0.tar.gz"
-  sha256 "3feb6e78907f8529119592999d393cc048a64d2593910996306d0b98a1c97653"
+  url "https://github.com/social4hyq/brewo-app/archive/refs/tags/v0.3.0.tar.gz"
+  sha256 "81e3e2a474278a191a32a611e7967ec96dd928bd7c61e1b8eedd9629fc22878e"
   license "AGPL-3.0-only"
-  revision 1
 
   livecheck do
     url :stable
@@ -12,14 +11,15 @@ class BrewoApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/brewo-app-v0.2.0-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "15e337954b24c2b78aaf1abf74ed74a5042622ad512be7dd676147216a00104f"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/brewo-app-v0.3.0-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5493a3a8269c621d555548b98e6cc5b527cce3b85ca2b1ca2676361ffea3bcd7"
   end
 
   depends_on "node" => :build
   depends_on "ohos-sdk" => :build
   depends_on "zip" => :build
   depends_on "app-installer"
+  depends_on "harbor-app"
   depends_on "python@3.15"
 
   def install
@@ -63,6 +63,9 @@ class BrewoApp < Formula
     odie "native bridge missing from HAP" unless hap_entries.include?("libbrewo_bridge.so")
 
     libexec.install hap => "brewo-unsigned.hap"
+    libexec.install "scripts/brewo-host.py"
+    (bin/"brewo-host").write_env_script formula_opt_bin("python@3.15")/"python3.15",
+                                      [opt_libexec/"brewo-host.py"], {}
 
     # `hap-app auto-install` requires a command named after the formula (`*-app`)
     # that accepts `install`. Forward to app-installer, swallowing the duplicate
@@ -71,10 +74,16 @@ class BrewoApp < Formula
     (bin/"brewo-app").write <<~SH
       #!/bin/sh
       [ "${1:-}" = "install" ] && shift
-      exec "#{installer}" \\
+      "#{installer}" \\
         --hap "#{libexec}/brewo-unsigned.hap" \\
         --bundle-id com.social4hyq.brewo \\
-        --module entry --ability EntryAbility "$@"
+        --module entry --ability EntryAbility --no-start "$@" || exit $?
+      launch=--launch-app
+      for arg in "$@"; do
+        [ "$arg" != "--sign-only" ] || exit 0
+        [ "$arg" != "--no-start" ] || launch=
+      done
+      exec "#{opt_bin}/brewo-host" --register-harbor $launch
     SH
     chmod 0755, bin/"brewo-app"
 
@@ -87,6 +96,16 @@ class BrewoApp < Formula
     end
   end
 
+  service do
+    run [opt_bin/"brewo-host", "--harbor"]
+    keep_alive true
+    environment_variables HOME:   HOMEBREW_PREFIX.parent.to_s,
+                          USER:   "currentUser",
+                          TMPDIR: "/data/storage/el2/base/cache"
+    log_path var/"log/brewo-host.log"
+    error_log_path var/"log/brewo-host.log"
+  end
+
   post_install_steps do
     run "{{HOMEBREW_PREFIX}}/bin/hap-app",
         args: ["auto-install", "brewo-app", "com.social4hyq.brewo"],
@@ -95,6 +114,8 @@ class BrewoApp < Formula
 
   test do
     assert_path_exists bin/"brewo-app"
+    assert_match "--register-harbor", shell_output("#{bin}/brewo-host --help")
+    assert_match "--harbor", systemd_service_path.read
     assert_path_exists libexec/"brewo-unsigned.hap"
     module_json = JSON.parse(Utils.safe_popen_read("unzip", "-p", libexec/"brewo-unsigned.hap", "module.json"))
     assert_equal "com.social4hyq.brewo", module_json.dig("app", "bundleName")
