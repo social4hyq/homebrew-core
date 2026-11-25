@@ -1,8 +1,8 @@
 class BrewoApp < Formula
   desc "BrewUI-faithful Homebrew GUI for HarmonyOS PC, as a pure-ArkTS HAP"
   homepage "https://github.com/social4hyq/brewo-app"
-  url "https://github.com/social4hyq/brewo-app/archive/refs/tags/v0.1.0.tar.gz"
-  sha256 "2236db4087fa724d57a9e3ffe78f89165acad9ef386b82dc1dc7b55577631291"
+  url "https://github.com/social4hyq/brewo-app/archive/refs/tags/v0.2.0.tar.gz"
+  sha256 "3feb6e78907f8529119592999d393cc048a64d2593910996306d0b98a1c97653"
   license "AGPL-3.0-only"
   revision 1
 
@@ -12,8 +12,8 @@ class BrewoApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/brewo-app-v0.1.0-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "673962b45013fc3a2a5a421ea8af7ae1c5e8c2cfa68d96cca01fbde11d67f87c"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/brewo-app-v0.2.0-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "15e337954b24c2b78aaf1abf74ed74a5042622ad512be7dd676147216a00104f"
   end
 
   depends_on "node" => :build
