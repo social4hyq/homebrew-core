@@ -8,6 +8,8 @@ class BrunoApp < Formula
       using: :nounzip
   sha256 "0264f6bd80deec178e89bdbe229e41747fa59e6fce1ef9bf9f3764924f362d7c"
   license "MIT"
+  # Resources-only fix: use Bruno icon and correct --deb help text.
+  revision 1
 
   livecheck do
     url :stable
