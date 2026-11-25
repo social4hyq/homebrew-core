@@ -1,8 +1,8 @@
 class Genoffice < Formula
   desc "Command-line for the GenOffice AI office suite (docx, xlsx, pptx, pdf)"
   homepage "https://github.com/genspark-ai/genoffice"
-  url "https://github.com/genspark-ai/genoffice/archive/refs/tags/v0.13.615.tar.gz"
-  sha256 "bd8cbe95dcee05ec20785b2aee015d5a1d69c0552683d808932ee5fa342c7505"
+  url "https://github.com/genspark-ai/genoffice/archive/refs/tags/v0.13.886.tar.gz"
+  sha256 "5099683639c438695c119608095349342938263b2191c000e6b989d24f8d3379"
   license "Apache-2.0"
 
   livecheck do
