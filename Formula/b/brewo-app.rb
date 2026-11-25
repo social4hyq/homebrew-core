@@ -13,7 +13,7 @@ class BrewoApp < Formula
 
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/brewo-app-v0.1.0-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0000000000000000000000000000000000000000000000000000000000000000"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "673962b45013fc3a2a5a421ea8af7ae1c5e8c2cfa68d96cca01fbde11d67f87c"
   end
 
   depends_on "node" => :build
