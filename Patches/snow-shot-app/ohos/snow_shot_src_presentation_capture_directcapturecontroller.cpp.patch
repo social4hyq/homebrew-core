@@ -6,7 +6,18 @@ contract.
 diff --git a/snow_shot/src/presentation/capture/directcapturecontroller.cpp b/snow_shot/src/presentation/capture/directcapturecontroller.cpp
 --- a/snow_shot/src/presentation/capture/directcapturecontroller.cpp
 +++ b/snow_shot/src/presentation/capture/directcapturecontroller.cpp
-@@ -312,6 +312,11 @@ void DirectCaptureController::captureCurrentMonitor() {
+@@ -33,6 +33,10 @@
+ #include <windows.h>
+ #endif
+ 
++#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
++#include <window_manager/oh_display_manager.h>
++#endif
++
+ namespace snow_shot::presentation {
+ namespace {
+ 
+@@ -312,6 +316,11 @@ void DirectCaptureController::captureCurrentMonitor() {
      const quint32 id = platform::screenshotDisplayAtCursor(&request.monitorCursor);
      if (id)
          request.monitorName = QStringLiteral("display:%1").arg(id);
