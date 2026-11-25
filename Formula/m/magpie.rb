@@ -1,8 +1,8 @@
 class Magpie < Formula
   desc "Pick the model each AI coding agent on your machine uses"
   homepage "https://github.com/yetone/magpie"
-  url "https://github.com/yetone/magpie/archive/refs/tags/v0.1.4743.tar.gz"
-  sha256 "6344eed4d1d3a18d21c858e4f7c3da9bf5535b77a5aad37de655c63fa36dca1f"
+  url "https://github.com/yetone/magpie/archive/refs/tags/v0.1.4777.tar.gz"
+  sha256 "c47ccfbf93ba8953ab1b988cf513fe1dfa291eeb56c4bad6b839cc9ae7093361"
   license "MIT"
 
   livecheck do
@@ -11,8 +11,8 @@ class Magpie < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/magpie-v0.1.4743-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "ee3322047481fb5b6ca65cf69deaa5de8f7e9d05be63c3be3ddfd8277cf94e44"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/magpie-v0.1.4777-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "35062c87eabe734e88af622cf604be68c898df1cb4861b8d16532ab81e5287c2"
   end
 
   depends_on "go" => :build
