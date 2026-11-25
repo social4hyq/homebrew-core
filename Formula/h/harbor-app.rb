@@ -4,6 +4,7 @@ class HarborApp < Formula
   url "https://github.com/social4hyq/harbor-app/archive/refs/tags/v0.1.0.tar.gz"
   sha256 "809b8fd7ce35846dc843485b39b2db41e4031c0da76ca4cca9068bac1e29cb35"
   license "MIT"
+  revision 1
 
   livecheck do
     url :stable
@@ -11,9 +12,8 @@ class HarborApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/harbor-app-v0.1.0-r3"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a134c4f8cc0cb3cfb72050f26195f0efca17c41b3e027eb79be82595cc163f2d"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/harbor-app-v0.1.0-r5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "41666b4cb5b9a68683efeb61d728df4c4b2d218d6964f47e6f35c5a9cca62aa1"
   end
 
   depends_on "node" => :build
