@@ -14,6 +14,11 @@ class BrunoApp < Formula
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bruno-app-v4.4.0-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9b06716ee768dcdabe71e514d6bc728c3ef4832dc68ecc7fae0dadff229163af"
+  end
+
   depends_on "app-installer"
   depends_on "node"
   depends_on "ohos-sdk-toolchains"
