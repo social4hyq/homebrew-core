@@ -1,8 +1,8 @@
 class HerdrApp < Formula
   desc "Herdr terminal multiplexer desktop app, unsigned OHOS HAP"
   homepage "https://herdr.dev"
-  url "https://github.com/herdrdev/herdr-app/archive/refs/tags/v0.1.17.tar.gz"
-  sha256 "e0f0902bd29834de65ce0136779c566d8232a235c0f6d33827dd4d13142c13f9"
+  url "https://github.com/herdrdev/herdr-app/archive/refs/tags/v0.1.18.tar.gz"
+  sha256 "0c442fd54231dee2aca661661b50f4177ca04b55966c572f26cf06c629e9e59d"
   license "Apache-2.0"
 
   livecheck do
