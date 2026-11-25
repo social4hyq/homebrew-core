@@ -13,7 +13,7 @@ class CellarApp < Formula
 
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/cellar-app-v0.1.0-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0000000000000000000000000000000000000000000000000000000000000000"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "64f01d4c4fd356c09a190ae3bcfafd353278b28fc7c3544fa01e483328084fce"
   end
 
   depends_on "node" => :build
