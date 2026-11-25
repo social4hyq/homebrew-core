@@ -11,7 +11,7 @@ import struct
 from pathlib import Path
 from typing import Any
 
-RUNTIME_VERSION = "1.3.0"
+RUNTIME_VERSION = "1.5.0"
 RUNTIME_PROTOCOL = 8
 PLATFORM = "openharmony-arm64"
 RUNTIME_NAME = "libsnow_ocr_inprocess.so"
@@ -84,12 +84,12 @@ def stage(source_manifest: Path, runtime: Path, model_root: Path, output_root: P
         raise ValueError("Small model role names do not match its asset file descriptors")
     verified_files = [_verified_model_file(model_root, model_id, item) for item in files]
     paragraph = manifest.get("paragraph_model")
-    if not isinstance(paragraph, dict) or paragraph.get("id") != "line2para-1-c8cede9":
+    if not isinstance(paragraph, dict) or paragraph.get("id") != "line2para-1-2-956253e":
         raise ValueError("source manifest has no supported paragraph model")
     paragraph_files = paragraph.get("files")
     if not isinstance(paragraph_files, list) or len(paragraph_files) != 1:
         raise ValueError("paragraph model must contain exactly one file")
-    if paragraph_files[0].get("name") != "line2para_1.onnx":
+    if paragraph_files[0].get("name") != "line2para_1_2-epoch12-signed-1.625.onnx":
         raise ValueError("paragraph model has an unexpected filename")
     verified_paragraph = [
         _verified_model_file(model_root, paragraph["id"], item) for item in paragraph_files

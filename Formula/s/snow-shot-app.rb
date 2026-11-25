@@ -68,8 +68,8 @@ class SnowShotApp < Formula
   end
 
   resource "ocr-paragraph-model" do
-    url "https://www.modelscope.cn/models/mgchao/SnowShotOCR/resolve/master/line2para/line2para_1.onnx"
-    sha256 "c8cede9a564d9da10cf72d2ca9fe70d1d83ac947566d8cbc546b1ea36402d922"
+    url "https://www.modelscope.cn/models/mgchao/SnowShotOCR/resolve/master/line2para/line2para_1_2-epoch12-signed-1.625.onnx"
+    sha256 "956253efb9eefe81692b5ba88b2923f1a012427933768acd5657c509b7363ac5"
   end
 
   resource "snow-shot-ocr-rs" do
@@ -190,7 +190,7 @@ class SnowShotApp < Formula
       end
     end
     resource("ocr-paragraph-model").stage do
-      model_dir = buildpath/"ocr-models/line2para-1-c8cede9"
+      model_dir = buildpath/"ocr-models/line2para-1-2-956253e"
       mkdir_p model_dir
       filename = Dir.children(".").first
       cp filename, model_dir/filename
@@ -677,7 +677,7 @@ class SnowShotApp < Formula
       libsnow_shot.so libqohos.so libQt6Widgets.so.6
       rawfile/qrcode/detect.prototxt rawfile/qrcode/detect.caffemodel
       rawfile/qrcode/sr.prototxt rawfile/qrcode/sr.caffemodel
-      rawfile/ocr/models/line2para-1-c8cede9/line2para_1.onnx
+      rawfile/ocr/models/line2para-1-2-956253e/line2para_1_2-epoch12-signed-1.625.onnx
     ].each { |name| assert_match name, listing }
     refute_match "libs/arm64-v8a/libsnow_ocr_process.so", listing
     assert_match "libs/arm64-v8a/tls/libqopensslbackend.so", listing

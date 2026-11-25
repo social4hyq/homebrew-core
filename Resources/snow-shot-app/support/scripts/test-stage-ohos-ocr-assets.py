@@ -55,10 +55,12 @@ class StageOhosOcrAssetsTests(unittest.TestCase):
                     "url": f"https://example.invalid/{name}",
                 }
             )
-        paragraph_dir = self.model_root / "line2para-1-c8cede9"
+        self.paragraph_id = "line2para-1-2-956253e"
+        self.paragraph_name = "line2para_1_2-epoch12-signed-1.625.onnx"
+        paragraph_dir = self.model_root / self.paragraph_id
         paragraph_dir.mkdir()
         self.paragraph_bytes = b"paragraph"
-        (paragraph_dir / "line2para_1.onnx").write_bytes(self.paragraph_bytes)
+        (paragraph_dir / self.paragraph_name).write_bytes(self.paragraph_bytes)
         model_descriptors = [
             {
                 "type": "extra_small",
@@ -88,15 +90,15 @@ class StageOhosOcrAssetsTests(unittest.TestCase):
         manifest = {
             "schema": 2,
             "default_model": "small",
-            "runtime": {"version": "1.3.0", "platform": "windows-arm64"},
+            "runtime": {"version": "1.5.0", "platform": "windows-arm64"},
             "models": model_descriptors,
             "paragraph_model": {
-                "id": "line2para-1-c8cede9",
+                "id": self.paragraph_id,
                 "files": [{
-                    "name": "line2para_1.onnx",
+                    "name": self.paragraph_name,
                     "size": len(self.paragraph_bytes),
                     "sha256": hashlib.sha256(self.paragraph_bytes).hexdigest(),
-                    "url": "https://example.invalid/line2para_1.onnx",
+                    "url": f"https://example.invalid/{self.paragraph_name}",
                 }],
             },
         }
@@ -113,13 +115,13 @@ class StageOhosOcrAssetsTests(unittest.TestCase):
         self.assertEqual(staged["runtime"]["platform"], "openharmony-arm64")
         self.assertEqual(staged["runtime"]["delivery"], "bundled")
         self.assertEqual(staged["runtime"]["executable"], "libsnow_ocr_inprocess.so")
-        self.assertEqual(staged["runtime"]["version"], "1.3.0")
+        self.assertEqual(staged["runtime"]["version"], "1.5.0")
         self.assertEqual(staged["runtime"]["protocol"], 8)
         self.assertEqual(staged["runtime"]["files"][0]["sha256"],
                          hashlib.sha256(self.runtime_bytes).hexdigest())
         for name, content in self.model_bytes.items():
             self.assertEqual((self.output / "models" / self.model_id / name).read_bytes(), content)
-        paragraph = self.output / "models" / "line2para-1-c8cede9" / "line2para_1.onnx"
+        paragraph = self.output / "models" / self.paragraph_id / self.paragraph_name
         self.assertEqual(paragraph.read_bytes(), self.paragraph_bytes)
         self.assertEqual(staged["paragraph_model"]["files"][0]["sha256"],
                          hashlib.sha256(self.paragraph_bytes).hexdigest())
