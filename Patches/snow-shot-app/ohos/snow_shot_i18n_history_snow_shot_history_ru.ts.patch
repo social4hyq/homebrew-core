@@ -1,0 +1,68 @@
+OHOS: keep the Russian catalog in parity with en_US after the OHOS
+document-picker/export messages were added. Upstream 1.6.4 validates
+message-key parity across locales at CMake configure time; translations
+fall back to the English source until upstream supplies Russian strings.
+
+--- a/snow_shot/i18n/history/snow_shot_history_ru.ts
++++ b/snow_shot/i18n/history/snow_shot_history_ru.ts
+@@ -173,6 +173,14 @@
+             <translation>Не найдено свободное имя выходного файла</translation>
+         </message>
+         <message>
++            <source>No valid document was selected for the recognition result</source>
++            <translation>No valid document was selected for the recognition result</translation>
++        </message>
++        <message>
++            <source>The document picker could not be opened</source>
++            <translation>The document picker could not be opened</translation>
++        </message>
++        <message>
+             <source>The editing content could not be prepared for export</source>
+             <translation>Не удалось подготовить содержимое для экспорта</translation>
+         </message>
+@@ -193,6 +201,10 @@
+             <translation>Изображение слишком большое или не хватает памяти для его загрузки</translation>
+         </message>
+         <message>
++            <source>The recognition result could not be staged for saving</source>
++            <translation>The recognition result could not be staged for saving</translation>
++        </message>
++        <message>
+             <source>The save directory is not available</source>
+             <translation>Каталог для сохранения недоступен</translation>
+         </message>
+@@ -199,3 +211,7 @@
++        <message>
++            <source>The user-file export queue is unavailable</source>
++            <translation>The user-file export queue is unavailable</translation>
++        </message>
+     </context>
+     <context>
+         <name>ImageSplitDocument</name>
+@@ -2376,6 +2392,26 @@
+             <translation>Не удалось начать сохранение закреплённого изображения</translation>
+         </message>
+         <message>
++            <source>The primary result was saved, but its text companion could not be written: %1</source>
++            <translation>The primary result was saved, but its text companion could not be written: %1</translation>
++        </message>
++        <message>
++            <source>The primary result was saved, but its text companion picker could not be opened</source>
++            <translation>The primary result was saved, but its text companion picker could not be opened</translation>
++        </message>
++        <message>
++            <source>The primary result was saved, but its text companion was not selected</source>
++            <translation>The primary result was saved, but its text companion was not selected</translation>
++        </message>
++        <message>
++            <source>The primary result was saved, but the text companion export queue is unavailable</source>
++            <translation>The primary result was saved, but the text companion export queue is unavailable</translation>
++        </message>
++        <message>
++            <source>The user-file export queue is unavailable</source>
++            <translation>The user-file export queue is unavailable</translation>
++        </message>
++        <message>
+             <source>The window changed while preparing the image. Please try again</source>
+             <translation>Окно изменилось во время подготовки изображения. Повторите попытку</translation>
+         </message>
