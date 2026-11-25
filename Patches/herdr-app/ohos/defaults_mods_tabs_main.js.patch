@@ -1,0 +1,70 @@
+OHOS: don't select a tab on the close button's mouse-up
+
+A tap can deliver its mouse-up to the tab item even after the × has closed
+the tab. The item's handler fell through to tab.select with a deleted id,
+which surfaced as a bottom-right "tab.select failed / no such tab" toast.
+
+--- a/defaults/mods/tabs/main.js
++++ b/defaults/mods/tabs/main.js
+@@ -114,14 +114,18 @@ export default class Tabs extends View {
+         .on_mouse_up("left", () => {
+           const from = this.pressed; this.pressed = null;
+           if (from !== null && from !== i) run("tab.move", { id: shown[from].id, index: space.tabs.findIndex(x => x.id === c.id) + 1 });
+-          else run("tab.select", { id: c.id });
++          // A press that didn't start on this tab (the × close button stops the
++          // press, and a touch tap can still deliver its release here) must not
++          // select it: the close may already have removed it, and selecting a
++          // deleted tab only produces a "no such tab" toast.
++          else if (from === i) run("tab.select", { id: c.id });
+         })
+         .on_mouse_down("right", (_e, cx) => { cx.stop_propagation(); openOverlay({ mod: "menu", kind: "popup", width: 200, props: { tab: "tab", target: { id: c.id, space: space.id } } }); })
+         .when(Boolean(program?.icon), el => el.child(program.tint ? svg(program.icon).size(14).text_color(t.muted) : image(program.icon).size(14)))
+         .child(div().max_w(170).truncate().child(c.zoomed ? `${name} Z` : name))
+         .when(c.status === "working", el => el.child(svg("mods/workspace-chrome/spinner.svg").size(12).flex_none().text_color(t.working).spin(900)))
+         .when(c.status === "blocked" || c.status === "done", el => el.child(div().size(6).rounded(3).bg(t[c.status])))
+-        .when(c.active, el => el.child(div().id(`close-${c.id}`).text_color(t.dim).on_mouse_down("left", stop).on_click((_e, cx) => { cx.stop_propagation(); run("tab.close", { id: c.id }); }).child(svg("mods/pane/close.svg").size(12))));
++        .when(c.active, el => el.child(div().id(`close-${c.id}`).text_color(t.dim).on_mouse_down("left", stop).on_mouse_up("left", stop).on_click((_e, cx) => { cx.stop_propagation(); run("tab.close", { id: c.id }); }).child(svg("mods/pane/close.svg").size(12))));
+     };
+     const root = layout(), sidebar = find(root, "sidebar"), w = window();
+     // Old saved rails and a dragged-narrow sidebar can be smaller than the window buttons.
+--- a/scripts/tabs.test.ts
++++ b/scripts/tabs.test.ts
+@@ -101,6 +101,38 @@ test("each wheel notch switches one tab", () => {
+   expect(commands).toEqual(["tab.next", "tab.next", "tab.prev"]);
+ });
+ 
++// A press on the close button must never turn into a tab.select for the tab
++// that is being closed. GPUI's on_mouse_down stop keeps `pressed` null, but a
++// mouse-up can still reach the tab item (notably from a touch tap): the item's
++// handler currently falls through to tab.select with a now-deleted id, which
++// surfaces as the bottom-right "tab.select failed / no such tab" toast.
++test("the close button's mouse-up does not select the tab being closed", () => {
++  const view = new Tabs();
++  view.init();
++  const root = view.render() as Element;
++  const find = (node: Element, id: string): Element | null => {
++    if (!node || typeof node !== "object" || !node.calls) return null;
++    if (node.calls.id?.[0] === id) return node;
++    for (const child of node.nodes) {
++      const hit = find(child, id);
++      if (hit) return hit;
++    }
++    return null;
++  };
++  const item = find(root, "tab-t2");
++  const close = find(root, "close-t2");
++  expect(item).not.toBeNull();
++  expect(close).not.toBeNull();
++  const cx = { stop_propagation() {}, notify() {} };
++  const ev = { click_count: 1 };
++  // Press on × (stop), click on × (tab.close), then the mouse-up bubbles to the
++  // tab item after the close has removed the tab from the model.
++  (close!.calls.on_mouse_down[1] as Handler)(ev, cx);
++  close!.calls.on_click[0](ev, cx);
++  (item!.calls.on_mouse_up[1] as Handler)(ev, cx);
++  expect(commands).toEqual(["tab.close"]);
++});
++
+ const label = new Function("View", `${source.replace(/^import .*;\n/gm, "").replace("export default class Tabs", "class Tabs")}; return label;`)(class {});
+ 
+ const claude = { program: { name: "Claude Code", key: "claude", agent: true }, title: "my-task" };
