@@ -212,8 +212,6 @@ diff --git a/snow_shot/src/presentation/ocr/screenshotocrrecognitionservice.cpp 
 +        const QByteArray recognizer = m_assets.recognizerModelPath.toUtf8();
 +        const QByteArray dictionary = m_assets.dictionaryPath.toUtf8();
 +        const quint64 configurationGeneration = m_configurationGeneration;
-+        const uint8_t resizePolicy =
-+            m_configuration.detectorResizePolicy == ScreenshotOcrDetectorResizePolicy::Min ? 1 : 0;
 +        const uint8_t processing = m_configuration.textDetectionProcessing ==
 +                                           ScreenshotOcrTextDetectionProcessing::SpeedFirst
 +                                       ? 1
@@ -223,12 +221,14 @@ diff --git a/snow_shot/src/presentation/ocr/screenshotocrrecognitionservice.cpp 
 +        const QPointer<ScreenshotOcrRecognitionService> service(m_owner);
 +        const auto alive = m_alive;
 +        m_localPool->start(QRunnable::create([service, alive, generation, configurationGeneration,
-+                                              detector, recognizer, dictionary, resizePolicy,
-+                                              processing, threadBudget]() {
++                                              detector, recognizer, dictionary, processing,
++                                              threadBudget]() {
++            // OCR no longer uses a resize policy. ABI v1 still requires the legacy argument.
++            constexpr uint8_t legacyResizePolicy = 0;
 +            char* errorRaw = nullptr;
 +            SnowOcrHandle* raw = snow_ocr_create(detector.constData(), recognizer.constData(),
-+                                                 dictionary.constData(), threadBudget, resizePolicy,
-+                                                 processing, &errorRaw);
++                                                 dictionary.constData(), threadBudget,
++                                                 legacyResizePolicy, processing, &errorRaw);
 +            const auto freeString = [](char* value) { snow_ocr_string_free(value); };
 +            const std::unique_ptr<char, decltype(freeString)> errorText(errorRaw, freeString);
 +            const QString error =
