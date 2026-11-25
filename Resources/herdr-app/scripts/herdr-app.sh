@@ -42,6 +42,13 @@ Commands:
   bridge start|stop|restart|status
             Run the core bridge by itself. It listens on 127.0.0.1 only and answers only the
             app that carries the token.
+  do <command> [--arg value ... | json]
+            Run a command in the running window (through herdr-core documents).
+  ls | commands | shot [file.png] | feedback <message>
+            Inspect the window, list commands, take a screenshot, draft feedback.
+  ctl <command> [options]
+            Pass do/ls/status/commands/shot/feedback through unchanged;
+            `ctl status` is the window status (`status` alone stays the bridge status).
   -h, --help  Show this help
 EOF
 }
@@ -267,6 +274,7 @@ PY
 command_name="${1:-}"
 case "$command_name" in
   -h|--help|help|"") usage; [[ -n "$command_name" ]] || exit 2; exit 0 ;;
+  do|ls|commands|shot|feedback|ctl) shift ;;
   install|start|stop|status|uninstall|bridge) shift ;;
   *) usage >&2; exit 2 ;;
 esac
@@ -282,6 +290,19 @@ if [[ "$command_name" == bridge ]]; then
     *) usage >&2; exit 2 ;;
   esac
   exit
+fi
+
+# Control commands drive the running window through herdr-core documents:
+# the HAP's own control socket lives in its sandbox and cannot be reached here.
+if [[ "$command_name" == do || "$command_name" == ls || "$command_name" == commands ||
+      "$command_name" == shot || "$command_name" == feedback || "$command_name" == ctl ]]; then
+  control="${HERDR_APP_CONTROL:-$(dirname "${BASH_SOURCE[0]}")/herdr-app-control.py}"
+  [[ -f "$control" ]] || die "control client not found: $control"
+  if [[ "$command_name" == ctl ]]; then
+    exec "${HERDR_APP_PYTHON:-python3}" "$control" "$@"
+  else
+    exec "${HERDR_APP_PYTHON:-python3}" "$control" "$command_name" "$@"
+  fi
 fi
 
 device=

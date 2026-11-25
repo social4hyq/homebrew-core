@@ -1,0 +1,141 @@
+OHOS: add a core-document control channel for the host CLI
+
+The app control UNIX socket lives in the HAP sandbox and cannot be
+reached from the host. Drive the window through herdr-core documents.
+
+--- /dev/null
++++ b/src/doc_control.rs
+@@ -0,0 +1,133 @@
++//! Control the window from another process through herdr-core documents.
++//!
++//! On OHOS the app runs in a HAP sandbox, so its control UNIX socket
++//! (`control::listen`) cannot be reached from the host. Both sides instead meet
++//! in the core's document store, which is shared through the bridge:
++//!
++//!   * a client writes `{"id","token","cmd"}` to [`REQ`] (CAS on its version);
++//!   * this module reads it, checks `token` against the bridge token baked into
++//!     the HAP, and passes `cmd` to `AppWindow::control` on the UI thread;
++//!   * the answer is written to [`REPLY`] as `{"id","reply"}`;
++//!   * the client polls `REPLY` for its `id`.
++//!
++//! Only the protocol lives here (read, authenticate, track versions, write).
++//! Calling `control` and driving the poll need `Window`/`Context` and are wired
++//! in `window.rs`. The decision logic is std-only and testable on its own:
++//! `rustc --edition 2024 --test src/doc_control.rs`.
++
++#[cfg(not(test))]
++use crate::hc::Core;
++#[cfg(not(test))]
++use serde_json::{Value, json};
++#[cfg(not(test))]
++use std::time::Duration;
++
++/// The document a client writes requests to.
++pub const REQ: &str = "herdr-app.control";
++/// The document this app writes answers to.
++pub const REPLY: &str = "herdr-app.control.reply";
++
++/// A request read from [`REQ`], with the version it was read at.
++#[cfg(not(test))]
++#[derive(Debug, Clone, PartialEq)]
++pub struct Request {
++    pub version: u64,
++    pub id: String,
++    pub cmd: Value,
++}
++
++/// What the pure decision logic says about a document version.
++#[derive(Debug, PartialEq)]
++pub enum Verdict {
++    /// New, well-formed and trusted: the caller should read the id/cmd.
++    Run,
++    /// A version we should note (skip / clear / bad auth), so it isn't retried.
++    Skip(u64),
++    /// Nothing new.
++    None,
++}
++
++/// Pure decision logic, free of `Value` so it can be unit-tested standalone.
++///
++/// `has_token` is whether the request carried a token, `token_ok` whether it
++/// matched the app's token.
++pub fn decide(version: u64, seen: u64, has_id: bool, has_cmd: bool, has_token: bool, token_ok: bool) -> Verdict {
++    if version == 0 || version <= seen {
++        return Verdict::None;
++    }
++    if !has_id || !has_cmd {
++        return Verdict::Skip(version);
++    }
++    // A request must carry the bridge token and it must match. With no token
++    // on the app side, nothing is accepted (like a bridge refusing a client).
++    if !has_token || !token_ok {
++        return Verdict::Skip(version);
++    }
++    Verdict::Run
++}
++
++/// Parse and authenticate a request document snapshot.
++///
++/// `seen` is the last version this app handled. `token` is the bridge token
++/// baked into the HAP; `None` means the app has no token and trusts nothing.
++#[cfg(not(test))]
++pub fn incoming(value: Option<&Value>, version: u64, seen: u64, token: Option<&str>) -> Option<Request> {
++    let obj = value.and_then(Value::as_object);
++    let has_id = obj.and_then(|o| o.get("id").and_then(Value::as_str)).is_some();
++    let has_cmd = obj.and_then(|o| o.get("cmd")).is_some();
++    let given = obj.and_then(|o| o.get("token").and_then(Value::as_str));
++    let token_ok = matches!((token, given), (Some(want), Some(got)) if want == got);
++    if decide(version, seen, has_id, has_cmd, given.is_some(), token_ok) != Verdict::Run {
++        return None;
++    }
++    let object = obj?;
++    Some(Request { version, id: object["id"].as_str()?.to_owned(), cmd: object["cmd"].clone() })
++}
++
++/// Read the request document once. Returns the raw snapshot for `incoming`.
++#[cfg(not(test))]
++pub fn read(core: &Core) -> (Option<Value>, u64) {
++    let result = core.call_timeout("doc.get", json!({"name": REQ}), Duration::from_secs(5));
++    match result {
++        Ok(v) => (v.get("value").cloned().filter(|x| !x.is_null()), v["version"].as_u64().unwrap_or(0)),
++        Err(_) => (None, 0),
++    }
++}
++
++/// The document value for an answer.
++#[cfg(not(test))]
++pub fn answer(id: &str, reply: &Value) -> Value {
++    json!({ "id": id, "reply": reply })
++}
++
++/// Write an answer to [`REPLY`], advancing its current version (CAS).
++#[cfg(not(test))]
++pub fn write(core: &Core, value: Value) -> bool {
++    let current = match core.call_timeout("doc.get", json!({"name": REPLY}), Duration::from_secs(5)) {
++        Ok(v) => v["version"].as_u64().unwrap_or(0),
++        Err(_) => return false,
++    };
++    core.call_timeout("doc.set", json!({"name": REPLY, "version": current, "value": value}), Duration::from_secs(5)).is_ok()
++}
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++
++    #[test]
++    fn decide_accepts_only_new_well_formed_trusted() {
++        assert_eq!(decide(1, 0, true, true, true, true), Verdict::Run);
++        assert_eq!(decide(0, 0, true, true, true, true), Verdict::None);
++        assert_eq!(decide(1, 1, true, true, true, true), Verdict::None);
++        assert_eq!(decide(2, 0, false, true, true, true), Verdict::Skip(2));
++        assert_eq!(decide(2, 0, true, false, true, true), Verdict::Skip(2));
++        assert_eq!(decide(2, 0, true, true, false, true), Verdict::Skip(2));
++        assert_eq!(decide(2, 0, true, true, true, false), Verdict::Skip(2));
++    }
++
++    #[test]
++    fn constants_name_the_documents() {
++        assert_eq!(REQ, "herdr-app.control");
++        assert_eq!(REPLY, "herdr-app.control.reply");
++    }
++}

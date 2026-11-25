@@ -1,0 +1,52 @@
+OHOS: poll the control document and run commands through control()
+
+--- a/src/window.rs
++++ b/src/window.rs
+@@ -818,7 +818,47 @@
+                 cx.background_executor().timer(Duration::from_millis(500)).await;
+             }
+         }));
++        // Drive the window from another process through herdr-core documents.
++        // The host cannot reach this HAP's control socket; clients write a
++        // request doc instead. See `doc_control`.
+         w._tasks.push(cx.spawn_in(window, async move |this, cx| {
++            let mut seen = 0u64;
++            loop {
++                let Some(core) = this.update(cx, |this, _| this.core.clone()).ok() else { break };
++                let token = this.update(cx, |this, _| {
++                    crate::bridge_auth::token(&crate::mods::app_dir())
++                }).ok().flatten();
++                let (value, version) = crate::doc_control::read(&core);
++                let request = crate::doc_control::incoming(value.as_ref(), version, seen, token.as_deref());
++                if let Some(request) = request {
++                    seen = request.version;
++                    let id = request.id.clone();
++                    let cmd = request.cmd.clone();
++                    let reply = this.update_in(cx, |this, window, cx| {
++                        // A screenshot must be taken on the UI thread, like the
++                        // control socket's handle() does; control() doesn't do it.
++                        if let Some(path) = cmd.get("shot").and_then(Value::as_str) {
++                            return match crate::control::save_shot(window.window_handle(), cx, std::path::Path::new(path)) {
++                                Ok(()) => json!({ "path": path }),
++                                Err(error) => json!({ "error": format!("cannot save screenshot: {error:#}") }),
++                            };
++                        }
++                        this.control(cmd, window, cx)
++                    });
++                    if let Ok(reply) = reply {
++                        // Same shape the control socket returns: the command's
++                        // result (possibly with an `error`) under `reply`.
++                        crate::doc_control::write(&core, crate::doc_control::answer(&id, &reply));
++                    }
++                } else if version > seen {
++                    // Advance past skipped/untrusted/malformed documents so a
++                    // rejected request is not retried on every tick.
++                    seen = version;
++                }
++                cx.background_executor().timer(Duration::from_millis(200)).await;
++            }
++        }));
++        w._tasks.push(cx.spawn_in(window, async move |this, cx| {
+             // Cores restart (upgrades, crashes) and their programs survive: keep
+             // the panes, reconnect, reattach the same terminals.
+             loop {
