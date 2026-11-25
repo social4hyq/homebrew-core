@@ -1,0 +1,12 @@
+OHOS: register the doc_control module
+
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -6,6 +6,7 @@
+ pub mod bench;
+ pub mod commands;
+ pub mod control;
++pub mod doc_control;
+ pub mod core_bin;
+ pub mod files;
+ pub mod hc;
