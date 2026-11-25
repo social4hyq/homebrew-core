@@ -5,9 +5,9 @@ apply the same projection the ranges overload used.
 diff --git a/snow_shot/src/presentation/ocr/screenshotocrtextlayout.cpp b/snow_shot/src/presentation/ocr/screenshotocrtextlayout.cpp
 --- a/snow_shot/src/presentation/ocr/screenshotocrtextlayout.cpp
 +++ b/snow_shot/src/presentation/ocr/screenshotocrtextlayout.cpp
-@@ -89,7 +89,8 @@
+@@ -86,7 +86,8 @@ template <typename Layout> QRectF textLayoutInkBounds(const Layout& layout) {
  }
-
+ 
  bool glyphsUseCffOutlines(const QTextLayout& layout) {
 -    return std::ranges::any_of(layout.glyphRuns(), [](const QGlyphRun& run) {
 +    const QList<QGlyphRun> glyphRuns = layout.glyphRuns();
@@ -15,16 +15,26 @@ diff --git a/snow_shot/src/presentation/ocr/screenshotocrtextlayout.cpp b/snow_s
          const QRawFont font = run.rawFont();
          return !font.fontTable("CFF ").isEmpty() || !font.fontTable("CFF2").isEmpty();
      });
-@@ -242,7 +243,7 @@
+@@ -239,7 +240,7 @@ QString translationDisplayText(const QString& text) {
  }
-
+ 
  bool hasVisibleCharacters(QStringView text) {
 -    return std::ranges::any_of(text, [](QChar character) {
 +    return std::any_of(text.cbegin(), text.cend(), [](QChar character) {
          return !character.isSpace() && character.category() != QChar::Other_Format;
      });
  }
-@@ -1227,7 +1228,11 @@
+@@ -288,7 +289,8 @@ struct WeightedMetric {
+ qreal medianByExtent(QVector<WeightedMetric>& samples) {
+     if (samples.isEmpty())
+         return 0;
+-    std::ranges::sort(samples, {}, &WeightedMetric::value);
++    std::sort(samples.begin(), samples.end(),
++              [](const WeightedMetric& a, const WeightedMetric& b) { return a.value < b.value; });
+     qreal total = 0;
+     for (const auto& sample : samples)
+         total += sample.extent;
+@@ -1305,7 +1307,11 @@ int ScreenshotOcrTextLayout::cursorPositionAt(const QPointF& itemPosition) const
                  const auto rect = verticalCell(static_cast<std::size_t>(column.start));
                  return std::abs(rect.center().x() - itemPosition.x());
              };
@@ -37,7 +47,7 @@ diff --git a/snow_shot/src/presentation/ocr/screenshotocrtextlayout.cpp b/snow_s
              const auto row =
                  static_cast<int>(std::clamp(std::round(itemPosition.y() / m_verticalCellAdvance),
                                              0.0, static_cast<qreal>(closest->length)));
-@@ -1247,8 +1252,12 @@
+@@ -1325,8 +1331,12 @@ int ScreenshotOcrTextLayout::cursorPositionAt(const QPointF& itemPosition) const
              const qreal y = itemPosition.y();
              return std::abs(std::clamp(y, row.top(), row.bottom()) - y);
          };
@@ -52,3 +62,13 @@ diff --git a/snow_shot/src/presentation/ocr/screenshotocrtextlayout.cpp b/snow_s
          return qBound(0, line.xToCursor(itemPosition.x(), QTextLine::CursorBetweenCharacters),
                        static_cast<int>(m_text.size()));
      }
+@@ -1829,7 +1839,8 @@ void prepareScreenshotOcrTranslationLayout(QVector<ScreenshotOcrLine>& translati
+         return line.fontSizeCapRatio && line.sourceTextMetrics &&
+                line.sourceTextMetrics->measuredFont == font;
+     };
+-    if (translation.size() != sourceIndices.size() || std::ranges::all_of(translation, measured))
++    if (translation.size() != sourceIndices.size() ||
++        std::all_of(translation.cbegin(), translation.cend(), measured))
+         return;
+     QVector<qreal> fontSizes(source.size(), 0);
+     QVector<ScreenshotOcrSourceTextMetrics> metrics(source.size());

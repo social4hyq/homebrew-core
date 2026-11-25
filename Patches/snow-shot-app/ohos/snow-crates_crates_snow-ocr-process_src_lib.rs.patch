@@ -18,7 +18,7 @@ compiling here, matching the upstream out-of-process worker's definitions.
 diff --git a/snow-crates/crates/snow-ocr-process/src/lib.rs b/snow-crates/crates/snow-ocr-process/src/lib.rs
 --- a/snow-crates/crates/snow-ocr-process/src/lib.rs
 +++ b/snow-crates/crates/snow-ocr-process/src/lib.rs
-@@ -0,0 +1,349 @@
+@@ -0,0 +1,350 @@
 +//! In-process C ABI for hosts that cannot execute a bundled helper process.
 +//!
 +//! The standalone worker remains the preferred host integration where process
@@ -67,6 +67,7 @@ diff --git a/snow-crates/crates/snow-ocr-process/src/lib.rs b/snow-crates/crates
 +    SpeedFirst,
 +}
 +
++#[allow(dead_code)]
 +impl TextDetectionProcessing {
 +    fn recognition_width(self) -> usize {
 +        match self {
