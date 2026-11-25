@@ -205,11 +205,15 @@ def check(config):
 
 def main():
     parser = argparse.ArgumentParser(description="Token-authenticated bridge from the Herdr HAP to herdr-core.")
-    parser.add_argument("--config", default=os.environ.get("HERDR_BRIDGE_CONFIG") or default_config())
+    parser.add_argument("--config")
+    parser.add_argument("--brew-prefix", help="use the home directory that owns the Harmonybrew prefix")
     parser.add_argument("--check", action="store_true", help="connect with the token and report whether the bridge accepts it")
     args = parser.parse_args()
+    if args.brew_prefix:
+        os.environ["HOME"] = os.path.dirname(os.path.abspath(args.brew_prefix))
+    config = args.config or os.environ.get("HERDR_BRIDGE_CONFIG") or default_config()
     try:
-        return check(args.config) if args.check else serve(args.config)
+        return check(config) if args.check else serve(config)
     except (OSError, ValueError) as error:
         print(f"herdr-bridge: {error}", file=sys.stderr)
         return 2
