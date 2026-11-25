@@ -8,8 +8,8 @@ class BrunoApp < Formula
       using: :nounzip
   sha256 "0264f6bd80deec178e89bdbe229e41747fa59e6fce1ef9bf9f3764924f362d7c"
   license "MIT"
-  # Resources-only fix: use Bruno icon and correct --deb help text.
-  revision 1
+  # Resources-only fix: declare READ_PASTEBOARD for clipboard support.
+  revision 2
 
   livecheck do
     url :stable
@@ -17,8 +17,8 @@ class BrunoApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bruno-app-v4.4.0-r3"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "be7582fe9e9bf91a2099ec133674e146a5a91b9aec4e5d419365a5669069557c"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bruno-app-v4.4.0-r4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bd2a1e1fee9af049d08090a7f3b870674442aeddaf04684f8cca23fe88d886c1"
   end
 
   depends_on "app-installer"
@@ -121,6 +121,13 @@ class BrunoApp < Formula
     shell_module = JSON.parse(
       Utils.safe_popen_read("unzip", "-p", libexec/"bruno-app-shell-unsigned.hap", "module.json"),
     )
+    # READ_PASTEBOARD is user_grant: declaring it in module.json5 would fail the
+    # build (it requires a reason string). Inject it into the ACL variant only,
+    # which is signed at install time and does not go through hvigor.
+    requested = shell_module.fetch("module").fetch("requestPermissions")
+    unless requested.any? { |permission| permission["name"] == "ohos.permission.READ_PASTEBOARD" }
+      requested << { "name" => "ohos.permission.READ_PASTEBOARD" }
+    end
     (pkgshare/"module-acl.json").write JSON.generate(shell_module)
 
     # Run the assembler's package checks against the .deb Homebrew just
@@ -180,8 +187,11 @@ class BrunoApp < Formula
     assert_includes permissions, "ohos.permission.CUSTOM_SANDBOX"
     assert_includes permissions, "ohos.permission.READ_WRITE_USER_FILE"
     acl = JSON.parse((pkgshare/"module-acl.json").read)
-    assert_includes acl.dig("module", "requestPermissions").map { |item| item.fetch("name") },
-                    "ohos.permission.CUSTOM_SANDBOX"
+    acl_permissions = acl.dig("module", "requestPermissions").map { |item| item.fetch("name") }
+    assert_includes acl_permissions, "ohos.permission.CUSTOM_SANDBOX"
+    # READ_PASTEBOARD is user_grant; it lives in the ACL variant only (a reason
+    # string in module.json5 would fail the build).
+    assert_includes acl_permissions, "ohos.permission.READ_PASTEBOARD"
     system "unzip", "-tq", hap
 
     system "python3", tap_root/"Resources/bruno-app/tests/assemble-local-hap.test.py"
