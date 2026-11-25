@@ -134,9 +134,13 @@ PY
 }
 
 bridge_start() {
+  ensure_conf
+  if [[ -z "$(bridge_pid)" ]] && bridge_check; then
+    printf 'herdr-app: using the externally managed bridge at %s\n' "$(conf_value addr)" >&2
+    return 0
+  fi
   ensure_socket_tmpdir ||
     die "no directory that can hold a UNIX socket; set TMPDIR to the terminal app's cache (for example /data/storage/el2/base/cache)"
-  ensure_conf
   if [[ -n "$(bridge_pid)" ]]; then
     local recorded
     recorded="$(cat "$STATE/bridge.tmpdir" 2>/dev/null || true)"
@@ -174,7 +178,14 @@ bridge_start() {
 
 bridge_stop() {
   local pid; pid="$(bridge_pid)"
-  [[ -n "$pid" ]] || { rm -f "$PIDFILE"; printf 'herdr-app: the bridge is not running\n' >&2; return 0; }
+  if [[ -z "$pid" ]]; then
+    if conf_ok && bridge_check; then
+      die 'the bridge is managed externally; if using Harbor, run: harbor stop herdr-app'
+    fi
+    rm -f "$PIDFILE"
+    printf 'herdr-app: the bridge is not running\n' >&2
+    return 0
+  fi
   kill "$pid" 2>/dev/null || true
   local i
   for i in $(seq 1 30); do kill -0 "$pid" 2>/dev/null || break; sleep 0.1; done
@@ -192,6 +203,10 @@ bridge_status() {
   printf 'config:         %s\n' "$CONF"
   local pid; pid="$(bridge_pid)"
   if [[ -z "$pid" ]]; then
+    if bridge_check; then
+      printf 'bridge:         running (externally managed)\ntoken:          accepted\n'
+      return 0
+    fi
     printf 'bridge:         not running\n'
     return 1
   fi

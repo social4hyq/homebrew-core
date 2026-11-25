@@ -4,6 +4,7 @@ class HerdrApp < Formula
   url "https://github.com/herdrdev/herdr-app/archive/refs/tags/v0.1.18.tar.gz"
   sha256 "0c442fd54231dee2aca661661b50f4177ca04b55966c572f26cf06c629e9e59d"
   license "Apache-2.0"
+  revision 1
 
   livecheck do
     url "https://github.com/herdrdev/herdr-app.git"
@@ -204,6 +205,29 @@ class HerdrApp < Formula
         must_succeed: false, print_stdout: true, network_access: true
   end
 
+  service do
+    run [formula_opt_bin("python@3.15")/"python3", opt_libexec/"herdr-bridge.py", "--brew-prefix", HOMEBREW_PREFIX]
+    environment_variables HC_BIN:         formula_opt_bin("social4hyq/core/herdr-core")/"hc",
+                          PATH:           std_service_path_env,
+                          SHELL:          "/bin/sh",
+                          TMPDIR:         "/data/storage/el2/base/cache/harbor",
+                          XDG_STATE_HOME: "/data/storage/el2/base/files/herdr-app"
+    keep_alive true
+    log_path var/"log/herdr-app-bridge.log"
+    error_log_path var/"log/herdr-app-bridge.log"
+  end
+
+  def caveats
+    <<~EOS
+      To run the bridge at login with Harbor, first install the Herdr HAP and
+      stop its standalone bridge with `herdr-app bridge stop`. Then run:
+        harbor discover --add herdr-app
+        harbor start herdr-app
+      Enable Harbor in the system app startup manager.
+      The Harbor-managed core has its own terminal state.
+    EOS
+  end
+
   test do
     hap = libexec/"herdr-app-unsigned.hap"
     manifest = JSON.parse(shell_output("unzip -p #{hap} module.json"))
@@ -232,6 +256,11 @@ class HerdrApp < Formula
     assert_includes library, "herdr-core keeps them running".b
 
     assert_match "Usage: herdr-app", shell_output("#{bin}/herdr-app --help")
+    unit = systemd_service_path.read
+    assert_match "--brew-prefix", unit
+    assert_match "herdr-bridge.py", unit
+    assert_match "TMPDIR=/data/storage/el2/base/cache/harbor", unit
+    assert_match "Restart=on-failure", unit
 
     # Run the bridge and install flow with stand-ins for hc and app-installer:
     # the token ends up in the HAP and the bridge answers only it.
