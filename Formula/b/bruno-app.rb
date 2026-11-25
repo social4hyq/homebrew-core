@@ -17,8 +17,8 @@ class BrunoApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bruno-app-v4.4.0-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9b06716ee768dcdabe71e514d6bc728c3ef4832dc68ecc7fae0dadff229163af"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bruno-app-v4.4.0-r4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bd2a1e1fee9af049d08090a7f3b870674442aeddaf04684f8cca23fe88d886c1"
   end
 
   depends_on "app-installer"
