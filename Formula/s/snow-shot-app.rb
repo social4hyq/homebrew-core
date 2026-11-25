@@ -204,7 +204,7 @@ class SnowShotApp < Formula
                     .find { |entry| entry.directory? && (entry/"translations/qtbase_zh_CN.ts").file? }
       end
       odie "could not find Qt base translation catalogs" unless source
-      %w[zh_CN zh_TW].each do |locale|
+      %w[zh_CN zh_TW ru].each do |locale|
         system qt/"libexec/lrelease", source/"translations/qtbase_#{locale}.ts",
                "-qm", qt_translation_dir/"qtbase_#{locale}.qm"
       end
