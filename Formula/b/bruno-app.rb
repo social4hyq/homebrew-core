@@ -8,6 +8,8 @@ class BrunoApp < Formula
       using: :nounzip
   sha256 "0264f6bd80deec178e89bdbe229e41747fa59e6fce1ef9bf9f3764924f362d7c"
   license "MIT"
+  # Resources-only fix: use Bruno icon and correct --deb help text.
+  revision 1
 
   livecheck do
     url :stable
@@ -15,8 +17,8 @@ class BrunoApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bruno-app-v4.4.0-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9b06716ee768dcdabe71e514d6bc728c3ef4832dc68ecc7fae0dadff229163af"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bruno-app-v4.4.0-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "be7582fe9e9bf91a2099ec133674e146a5a91b9aec4e5d419365a5669069557c"
   end
 
   depends_on "app-installer"

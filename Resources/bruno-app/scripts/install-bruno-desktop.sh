@@ -18,8 +18,8 @@ DEFAULT_HAP="${BRUNO_APP_UNSIGNED_HAP:-}"
 
 app_usage_extra() {
   cat <<'EOF'
-  --deb PATH  Official Bruno linux-arm64 tarball to use instead of downloading.
-  --clean-cache   Remove the cached tarball and assembled HAP before installing.
+  --deb PATH  Official Bruno linux-arm64 .deb to use instead of downloading.
+  --clean-cache   Remove the cached .deb and assembled HAP before installing.
 EOF
 }
 

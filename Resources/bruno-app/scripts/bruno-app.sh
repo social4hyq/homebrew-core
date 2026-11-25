@@ -9,7 +9,7 @@ usage() {
   cat <<'EOF'
 Usage: bruno-app <command>
 
-  install [--device ID] [--tarball PATH] [--clean-cache]
+  install [--device ID] [--deb PATH] [--clean-cache]
           Download/verify the official Bruno package, assemble, sign and
           install the HAP under the weak sandbox (CUSTOM_SANDBOX +
           READ_WRITE_USER_FILE). Host binaries need those ACL permissions.
