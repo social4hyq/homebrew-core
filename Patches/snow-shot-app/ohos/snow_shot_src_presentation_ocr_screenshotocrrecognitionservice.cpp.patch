@@ -10,7 +10,7 @@ OCR onto the UI thread.
 diff --git a/snow_shot/src/presentation/ocr/screenshotocrrecognitionservice.cpp b/snow_shot/src/presentation/ocr/screenshotocrrecognitionservice.cpp
 --- a/snow_shot/src/presentation/ocr/screenshotocrrecognitionservice.cpp
 +++ b/snow_shot/src/presentation/ocr/screenshotocrrecognitionservice.cpp
-@@ -10,6 +10,9 @@
+@@ -10,9 +10,13 @@
  
  #include <QCoreApplication>
  #include <QDebug>
@@ -20,12 +20,11 @@ diff --git a/snow_shot/src/presentation/ocr/screenshotocrrecognitionservice.cpp 
  #include <QDir>
  #include <QElapsedTimer>
  #include <QFileInfo>
-@@ -16,3 +19,4 @@
 +#include <QJsonArray>
  #include <QJsonDocument>
  #include <QMetaObject>
  #include <QProcess>
-@@ -53,6 +57,107 @@
+@@ -53,6 +57,107 @@ qreal edgeLength(const QPointF& first, const QPointF& second) {
      return std::hypot(second.x() - first.x(), second.y() - first.y());
  }
  
@@ -133,25 +132,15 @@ diff --git a/snow_shot/src/presentation/ocr/screenshotocrrecognitionservice.cpp 
  ScreenshotOcrTextDirection textDirectionForQuad(const QPolygonF& quad) {
      if (quad.size() != 4)
          return ScreenshotOcrTextDirection::Horizontal;
-@@ -123,10 +228,13 @@
-                                             ? QDir(QCoreApplication::applicationDirPath())
-                                                   .filePath(QStringLiteral("assets/ocr"))
+@@ -126,6 +231,7 @@ class ScreenshotOcrRecognitionService::Impl final {
                                              : options.offlineRoot;
--            m_assetManager = std::make_unique<ScreenshotOcrAssets>(
--                ScreenshotOcrAssets::Options{offlineRoot, options.cacheRoot, options.proxyUrl,
--                                             options.modelType},
--                owner);
-+            ScreenshotOcrAssets::Options assetOptions;
-+            assetOptions.offlineRoot = offlineRoot;
-+            assetOptions.cacheRoot = options.cacheRoot;
-+            assetOptions.proxyUrl = options.proxyUrl;
-+            assetOptions.modelType = options.modelType;
-+            assetOptions.bundledRuntimeRoot = options.bundledRuntimeRoot;
-+            m_assetManager = std::make_unique<ScreenshotOcrAssets>(assetOptions, owner);
+             m_modelAssetOptions = {offlineRoot, options.cacheRoot, options.proxyUrl,
+                                    options.modelType};
++            m_modelAssetOptions.bundledRuntimeRoot = options.bundledRuntimeRoot;
+             m_assetManager = std::make_unique<ScreenshotOcrAssets>(m_modelAssetOptions, owner);
              connect(m_assetManager.get(), &ScreenshotOcrAssets::statusChanged, owner,
-                     [this](const ScreenshotOcrAssetStatus& status) { m_assetStatus = status; });
-             connect(m_assetManager.get(), &ScreenshotOcrAssets::ready, owner,
-@@ -340,6 +448,10 @@
+                     [this](const ScreenshotOcrAssetStatus& status) {
+@@ -373,6 +479,10 @@ class ScreenshotOcrRecognitionService::Impl final {
              m_staged.reset();
          }
          if (job->processSubmitted) {
@@ -162,7 +151,7 @@ diff --git a/snow_shot/src/presentation/ocr/screenshotocrrecognitionservice.cpp 
              sendFrame(makeFrame(kCancel, token));
              if (!m_configuration.residentProcess && !job->residentSubmission && m_pending.empty()) {
                  m_processState = ProcessState::Stopping;
-@@ -350,6 +462,7 @@
+@@ -383,6 +493,7 @@ class ScreenshotOcrRecognitionService::Impl final {
                  job->running = job->processSubmitted = false;
                  stopTransport(true);
              }
@@ -170,7 +159,7 @@ diff --git a/snow_shot/src/presentation/ocr/screenshotocrrecognitionservice.cpp 
          }
          QObject::disconnect(job->receiverDestroyed);
          if (!job->request.renderOnly) {
-@@ -410,8 +523,10 @@
+@@ -464,8 +575,10 @@ class ScreenshotOcrRecognitionService::Impl final {
              (!configuration.modelHotStart || !configuration.residentProcess))
              m_invalidateWarmSession = true;
          m_configuration = configuration;
@@ -181,7 +170,7 @@ diff --git a/snow_shot/src/presentation/ocr/screenshotocrrecognitionservice.cpp 
          if (!configuration.hardwareAcceleration)
              m_accelerationReadyPending = false;
          m_modelType = configuration.modelType;
-@@ -507,6 +622,9 @@
+@@ -621,6 +734,9 @@ class ScreenshotOcrRecognitionService::Impl final {
      }
  
      bool ensureProcess() {
@@ -191,7 +180,7 @@ diff --git a/snow_shot/src/presentation/ocr/screenshotocrrecognitionservice.cpp 
          if ((!assetsReady() && !m_paragraphAssets.valid()) || m_stopping)
              return false;
          if (m_transport != nullptr)
-@@ -608,6 +726,7 @@
+@@ -722,6 +838,7 @@ class ScreenshotOcrRecognitionService::Impl final {
                  processFailed("ready_timeout");
          });
          return true;
@@ -199,7 +188,7 @@ diff --git a/snow_shot/src/presentation/ocr/screenshotocrrecognitionservice.cpp 
      }
  
      void sendFrame(const QByteArray& frame) {
-@@ -698,6 +817,165 @@
+@@ -812,6 +929,165 @@ class ScreenshotOcrRecognitionService::Impl final {
      bool processStopping() const {
          return m_processState == ProcessState::Stopping;
      }
@@ -365,7 +354,7 @@ diff --git a/snow_shot/src/presentation/ocr/screenshotocrrecognitionservice.cpp 
      bool residentEffective() const {
          return m_configuration.residentProcess && !m_residentSuspended;
      }
-@@ -812,6 +1090,11 @@
+@@ -929,6 +1205,11 @@ class ScreenshotOcrRecognitionService::Impl final {
                  m_processStopReason = ProcessStopReason::Shutdown;
                  stopTransport(false);
              }
@@ -377,7 +366,7 @@ diff --git a/snow_shot/src/presentation/ocr/screenshotocrrecognitionservice.cpp 
              return;
          }
          const bool undelivered =
-@@ -842,6 +1125,10 @@
+@@ -959,6 +1240,10 @@ class ScreenshotOcrRecognitionService::Impl final {
          }
          if (!ensureProcess() || !processReady())
              return;
@@ -388,7 +377,7 @@ diff --git a/snow_shot/src/presentation/ocr/screenshotocrrecognitionservice.cpp 
  
          // Only one transfer may own the mapping, and only one copied image waits ahead.
          std::shared_ptr<Job> nextImage;
-@@ -1377,6 +1664,7 @@
+@@ -1494,6 +1779,7 @@ class ScreenshotOcrRecognitionService::Impl final {
      }
  
      void processFailed(const char* stage = "process_exit", const QString& error = {}) {
@@ -396,7 +385,7 @@ diff --git a/snow_shot/src/presentation/ocr/screenshotocrrecognitionservice.cpp 
          if (m_transport == nullptr || m_stopping || processStopping())
              return;
          QJsonObject fields{{QStringLiteral("stage"), QString::fromLatin1(stage)},
-@@ -1545,6 +1833,10 @@
+@@ -1670,6 +1956,10 @@ class ScreenshotOcrRecognitionService::Impl final {
      QThread* m_transportThread = nullptr;
      std::vector<QPointer<QThread>> m_transportThreads;
      ScreenshotOcrTransport* m_transport = nullptr;
