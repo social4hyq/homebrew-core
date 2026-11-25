@@ -16,11 +16,9 @@ recognition_width() inside make_engine_for_models, so both must keep
 compiling here, matching the upstream out-of-process worker's definitions.
 
 diff --git a/snow-crates/crates/snow-ocr-process/src/lib.rs b/snow-crates/crates/snow-ocr-process/src/lib.rs
-new file mode 100644
-index 0000000..2312636
---- /dev/null
+--- a/snow-crates/crates/snow-ocr-process/src/lib.rs
 +++ b/snow-crates/crates/snow-ocr-process/src/lib.rs
-@@ -0,0 +1,350 @@
+@@ -0,0 +1,349 @@
 +//! In-process C ABI for hosts that cannot execute a bundled helper process.
 +//!
 +//! The standalone worker remains the preferred host integration where process
@@ -139,7 +137,7 @@ index 0000000..2312636
 +        let recognizer = unsafe { path_from_c(recognizer, "recognizer")? };
 +        // SAFETY: each C string is validated and consumed synchronously.
 +        let dictionary = unsafe { path_from_c(dictionary, "dictionary")? };
-+        let policy = match resize_policy {
++        let _policy = match resize_policy {
 +            0 => DetectorResizePolicy::Max,
 +            1 => DetectorResizePolicy::Min,
 +            _ => return Err("invalid detector resize policy".to_owned()),
@@ -154,7 +152,6 @@ index 0000000..2312636
 +            Path::new(&recognizer),
 +            Path::new(&dictionary),
 +            thread_budget.max(1) as usize,
-+            policy,
 +            processing,
 +            None,
 +        )

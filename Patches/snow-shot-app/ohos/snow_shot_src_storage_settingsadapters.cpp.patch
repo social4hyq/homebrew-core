@@ -62,7 +62,17 @@ diff --git a/snow_shot/src/storage/settingsadapters.cpp b/snow_shot/src/storage/
      }
      return nullptr;
  }
-@@ -1663,7 +1661,7 @@ bool localShortcutChangesValid(const QMap<QString, QJsonValue>& current,
+@@ -1622,7 +1620,8 @@ bool ScreenshotShortcutSettings::isReservedShortcut(const shortcuts::ShortcutBin
+     const auto selectAll = qobject_cast<QGuiApplication*>(QCoreApplication::instance())
+                                ? QKeySequence::keyBindings(QKeySequence::SelectAll)
+                                : QList<QKeySequence>{QKeySequence(Qt::CTRL | Qt::Key_A)};
+-    return std::ranges::any_of(selectAll, [&shortcut](const QKeySequence& sequence) {
++    return std::any_of(selectAll.cbegin(), selectAll.cend(),
++                       [&shortcut](const QKeySequence& sequence) {
+         return shortcuts::bindingsConflict(
+             shortcut,
+             shortcuts::bindingFromPortableText(sequence.toString(QKeySequence::PortableText)),
+@@ -1663,7 +1662,7 @@ bool localShortcutChangesValid(const QMap<QString, QJsonValue>& current,
          const auto* group = localShortcutGroup(it.key());
          if (group == nullptr)
              return false;
@@ -71,7 +81,7 @@ diff --git a/snow_shot/src/storage/settingsadapters.cpp b/snow_shot/src/storage/
      }
  
      struct Assignment {
-@@ -1673,16 +1671,16 @@ bool localShortcutChangesValid(const QMap<QString, QJsonValue>& current,
+@@ -1673,16 +1672,16 @@ bool localShortcutChangesValid(const QMap<QString, QJsonValue>& current,
      };
      QList<Assignment> seen;
      for (const auto& group : localShortcutGroups()) {
@@ -92,7 +102,7 @@ diff --git a/snow_shot/src/storage/settingsadapters.cpp b/snow_shot/src/storage/
              const auto previous = current.value(key);
              const auto value = changes.value(key, previous);
              const bool affected = (validateUnchanged && checkGroup) || value != previous;
-@@ -1706,7 +1704,8 @@ bool localShortcutChangesValid(const QMap<QString, QJsonValue>& current,
+@@ -1706,7 +1705,8 @@ bool localShortcutChangesValid(const QMap<QString, QJsonValue>& current,
                              return false;
                          // Old configurations could explicitly share a key across these scopes.
                          // Permit unrelated changes while the two assignments are untouched.
