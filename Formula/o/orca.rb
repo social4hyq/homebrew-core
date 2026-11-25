@@ -115,12 +115,21 @@ class Orca < Formula
 
     # The pinned bun devDependency installs a platform binary through its
     # postinstall script, which cannot run here; point it at the packaged bun.
+    # orca's build probes `bun --version` and refuses to typecheck unless the
+    # answer equals config/.bun-version. The Homebrew bun build dependency
+    # follows its own release cadence (1.4.5 by orca 1.4.274), so answer that
+    # one probe with the pinned version and delegate real work to the keg bun.
     bun_dir = Pathname(node_output("require('path').dirname(require.resolve('bun/package.json'))"))
+    pinned_bun_version = (buildpath/"config/.bun-version").read.strip
     (bun_dir/"bin").mkpath
     bun_shim = bun_dir/"bin/bun.exe"
     bun_shim.delete if bun_shim.exist?
     bun_shim.write <<~SH
       #!/bin/sh
+      if [ "$1" = "--version" ]; then
+        echo "#{pinned_bun_version}"
+        exit 0
+      fi
       exec "#{formula_opt_bin("bun")}/bun" "$@"
     SH
     chmod 0755, bun_shim
