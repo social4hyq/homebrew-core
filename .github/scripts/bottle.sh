@@ -1,6 +1,6 @@
 #!/bin/bash
-# Bottle the built keg. UPLOAD=true resolves the next atomgit release tag
-# (<formula>-v<ver>-rN); UPLOAD=false uses a throwaway CI tag and fake root-url.
+# Bottle the built keg using the release destination for the formula.
+# UPLOAD=false uses a throwaway CI tag and placeholder root URL.
 # Writes tag=<TAG> to $GITHUB_OUTPUT; bottle + json land in bottle-out/.
 source "$(dirname "$0")/lib.sh"
 
@@ -10,7 +10,10 @@ ag() { curl -sf -m 30 --retry 3 --retry-delay 5 --retry-connrefused -H "Authoriz
 VER=$(cbrew "info --json=v2 $TAP/$FORMULA" | jq -r '.formulae[0].versions.stable')
 BASE="${FORMULA}-v${VER}"
 
-if [ "$UPLOAD" = "true" ]; then
+if [ "$UPLOAD" = "true" ] && [ "$FORMULA" = "brewo-app" ]; then
+  TAG="${BASE}-r${GITHUB_RUN_ID}.${GITHUB_RUN_ATTEMPT}"
+  ROOT="https://github.com/social4hyq/homebrew-core/releases/download/$TAG"
+elif [ "$UPLOAD" = "true" ]; then
   # N = max existing + 1 across ALL pages. Any API failure aborts (curl -sf +
   # pipefail) instead of silently falling back to -r1, which would overwrite
   # old release assets.

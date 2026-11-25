@@ -127,6 +127,10 @@ jobs:
         run: |
           [[ "$FORMULA" =~ ^[A-Za-z0-9@+._-]+$ ]] \
             || { echo "::error::invalid formula name: $FORMULA (allowed: [A-Za-z0-9@+._-])"; exit 1; }
+          if [[ "$FORMULA" == brewo-app && "$UPLOAD" == true && "$PUSH_REF" == main ]]; then
+            echo "::error::Publish Brewo to a PR branch. The main branch is mirrored to AtomGit."
+            exit 1
+          fi
 
       - name: Start OHOS container
         env:
@@ -165,7 +169,7 @@ jobs:
           path: bottle-out/
           retention-days: 14
 
-      - name: Publish to atomgit and push
+      - name: Publish bottle and push
         id: publish
         if: inputs.upload
         env:
@@ -187,7 +191,7 @@ jobs:
       # publish failed before the bottle commit reached main → the release is
       # orphaned and safe to delete
       - name: Roll back atomgit release
-        if: failure() && inputs.upload && steps.publish.outcome == 'failure'
+        if: failure() && inputs.upload && inputs.formula != 'brewo-app' && steps.publish.outcome == 'failure'
         env:
           ATOMGIT_TOKEN: ${{ secrets.ATOMGIT_TOKEN }}
           TAG: ${{ steps.bottle.outputs.tag }}
