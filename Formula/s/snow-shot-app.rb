@@ -169,26 +169,6 @@ class SnowShotApp < Formula
       "#{clt}/sdk/default/openharmony/native/llvm/lib/clang/15.0.4/lib/aarch64-linux-ohos",
       "#{opencv}/lib", "#{formula_opt_prefix("zstd")}/lib"
     ].join(":")
-    # ffmpeg-sys-next 9.0.0's hwcontext_wrapper.h predates the CUDA types used by
-    # the current ffmpeg headers; supply the same stand-ins as upstream added in
-    # rust-ffmpeg-sys 9.1.x so bindgen can parse hwcontext_cuda.h.
-    cuda_shim = buildpath/"snow-shot-cuda-shim.h"
-    cuda_shim.write <<~'HEADER'
-      #include <stddef.h>
-      typedef struct CUctx_st *CUcontext;
-      typedef struct CUstream_st *CUstream;
-      typedef struct CUarray_st *CUarray;
-      typedef int CUarray_format;
-      typedef struct CUDA_ARRAY3D_DESCRIPTOR_st {
-          size_t Width;
-          size_t Height;
-          size_t Depth;
-          CUarray_format Format;
-          unsigned int NumChannels;
-          unsigned int Flags;
-      } CUDA_ARRAY3D_DESCRIPTOR;
-    HEADER
-    ENV["BINDGEN_EXTRA_CLANG_ARGS"] = "-include #{cuda_shim}"
     soft_cap, hard_cap = Process.getrlimit(Process::RLIMIT_NOFILE)
     Process.setrlimit(Process::RLIMIT_NOFILE, [soft_cap, 65_536].min, 65_536) if hard_cap > 65_536
 
