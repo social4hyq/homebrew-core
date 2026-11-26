@@ -1,8 +1,8 @@
 class SnowShotApp < Formula
   desc "Screenshot and annotation utility from Snow Apps, unsigned OHOS HAP"
   homepage "https://github.com/mg-chao/snow-shot"
-  url "https://github.com/mg-chao/snow-shot/archive/refs/tags/v1.6.4_snow-shot.tar.gz"
-  sha256 "8a64e75d9daa4db8d76908da40bae52f63e7af76f04f0beacff05f775470baf0"
+  url "https://github.com/mg-chao/snow-shot/archive/refs/tags/v1.6.5_snow-shot.tar.gz"
+  sha256 "125059b53d029b9fba8307868595c2eed478b4bf129b88c22d4a4dbb0f30c0d6"
   license "GPL-3.0-or-later"
 
   livecheck do
@@ -12,8 +12,8 @@ class SnowShotApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-app-v1.6.4-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7b88e5b29f0c4b6671eaf5d66ddcbf18092e21ea505d3d8030686a45d0fef983"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-app-v1.6.5-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9ce814e61030868a6183ca715b28b3f46155ddf5f67a478be2e0a6249959e904"
   end
 
   depends_on "brotli" => :build
@@ -144,6 +144,7 @@ class SnowShotApp < Formula
     Resources/snow-shot-app/snow-shot-install.sh
     Resources/snow-shot-app/support/scripts/add-ohos-module-permissions.py
     Resources/snow-shot-app/support/scripts/finalize-ohos-ocr-manifest.py
+    Resources/snow-shot-app/support/scripts/merge-ohos-translations.py
     Resources/snow-shot-app/support/scripts/stage-ohos-app-icon-assets.py
     Resources/snow-shot-app/support/scripts/stage-ohos-app-label-assets.py
     Resources/snow-shot-app/support/scripts/stage-ohos-ocr-assets.py
@@ -151,6 +152,7 @@ class SnowShotApp < Formula
     Resources/snow-shot-app/support/scripts/test-finalize-ohos-ocr-manifest.py
     Resources/snow-shot-app/support/scripts/test-snow-shot-hap-runtime-closure.py
     Resources/snow-shot-app/support/scripts/test-stage-ohos-ocr-assets.py
+    Resources/snow-shot-app/support/translations.json
   ].freeze
 
   def install
@@ -178,6 +180,8 @@ class SnowShotApp < Formula
     tap_root = Pathname(__FILE__).parent.parent.parent
     res = tap_root/"Resources/snow-shot-app"
     RESOURCE_FILES.each { |file| odie "missing tap resource: #{file}" unless (tap_root/file).exist? }
+    system "python3", res/"support/scripts/merge-ohos-translations.py", buildpath/"snow_shot",
+           res/"support/translations.json"
     resource("snow-shot-ocr-rs").stage do
       cp_r ".", ocr_crate
     end
@@ -195,6 +199,9 @@ class SnowShotApp < Formula
       filename = Dir.children(".").first
       cp filename, model_dir/filename
     end
+    system "python3", res/"support/scripts/stage-ohos-ocr-assets.py",
+           "--source-manifest", buildpath/"snow_shot/packaging/snow-shot-ocr-asset-manifest-arm64.json",
+           "--model-root", buildpath/"ocr-models", "--verify-models-only"
     qt_translation_dir = buildpath/"qt-translations"
     mkdir_p qt_translation_dir
     resource("qttranslations").stage do

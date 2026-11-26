@@ -7,6 +7,7 @@ grouping policy, conflict detection and atomic write semantics are
 unchanged.
 
 diff --git a/snow_shot/src/storage/settingsadapters.cpp b/snow_shot/src/storage/settingsadapters.cpp
+index ad395fa416..7329833296 100644
 --- a/snow_shot/src/storage/settingsadapters.cpp
 +++ b/snow_shot/src/storage/settingsadapters.cpp
 @@ -17,6 +17,7 @@
@@ -17,7 +18,7 @@ diff --git a/snow_shot/src/storage/settingsadapters.cpp b/snow_shot/src/storage/
  
  #include <algorithm>
  #include <array>
-@@ -238,30 +239,27 @@ QString pinToScreenShortcutKey(const QString& actionId) {
+@@ -245,30 +246,27 @@ QString pinToScreenShortcutKey(const QString& actionId) {
  enum class LocalShortcutPolicy : std::uint8_t { Screenshot, Drawing, WindowCommand };
  
  struct LocalShortcutGroup {
@@ -62,7 +63,7 @@ diff --git a/snow_shot/src/storage/settingsadapters.cpp b/snow_shot/src/storage/
      }
      return nullptr;
  }
-@@ -1622,7 +1620,8 @@ bool ScreenshotShortcutSettings::isReservedShortcut(const shortcuts::ShortcutBin
+@@ -1653,7 +1651,8 @@ bool ScreenshotShortcutSettings::isReservedShortcut(const shortcuts::ShortcutBin
      const auto selectAll = qobject_cast<QGuiApplication*>(QCoreApplication::instance())
                                 ? QKeySequence::keyBindings(QKeySequence::SelectAll)
                                 : QList<QKeySequence>{QKeySequence(Qt::CTRL | Qt::Key_A)};
@@ -72,7 +73,7 @@ diff --git a/snow_shot/src/storage/settingsadapters.cpp b/snow_shot/src/storage/
          return shortcuts::bindingsConflict(
              shortcut,
              shortcuts::bindingFromPortableText(sequence.toString(QKeySequence::PortableText)),
-@@ -1663,7 +1662,7 @@ bool localShortcutChangesValid(const QMap<QString, QJsonValue>& current,
+@@ -1694,7 +1693,7 @@ bool localShortcutChangesValid(const QMap<QString, QJsonValue>& current,
          const auto* group = localShortcutGroup(it.key());
          if (group == nullptr)
              return false;
@@ -81,7 +82,7 @@ diff --git a/snow_shot/src/storage/settingsadapters.cpp b/snow_shot/src/storage/
      }
  
      struct Assignment {
-@@ -1673,16 +1672,16 @@ bool localShortcutChangesValid(const QMap<QString, QJsonValue>& current,
+@@ -1704,16 +1703,16 @@ bool localShortcutChangesValid(const QMap<QString, QJsonValue>& current,
      };
      QList<Assignment> seen;
      for (const auto& group : localShortcutGroups()) {
@@ -102,7 +103,7 @@ diff --git a/snow_shot/src/storage/settingsadapters.cpp b/snow_shot/src/storage/
              const auto previous = current.value(key);
              const auto value = changes.value(key, previous);
              const bool affected = (validateUnchanged && checkGroup) || value != previous;
-@@ -1706,7 +1705,8 @@ bool localShortcutChangesValid(const QMap<QString, QJsonValue>& current,
+@@ -1741,7 +1740,8 @@ bool localShortcutChangesValid(const QMap<QString, QJsonValue>& current,
                              return false;
                          // Old configurations could explicitly share a key across these scopes.
                          // Permit unrelated changes while the two assignments are untouched.
@@ -112,3 +113,12 @@ diff --git a/snow_shot/src/storage/settingsadapters.cpp b/snow_shot/src/storage/
                              !changes.contains(existing.key))
                              return false;
                          return shortcuts::localShortcutKeysMayConflict(existing.key, key) &&
+@@ -1924,7 +1924,7 @@ bool PinToScreenShortcutSettings::isReservedShortcut(const shortcuts::ShortcutBi
+                                                  QKeySequence(Qt::SHIFT | Qt::Key_Insert),
+ #endif
+                                                  QKeySequence(Qt::Key_Paste)};
+-    return std::ranges::any_of(paste, [&shortcut](const QKeySequence& sequence) {
++    return std::any_of(paste.cbegin(), paste.cend(), [&shortcut](const QKeySequence& sequence) {
+         if (sequence.count() != 1)
+             return false;
+         const shortcuts::ShortcutBinding fixed{sequence.toString(QKeySequence::PortableText)};

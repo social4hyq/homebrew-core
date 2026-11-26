@@ -90,7 +90,7 @@ class StageOhosOcrAssetsTests(unittest.TestCase):
         manifest = {
             "schema": 2,
             "default_model": "small",
-            "runtime": {"version": "1.5.0", "platform": "windows-arm64"},
+            "runtime": {"version": "1.5.1", "platform": "windows-arm64"},
             "models": model_descriptors,
             "paragraph_model": {
                 "id": self.paragraph_id,
@@ -115,7 +115,7 @@ class StageOhosOcrAssetsTests(unittest.TestCase):
         self.assertEqual(staged["runtime"]["platform"], "openharmony-arm64")
         self.assertEqual(staged["runtime"]["delivery"], "bundled")
         self.assertEqual(staged["runtime"]["executable"], "libsnow_ocr_inprocess.so")
-        self.assertEqual(staged["runtime"]["version"], "1.5.0")
+        self.assertEqual(staged["runtime"]["version"], "1.5.1")
         self.assertEqual(staged["runtime"]["protocol"], 8)
         self.assertEqual(staged["runtime"]["files"][0]["sha256"],
                          hashlib.sha256(self.runtime_bytes).hexdigest())
@@ -131,6 +131,16 @@ class StageOhosOcrAssetsTests(unittest.TestCase):
         (self.model_root / self.model_id / "PP-OCRv6_det_small.onnx").write_bytes(b"tampered")
         with self.assertRaisesRegex(ValueError, "SHA-256"):
             STAGER.stage(self.source_manifest, self.runtime, self.model_root, self.output)
+
+    def test_preflight_rejects_runtime_version_drift_without_a_built_runtime(self) -> None:
+        self.runtime.unlink()
+        STAGER.verify_models(self.source_manifest, self.model_root)
+        manifest = json.loads(self.source_manifest.read_text(encoding="utf-8"))
+        manifest["runtime"]["version"] = "1.5.2"
+        self.source_manifest.write_text(json.dumps(manifest), encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "1.5.2"):
+            STAGER.verify_models(self.source_manifest, self.model_root)
+        self.assertFalse(self.output.exists())
 
     def test_stages_shared_runtime_without_an_execute_permission_requirement(self) -> None:
         self.runtime.chmod(0o644)

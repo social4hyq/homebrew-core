@@ -5,7 +5,7 @@ is a capture-overlay visibility fix, not an added floating-window
 permission.
 
 diff --git a/snow_shot/src/presentation/overlay/screenshotoverlaywindow.cpp b/snow_shot/src/presentation/overlay/screenshotoverlaywindow.cpp
-index 68d0610..9657522 100644
+index 8ca48bac54..9d541c952e 100644
 --- a/snow_shot/src/presentation/overlay/screenshotoverlaywindow.cpp
 +++ b/snow_shot/src/presentation/overlay/screenshotoverlaywindow.cpp
 @@ -78,7 +78,16 @@ qint64 paintRegionArea(const QRegion& region) {
@@ -25,4 +25,4 @@ index 68d0610..9657522 100644
 +    setWindowFlags(flags);
  #ifdef Q_OS_MACOS
      setWindowFlag(Qt::NoDropShadowWindowHint);
- #endif
+     snow_shot::mouse::initializeNativeButtonInput();
