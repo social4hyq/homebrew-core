@@ -144,6 +144,7 @@ class SnowShotApp < Formula
     Resources/snow-shot-app/snow-shot-install.sh
     Resources/snow-shot-app/support/scripts/add-ohos-module-permissions.py
     Resources/snow-shot-app/support/scripts/finalize-ohos-ocr-manifest.py
+    Resources/snow-shot-app/support/scripts/merge-ohos-translations.py
     Resources/snow-shot-app/support/scripts/stage-ohos-app-icon-assets.py
     Resources/snow-shot-app/support/scripts/stage-ohos-app-label-assets.py
     Resources/snow-shot-app/support/scripts/stage-ohos-ocr-assets.py
@@ -151,6 +152,7 @@ class SnowShotApp < Formula
     Resources/snow-shot-app/support/scripts/test-finalize-ohos-ocr-manifest.py
     Resources/snow-shot-app/support/scripts/test-snow-shot-hap-runtime-closure.py
     Resources/snow-shot-app/support/scripts/test-stage-ohos-ocr-assets.py
+    Resources/snow-shot-app/support/translations.json
   ].freeze
 
   def install
@@ -178,6 +180,8 @@ class SnowShotApp < Formula
     tap_root = Pathname(__FILE__).parent.parent.parent
     res = tap_root/"Resources/snow-shot-app"
     RESOURCE_FILES.each { |file| odie "missing tap resource: #{file}" unless (tap_root/file).exist? }
+    system "python3", res/"support/scripts/merge-ohos-translations.py", buildpath/"snow_shot",
+           res/"support/translations.json"
     resource("snow-shot-ocr-rs").stage do
       cp_r ".", ocr_crate
     end
@@ -195,6 +199,9 @@ class SnowShotApp < Formula
       filename = Dir.children(".").first
       cp filename, model_dir/filename
     end
+    system "python3", res/"support/scripts/stage-ohos-ocr-assets.py",
+           "--source-manifest", buildpath/"snow_shot/packaging/snow-shot-ocr-asset-manifest-arm64.json",
+           "--model-root", buildpath/"ocr-models", "--verify-models-only"
     qt_translation_dir = buildpath/"qt-translations"
     mkdir_p qt_translation_dir
     resource("qttranslations").stage do

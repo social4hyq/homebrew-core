@@ -1,0 +1,188 @@
+{
+  "ScreenshotController": {
+    "Could not write the selected user file": {
+      "en_US": "Could not write the selected user file",
+      "ru": "Could not write the selected user file",
+      "zh_CN": "无法写入所选用户文件",
+      "zh_TW": "無法寫入所選用戶檔案"
+    },
+    "No valid document was selected for the recognition result": {
+      "en_US": "No valid document was selected for the recognition result",
+      "ru": "No valid document was selected for the recognition result",
+      "zh_CN": "未为识别结果选择有效文档",
+      "zh_TW": "未為識別結果選擇有效文檔"
+    },
+    "No valid document was selected for the screenshot": {
+      "en_US": "No valid document was selected for the screenshot",
+      "ru": "No valid document was selected for the screenshot",
+      "zh_CN": "未为截图选择有效文档",
+      "zh_TW": "未為截圖選擇有效文檔"
+    },
+    "The document picker could not be opened": {
+      "en_US": "The document picker could not be opened",
+      "ru": "The document picker could not be opened",
+      "zh_CN": "无法打开文档选择器",
+      "zh_TW": "無法打開文檔選擇器"
+    },
+    "The primary result was saved, but its text companion could not be written: %1": {
+      "en_US": "The primary result was saved, but its text companion could not be written: %1",
+      "ru": "The primary result was saved, but its text companion could not be written: %1",
+      "zh_CN": "主要结果已保存，但无法写入其文本配套文件：%1",
+      "zh_TW": "主要結果已儲存，但無法寫入其文本配套檔案：%1"
+    },
+    "The primary result was saved, but its text companion picker could not be opened": {
+      "en_US": "The primary result was saved, but its text companion picker could not be opened",
+      "ru": "The primary result was saved, but its text companion picker could not be opened",
+      "zh_CN": "主要结果已保存，但无法打开文本配套文件的选择器",
+      "zh_TW": "主要結果已儲存，但無法打開文本配套檔案的選擇器"
+    },
+    "The primary result was saved, but its text companion was not selected": {
+      "en_US": "The primary result was saved, but its text companion was not selected",
+      "ru": "The primary result was saved, but its text companion was not selected",
+      "zh_CN": "主要结果已保存，但未选择其文本配套文件",
+      "zh_TW": "主要結果已儲存，但未選擇其文本配套檔案"
+    },
+    "The primary result was saved, but the text companion export queue is unavailable": {
+      "en_US": "The primary result was saved, but the text companion export queue is unavailable",
+      "ru": "The primary result was saved, but the text companion export queue is unavailable",
+      "zh_CN": "主要结果已保存，但文本配套文件导出队列不可用",
+      "zh_TW": "主要結果已儲存，但文本配套檔案導出隊列不可用"
+    },
+    "The recognition result could not be staged for saving": {
+      "en_US": "The recognition result could not be staged for saving",
+      "ru": "The recognition result could not be staged for saving",
+      "zh_CN": "无法暂存识别结果以供保存",
+      "zh_TW": "無法暫存識別結果以供儲存"
+    },
+    "The recognition result could not be written to the selected document": {
+      "en_US": "The recognition result could not be written to the selected document",
+      "ru": "The recognition result could not be written to the selected document",
+      "zh_CN": "无法将识别结果写入所选文档",
+      "zh_TW": "無法將識別結果寫入所選文檔"
+    },
+    "The screenshot could not be staged for saving": {
+      "en_US": "The screenshot could not be staged for saving",
+      "ru": "The screenshot could not be staged for saving",
+      "zh_CN": "无法暂存截图以供保存",
+      "zh_TW": "無法暫存截圖以供儲存"
+    },
+    "The screenshot could not be written to the selected document": {
+      "en_US": "The screenshot could not be written to the selected document",
+      "ru": "The screenshot could not be written to the selected document",
+      "zh_CN": "无法将截图写入所选文档",
+      "zh_TW": "無法將截圖寫入所選文檔"
+    },
+    "The user-file export queue is unavailable": {
+      "en_US": "The user-file export queue is unavailable",
+      "ru": "The user-file export queue is unavailable",
+      "zh_CN": "用户文件导出队列不可用",
+      "zh_TW": "用戶檔案導出隊列不可用"
+    }
+  },
+  "SystemTrayController": {
+    "Choose a destination in Files to save the recording.": {
+      "en_US": "Choose a destination in Files to save the recording.",
+      "ru": "Choose a destination in Files to save the recording.",
+      "zh_CN": "选择文件保存位置以保存录屏。",
+      "zh_TW": "選擇檔案儲存位置以儲存錄屏。"
+    }
+  },
+  "ScreenshotRecognitionFileExport": {
+    "The primary result was saved, but its text companion could not be written: %1": {
+      "en_US": "The primary result was saved, but its text companion could not be written: %1",
+      "ru": "The primary result was saved, but its text companion could not be written: %1",
+      "zh_CN": "主要结果已保存，但无法写入其文本配套文件：%1",
+      "zh_TW": "主要結果已儲存，但無法寫入其文本配套檔案：%1"
+    },
+    "The primary result was saved, but its text companion picker could not be opened": {
+      "en_US": "The primary result was saved, but its text companion picker could not be opened",
+      "ru": "The primary result was saved, but its text companion picker could not be opened",
+      "zh_CN": "主要结果已保存，但无法打开文本配套文件的选择器",
+      "zh_TW": "主要結果已儲存，但無法打開文本配套檔案的選擇器"
+    },
+    "The primary result was saved, but its text companion was not selected": {
+      "en_US": "The primary result was saved, but its text companion was not selected",
+      "ru": "The primary result was saved, but its text companion was not selected",
+      "zh_CN": "主要结果已保存，但未选择其文本配套文件",
+      "zh_TW": "主要結果已儲存，但未選擇其文本配套檔案"
+    },
+    "The primary result was saved, but the text companion export queue is unavailable": {
+      "en_US": "The primary result was saved, but the text companion export queue is unavailable",
+      "ru": "The primary result was saved, but the text companion export queue is unavailable",
+      "zh_CN": "主要结果已保存，但文本配套文件导出队列不可用",
+      "zh_TW": "主要結果已儲存，但文本配套檔案導出隊列不可用"
+    }
+  },
+  "ScreenshotSaveAsFileDialog": {
+    "The temporary export file is unavailable": {
+      "en_US": "The temporary export file is unavailable",
+      "ru": "The temporary export file is unavailable",
+      "zh_CN": "临时导出文件不可用",
+      "zh_TW": "臨時導出檔案不可用"
+    },
+    "The user-file export could not be queued": {
+      "en_US": "The user-file export could not be queued",
+      "ru": "The user-file export could not be queued",
+      "zh_CN": "无法将用户文件导出任务加入队列",
+      "zh_TW": "無法將用戶檔案導出任務加入隊列"
+    }
+  },
+  "ImageEditingWindow": {
+    "No valid document was selected for the recognition result": {
+      "en_US": "No valid document was selected for the recognition result",
+      "ru": "No valid document was selected for the recognition result",
+      "zh_CN": "未为识别结果选择有效文档",
+      "zh_TW": "未為識別結果選擇有效文檔"
+    },
+    "The document picker could not be opened": {
+      "en_US": "The document picker could not be opened",
+      "ru": "The document picker could not be opened",
+      "zh_CN": "无法打开文档选择器",
+      "zh_TW": "無法打開文檔選擇器"
+    },
+    "The recognition result could not be staged for saving": {
+      "en_US": "The recognition result could not be staged for saving",
+      "ru": "The recognition result could not be staged for saving",
+      "zh_CN": "无法暂存识别结果以供保存",
+      "zh_TW": "無法暫存識別結果以供儲存"
+    },
+    "The user-file export queue is unavailable": {
+      "en_US": "The user-file export queue is unavailable",
+      "ru": "The user-file export queue is unavailable",
+      "zh_CN": "用户文件导出队列不可用",
+      "zh_TW": "用戶檔案導出隊列不可用"
+    }
+  },
+  "ScreenshotPinnedWindow": {
+    "The primary result was saved, but its text companion could not be written: %1": {
+      "en_US": "The primary result was saved, but its text companion could not be written: %1",
+      "ru": "The primary result was saved, but its text companion could not be written: %1",
+      "zh_CN": "主要结果已保存，但无法写入其文本配套文件：%1",
+      "zh_TW": "主要結果已儲存，但無法寫入其文本配套檔案：%1"
+    },
+    "The primary result was saved, but its text companion picker could not be opened": {
+      "en_US": "The primary result was saved, but its text companion picker could not be opened",
+      "ru": "The primary result was saved, but its text companion picker could not be opened",
+      "zh_CN": "主要结果已保存，但无法打开文本配套文件的选择器",
+      "zh_TW": "主要結果已儲存，但無法打開文本配套檔案的選擇器"
+    },
+    "The primary result was saved, but its text companion was not selected": {
+      "en_US": "The primary result was saved, but its text companion was not selected",
+      "ru": "The primary result was saved, but its text companion was not selected",
+      "zh_CN": "主要结果已保存，但未选择其文本配套文件",
+      "zh_TW": "主要結果已儲存，但未選擇其文本配套檔案"
+    },
+    "The primary result was saved, but the text companion export queue is unavailable": {
+      "en_US": "The primary result was saved, but the text companion export queue is unavailable",
+      "ru": "The primary result was saved, but the text companion export queue is unavailable",
+      "zh_CN": "主要结果已保存，但文本配套文件导出队列不可用",
+      "zh_TW": "主要結果已儲存，但文本配套檔案導出隊列不可用"
+    },
+    "The user-file export queue is unavailable": {
+      "en_US": "The user-file export queue is unavailable",
+      "ru": "The user-file export queue is unavailable",
+      "zh_CN": "用户文件导出队列不可用",
+      "zh_TW": "用戶檔案導出隊列不可用"
+    }
+  }
+}

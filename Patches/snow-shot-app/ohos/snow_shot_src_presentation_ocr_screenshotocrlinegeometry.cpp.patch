@@ -1,0 +1,14 @@
+OHOS: use the iterator algorithm supported by the SDK libc++.
+
+diff --git a/snow_shot/src/presentation/ocr/screenshotocrlinegeometry.cpp b/snow_shot/src/presentation/ocr/screenshotocrlinegeometry.cpp
+index 4f36a08bb3..e5c5c601c6 100644
+--- a/snow_shot/src/presentation/ocr/screenshotocrlinegeometry.cpp
++++ b/snow_shot/src/presentation/ocr/screenshotocrlinegeometry.cpp
+@@ -75,5 +75,6 @@ struct Votes {
+ void alignSmallTilts(QVector<ScreenshotOcrLine>& lines, const QVector<DetectedLine>& peers,
+                      const QSize& imageSize) {
+-    if (std::ranges::none_of(peers, &DetectedLine::canAlign))
++    if (std::none_of(peers.cbegin(), peers.cend(),
++                     [](const DetectedLine& line) { return line.canAlign(); }))
+         return;
+     QVector<qreal> thicknesses;

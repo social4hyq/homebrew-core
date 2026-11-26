@@ -8,11 +8,10 @@ document URI through the user-file export queue, keeping error handling,
 thread hand-off, cleanup and history-completion behavior unchanged.
 
 diff --git a/snow_shot/src/presentation/services/screenshotcontroller.cpp b/snow_shot/src/presentation/services/screenshotcontroller.cpp
-index ded283b..cdda278 100644
+index 2e2499874b..53b6d080fb 100644
 --- a/snow_shot/src/presentation/services/screenshotcontroller.cpp
 +++ b/snow_shot/src/presentation/services/screenshotcontroller.cpp
-@@ -32,7 +32,12 @@
- #include "snow_shot/app/mcp/screenshotmcpselection.h"
+@@ -33,5 +33,10 @@
  #include "snow_shot/app/mcp/mcpstylepatch.h"
  #include "snow_shot/platform/screenshotnative.h"
 +#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
@@ -23,9 +22,7 @@ index ded283b..cdda278 100644
 +#include <QRect>
  #include <QThread>
  #include <QSysInfo>
- #include <cmath>
-@@ -80,6 +85,10 @@
- #include "snow_shot/presentation/screenshothidpiimagescaling.h"
+@@ -81,4 +86,8 @@
  #include "snow_shot/presentation/screenshotclouduploadservice.h"
  #include "snow_shot/presentation/screenshotexportcoordinator.h"
 +#ifdef Q_OS_HARMONY
@@ -34,31 +31,24 @@ index ded283b..cdda278 100644
 +#endif
  #include "snow_shot/presentation/screenshotimagefileservice.h"
  #include "snow_shot/presentation/screenshotrecognitionfileexport.h"
- #include "snow_shot/presentation/screenshotsaveasfiledialog.h"
-@@ -134,6 +143,7 @@
- #include <QApplication>
+@@ -135,8 +144,10 @@
  #include <QClipboard>
  #include <QCoreApplication>
 +#include <QStandardPaths>
  #include <QCursor>
  #include <QDir>
  #include <QElapsedTimer>
-@@ -140,4 +150,5 @@
  #include <QFileDialog>
 +#include <QFile>
  #include <QFileInfo>
  #include <QGuiApplication>
- #include <QProcessEnvironment>
-@@ -150,6 +161,7 @@
- #include <QUrl>
+@@ -151,4 +162,5 @@
  #include <QMimeData>
  #include <QTimer>
 +#include <QUuid>
  #include <QWindow>
  
- #include <algorithm>
-@@ -169,6 +181,22 @@
- #endif
+@@ -170,4 +182,20 @@
  
  namespace {
 +#ifdef Q_OS_HARMONY
@@ -79,17 +69,13 @@ index ded283b..cdda278 100644
 +
  constexpr auto kCopyMessageKey = "screenshot-copy";
  constexpr auto kSaveMessageKey = "screenshot-save";
- constexpr auto kPinClipboardMessageKey = "screenshot-pin-clipboard";
-@@ -712,6 +740,7 @@
-     ScreenshotExportJobHandle m_documentSaveJob;
+@@ -724,4 +752,5 @@ struct ScreenshotController::Impl final : public ScreenshotToolbarCommandSink,
  #endif
      std::vector<std::weak_ptr<ScreenshotExportArtifact>> m_saveArtifacts;
 +    QString m_pendingUserFileSaveUri;
      std::vector<ScreenshotExportJobHandle> m_exportJobs;
      ScreenshotClipboardCommitScope m_clipboardScope;
-     ScreenshotExportJobHandle m_clipboardPinJob;
-@@ -760,6 +789,9 @@
-     std::optional<snow_shot::presentation::AppPermissionSnapshot> m_recordingPreviewPermissions;
+@@ -772,4 +801,7 @@ struct ScreenshotController::Impl final : public ScreenshotToolbarCommandSink,
  #endif
      std::unique_ptr<ScreenRecordingController> m_screenRecordingController;
 +#ifdef Q_OS_HARMONY
@@ -97,9 +83,7 @@ index ded283b..cdda278 100644
 +#endif
      bool m_constructingRecognitionFeature = false;
      bool m_constructingScrollingFeature = false;
-     bool m_constructingRecordingFeature = false;
-@@ -1310,6 +1342,18 @@
-             .toString());
+@@ -1315,4 +1347,16 @@ bool ScreenshotController::Impl::ensureRecognitionFeature() {
      ocrOptions.offlineRoot =
          QDir(QCoreApplication::applicationDirPath()).filePath(QStringLiteral("assets/ocr"));
 +#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
@@ -116,9 +100,7 @@ index ded283b..cdda278 100644
 +#endif
      if (applicationStorage.isInitialized() &&
          !applicationStorage.configurationDirectory().trimmed().isEmpty()) {
-         ocrOptions.cacheRoot = QDir(applicationStorage.configurationDirectory())
-@@ -1325,8 +1369,23 @@
-     }
+@@ -1330,6 +1374,21 @@ bool ScreenshotController::Impl::ensureRecognitionFeature() {
  #if SNOW_SHOT_ENABLE_QR_RECOGNITION
      if (!m_qrRecognition)
 +#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
@@ -140,9 +122,7 @@ index ded283b..cdda278 100644
 +#endif
  #if SNOW_SHOT_ENABLE_TABLE_RECOGNITION || SNOW_SHOT_ENABLE_LATEX_RECOGNITION ||                    \
      SNOW_SHOT_ENABLE_IMAGE_CONVERSION || SNOW_SHOT_ENABLE_TEXT_TRANSLATION
-     if (m_tableRecognition == nullptr) {
-@@ -5057,8 +5116,14 @@
-         return;
+@@ -5081,6 +5140,12 @@ void ScreenshotController::Impl::saveSelectionToFile() {
      }
  #endif
 -    if (snow_shot::storage::ScreenshotSettings().saveAsFileDialog() ==
@@ -157,14 +137,17 @@ index ded283b..cdda278 100644
 +                                          QStringLiteral("snow_shot")) {
          saveSelectionWithSnowDialog();
          return;
-     }
-@@ -5080,6 +5145,57 @@
-                                             outputSettings.manualSaveFilenameFormat());
-     const auto defaults = screenshotManualSaveDefaults(QDateTime::currentDateTime(), names);
-     QString selectedFilter = defaults.selectedFilter;
+@@ -5133,4 +5198,62 @@ void ScreenshotController::Impl::saveSelectionWithSystemDialog(
+     const QPointer<ScreenshotController> receiver(&owner);
+     const auto epoch = m_captureEpoch;
++    const snow_shot::storage::ScreenshotSettings outputSettings;
++    const ScreenshotPdfOptions pdf{screenshot_pdf::pageSizeForKey(outputSettings.pdfPageSize())};
++    const auto names = captureExportContext(outputSettings.imageSaveDirectory(),
++                                            outputSettings.manualSaveFilenameFormat());
++    const auto encoding = snow_shot::presentation::screenshotEncodingOptions(outputSettings);
++    const auto defaults = screenshotManualSaveDefaults(QDateTime::currentDateTime(), names);
++    QString selectedFilter = defaults.selectedFilter;
 +#ifdef Q_OS_HARMONY
-+    if (owner.property("saveDialogOpen").toBool())
-+        return;
 +    QString selectedPath = std::exchange(m_pendingUserFileSaveUri, QString());
 +    if (selectedPath.isEmpty()) {
 +        owner.setProperty("saveDialogOpen", true);
@@ -177,15 +160,17 @@ index ded283b..cdda278 100644
 +            QStringLiteral("AVIF|.avif"), QStringLiteral("PDF|.pdf")};
 +        const quint64 requestId =
 +            snow_shot::platform::ohos::sharedUserFileSavePickerQueue().enqueue(
-+                suggestedName, suffixChoices, [receiver](QString uri, int, QString error) mutable {
++                suggestedName, suffixChoices, [receiver, epoch](QString uri, int, QString error) mutable {
 +                    if (receiver.isNull())
 +                        return;
 +                    QMetaObject::invokeMethod(
 +                        receiver.data(),
-+                        [receiver, uri = std::move(uri), error = std::move(error)]() mutable {
++                        [receiver, epoch, uri = std::move(uri), error = std::move(error)]() mutable {
 +                            if (receiver.isNull() || receiver->m_impl == nullptr)
 +                                return;
 +                            receiver->setProperty("saveDialogOpen", false);
++                            if (receiver->m_impl->m_captureEpoch != epoch)
++                                return;
 +                            if (uri.isEmpty() ||
 +                                !snow_shot::platform::ohos::isDocumentViewPickerUri(uri)) {
 +                                receiver->m_impl->m_messages->error(
@@ -213,16 +198,26 @@ index ded283b..cdda278 100644
 +    }
 +    selectedFilter.clear();
 +#else
+     const bool scrolling = m_scrollingCaptureController && m_scrollingCaptureController->active();
+     if (scrolling)
+@@ -5153,15 +5276,8 @@ void ScreenshotController::Impl::saveSelectionWithSystemDialog(
+             restoreKeyboardOwnerQueued(dialogOwner.data());
+         });
+-
+-    const snow_shot::storage::ScreenshotSettings outputSettings;
+-    const ScreenshotPdfOptions pdf{screenshot_pdf::pageSizeForKey(outputSettings.pdfPageSize())};
+-    const auto names = captureExportContext(outputSettings.imageSaveDirectory(),
+-                                            outputSettings.manualSaveFilenameFormat());
+-    const auto encoding = snow_shot::presentation::screenshotEncodingOptions(outputSettings);
+-    const auto defaults = screenshotManualSaveDefaults(QDateTime::currentDateTime(), names);
+-    QString selectedFilter = defaults.selectedFilter;
      const QString selectedPath = QFileDialog::getSaveFileName(
          dialogOwner.data(), QCoreApplication::translate("ScreenshotController", "Save screenshot"),
          defaults.initialPath, ScreenshotImageFileService::saveDialogFilter(), &selectedFilter);
-@@ -5086,3 +5202,4 @@
 +#endif
-     if (selectedPath.isEmpty()) {
+     if (!receiver || m_captureEpoch != epoch || selectedPath.isEmpty()) {
          return;
-     }
-@@ -5204,6 +5321,186 @@
-         ScreenshotImageFileService::suggestedBaseName(settings.manualSaveFilenameFormat(),
+@@ -5228,4 +5344,184 @@ void ScreenshotController::Impl::saveRecognitionResultWithSystemDialog(
                                                        timestamp, names),
          QLatin1Char('.') + ScreenshotRecognitionFileExport::extension(snapshot.kind)));
 +#ifdef Q_OS_HARMONY
@@ -407,17 +402,13 @@ index ded283b..cdda278 100644
 +#else
      QString selectedFilter;
      QString selectedPath = QFileDialog::getSaveFileName(
-         dialogOwner.data(),
-@@ -5240,6 +5537,7 @@
-     static_cast<void>(settings.setLastManualSaveDirectory(QFileInfo(result.path).absolutePath()));
+@@ -5264,4 +5560,5 @@ void ScreenshotController::Impl::saveRecognitionResultWithSystemDialog(
      detachCaptureForExport(ExportDetachMode::Immediate,
                             ScreenshotCaptureFocusDisposition::RestorePrevious);
 +#endif
  #else
      Q_UNUSED(snapshot)
- #endif
-@@ -5440,6 +5738,28 @@
-     ScreenshotPdfOptions pdf, ScreenshotImageEncodingOptions encoding, quint64 generation,
+@@ -5453,4 +5750,26 @@ void ScreenshotController::Impl::saveSourceToFile(
      std::shared_ptr<std::optional<ScreenshotHistoryEntry>> historyCandidate, qreal outputScale,
      ScreenshotExportTasks tasks) {
 +#ifdef Q_OS_HARMONY
@@ -444,9 +435,7 @@ index ded283b..cdda278 100644
 +#endif
      auto artifact = scaledExport(std::move(source), outputScale, tasks);
      const QPointer<ScreenshotController> receiver(&owner);
-     std::erase_if(m_saveArtifacts, [](const auto& weak) { return weak.expired(); });
-@@ -5455,8 +5775,67 @@
-                 std::move(result), generation, historyCandidate,
+@@ -5468,6 +5787,65 @@ void ScreenshotController::Impl::saveSourceToFile(
                  snow_shot::storage::CaptureHistorySource::SavedToFile, artifact);
      };
 -    if (!artifact->requestSaveToPath(&owner, outputPath, format, encoding, complete, pdf, {},
@@ -514,9 +503,7 @@ index ded283b..cdda278 100644
 +    if (!started)
          complete(ScreenshotExportTaskResult::failure(
              ScreenshotExportFailureStage::Queue,
-             QCoreApplication::translate("ScreenshotController",
-@@ -5486,9 +5865,17 @@
-     }
+@@ -5499,7 +5877,15 @@ void ScreenshotController::Impl::completeFileSave(
      if (result.succeeded()) {
          const snow_shot::storage::ScreenshotSettings settings;
 -        const QString directory = QFileInfo(result.savedPath).absolutePath();
@@ -535,9 +522,7 @@ index ded283b..cdda278 100644
 +        }
          publishHistoryResult(std::move(historyCandidate), historySource, std::move(artifact));
      }
- }
-@@ -6584,7 +6971,22 @@
-         m_selection.regionOperationActive() || m_selection.constructionActive() || m_recaptureBusy)
+@@ -6600,5 +6986,20 @@ void ScreenshotController::Impl::startAutomaticQrRecognition() {
          return;
      if (!m_qrRecognition)
 +#if defined(Q_OS_OHOS) || defined(Q_OS_HARMONY)
@@ -558,9 +543,7 @@ index ded283b..cdda278 100644
 +#endif
      if (!m_qrController) {
          m_qrController = std::make_unique<ScreenshotQrController>(
-             *m_qrRecognition, ScreenshotQrController::Actions{{}, [this] { cancelCapture(); }},
-@@ -7180,6 +7582,33 @@
-     }
+@@ -7199,4 +7600,31 @@ void ScreenshotController::openScreenRecordingFolder() {
  }
  
 +#ifdef Q_OS_HARMONY
@@ -592,4 +575,3 @@ index ded283b..cdda278 100644
 +
  void ScreenshotController::editHistoryRecord(const QString& recordId) {
      ++m_impl->m_captureEpoch;
-     m_impl->startHistoryEdit(recordId);

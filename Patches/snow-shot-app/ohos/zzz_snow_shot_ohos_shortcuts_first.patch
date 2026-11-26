@@ -1,10 +1,10 @@
 OHOS: add screen-recording defaults (Ctrl+Alt+F2 / Ctrl+F2) alongside the existing screenshot pair (Ctrl+Alt+F1 / Ctrl+F1).
 
 diff --git a/snow_shot/src/storage/configurationschema.cpp b/snow_shot/src/storage/configurationschema.cpp
-index 713e851..d13d256 100644
+index 9e7b21791a..b2991759fe 100644
 --- a/snow_shot/src/storage/configurationschema.cpp
 +++ b/snow_shot/src/storage/configurationschema.cpp
-@@ -1931,6 +1931,21 @@ QVector<ConfigurationSchemaEntry> buildEntries() {
+@@ -1961,6 +1961,21 @@ QVector<ConfigurationSchemaEntry> buildEntries() {
                     macGlobalShortcutDefault(QStringLiteral("Meta+Shift+3"), 20));
      replaceDefault(QStringLiteral("global_shortcuts/pin_clipboard_content"),
                     macGlobalShortcutDefault(QStringLiteral("Meta+3"), 20));
@@ -26,3 +26,13 @@ index 713e851..d13d256 100644
  #endif
      result.removeIf([](const ConfigurationSchemaEntry& entry) {
          return !app::editionConfigurationKeyAvailable(entry.key);
+@@ -2069,7 +2084,8 @@ ConfigurationNormalization normalizeShortcuts(const QString& key, const QJsonVal
+         value, ConfigurationSchema::allowsModifierOnlyShift(key), maximumItems, &valid, &changed,
+         key == QStringLiteral("screenshot_shortcuts/toggle_guides"), policy);
+     if (key.startsWith(QStringLiteral("pin_to_screen_shortcuts/")) &&
+-        std::ranges::any_of(bindings, PinToScreenShortcutSettings::isReservedShortcut))
++        std::any_of(bindings.cbegin(), bindings.cend(),
++                    PinToScreenShortcutSettings::isReservedShortcut))
+         return {};
+     return {shortcuts::shortcutBindingsToJson(bindings), valid, changed};
+ }
