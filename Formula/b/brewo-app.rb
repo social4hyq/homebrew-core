@@ -10,6 +10,11 @@ class BrewoApp < Formula
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/brewo-app-v0.3.2-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "8dd5444bfe5bb34581c5e43b59523f66eb104e4b021cdf481c7014c897e822d7"
+  end
+
   depends_on "node" => :build
   depends_on "ohos-sdk" => :build
   depends_on "zip" => :build
