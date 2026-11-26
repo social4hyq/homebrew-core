@@ -8,7 +8,7 @@ shape is this two-stage transaction's actual implementation, not incidental
 complexity to simplify away.
 
 diff --git a/snow_shot/src/presentation/imageediting/imageeditingexportcontroller.cpp b/snow_shot/src/presentation/imageediting/imageeditingexportcontroller.cpp
-index 38e33292d1..60ec6cb817 100644
+index 38e33292d1..1814d0d474 100644
 --- a/snow_shot/src/presentation/imageediting/imageeditingexportcontroller.cpp
 +++ b/snow_shot/src/presentation/imageediting/imageeditingexportcontroller.cpp
 @@ -6,12 +6,22 @@
@@ -70,17 +70,18 @@ index 38e33292d1..60ec6cb817 100644
  } // namespace
  
  struct ImageEditingExportController::Impl {
-@@ -83,6 +115,9 @@ struct ImageEditingExportController::Impl {
+@@ -83,6 +115,10 @@ struct ImageEditingExportController::Impl {
          return request;
      }
  
-+    Impl(ImageEditingExportController& controller, ScreenshotPrintService* printService, Pin action)
-+        : q(controller), printing(printService), pin(std::move(action)) {}
++    Impl(ImageEditingExportController& controller, ScreenshotPrintService* printService,
++         ScreenshotAirDropService* airDropService, Pin action)
++        : q(controller), printing(printService), airDrop(airDropService), pin(std::move(action)) {}
 +
      void finish(QPointer<Request> request, bool success, QString error = {}) {
          if (!current(request))
              return;
-@@ -150,10 +185,33 @@ struct ImageEditingExportController::Impl {
+@@ -150,10 +186,33 @@ struct ImageEditingExportController::Impl {
              startFailed(request);
      }
      void submit(QPointer<Request> request, ScreenshotExportCoordinator::Work work,
@@ -116,7 +117,7 @@ index 38e33292d1..60ec6cb817 100644
                  if (!request || active != request)
                      return;
                  if (result.succeeded() && operation == Operation::Save)
-@@ -166,6 +224,134 @@ struct ImageEditingExportController::Impl {
+@@ -166,6 +225,134 @@ struct ImageEditingExportController::Impl {
                     QCoreApplication::translate("snow_shot::presentation::ImageEditingWindow",
                                                 "Export could not be started"));
      }
@@ -251,7 +252,7 @@ index 38e33292d1..60ec6cb817 100644
      void confirmOverwrite(QPointer<Request> request, const QStringList& paths,
                            std::function<void()> write) {
          QStringList existing;
-@@ -213,17 +399,37 @@ struct ImageEditingExportController::Impl {
+@@ -213,17 +400,37 @@ struct ImageEditingExportController::Impl {
  #if SNOW_SHOT_ENABLE_IMAGE_CONVERSION || SNOW_SHOT_ENABLE_LATEX_RECOGNITION ||                     \
      SNOW_SHOT_ENABLE_QR_RECOGNITION || SNOW_SHOT_ENABLE_TABLE_RECOGNITION
      void saveRecognition(QPointer<Request> request, Operation operation,
@@ -291,7 +292,7 @@ index 38e33292d1..60ec6cb817 100644
                  if (!request || active != request)
                      return;
                  submit(
-@@ -249,9 +455,18 @@ struct ImageEditingExportController::Impl {
+@@ -249,9 +456,18 @@ struct ImageEditingExportController::Impl {
                                               : ScreenshotExportFailureStage::File,
                                           result.error);
                      },
@@ -312,7 +313,7 @@ index 38e33292d1..60ec6cb817 100644
                  confirmOverwrite(request, paths, std::move(submitSnapshot));
              else
                  submitSnapshot();
-@@ -260,6 +475,43 @@ struct ImageEditingExportController::Impl {
+@@ -260,6 +476,43 @@ struct ImageEditingExportController::Impl {
              write({});
              return;
          }
@@ -356,7 +357,7 @@ index 38e33292d1..60ec6cb817 100644
          auto* dialog = new QFileDialog(
              owner, QCoreApplication::translate("snow_shot::presentation::ImageEditingWindow",
                                                 "Save as file"));
-@@ -299,6 +551,7 @@ struct ImageEditingExportController::Impl {
+@@ -299,6 +552,7 @@ struct ImageEditingExportController::Impl {
                  finish(request, false);
          });
          dialog->show();
@@ -364,7 +365,7 @@ index 38e33292d1..60ec6cb817 100644
      }
  #endif
      void image(QPointer<Request> request, Operation operation, ScreenshotExportSource source,
-@@ -529,6 +782,18 @@ void ImageEditingExportController::Impl::cancelRequest(QPointer<Request>& pendin
+@@ -529,6 +783,18 @@ void ImageEditingExportController::Impl::cancelRequest(QPointer<Request>& pendin
      [[maybe_unused]] const auto completion = std::move(request->completion);
      request->job.cancel();
      request->save.cancel();
