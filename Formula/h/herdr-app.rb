@@ -4,7 +4,7 @@ class HerdrApp < Formula
   url "https://github.com/herdrdev/herdr-app/archive/refs/tags/v0.1.18.tar.gz"
   sha256 "0c442fd54231dee2aca661661b50f4177ca04b55966c572f26cf06c629e9e59d"
   license "Apache-2.0"
-  revision 4
+  revision 5
 
   livecheck do
     url "https://github.com/herdrdev/herdr-app.git"
@@ -13,8 +13,8 @@ class HerdrApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/herdr-app-v0.1.18-r5"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a973adcd7681248241a76923cf466a3e312d6e161b3f86c6d5e0166ea52beda3"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/herdr-app-v0.1.18-r6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e132184b28e40183c7ed04ee205f0fde893cf492a16b8b38f105009a558c4d5e"
   end
 
   depends_on "node" => :build
@@ -192,12 +192,16 @@ class HerdrApp < Formula
     cp res/"scripts/herdr-app.sh", libexec/"herdr-app.sh"
     cp res/"scripts/herdr-bridge.py", libexec/"herdr-bridge.py"
     cp res/"scripts/herdr-app-control.py", libexec/"herdr-app-control.py"
+    # The agent guide ships inside the upstream source (src/SKILL.md), printed by
+    # herdr-app --skill upstream. Take it from the tarball so it tracks the version.
+    cp buildpath/"src/SKILL.md", libexec/"SKILL.md"
     chmod 0755, [libexec/"herdr-app.sh", libexec/"herdr-bridge.py", libexec/"herdr-app-control.py"]
     (bin/"herdr-app").write_env_script libexec/"herdr-app.sh",
       HERDR_APP_HAP:         libexec/"herdr-app-unsigned.hap",
       HERDR_APP_HDC_DEFAULT: formula_opt_prefix("ohos-sdk-toolchains")/"hdc",
       HERDR_APP_BRIDGE:      libexec/"herdr-bridge.py",
       HERDR_APP_CONTROL:     libexec/"herdr-app-control.py",
+      HERDR_APP_SKILL:       libexec/"SKILL.md",
       HERDR_APP_HC:          formula_opt_bin("herdr-core")/"hc",
       HERDR_APP_PYTHON:      formula_opt_bin("python@3.15")/"python3"
   end
@@ -242,6 +246,10 @@ class HerdrApp < Formula
     assert_match "do <command>", help
     assert_match "ls | commands", help
     assert_match "ctl <command>", help
+    assert_match "--skill", help
+    skill = shell_output("#{bin}/herdr-app --skill")
+    assert_match "herdr-app: drive the person's window", skill
+    assert_match "herdr-app do", skill
     assert_match "herdr-app.control", shell_output("#{libexec}/herdr-app-control.py --help")
 
     # Run the bridge and install flow with stand-ins for hc and app-installer:
