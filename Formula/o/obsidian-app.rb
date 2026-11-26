@@ -7,7 +7,7 @@ class ObsidianApp < Formula
   # host payload in Resources/obsidian-app is version-independent. The asar is
   # fetched at install time and never put in the bottle.
   license :cannot_represent
-  revision 13
+  revision 14
 
   # desktop-releases.json carries the latest desktop version, asar URL and
   # sha256.
@@ -19,8 +19,8 @@ class ObsidianApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/obsidian-app-v1.15.1-r15"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3b8b09cb2dd845daf4027d3c2bb89de8b2649fcd825b318872610175da6cfeb5"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/obsidian-app-v1.15.1-r16"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "43704577360cdb23988d95667bdd69097d56d2c04c02acabe4e0c6b86508b84c"
   end
 
   depends_on "app-installer"
@@ -66,6 +66,7 @@ class ObsidianApp < Formula
     Resources/obsidian-app/assets/icon.png
     Resources/obsidian-app/assets/icon32.png
     Resources/obsidian-app/scripts/install-desktop.sh
+    Resources/obsidian-app/scripts/obsidian-cli-entry.sh
     Resources/obsidian-app/scripts/obsidian-cli.cjs
     Resources/obsidian-app/scripts/obsidian-desktop.sh
   ].freeze
@@ -251,6 +252,14 @@ class ObsidianApp < Formula
     chmod 0755, libexec/"obsidian-desktop.sh"
     cp res/"scripts/obsidian-cli.cjs", libexec/"obsidian-cli.cjs"
     chmod 0755, libexec/"obsidian-cli.cjs"
+    cp res/"scripts/obsidian-cli-entry.sh", libexec/"obsidian-cli-entry.sh"
+    chmod 0755, libexec/"obsidian-cli-entry.sh"
+    # Bare `obsidian` matches the upstream CLI entry point; it shares the same
+    # client and env as `obsidian-app cli` and leaves the management surface
+    # (install/start/stop/status/uninstall) on `obsidian-app`.
+    (bin/"obsidian").write_env_script libexec/"obsidian-cli-entry.sh",
+      OBSIDIAN_DESKTOP_NODE: formula_opt_bin("node")/"node",
+      OBSIDIAN_DESKTOP_CLI:  libexec/"obsidian-cli.cjs"
     (bin/"obsidian-app").write_env_script libexec/"obsidian-desktop.sh",
       OBSIDIAN_DESKTOP_UNSIGNED_HAP:   libexec/"obsidian-desktop-unsigned.hap",
       OBSIDIAN_DESKTOP_INSTALL_SCRIPT: pkgshare/"install-desktop.sh",
@@ -277,6 +286,25 @@ class ObsidianApp < Formula
     assert_match "Usage: obsidian-app", help
     assert_match "cli ...", help
     system formula_opt_bin("node")/"node", "--check", libexec/"obsidian-cli.cjs"
+
+    # Bare `obsidian`: wrapper wiring plus argv passthrough to the shared client.
+    bare = (bin/"obsidian").read
+    assert_match "obsidian-cli-entry.sh", bare
+    assert_match "OBSIDIAN_DESKTOP_CLI", bare
+    fake_entry_node = testpath/"entry-node"
+    fake_entry_node.write <<~SH
+      #!/bin/sh
+      printf '%s\\n' "$@" > #{testpath}/entry-args
+      printf '__CLI_CALLED__\\n'
+    SH
+    chmod 0755, fake_entry_node
+    entry_out = with_env(
+      "OBSIDIAN_DESKTOP_NODE" => fake_entry_node.to_s,
+      "OBSIDIAN_DESKTOP_CLI"  => (libexec/"obsidian-cli.cjs").to_s,
+    ) { shell_output("#{libexec}/obsidian-cli-entry.sh help 'daily:append content=a b'") }
+    assert_match "__CLI_CALLED__", entry_out
+    assert_equal [(libexec/"obsidian-cli.cjs").to_s, "help", "daily:append content=a b"],
+                 (testpath/"entry-args").read.lines(chomp: true)
 
     hap = libexec/"obsidian-desktop-unsigned.hap"
     listing = shell_output("unzip -l #{hap}")
