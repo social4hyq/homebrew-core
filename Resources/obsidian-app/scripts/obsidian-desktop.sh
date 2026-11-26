@@ -23,6 +23,7 @@ Usage: obsidian-app <command>
             data; --purge also deletes it.
   cli ...   Run an Obsidian CLI command against the running app
             (enable Settings -> General -> Command line interface first).
+  smoke     Run a real-device smoke test of the CLI bridge (read-only).
 
 Device options: --device ID picks the hdc target (default: HDC_TARGET, else
 the first connected device).
@@ -80,6 +81,10 @@ case "${1:-}" in
     shift
     exec "${OBSIDIAN_DESKTOP_NODE:-node}" \
       "${OBSIDIAN_DESKTOP_CLI:?missing CLI client}" "$@"
+    ;;
+  smoke)
+    shift
+    exec "${OBSIDIAN_DESKTOP_SMOKE:?missing smoke script}" "$@"
     ;;
   status)
     shift
