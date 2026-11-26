@@ -7,7 +7,7 @@ class ObsidianApp < Formula
   # host payload in Resources/obsidian-app is version-independent. The asar is
   # fetched at install time and never put in the bottle.
   license :cannot_represent
-  revision 14
+  revision 15
 
   # desktop-releases.json carries the latest desktop version, asar URL and
   # sha256.
@@ -65,10 +65,13 @@ class ObsidianApp < Formula
     Resources/obsidian-app/app/package.json
     Resources/obsidian-app/assets/icon.png
     Resources/obsidian-app/assets/icon32.png
+    Resources/obsidian-app/scripts/cli-smoke.sh
     Resources/obsidian-app/scripts/install-desktop.sh
     Resources/obsidian-app/scripts/obsidian-cli-entry.sh
     Resources/obsidian-app/scripts/obsidian-cli.cjs
     Resources/obsidian-app/scripts/obsidian-desktop.sh
+    Resources/obsidian-app/tests/bare-cli-entry.test.sh
+    Resources/obsidian-app/tests/official-cli-examples.sh
   ].freeze
 
   resource "electron-ohos" do
@@ -254,6 +257,8 @@ class ObsidianApp < Formula
     chmod 0755, libexec/"obsidian-cli.cjs"
     cp res/"scripts/obsidian-cli-entry.sh", libexec/"obsidian-cli-entry.sh"
     chmod 0755, libexec/"obsidian-cli-entry.sh"
+    cp res/"scripts/cli-smoke.sh", libexec/"cli-smoke.sh"
+    chmod 0755, libexec/"cli-smoke.sh"
     # Bare `obsidian` matches the upstream CLI entry point; it shares the same
     # client and env as `obsidian-app cli` and leaves the management surface
     # (install/start/stop/status/uninstall) on `obsidian-app`.
@@ -265,6 +270,7 @@ class ObsidianApp < Formula
       OBSIDIAN_DESKTOP_INSTALL_SCRIPT: pkgshare/"install-desktop.sh",
       OBSIDIAN_DESKTOP_MODULE_ACL:     pkgshare/"module-acl.json",
       OBSIDIAN_DESKTOP_CLI:            libexec/"obsidian-cli.cjs",
+      OBSIDIAN_DESKTOP_SMOKE:          libexec/"cli-smoke.sh",
       OBSIDIAN_DESKTOP_NODE:           formula_opt_bin("node")/"node",
       OBSIDIAN_DESKTOP_HDC_DEFAULT:    formula_opt_prefix("ohos-sdk-toolchains")/"hdc",
       OBSIDIAN_ASAR_URL:               stable.url.to_s,
@@ -305,6 +311,16 @@ class ObsidianApp < Formula
     assert_match "__CLI_CALLED__", entry_out
     assert_equal [(libexec/"obsidian-cli.cjs").to_s, "help", "daily:append content=a b"],
                  (testpath/"entry-args").read.lines(chomp: true)
+
+    # `obsidian-app smoke` is the real-device gate; assert wrapper wiring and
+    # that the script parses stdout rather than trusting the exit code.
+    assert_match "smoke", shell_output("#{bin}/obsidian-app --help")
+    assert_match "cli-smoke.sh", (bin/"obsidian-app").read
+    smoke = (libexec/"cli-smoke.sh").read
+    assert_match "grep -qiE", smoke
+    assert_match "Usage: obsidian", smoke
+    assert_match "python3", smoke
+    assert_predicate libexec/"cli-smoke.sh", :executable?
 
     hap = libexec/"obsidian-desktop-unsigned.hap"
     listing = shell_output("unzip -l #{hap}")
