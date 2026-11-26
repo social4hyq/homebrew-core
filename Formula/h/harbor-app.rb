@@ -10,6 +10,11 @@ class HarborApp < Formula
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/harbor-app-v0.4.1-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "3249085a1329c2f3ad1c05bebf2bebafd7a3c6650dab351573b9fa5bd17ff027"
+  end
+
   depends_on "node" => :build
   depends_on "ohos-sdk" => :build
   depends_on "zip" => :build
