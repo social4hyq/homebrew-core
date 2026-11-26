@@ -187,7 +187,7 @@ bridge_stop() {
   local pid; pid="$(bridge_pid)"
   if [[ -z "$pid" ]]; then
     if conf_ok && bridge_check; then
-      die 'the bridge is managed externally; if using Harbor, run: harbor stop herdr-app'
+      die 'the bridge is managed externally; stop it with whatever started it'
     fi
     rm -f "$PIDFILE"
     printf 'herdr-app: the bridge is not running\n' >&2
