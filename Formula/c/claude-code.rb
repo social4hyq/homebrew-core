@@ -78,6 +78,10 @@ class ClaudeCode < Formula
   post_install_steps do
     run "/usr/bin/sh",
         args: ["{{libexec}}/install-claude.sh", "{{HOMEBREW_PREFIX}}", "{{temp}}"],
+        # pnpm 12 puts its store operation locks under $XDG_RUNTIME_DIR and
+        # falls back to /tmp. The image bakes a device path there that the
+        # post-install sandbox cannot write, so point it at Homebrew's temp.
+        env: { "XDG_RUNTIME_DIR" => "{{temp}}" },
         writable_paths: ["{{var}}/{{formula_name}}", "{{temp}}"], network_access: true
   end
 
