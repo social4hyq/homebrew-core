@@ -11,8 +11,9 @@ class ClaudeCode < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.326-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "dfe93c02716a92c8cf475f14e1be3890ce32a57500aeb038b79e8d3a002b88fa"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-v2.1.326-r2"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "e00c87192a958592cfb87fb1aaa1bdb520163274a1f16a404e283a9da200bbd3"
   end
 
   depends_on "glibc"
@@ -78,6 +79,10 @@ class ClaudeCode < Formula
   post_install_steps do
     run "/usr/bin/sh",
         args: ["{{libexec}}/install-claude.sh", "{{HOMEBREW_PREFIX}}", "{{temp}}"],
+        # pnpm 12 puts its store operation locks under $XDG_RUNTIME_DIR and
+        # falls back to /tmp. The image bakes a device path there that the
+        # post-install sandbox cannot write, so point it at Homebrew's temp.
+        env: { "XDG_RUNTIME_DIR" => "{{temp}}" },
         writable_paths: ["{{var}}/{{formula_name}}", "{{temp}}"], network_access: true
   end
 
