@@ -49,6 +49,7 @@ Commands:
   ctl <command> [options]
             Pass do/ls/status/commands/shot/feedback through unchanged;
             `ctl status` is the window status (`status` alone stays the bridge status).
+  --skill     Print the Agent Skill guide: driving the window, and where hc fits.
   -h, --help  Show this help
 EOF
 }
@@ -274,6 +275,10 @@ PY
 command_name="${1:-}"
 case "$command_name" in
   -h|--help|help|"") usage; [[ -n "$command_name" ]] || exit 2; exit 0 ;;
+  --skill)
+    skill="${HERDR_APP_SKILL:-$(dirname "${BASH_SOURCE[0]}")/SKILL.md}"
+    [[ -f "$skill" ]] || die "skill guide not found: $skill"
+    exec cat "$skill" ;;
   do|ls|commands|shot|feedback|ctl) shift ;;
   install|start|stop|status|uninstall|bridge) shift ;;
   *) usage >&2; exit 2 ;;
