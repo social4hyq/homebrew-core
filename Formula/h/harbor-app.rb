@@ -1,10 +1,9 @@
 class HarborApp < Formula
   desc "Systemd-like service manager for HarmonyOS PC, as a tiny pure-ArkTS HAP"
   homepage "https://github.com/social4hyq/harbor-app"
-  url "https://github.com/social4hyq/harbor-app/archive/refs/tags/v0.3.0.tar.gz"
-  sha256 "c7b3d3424b297453cdf857497e1fa10958e52de5c5b69c22506a95496a33ea9d"
+  url "https://github.com/social4hyq/harbor-app/archive/refs/tags/v0.4.0.tar.gz"
+  sha256 "b31fd248809128234f34f48138ca88cb00180f70222e3bd47c162a930f7da88d"
   license "MIT"
-  revision 1
 
   livecheck do
     url :stable
@@ -12,8 +11,8 @@ class HarborApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/harbor-app-v0.3.0-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "63facc51df2b1831e7b9406b621ad1fbaf42955f986e01b28ae039d63092a6b8"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/harbor-app-v0.4.0-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "eb3bed6be8f4c07f68c98c8cd8fafe571e61f9ed25ad9cca00f0e4983e677164"
   end
 
   depends_on "node" => :build
