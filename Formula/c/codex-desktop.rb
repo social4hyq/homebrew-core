@@ -13,6 +13,11 @@ class CodexDesktop < Formula
     regex(%r{^Filename: pool/main/c/chatgpt/chatgpt_(\d+(?:\.\d+)+)_arm64\.deb$}i)
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codex-desktop-v26.1120.50957-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b9ed27850c467d27dc0d3ce0a759f4f357538fa9f02b3d2614595d805760ec1b"
+  end
+
   depends_on "codex"
   depends_on "node"
   depends_on "ohos-sdk-toolchains"
