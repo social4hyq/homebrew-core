@@ -4,7 +4,7 @@
 
 CLAUDE.md 只留导航到此；本文件维护全部细节。所有结论基于 tap 当前 `main`（复核基线 `2bfe8cfcd9`）与 2026-11-05 华为官宣的鸿蒙 PC 年内侧载。
 
-**前置声明**：本计划的前提是用户明确的清场指令——**不考虑现有 formula 兼容性、不做 rename/别名/迁移映射、直接改为最合适的设计、全面对标业界最佳实践、全面解耦方便维护**。因此不设弃用期、不建 `formula_renames.json` 映射、不做新旧双栈，在集成分支一次性切换发布。若该前提变化，回到 `docs/harmonybrew-tap.md` 与 `docs/hap-app-formulae.md`（旧架构说明）重新评估。
+**前置声明**：本计划的前提是用户明确的清场指令——**不考虑现有 formula 兼容性、不做 rename/别名/迁移映射、直接改为最合适的设计、对标业界最佳实践、全面解耦方便维护**。因此不设弃用期、不建 `formula_renames.json` 映射、不做新旧双栈，在集成分支一次性切换发布。**"对标业界最佳实践"按 §6.2 的分层原则执行（理念层对标、结构层借鉴、平台层自研），不是把任一工具全盘照搬。** 若该前提变化，回到 `docs/harmonybrew-tap.md` 与 `docs/hap-app-formulae.md`（旧架构说明）重新评估。
 
 ---
 
@@ -244,7 +244,15 @@ install_result: { type, operation_id, backend, state: "installed",
 
 ## 6.2 Homebrew Cask 对标研究（权威，实测文档）
 
-依据 `docs.brew.sh/Cask-Cookbook` 与 `How-to-Create-and-Maintain-a-Tap`（2026-11 抓取）。Cask 是 Homebrew 交付 GUI 应用的官方形态，是本设计最贴近的业界参照。结论：**Cask 的声明式交付、token 命名、uninstall/zap 分离强烈支持本方案；但 Cask 不签名、不部署到外部设备，这部分必须自研。**
+依据 `docs.brew.sh/Cask-Cookbook`、`How-to-Create-and-Maintain-a-Tap`（2026-11 抓取）与 `Homebrew/brew` 源码（`cask/artifact/moved.rb`、`pkg.rb`、`installer.rb`、`unpack_strategy/dmg.rb`，经 `gh api` 核实）。
+
+**对标原则（重要）：不"全面照搬" Cask，而是分三层。** Cask 解决的是 macOS **本机 GUI 应用交付**（`app` artifact 本质是 Ruby `FileUtils.move` 到 `/Applications`，装完即结束，无外部设备状态、无签名、无账号登录）；本方案解决的是 HAP 制品交付 + 签名 + 跨设备部署 + 宿主桥接。两者只在"声明式交付"一段重叠。全盘照搬会用"文件搬运"模型去套"签名+设备部署"，在关键处做错。
+
+| 层级 | 处理 | 范围 |
+|---|---|---|
+| **理念层** | **照搬** | 声明式 manifest、应用命令与包 token 分离、`uninstall`/`zap` 分级、安装不自动启动、`auto_updates` 不干预、上游 CLI 透明 exec |
+| **结构层** | **借鉴思路，形式自定** | artifact 按类型分派（→类型化 assembler）、受限 steps DSL + JSON 化（→fd JSON 插件合同）、0700 私有临时目录 |
+| **平台层** | **不照搬，自研** | 签名/凭据、外部设备部署、ACL 权限变体、宿主 bridge/配对——OHOS/HAP 硬差异，Cask 无对应物 |
 
 ### 6.2.1 直接印证本方案的 Cask 机制
 
@@ -267,6 +275,14 @@ install_result: { type, operation_id, backend, state: "installed",
 - **外部设备部署**：Cask 是**本机**安装（移入 `/Applications`）；本方案要把 signed HAP 部署到 hdc 设备或系统侧载安装器，含多设备选择、分片上传、`bm install`、后置核验、用户确认协议——全部无 Cask 对应物。
 - **ACL 权限变体**：OHOS `basic`/`acl` 变体与权限清单是平台特有，Cask 无对应。
 - **宿主 bridge/配对**：OHOS 沙箱读不到宿主、需 loopback 令牌桥；Cask 的 app 直接跑在本机，无此问题。
+
+### 6.2.2b 对标了反而有害的五种做法（警戒线）
+
+1. **别把 HAP 做成 cask artifact。** Cask 的 `app "Foo.app"` 只搬文件；HAP 要签名后 `bm install` 到设备或交给侧载安装器。照搬"artifact 声明即安装完成"会让 `ohos-app install` 退化成"把文件放某处"，丢掉设备状态与后置核验——正是压测 P0 第 4 条要防的。
+2. **别学 Cask 的"装完即结束"状态模型。** Cask 无设备端概念，`brew list --cask` 查本机；我们的 `status` 必须同时报本机 bottle 版本与设备 HAP 版本（验收合同第 11 条）。照搬会再次混淆"brew 成功"与"设备已装"。
+3. **别把"`installer script`/`pkg` 不沙箱"当安全目标。** Cask 官方承认这点是因为 vendor installer 需广泛权限——是**妥协**不是**最佳实践**。据此定"v1 只执行受信 tap 插件、不宣传强制隔离"即可，不把"不沙箱"写成设计目标。
+4. **别照搬 Cask token 全局唯一规则。** 官方 cask 必须全局唯一且不与其他 cask 冲突，是因为 `brew install foo` 有歧义；我们用 canonical formula 全名作 descriptor id，是 tap 内标识，无全局唯一约束，照搬反要改所有包名。
+5. **别照搬 Ruby DSL/JSON API 实现。** Cask 用 Ruby 因 Homebrew 本体是 Ruby；我们是 shell + cjs，对应物是 fd JSON 插件合同，不是 Ruby steps DSL。
 
 ### 6.2.3 由 Cask 研究触发的方案微调
 
