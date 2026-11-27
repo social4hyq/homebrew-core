@@ -1,9 +1,10 @@
-class HarborApp < Formula
+class HarborDesktop < Formula
   desc "Systemd-like service manager for HarmonyOS PC, as a tiny pure-ArkTS HAP"
   homepage "https://github.com/social4hyq/harbor-app"
   url "https://github.com/social4hyq/harbor-app/archive/refs/tags/v0.4.1.tar.gz"
   sha256 "74b6d19cc0af97b1b88972248eb67d6a0cbed8b989ff82bf1d15170761b2b7ee"
   license "MIT"
+  revision 1
 
   livecheck do
     url :stable
@@ -11,22 +12,19 @@ class HarborApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/harbor-app-v0.4.1-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3249085a1329c2f3ad1c05bebf2bebafd7a3c6650dab351573b9fa5bd17ff027"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/harbor-desktop-v0.4.1-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "63cc9db9d80309188733bfabea3e254b24ecea6c3ab81a4b7732fcf4df419c12"
   end
 
   depends_on "node" => :build
   depends_on "ohos-sdk" => :build
   depends_on "zip" => :build
-  depends_on "app-installer"
   depends_on "python@3.15"
 
   def install
     clt = Pathname("/opt/electron-ohos-clt")
     unless (clt/"hvigor/bin/hvigorw.js").exist?
-      odie "harbor-app needs the electron-ohos CI image (hvigor at " \
-           "#{clt}/hvigor/bin/hvigorw.js); add harbor-app to the " \
-           "OHOS_CI_IMAGE_OVERRIDES repo variable"
+      odie "#{name} builds only in electron-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES['#{name}']"
     end
 
     ENV["DEVECO_SDK_HOME"] = (clt/"sdk").to_s
@@ -62,25 +60,8 @@ class HarborApp < Formula
     hap_entries = Utils.safe_popen_read("unzip", "-l", hap.to_s)
     odie "native bridge missing from HAP" unless hap_entries.include?("libharbor_bridge.so")
 
-    libexec.install hap => "harbor-unsigned.hap"
+    libexec.install hap => "harbor-desktop-unsigned.hap"
     bin.install "harbor"
-
-    # `hap-app auto-install` requires a real command named after the formula
-    # (`*-app`) that accepts `install`. This is that installer entry point:
-    # it simply forwards to app-installer, which honours the HAP_INSTALLER_*
-    # environment variables set by hap-app.
-    installer = formula_opt_bin("app-installer")/"app-installer"
-    (bin/"harbor-app").write <<~SH
-      #!/bin/sh
-      # hap-app invokes `<command> install`; app-installer takes no such
-      # subcommand (install is its default action), so swallow it.
-      [ "${1:-}" = "install" ] && shift
-      exec "#{installer}" \\
-        --hap "#{libexec}/harbor-unsigned.hap" \\
-        --bundle-id com.social4hyq.harbor \\
-        --module entry --ability EntryAbility "$@"
-    SH
-    chmod 0755, bin/"harbor-app"
 
     (pkgshare/"apps.json.default").write <<~JSON
       {
@@ -90,28 +71,62 @@ class HarborApp < Formula
     JSON
 
     # Assert the HAP declares the ACL permissions Harbor needs.
-    module_json = JSON.parse(Utils.safe_popen_read("unzip", "-p", libexec/"harbor-unsigned.hap", "module.json"))
+    module_json = JSON.parse(
+      Utils.safe_popen_read("unzip", "-p", libexec/"harbor-desktop-unsigned.hap", "module.json"),
+    )
     requested = module_json.fetch("module").fetch("requestPermissions").map { |p| p["name"] }
     %w[ohos.permission.INTERNET ohos.permission.CUSTOM_SANDBOX
        ohos.permission.READ_WRITE_USER_FILE ohos.permission.KEEP_BACKGROUND_RUNNING].each do |perm|
       odie "missing permission in HAP: #{perm}" unless requested.include?(perm)
     end
-  end
 
-  post_install_steps do
-    run "{{HOMEBREW_PREFIX}}/bin/hap-app",
-        args: ["auto-install", "harbor-app", "com.social4hyq.harbor"],
-        must_succeed: false, print_stdout: true, network_access: true
+    # The HAP is delivered through app.json; deployment is an explicit
+    # `ohos-app install harbor-desktop`. The upstream CLI stays independent.
+    # Descriptor is written at build time with the real HAP digest and version.
+    (pkgshare/"ohos").mkpath
+    hap = libexec/"harbor-desktop-unsigned.hap"
+    hap_sha = Digest::SHA256.file(hap).hexdigest
+    descriptor = {
+      "schema_version" => 1,
+      "id"             => "social4hyq/core/harbor-desktop",
+      "artifact"       => {
+        "format"       => "hap",
+        "path"         => "../../libexec/harbor-desktop-unsigned.hap",
+        "sha256"       => hap_sha,
+        "api"          => 12,
+        "abis"         => ["arm64-v8a"],
+        "bundle_id"    => "com.social4hyq.harbor",
+        "version_name" => version.to_s,
+        "version_code" => 1,
+      },
+      "launch"         => { "module" => "entry", "ability" => "EntryAbility" },
+      "variants"       => {
+        "default"     => "basic",
+        "definitions" => { "basic" => {} },
+      },
+    }
+    (pkgshare/"ohos/app.json").write JSON.pretty_generate(descriptor) + "\n"
   end
 
   test do
+    # The upstream CLI is delivered independently of HAP deployment.
     help = shell_output("#{bin}/harbor --help")
     assert_match "brew services", help
     assert_match "discover", help
-    assert_path_exists bin/"harbor-app"
-    assert_path_exists libexec/"harbor-unsigned.hap"
+    refute_path_exists bin/"harbor-app"
+    assert_path_exists libexec/"harbor-desktop-unsigned.hap"
     assert_path_exists pkgshare/"apps.json.default"
-    module_json = JSON.parse(Utils.safe_popen_read("unzip", "-p", libexec/"harbor-unsigned.hap", "module.json"))
+
+    # Descriptor schema, id, digest and variants must match the HAP.
+    descriptor = JSON.parse((pkgshare/"ohos/app.json").read)
+    assert_equal 1, descriptor["schema_version"]
+    assert_equal "social4hyq/core/harbor-desktop", descriptor["id"]
+    hap = libexec/"harbor-desktop-unsigned.hap"
+    assert_equal Digest::SHA256.file(hap).hexdigest, descriptor.dig("artifact", "sha256")
+    assert_equal "com.social4hyq.harbor", descriptor.dig("artifact", "bundle_id")
+    assert_equal "basic", descriptor.dig("variants", "default")
+
+    module_json = JSON.parse(Utils.safe_popen_read("unzip", "-p", hap, "module.json"))
     assert_equal "com.social4hyq.harbor", module_json.dig("app", "bundleName")
   end
 end
