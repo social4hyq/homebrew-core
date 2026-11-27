@@ -4,7 +4,7 @@ class HarborDesktop < Formula
   url "https://github.com/social4hyq/harbor-app/archive/refs/tags/v0.4.1.tar.gz"
   sha256 "74b6d19cc0af97b1b88972248eb67d6a0cbed8b989ff82bf1d15170761b2b7ee"
   license "MIT"
-  revision 1
+  revision 2
 
   livecheck do
     url :stable
@@ -91,7 +91,7 @@ class HarborDesktop < Formula
       "id"             => "social4hyq/core/harbor-desktop",
       "artifact"       => {
         "format"       => "hap",
-        "path"         => "../../libexec/harbor-desktop-unsigned.hap",
+        "path"         => "../../../libexec/harbor-desktop-unsigned.hap",
         "sha256"       => hap_sha,
         "api"          => 12,
         "abis"         => ["arm64-v8a"],

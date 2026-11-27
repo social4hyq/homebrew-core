@@ -4,7 +4,7 @@ class MulticaDesktop < Formula
   url "https://github.com/multica-ai/multica/archive/refs/tags/v0.13.0.tar.gz"
   sha256 "8a2e69492f1640b33213105cb3aa0d7e633d77993cdf15d7d847cd54d8859817"
   license :cannot_represent # Multica License (Apache-2.0 plus additional conditions)
-  revision 1
+  revision 2
 
   livecheck do
     url :stable
@@ -200,7 +200,7 @@ class MulticaDesktop < Formula
       "id"             => "social4hyq/core/multica-desktop",
       "artifact"       => {
         "format"       => "hap",
-        "path"         => "../../libexec/multica-desktop-unsigned.hap",
+        "path"         => "../../../libexec/multica-desktop-unsigned.hap",
         "sha256"       => hap_sha,
         "api"          => 12,
         "abis"         => ["arm64-v8a"],

@@ -4,7 +4,7 @@ class BrewoDesktop < Formula
   url "https://github.com/social4hyq/brewo-app/archive/refs/tags/v0.3.2.tar.gz"
   sha256 "49d33aebf153347db7a2d8d80195f8b549d7696974304466ddebbaa1312aa16b"
   license "AGPL-3.0-only"
-  revision 1
+  revision 2
 
   livecheck do
     url :stable
@@ -87,7 +87,7 @@ class BrewoDesktop < Formula
       "id"             => "social4hyq/core/brewo-desktop",
       "artifact"       => {
         "format"       => "hap",
-        "path"         => "../../libexec/brewo-desktop-unsigned.hap",
+        "path"         => "../../../libexec/brewo-desktop-unsigned.hap",
         "sha256"       => hap_sha,
         "api"          => 12,
         "abis"         => ["arm64-v8a"],

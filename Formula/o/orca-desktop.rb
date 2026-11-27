@@ -8,7 +8,7 @@ class OrcaDesktop < Formula
   # Tap-authored shell scripts (MIT) on the CPF-Electron runtime (mixed
   # MIT/BSD/LGPL).
   license :cannot_represent
-  revision 1
+  revision 2
 
   livecheck do
     url :stable
@@ -199,7 +199,7 @@ class OrcaDesktop < Formula
       "id"             => "social4hyq/core/orca-desktop",
       "artifact"       => {
         "format"       => "hap",
-        "path"         => "../../libexec/orca-desktop-unsigned.hap",
+        "path"         => "../../../libexec/orca-desktop-unsigned.hap",
         "sha256"       => hap_sha,
         "api"          => 12,
         "abis"         => ["arm64-v8a"],

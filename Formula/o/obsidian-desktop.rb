@@ -7,7 +7,7 @@ class ObsidianDesktop < Formula
   # host payload in Resources/obsidian-desktop is version-independent and the
   # asar is not bundled in the HAP.
   license :cannot_represent
-  revision 16
+  revision 17
 
   # desktop-releases.json carries the latest desktop version, asar URL and
   # sha256.
@@ -248,7 +248,7 @@ class ObsidianDesktop < Formula
       "id"             => "social4hyq/core/obsidian-desktop",
       "artifact"       => {
         "format"       => "hap",
-        "path"         => "../../libexec/obsidian-desktop-unsigned.hap",
+        "path"         => "../../../libexec/obsidian-desktop-unsigned.hap",
         "sha256"       => hap_sha,
         "api"          => 12,
         "abis"         => ["arm64-v8a"],

@@ -6,6 +6,7 @@ class GenofficeDesktop < Formula
   # Apache-2.0 upstream with tap-authored packaging on the CPF-Electron runtime
   # (mixed MIT/BSD/LGPL).
   license :cannot_represent
+  revision 1
 
   livecheck do
     url :stable
@@ -207,7 +208,7 @@ class GenofficeDesktop < Formula
       "id"             => "social4hyq/core/genoffice-desktop",
       "artifact"       => {
         "format"       => "hap",
-        "path"         => "../../libexec/genoffice-desktop-unsigned.hap",
+        "path"         => "../../../libexec/genoffice-desktop-unsigned.hap",
         "sha256"       => hap_sha,
         "api"          => 12,
         "abis"         => ["arm64-v8a"],

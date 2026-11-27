@@ -6,6 +6,7 @@ class OpencodeDesktop < Formula
   # Tap-authored shell sources (MIT) on the CPF-Electron runtime (mixed
   # MIT/BSD/LGPL).
   license :cannot_represent
+  revision 1
 
   livecheck do
     url :stable
@@ -180,7 +181,7 @@ class OpencodeDesktop < Formula
       "id"             => "social4hyq/core/opencode-desktop",
       "artifact"       => {
         "format"       => "hap",
-        "path"         => "../../libexec/opencode-desktop-unsigned.hap",
+        "path"         => "../../../libexec/opencode-desktop-unsigned.hap",
         "sha256"       => hap_sha,
         "api"          => 12,
         "abis"         => ["arm64-v8a"],

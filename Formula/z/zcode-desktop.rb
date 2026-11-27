@@ -6,10 +6,10 @@ class ZcodeDesktop < Formula
   url "https://github.com/zai-org/ZCode.git",
       revision: "a4b4445141eb7d3b3e99eada9292775383bfc44e"
   version "4.0.0"
-  revision 1
   # Tap-authored shell scripts (MIT) on the CPF-Electron runtime (mixed
   # MIT/BSD/LGPL).
   license :cannot_represent
+  revision 2
 
   livecheck do
     url "https://raw.githubusercontent.com/zai-org/ZCode/main/package.json"
@@ -207,7 +207,7 @@ class ZcodeDesktop < Formula
       "id"             => "social4hyq/core/zcode-desktop",
       "artifact"       => {
         "format"       => "hap",
-        "path"         => "../../libexec/zcode-desktop-unsigned.hap",
+        "path"         => "../../../libexec/zcode-desktop-unsigned.hap",
         "sha256"       => hap_sha,
         "api"          => 12,
         "abis"         => ["arm64-v8a"],

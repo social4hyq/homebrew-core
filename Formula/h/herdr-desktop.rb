@@ -4,7 +4,7 @@ class HerdrDesktop < Formula
   url "https://github.com/herdrdev/herdr-app/archive/refs/tags/v0.1.18.tar.gz"
   sha256 "0c442fd54231dee2aca661661b50f4177ca04b55966c572f26cf06c629e9e59d"
   license "Apache-2.0"
-  revision 6
+  revision 7
 
   livecheck do
     url "https://github.com/herdrdev/herdr-app.git"
@@ -196,7 +196,7 @@ class HerdrDesktop < Formula
       "id"             => "social4hyq/core/herdr-desktop",
       "artifact"       => {
         "format"       => "hap",
-        "path"         => "../../libexec/herdr-desktop-unsigned.hap",
+        "path"         => "../../../libexec/herdr-desktop-unsigned.hap",
         "sha256"       => hap_sha,
         "api"          => 12,
         "abis"         => ["arm64-v8a"],

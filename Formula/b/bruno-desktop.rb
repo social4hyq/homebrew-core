@@ -8,7 +8,7 @@ class BrunoDesktop < Formula
       using: :nounzip
   sha256 "0264f6bd80deec178e89bdbe229e41747fa59e6fce1ef9bf9f3764924f362d7c"
   license "MIT"
-  revision 3
+  revision 4
 
   livecheck do
     url :stable
@@ -141,7 +141,7 @@ class BrunoDesktop < Formula
       "id"             => "social4hyq/core/bruno-desktop",
       "artifact"       => {
         "format"       => "hap",
-        "path"         => "../../libexec/bruno-desktop-unsigned.hap",
+        "path"         => "../../../libexec/bruno-desktop-unsigned.hap",
         "sha256"       => hap_sha,
         "api"          => 12,
         "abis"         => ["arm64-v8a"],

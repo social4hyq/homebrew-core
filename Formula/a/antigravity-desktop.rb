@@ -5,7 +5,7 @@ class AntigravityDesktop < Formula
       "2.34.0-5887025308631040/linux-arm/Antigravity.tar.gz"
   sha256 "91f31ce50c795e0571e7922511119ff3e7afc2ee4f640a97d69dbad2063c1866"
   license :cannot_represent # Google Terms of Service; closed-source prebuilt desktop app
-  revision 11
+  revision 12
 
   livecheck do
     url :homepage
@@ -128,7 +128,7 @@ class AntigravityDesktop < Formula
       "id"             => "social4hyq/core/antigravity-desktop",
       "artifact"       => {
         "format"       => "hap",
-        "path"         => "../../libexec/antigravity-desktop-unsigned.hap",
+        "path"         => "../../../libexec/antigravity-desktop-unsigned.hap",
         "sha256"       => hap_sha,
         "api"          => 12,
         "abis"         => ["arm64-v8a"],

@@ -4,7 +4,7 @@ class MagpieDesktop < Formula
   url "https://github.com/yetone/magpie/archive/refs/tags/v0.1.4828.tar.gz"
   sha256 "6db17effe70b15e25991c0524f81b1233361ffa287b50b982e3977d7d215cd30"
   license :cannot_represent
-  revision 1
+  revision 2
 
   livecheck do
     url :stable
@@ -167,7 +167,7 @@ class MagpieDesktop < Formula
       "id"             => "social4hyq/core/magpie-desktop",
       "artifact"       => {
         "format"       => "hap",
-        "path"         => "../../libexec/magpie-desktop-unsigned.hap",
+        "path"         => "../../../libexec/magpie-desktop-unsigned.hap",
         "sha256"       => hap_sha,
         "api"          => 12,
         "abis"         => ["arm64-v8a"],

@@ -4,7 +4,7 @@ class SnowShotDesktop < Formula
   url "https://github.com/mg-chao/snow-shot/archive/refs/tags/v1.6.5_snow-shot.tar.gz"
   sha256 "125059b53d029b9fba8307868595c2eed478b4bf129b88c22d4a4dbb0f30c0d6"
   license "GPL-3.0-or-later"
-  revision 1
+  revision 2
 
   livecheck do
     url "https://github.com/mg-chao/snow-shot.git"
@@ -388,7 +388,7 @@ class SnowShotDesktop < Formula
       "id"             => "social4hyq/core/snow-shot-desktop",
       "artifact"       => {
         "format"       => "hap",
-        "path"         => "../../libexec/snow-shot-desktop-unsigned.hap",
+        "path"         => "../../../libexec/snow-shot-desktop-unsigned.hap",
         "sha256"       => hap_sha,
         "api"          => 12,
         "abis"         => ["arm64-v8a"],

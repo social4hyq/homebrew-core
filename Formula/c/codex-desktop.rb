@@ -6,7 +6,7 @@ class CodexDesktop < Formula
   version "26.1120.50957"
   sha256 "d11adb9a13d21bc5f514885924207af0e8689a978328550e3a43895a69603d89"
   license :cannot_represent # OpenAI service and software terms
-  revision 1
+  revision 2
 
   livecheck do
     url "https://persistent.oaistatic.com/codex-app-prod/linux/deb/dists/stable/main/binary-arm64/Packages"
@@ -126,7 +126,7 @@ class CodexDesktop < Formula
       "id"             => "social4hyq/core/codex-desktop",
       "artifact"       => {
         "format"       => "hap",
-        "path"         => "../../libexec/codex-desktop-unsigned.hap",
+        "path"         => "../../../libexec/codex-desktop-unsigned.hap",
         "sha256"       => hap_sha,
         "api"          => 12,
         "abis"         => ["arm64-v8a"],

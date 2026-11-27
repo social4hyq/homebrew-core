@@ -3,8 +3,8 @@ class DeepseekHarnessDesktop < Formula
   homepage "https://github.com/deepseek-ai/deepseek-harness"
   url "https://github.com/deepseek-ai/deepseek-harness/archive/refs/tags/dsh-v0.2.3-alpha.2.tar.gz"
   sha256 "e3ae29a992f19f85294806e95b1bc0fef750ca23ce06b2d88944b4bc2a2b3064"
-  revision 1
   license :cannot_represent
+  revision 2
 
   livecheck do
     url "https://github.com/deepseek-ai/deepseek-harness.git"
@@ -175,7 +175,7 @@ class DeepseekHarnessDesktop < Formula
       "id"             => "social4hyq/core/deepseek-harness-desktop",
       "artifact"       => {
         "format"       => "hap",
-        "path"         => "../../libexec/deepseek-harness-desktop-unsigned.hap",
+        "path"         => "../../../libexec/deepseek-harness-desktop-unsigned.hap",
         "sha256"       => hap_sha,
         "api"          => 12,
         "abis"         => ["arm64-v8a"],

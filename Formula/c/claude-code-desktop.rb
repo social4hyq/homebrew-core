@@ -6,7 +6,7 @@ class ClaudeCodeDesktop < Formula
   version "6.28899.6"
   sha256 "239c20d218456cacc656d48382fd59116325ac679aa4e476377af1456ac85715"
   license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
-  revision 8
+  revision 9
 
   livecheck do
     url "https://downloads.claude.ai/claude-desktop/apt/stable/dists/stable/main/binary-arm64/Packages"
@@ -112,7 +112,7 @@ class ClaudeCodeDesktop < Formula
       "id"             => "social4hyq/core/claude-code-desktop",
       "artifact"       => {
         "format"       => "hap",
-        "path"         => "../../libexec/claude-code-desktop-unsigned.hap",
+        "path"         => "../../../libexec/claude-code-desktop-unsigned.hap",
         "sha256"       => hap_sha,
         "api"          => 12,
         "abis"         => ["arm64-v8a"],
