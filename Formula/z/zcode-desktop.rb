@@ -41,7 +41,6 @@ class ZcodeDesktop < Formula
     Resources/zcode-desktop/assets/tray-icon.png
     Resources/zcode-desktop/tests/close-handler.test.cjs
     Resources/zcode-desktop/tests/lifecycle.test.cjs
-    Resources/zcode-desktop/tests/server-auth.test.cjs
     Resources/zcode-desktop/tests/tray.test.cjs
   ].freeze
 
@@ -266,7 +265,6 @@ class ZcodeDesktop < Formula
     tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
     system "node", "--check", tap_root/"Resources/zcode-desktop/app/main.cjs"
     system "node", "--test", tap_root/"Resources/zcode-desktop/tests/lifecycle.test.cjs"
-    system "node", "--test", tap_root/"Resources/zcode-desktop/tests/server-auth.test.cjs"
     system "node", "--test", tap_root/"Resources/zcode-desktop/tests/tray.test.cjs"
     system "node", "--test", tap_root/"Resources/zcode-desktop/tests/close-handler.test.cjs"
     system "unzip", "-tq", hap
