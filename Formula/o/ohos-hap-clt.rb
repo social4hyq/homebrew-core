@@ -4,6 +4,7 @@ class OhosHapClt < Formula
   url "https://s3.oheco.org/command-line-tools/26.0.0.201/commandline-tools-harmonyos-26.0.0.201.tar.gz"
   sha256 "60929c00ae486cc038ea48145497ad34dbd4ac6a25c3f2fa895ce74afb4607f5"
   license :cannot_represent
+  revision 1
 
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-hap-clt-v26.0.0.201-r1"
@@ -26,7 +27,7 @@ class OhosHapClt < Formula
       const checksum = #{JSON.generate(stable.checksum.hexdigest)};
       const entries = #{JSON.generate(entries)};
       const curl = #{JSON.generate((formula_opt_bin("curl")/"curl").to_s)};
-      const tar = #{JSON.generate((formula_opt_bin("gnu-tar")/"gtar").to_s)};
+      const tar = #{JSON.generate((formula_opt_bin("gnu-tar")/(OS.mac? ? "gtar" : "tar")).to_s)};
     JS
       const crypto = require('node:crypto');
       const fs = require('node:fs');
@@ -92,5 +93,14 @@ class OhosHapClt < Formula
     (testpath/"staged").mkpath
     assert_match "EEXIST", shell_output("#{command} stage staged bad.tar.gz 2>&1", 1)
     assert_path_exists testpath/"staged"
+
+    (testpath/"command-line-tools/hvigor/bin/hvigorw.js").write "// Hvigor fixture"
+    (testpath/"command-line-tools/ohpm/bin/pm-cli.js").write "// OHPM fixture"
+    system "tar", "-czf", "fixture.tar.gz", "command-line-tools"
+    fixture_checksum = (testpath/"fixture.tar.gz").sha256
+    (testpath/"stage.cjs").write (libexec/"stage.cjs").read.sub(stable.checksum.hexdigest, fixture_checksum)
+    system formula_opt_bin("node")/"node", "stage.cjs", "stage", "staged tools", "fixture.tar.gz"
+    assert_equal "// Hvigor fixture", (testpath/"staged tools/hvigor/bin/hvigorw.js").read
+    assert_equal "// OHPM fixture", (testpath/"staged tools/ohpm/bin/pm-cli.js").read
   end
 end
