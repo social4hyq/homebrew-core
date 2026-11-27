@@ -9,6 +9,11 @@ class OhosApp < Formula
   sha256 "0f37124f93b2431ebba47ba7f8f91ceb8ec2324c02ae6689399aa5359e9b3a7e"
   license "MIT"
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-app-v1.0.0-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "613fc338ceb3b040dcc587a56753804435733bba53a66eced7770891b0be5a7f"
+  end
+
   depends_on "node"
   depends_on "ohos-device"
   depends_on "ohos-hap"
