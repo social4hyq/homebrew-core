@@ -12,6 +12,11 @@ class AntigravityDesktop < Formula
     regex(%r{antigravity-hub/(\d+(?:\.\d+)+)-\d+}i)
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/antigravity-desktop-v2.34.0-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "81c3caa6428e3938ac500e661467d04edc5a78c707ac282b3d9c0588f837cbef"
+  end
+
   depends_on "glibc"
   depends_on "node"
   depends_on "ohos-sdk-toolchains"
