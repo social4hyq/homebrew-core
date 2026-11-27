@@ -34,7 +34,7 @@ on:
   pull_request:
     branches: [main]
     paths: ['Formula/**', 'Patches/**', 'Resources/**',
-            '.github/scripts/check-hap-formulae.py', '.github/scripts/test-hap-install-lib.sh',
+            '.github/scripts/check-hap-formulae.py',
             '.github/scripts/detect-changes.sh', '.github/scripts/test-detect-changes.sh',
             '.github/scripts/test-waiting-page.sh', '.github/scripts/publish.sh',
             '.github/scripts/set-ci-label.sh']
@@ -96,8 +96,6 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Check HAP app formulae
         run: python3 .github/scripts/check-hap-formulae.py
-      - name: Test the shared install library
-        run: .github/scripts/test-hap-install-lib.sh
       - name: Test change detection
         run: .github/scripts/test-detect-changes.sh
       - name: Test the shared waiting page

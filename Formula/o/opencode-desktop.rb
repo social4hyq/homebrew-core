@@ -28,7 +28,6 @@ class OpencodeDesktop < Formula
 
   # The unused-resource audit requires literal tap paths.
   RESOURCE_FILES = %w[
-    Resources/_shared/hap-app/install-lib.sh
     Resources/_shared/waiting-page/render-waiting.cjs
     Resources/_shared/waiting-page/waiting.html.in
     Resources/opencode-desktop/app/config.json

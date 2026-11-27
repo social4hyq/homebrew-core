@@ -202,19 +202,6 @@ for line in "${CANDIDATES[@]}"; do
   fi
 
   case "$FORMULA" in
-    app-installer)
-      # npm ci can reuse the checked-in runtime lock only with the same direct dependencies.
-      LOCK_PACKAGE='node_modules/@deveco/deveco-cli-openharmony-arm64'
-      DEPENDENCIES='def deps: {dependencies: (.dependencies // {}), optionalDependencies: (.optionalDependencies // {})};'
-      LOCKED=$(jq -ceS --arg package "$LOCK_PACKAGE" "$DEPENDENCIES .packages[\$package] | select(. != null) | deps" \
-        Resources/app-installer/package-lock.json || true)
-      UPSTREAM=$(curl -fsSL --max-time 30 "https://registry.npmjs.org/@deveco%2fdeveco-cli-openharmony-arm64/$LATEST" \
-        | jq -ceS --arg version "$LATEST" "$DEPENDENCIES select(.version == \$version) | deps" || true)
-      if [[ -z "$LOCKED" || "$LOCKED" != "$UPSTREAM" ]]; then
-        echo "- ⏭️ $FORMULA $LATEST: could not verify the runtime lock against upstream; review dependencies manually" >> "$GITHUB_STEP_SUMMARY"
-        continue
-      fi
-      ;;
     herdr-app|herdr-core)
       # The Ghostty resource and its patch are tied to the upstream submodule commit.
       GHOSTTY=$(gh api "repos/herdrdev/$FORMULA/git/trees/v$LATEST?recursive=1" \
@@ -476,7 +463,7 @@ for line in "${CANDIDATES[@]}"; do
     continue
   fi
 
-  if [[ "$FORMULA" == deepseek-harness-desktop || "$FORMULA" == deepseek-harness-app ]]; then
+  if [[ "$FORMULA" == deepseek-harness-desktop ]]; then
     # brew test requires the shell package version to match the formula.
     # bump-formula-pr pushes by URL, so origin's remote-tracking ref may not
     # exist; take the lease expectation from the branch actually on GitHub.
