@@ -15,7 +15,7 @@ class OpencodeDesktop < Formula
 
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-desktop-v2.4.2-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "43b95a9be17ae8f70c33b459d60e799c821aa00c58a4464d6874474725729d84"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "372b2192979370663bac88f91023f59e4ef03528ed56c7d4adba422a04a719a7"
   end
 
   depends_on "curl"
