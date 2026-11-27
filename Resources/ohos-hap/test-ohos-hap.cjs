@@ -146,5 +146,60 @@ test("inspect: emits signed-hap source contract", () => {
   assert.equal(paste.grant_mode, "user_grant");
 });
 
+test("profile: add writes external-material profile with secret refs only", () => {
+  const cfg = path.join(tmp, "addcfg"); fs.mkdirSync(cfg, { recursive: true });
+  const store = mkfile("my.p12"), cert = mkfile("my.cer"), p7b = mkfile("my.p7b");
+  const res = run(["profile", "add", "ext2", "--keystore", store, "--cert", cert,
+    "--p7b", p7b, "--alias", "key0", "--store-password-ref", "env:STORE_PWD"],
+    { XDG_CONFIG_HOME: cfg });
+  assert.equal(res.status, 0, res.stderr);
+  const doc = JSON.parse(fs.readFileSync(path.join(cfg, "ohos-hap/profiles.json"), "utf8"));
+  assert.equal(doc.profiles.ext2.kind, "external-material");
+  assert.equal(doc.profiles.ext2.store_password_ref, "env:STORE_PWD");
+  assert.equal(JSON.stringify(doc).includes("STORE_PWD="), false); // no secret values, only refs
+});
+
+test("profile: add rejects inline password (not a ref)", () => {
+  const cfg = path.join(tmp, "addcfg2"); fs.mkdirSync(cfg, { recursive: true });
+  const store = mkfile("a.p12"), cert = mkfile("a.cer"), p7b = mkfile("a.p7b");
+  const res = run(["profile", "add", "bad", "--keystore", store, "--cert", cert,
+    "--p7b", p7b, "--alias", "key0", "--store-password-ref", "secret123"],
+    { XDG_CONFIG_HOME: cfg });
+  assert.notEqual(res.status, 0);
+  assert.match(res.stderr, /env: or file:/);
+});
+
+test("profile: add rejects missing material file", () => {
+  const cfg = path.join(tmp, "addcfg3"); fs.mkdirSync(cfg, { recursive: true });
+  const cert = mkfile("b.cer"), p7b = mkfile("b.p7b");
+  const res = run(["profile", "add", "bad2", "--keystore", path.join(tmp, "nope.p12"),
+    "--cert", cert, "--p7b", p7b, "--alias", "key0", "--store-password-ref", "env:X"],
+    { XDG_CONFIG_HOME: cfg });
+  assert.notEqual(res.status, 0);
+  assert.match(res.stderr, /file not found/);
+});
+
+test("profile: remove deletes the named profile", () => {
+  const cfg = path.join(tmp, "addcfg");
+  const res = run(["profile", "remove", "ext2"], { XDG_CONFIG_HOME: cfg });
+  assert.equal(res.status, 0, res.stderr);
+  const doc = JSON.parse(fs.readFileSync(path.join(cfg, "ohos-hap/profiles.json"), "utf8"));
+  assert.equal(doc.profiles.ext2, undefined);
+});
+
+test("profile: refresh stays explicit (no implicit vendor login)", () => {
+  const res = run(["profile", "refresh"]);
+  assert.notEqual(res.status, 0);
+  assert.match(res.stderr, /ERR_VENDOR_AUTH_REQUIRED/);
+});
+
+test("auth: status is explicit and holds no token", () => {
+  const res = run(["auth", "status"]);
+  assert.equal(res.status, 0);
+  const doc = JSON.parse(res.stdout.trim().split("\n").pop());
+  assert.equal(doc.subcommand, "status");
+  assert.match(doc.note, /explicit/);
+});
+
 console.log(`\n${passed} passed, ${failed} failed`);
 process.exit(failed ? 1 : 0);
