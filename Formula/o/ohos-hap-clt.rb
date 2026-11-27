@@ -7,8 +7,8 @@ class OhosHapClt < Formula
   revision 1
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-hap-clt-v26.0.0.201-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "1f205bdfcd17b224d1acd5e58226aefbeda0aeb7d646faacf3a1a955a2763515"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-hap-clt-v26.0.0.201-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "d65cb0095be5712211ba3ef3bc87326dee1f929ac8ec5b44fb3bdbe94646b03a"
   end
 
   depends_on "curl"
