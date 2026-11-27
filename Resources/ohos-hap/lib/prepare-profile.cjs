@@ -100,7 +100,7 @@ if (process.argv[2] === "--strip-dirs") {
     console.log(stripDirectoryEntries(process.argv[3], process.argv[4]));
     process.exit(0);
   } catch (error) {
-    console.error(`app-installer: ${error.message}`);
+    console.error(`ohos-hap: ${error.message}`);
     process.exit(1);
   }
 }
@@ -129,6 +129,6 @@ try {
     }
   }
 } catch (error) {
-  console.error(`app-installer: ${error.message}`);
+  console.error(`ohos-hap: ${error.message}`);
   process.exitCode = 1;
 }
