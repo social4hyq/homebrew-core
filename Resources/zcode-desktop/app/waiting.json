@@ -1,6 +1,6 @@
 {
   "name": "ZCode",
-  "command": "zcode-app",
+  "command": "ohos-app install zcode-desktop",
   "subtitle": "你的工作空间，正在就绪。",
   "accent": "6c83dc",
   "wash": "e9edff",
