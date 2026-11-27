@@ -131,8 +131,7 @@ test("doctor: reports argv residual risk note", () => {
 });
 
 test("inspect: emits signed-hap source contract", () => {
-  // 内嵌最小 zip（含 module.json），不依赖外部 zip 命令——CI 的 formula test
-  // 环境 PATH 只含该 formula 的依赖（ohos-hap 只依赖 node），没有 zip。
+  // A minimal inline zip containing module.json, so no external zip is needed.
   const b64 = "UEsDBBQAAAAIAFtRe11qvtbIegAAALYAAAALAAAAbW9kdWxlLmpzb26rVsrNTynNSVWyqlYqSi0sTS0uCUgtys0sLs7MzytWsoquVspLzAVKK+Vn5BfrFcDl9Dz9QlyD/FxDlGp1cKpxDg0O8feND3b0c3Hyj8CnMsjV0SU+wDE4xNXJ3zHIRUlHKb0oMa/ENz8FpLq0OLUoHiygVBtbW8sFAFBLAQIeAxQAAAAIAFtRe11qvtbIegAAALYAAAALAAAAAAAAAAEAAAC0gQAAAABtb2R1bGUuanNvblBLBQYAAAAAAQABADkAAACjAAAAAAA=";
   const hap = path.join(tmp, "inspect.hap");
   fs.writeFileSync(hap, Buffer.from(b64, "base64"));
