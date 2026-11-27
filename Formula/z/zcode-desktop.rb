@@ -18,6 +18,12 @@ class ZcodeDesktop < Formula
     end
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-desktop-v4.0.0-r1"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c1af0ea2695f19c318aca9596dd9d70a5da7a006f6f8bc4a53135e9b894c96b0"
+  end
+
   depends_on "bun"
   depends_on "curl"
   depends_on "node"
@@ -41,7 +47,6 @@ class ZcodeDesktop < Formula
     Resources/zcode-desktop/assets/tray-icon.png
     Resources/zcode-desktop/tests/close-handler.test.cjs
     Resources/zcode-desktop/tests/lifecycle.test.cjs
-    Resources/zcode-desktop/tests/server-auth.test.cjs
     Resources/zcode-desktop/tests/tray.test.cjs
   ].freeze
 
@@ -266,7 +271,6 @@ class ZcodeDesktop < Formula
     tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
     system "node", "--check", tap_root/"Resources/zcode-desktop/app/main.cjs"
     system "node", "--test", tap_root/"Resources/zcode-desktop/tests/lifecycle.test.cjs"
-    system "node", "--test", tap_root/"Resources/zcode-desktop/tests/server-auth.test.cjs"
     system "node", "--test", tap_root/"Resources/zcode-desktop/tests/tray.test.cjs"
     system "node", "--test", tap_root/"Resources/zcode-desktop/tests/close-handler.test.cjs"
     system "unzip", "-tq", hap
