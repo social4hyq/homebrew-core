@@ -1,3 +1,8 @@
 {
-  "hap-installer": "app-installer"
+  "hap-installer": "app-installer",
+  "zcode-desktop": "zcode-app",
+  "obsidian-desktop": "obsidian-app",
+  "multica-desktop": "multica-app",
+  "snow-shot": "snow-shot-app",
+  "antigravity-ide": "antigravity-ide-app"
 }
