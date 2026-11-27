@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/social4hyq/homebrew-core/contracts/ohos-app/v1/device/install-event.schema.json",
+  "title": "NDJSON event envelope — every line on the device event stream",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocol_version", "type"],
+  "properties": {
+    "protocol_version": { "const": 1 },
+    "type": { "enum": ["install_state", "install_result", "progress"] },
+    "data": { "type": "object" }
+  },
+  "description": "Exactly one terminal record (install_result) per operation. Truncated/malformed NDJSON, or exit-code/terminal-record mismatch, is a contract violation."
+}

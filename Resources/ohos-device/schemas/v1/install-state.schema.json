@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/social4hyq/homebrew-core/contracts/ohos-app/v1/device/install-state.schema.json",
+  "title": "InstallState — structured intermediate state (awaiting_user_confirmation etc.)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocol_version", "type", "operation_id", "backend", "state", "observed_at"],
+  "properties": {
+    "protocol_version": { "const": 1 },
+    "type": { "const": "install_state" },
+    "operation_id": { "type": "string", "description": "opaque OS/backend handle, or empty if unsupported" },
+    "backend": { "enum": ["hdc", "sideload"] },
+    "device": { "type": "string" },
+    "state": { "enum": ["awaiting_user_confirmation", "installing", "installed", "rejected", "cancelled", "failed", "unknown"] },
+    "observed_at": { "type": "string", "description": "RFC3339" },
+    "bundle": { "type": "object" },
+    "error": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code"],
+      "properties": { "code": { "type": "string" }, "detail": { "type": "string" } }
+    }
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/social4hyq/homebrew-core/contracts/ohos-app/v1/device/install-result.schema.json",
+  "title": "install_result — final record with post-install verification",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocol_version", "type", "operation_id", "backend", "state", "error"],
+  "properties": {
+    "protocol_version": { "const": 1 },
+    "type": { "const": "install_result" },
+    "operation_id": { "type": "string" },
+    "backend": { "enum": ["hdc", "sideload"] },
+    "state": { "enum": ["installed", "rejected", "cancelled", "failed", "unknown"] },
+    "bundle": {
+      "type": "object",
+      "properties": {
+        "bundle_id": { "type": "string" },
+        "version_name": { "type": "string" },
+        "version_code": { "type": "integer" }
+      }
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "false or null(unknown, with unsupported flag); never fabricate true",
+      "properties": {
+        "bundle_matched": { "type": ["boolean", "null"] },
+        "version_matched": { "type": ["boolean", "null"] },
+        "certificate_matched": { "type": ["boolean", "null"] },
+        "permissions_matched": { "type": ["boolean", "null"] },
+        "unsupported": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "error": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["code"],
+      "properties": { "code": { "type": "string" }, "detail": { "type": "string" } }
+    }
+  }
+}
