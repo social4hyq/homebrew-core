@@ -5,6 +5,11 @@ class OhosHapClt < Formula
   sha256 "60929c00ae486cc038ea48145497ad34dbd4ac6a25c3f2fa895ce74afb4607f5"
   license :cannot_represent
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-hap-clt-v26.0.0.201-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "1f205bdfcd17b224d1acd5e58226aefbeda0aeb7d646faacf3a1a955a2763515"
+  end
+
   depends_on "curl"
   depends_on "gnu-tar"
   depends_on "node"
