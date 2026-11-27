@@ -10,9 +10,12 @@ name: pr-validate
 # workflow (a new commit landed on the PR branch); detect-changes.sh
 # recognizes its own bottle write-back commit and short-circuits to an empty
 # build/changed/heavy set, so the second run is fast and does nothing.
-# Labels the PR ci-passed once lint-commits + light-check + build all pass
-# (light-check/build tolerate skip, e.g. self-triggered runs or
-# heavy-formula-only PRs; lint-commits always actually runs and must pass).
+# Sets/clears the ci-passed label from the real gate state: the label job runs
+# with `if: always()` and both adds and removes the label, so a failing run
+# never leaves a stale green label behind. It also withholds ci-passed when any
+# commit in the PR has a failing gate check — a bottle write-back commit
+# re-triggers this workflow with light-check/build skipped, which otherwise
+# launders a failed PR into ci-passed.
 #
 # lint-commits (adapted from Harmonybrew/ci's _check_commit_message):
 # validates every human commit's first line against this tap's convention
@@ -33,7 +36,8 @@ on:
     paths: ['Formula/**', 'Patches/**', 'Resources/**',
             '.github/scripts/check-hap-formulae.py', '.github/scripts/test-hap-install-lib.sh',
             '.github/scripts/detect-changes.sh', '.github/scripts/test-detect-changes.sh',
-            '.github/scripts/test-waiting-page.sh', '.github/scripts/publish.sh']
+            '.github/scripts/test-waiting-page.sh', '.github/scripts/publish.sh',
+            '.github/scripts/set-ci-label.sh']
 
 defaults:
   run:
@@ -224,21 +228,24 @@ jobs:
 
   label:
     needs: [lint-commits, hap-checks, detect, light-check, build]
-    # light-check/build are conditionally skipped when their input list is
-    # empty; treat skipped as pass so a PR that only touches one category
-    # (e.g. light-check-only heavy formula) still gets labeled. lint-commits
-    # always actually runs, so it must be a hard 'success', not skip-tolerant.
-    if: |
-      always() &&
-      needs.lint-commits.result == 'success' &&
-      needs.hap-checks.result == 'success' &&
-      (needs.light-check.result == 'success' || needs.light-check.result == 'skipped') &&
-      (needs.build.result == 'success' || needs.build.result == 'skipped')
+    # Always run so a failing run clears a stale ci-passed label (force-push,
+    # rerun and bottle write-back all used to leave a green label on a red PR).
+    # The script does the real gating: current-run results plus a history check
+    # of every commit's gate checks, which catches the bottle write-back
+    # self-trigger whose light-check/build are skipped.
+    if: always()
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
-      - name: Label ci-passed
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Set ci-passed label from real gate state
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
           PR: ${{ github.event.pull_request.number }}
-        run: gh pr edit "$PR" --add-label ci-passed --repo "${{ github.repository }}"
+          LINT: ${{ needs.lint-commits.result }}
+          HAP: ${{ needs.hap-checks.result }}
+          DETECT: ${{ needs.detect.result }}
+          LIGHT: ${{ needs.light-check.result }}
+          BUILD: ${{ needs.build.result }}
+        run: .github/scripts/set-ci-label.sh
