@@ -42,7 +42,7 @@ function parseArgs(args) {
     if (k.startsWith("--")) {
       const v = args[++i];
       if (!v) fail("ERR_INVALID_REQUEST", `missing value for ${k}`);
-      o[k.slice(2)] = v;
+      o[k.slice(2).replace(/-/g, "_")] = v;
     } else o._.push(k);
   }
   return o;
@@ -222,27 +222,99 @@ function cmdDoctor() {
     note: "argv password residual risk on current SDK; see docs/signing-argv-protection-findings.md" });
 }
 
+function profilesFile() {
+  const root = process.env.XDG_CONFIG_HOME || path.join(process.env.HOME || "", ".config");
+  return path.join(root, "ohos-hap", "profiles.json");
+}
+
+function readProfiles() {
+  const f = profilesFile();
+  if (!fs.existsSync(f)) return { profiles: {} };
+  try { return JSON.parse(fs.readFileSync(f, "utf8")); }
+  catch (e) { fail("ERR_INVALID_REQUEST", `cannot parse profiles.json: ${e.message}`); }
+}
+
+function writeProfiles(doc) {
+  const f = profilesFile();
+  fs.mkdirSync(path.dirname(f), { recursive: true });
+  fs.writeFileSync(f, JSON.stringify(doc, null, 2) + "\n", { mode: 0o600 });
+}
+
 function cmdProfile(o) {
   const sub = o._[1];
   if (!sub) fail("ERR_INVALID_REQUEST", "profile needs a subcommand");
   if (sub === "list" || sub === "show") {
-    const root = process.env.XDG_CONFIG_HOME || path.join(process.env.HOME || "", ".config");
-    const f = path.join(root, "ohos-hap", "profiles.json");
-    const doc = fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, "utf8")) : { profiles: {} };
+    const doc = readProfiles();
     if (sub === "show" && o._[2]) out(doc.profiles?.[o._[2]] || null);
     else out(doc.profiles || {});
     return;
   }
+  if (sub === "add") {
+    const name = o._[2];
+    if (!name) fail("ERR_INVALID_REQUEST", "profile add needs <name>");
+    const doc = readProfiles();
+    if (doc.profiles?.[name]) fail("ERR_INVALID_REQUEST", `profile already exists: ${name}`);
+    const kind = o.kind || "external-material";
+    if (kind !== "external-material") {
+      fail("ERR_UNSUPPORTED_PROTOCOL", `profile add supports only external-material (got ${kind})`);
+    }
+    const fields = [
+      ["keystore_path", o.keystore, "keystore"],
+      ["certificate_path", o.cert, "cert"],
+      ["p7b_path", o.p7b, "p7b"],
+      ["key_alias", o.alias, "alias"],
+      ["store_password_ref", o.store_password_ref, "store-password-ref"],
+    ];
+    const required = {};
+    for (const [key, value, flag] of fields) {
+      if (!value) fail("ERR_INVALID_REQUEST", `profile add needs --${flag}`);
+      required[key] = value;
+    }
+    if (!/^(env:|file:)/.test(required.store_password_ref)) {
+      fail("ERR_INVALID_REQUEST", "store_password_ref must be an env: or file: reference");
+    }
+    checkFiles(required, ["keystore_path", "certificate_path", "p7b_path"]);
+    const profile = {
+      kind, keystore_path: required.keystore_path, certificate_path: required.certificate_path,
+      p7b_path: required.p7b_path, key_alias: required.key_alias,
+      store_password_ref: required.store_password_ref,
+    };
+    if (o.key_password_ref) {
+      if (!/^(env:|file:)/.test(o.key_password_ref)) fail("ERR_INVALID_REQUEST", "key_password_ref must be an env: or file: reference");
+      profile.key_password_ref = o.key_password_ref;
+    }
+    if (o.signer) profile.signer_path = o.signer;
+    if (o.sign_alg) profile.sign_alg = o.sign_alg;
+    if (o.bundle_id) profile.bundle_id = o.bundle_id;
+    doc.profiles = doc.profiles || {};
+    doc.profiles[name] = profile;
+    writeProfiles(doc);
+    out({ protocol_version: 1, added: name, profile });
+    return;
+  }
+  if (sub === "remove") {
+    const name = o._[2];
+    if (!name) fail("ERR_INVALID_REQUEST", "profile remove needs <name>");
+    const doc = readProfiles();
+    if (!doc.profiles?.[name]) fail("ERR_INVALID_REQUEST", `unknown signing profile: ${name}`);
+    delete doc.profiles[name];
+    writeProfiles(doc);
+    out({ protocol_version: 1, removed: name });
+    return;
+  }
   if (sub === "refresh") {
-    // Explicit vendor login/refresh only; never called from sign.
-    fail("ERR_VENDOR_AUTH_REQUIRED", "profile refresh requires an interactive vendor auth flow (not implemented in this contract layer)");
+    // Vendor login and profile generation stay explicit and out of this layer.
+    // Sign never calls this; the vendor CLI must be driven by the user.
+    fail("ERR_VENDOR_AUTH_REQUIRED", "vendor-debug material must be prepared by the vendor CLI; use `profile add <name> --kind external-material` with your own material");
   }
   fail("ERR_INVALID_REQUEST", `unsupported profile subcommand: ${sub}`);
 }
 
 function cmdAuth(o) {
-  const sub = o._[1];
-  out({ protocol_version: 1, subcommand: sub || "status",
+  const sub = o._[1] || "status";
+  // Vendor auth is explicit and delegated to the vendor CLI. This layer holds
+  // no tokens and starts no interactive flow from sign/install.
+  out({ protocol_version: 1, subcommand: sub,
     note: "vendor auth is explicit; delegated to the vendor CLI, never implicit from sign/install" });
 }
 
