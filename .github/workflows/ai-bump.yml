@@ -13,8 +13,16 @@ name: ai-bump
 # The push uses BOT_PUSH_TOKEN, not GITHUB_TOKEN: a GITHUB_TOKEN push triggers
 # no workflow (GitHub anti-recursion), and the AI-fixed head MUST go through
 # pr-validate again for a real gate verdict. bump-* branches authored by the
-# bot land in action_required on that re-run; automerge-autobump.yml's hourly
-# scanner auto-approves them (same fallback as bottle write-back pushes).
+# bot land in action_required on that re-run. automerge-autobump.yml's hourly
+# scanner approves only allowlisted bump branches; HAP/app branches (matched
+# by BUMP_MANUAL_RE or outside the allowlist) stay parked for a human, which
+# is the intended device-verification gate — approve those runs manually.
+#
+# The container is started with the changed formula's CI image from
+# OHOS_CI_IMAGE_OVERRIDES (via `ai_bump.py --resolve-image`), matching the
+# image pr-validate uses to produce bottles. HAP/Electron formulae need the
+# private CLT/SDK in that image for `brew test` to be verifiable; with the
+# default image the AI cannot confirm a fix and always self-declares failure.
 #
 # SECURITY BOUNDARY (same as upstream ai_bump.py): the container runs
 # AI-generated commands plus PR-supplied code; the ONLY secret passed into it
@@ -78,7 +86,27 @@ jobs:
           for spec in "request-ai-bump:7057ff" "ai-running:fbca04" "ai-success:0e8a16" "ai-failed:d93f0b"; do
             gh label create "${spec%%:*}" --color "${spec##*:}" --force
           done
+      - name: Resolve CI image for the changed formula
+        id: resolve-image
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          OVERRIDES: ${{ vars.OHOS_CI_IMAGE_OVERRIDES }}
+          DEFAULT_IMAGE: ${{ vars.OHOS_CI_IMAGE }}
+        run: |
+          python3 .github/scripts/ai_bump.py --resolve-image || {
+            echo "::warning::CI image resolution failed; falling back to the default image"
+            echo "image=$DEFAULT_IMAGE" >> "$GITHUB_OUTPUT"
+          }
       - name: Start OHOS container
+        env:
+          # HAP/Electron formulae need the private image (with the matching
+          # CLT/SDK) for `brew test` to be verifiable; otherwise the AI can
+          # never confirm a fix and always self-declares failure. Step-level
+          # IMAGE overrides the workflow-level default. GHCR_TOKEN mirrors
+          # bottle-build.yml so private ghcr images can be pulled.
+          IMAGE: ${{ steps.resolve-image.outputs.image }}
+          GHCR_TOKEN: ${{ secrets.GHCR_PULL_TOKEN != '' && secrets.GHCR_PULL_TOKEN || secrets.GITHUB_TOKEN }}
         run: .github/scripts/setup-container.sh
       - name: Run AI fix and push result
         env:
