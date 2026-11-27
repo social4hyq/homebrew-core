@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/social4hyq/homebrew-core/contracts/ohos-app/v1/l2/assembly-request.schema.json",
+  "title": "assembly request — engine → assembler plugin",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocol_version", "unsigned_hap", "out_hap", "variant", "abi", "tree"],
+  "properties": {
+    "protocol_version": { "const": 1 },
+    "unsigned_hap": { "type": "string", "description": "verified content-addressed path" },
+    "out_hap": { "type": "string" },
+    "variant": { "type": "string" },
+    "abi": { "type": "string" },
+    "api": { "type": "integer" },
+    "tree": { "type": "string", "description": "0700 private staging dir for injected files" },
+    "verified_artifacts": { "type": "object", "description": "name → verified path (no URLs, no secrets)" },
+    "config": { "type": "object", "description": "closed, non-secret config only" }
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/social4hyq/homebrew-core/contracts/ohos-app/v1/descriptor/app.schema.json",
+  "title": "app.json v1 — desktop HAP delivery manifest (declarative)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "id", "artifact", "launch", "variants"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._/+@-]*$", "description": "canonical formula full name, e.g. social4hyq/core/codex-desktop; CI enforces equality" },
+    "requires": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": { "features": { "type": "array", "items": { "type": "string" }, "uniqueItems": true } }
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["format", "path", "sha256", "bundle_id", "version_name", "version_code"],
+      "properties": {
+        "format": { "const": "hap" },
+        "path": { "type": "string", "description": "relative to manifest dir; must resolve inside canonical keg" },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "api": { "type": "integer", "minimum": 1 },
+        "abis": { "type": "array", "items": { "type": "string" } },
+        "bundle_id": { "type": "string", "pattern": "^[a-zA-Z][a-zA-Z0-9._]*$" },
+        "version_name": { "type": "string", "minLength": 1 },
+        "version_code": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "launch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["module", "ability"],
+      "properties": {
+        "module": { "type": "string", "minLength": 1 },
+        "ability": { "type": "string", "minLength": 1 }
+      }
+    },
+    "variants": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["default", "definitions"],
+      "properties": {
+        "default": { "type": "string", "minLength": 1 },
+        "definitions": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "module_overlay": { "type": "string" },
+              "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+            }
+          }
+        }
+      }
+    },
+    "sources": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": { "lockfile": { "type": "string" } }
+    },
+    "assembly": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["protocol", "plugin"],
+      "properties": {
+        "protocol": { "type": "integer", "const": 1 },
+        "plugin": { "type": "string" },
+        "config": { "type": "object" }
+      }
+    },
+    "personalization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["protocol", "plugin"],
+      "properties": {
+        "protocol": { "type": "integer", "const": 1 },
+        "plugin": { "type": "string" },
+        "required_config": { "type": "string" }
+      }
+    }
+  },
+  "allOf": [
+    { "if": { "properties": { "variants": { "properties": { "default": { "const": "acl" } } } } },
+      "then": { "properties": { "variants": { "properties": { "definitions": { "required": ["acl"] } } } } } }
+  ]
+}

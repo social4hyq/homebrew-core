@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/social4hyq/homebrew-core/contracts/ohos-app/v1/descriptor/sources-lock.schema.json",
+  "title": "sources.lock.json v1 — external vendor artifacts (pinned)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "sources"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "sources": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["urls", "sha256", "size", "filename", "license"],
+        "properties": {
+          "urls": { "type": "array", "minItems": 1, "items": { "type": "string", "format": "uri" }, "description": "no long-lived token in URL; auth via separate credential provider" },
+          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "size": { "type": "integer", "minimum": 1 },
+          "filename": { "type": "string", "pattern": "^[A-Za-z0-9._+-]+$" },
+          "target": { "type": "string" },
+          "license": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}

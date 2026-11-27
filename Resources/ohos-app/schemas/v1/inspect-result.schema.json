@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/social4hyq/homebrew-core/contracts/ohos-app/v1/sign/inspect-result.schema.json",
+  "title": "inspect result — permissions derived from final signed HAP",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["source", "requested_permissions"],
+  "properties": {
+    "source": { "const": "signed-hap", "description": "must be derived from final signed HAP, not app.json/overlay" },
+    "variant": { "type": "string" },
+    "requested_permissions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "grant_mode"],
+        "properties": {
+          "name": { "type": "string" },
+          "grant_mode": { "enum": ["system_grant", "user_grant"] },
+          "acl": { "type": "boolean" },
+          "reason": { "type": "string" },
+          "used_scene": { "type": "object" }
+        }
+      }
+    }
+  }
+}

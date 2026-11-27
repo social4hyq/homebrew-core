@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/social4hyq/homebrew-core/contracts/ohos-app/v1/plugins/assembler.schema.json",
+  "title": "assembler plugin contract — no network, no device, no host write, deterministic",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocol", "input", "output"],
+  "properties": {
+    "protocol": { "const": 1 },
+    "input": { "$ref": "https://github.com/social4hyq/homebrew-core/contracts/ohos-app/v1/l2/assembly-request.schema.json" },
+    "output": { "$ref": "https://github.com/social4hyq/homebrew-core/contracts/ohos-app/v1/l2/assembly-result.schema.json" },
+    "forbidden": { "type": "array", "const": ["brew", "ohos-app", "ohos-hap", "ohos-device", "network", "device", "persistent_process"] }
+  }
+}
