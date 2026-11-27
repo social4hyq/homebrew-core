@@ -12,11 +12,6 @@ class GenofficeDesktop < Formula
     strategy :github_latest
   end
 
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/genoffice-desktop-v0.13.886-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9d6ac9f7a5ce9fc8342e3f74df2f62e168ce857dda0ed184cd77b87dbff7058c"
-  end
-
   depends_on "genoffice" => :build
   depends_on "node"
   depends_on "ohos-sdk-toolchains"
@@ -194,17 +189,14 @@ class GenofficeDesktop < Formula
     end
     (pkgshare/"module-acl.json").write JSON.generate(module_json)
 
-    # 清场：不再交付自造的 `genoffice-app` 装机命令，也不再做 post_install
-    # 自动装机。桌面 HAP 通过 app.json descriptor 交付，由用户显式
-    # `ohos-app install genoffice-desktop` 部署。上游 CLI `genoffice` 保持独立。
-
-    # Descriptor：构建期写入实际 HAP 摘要与版本，放 pkgshare/ohos/app.json，
-    # ohos-app 从 opt/<formula>/share/<formula>/ohos/app.json 发现它。
+    # The HAP is delivered through app.json; deployment is an explicit
+    # `ohos-app install genoffice-desktop`. The upstream CLI stays independent.
+    # Descriptor is written at build time with the real HAP digest and version.
     (pkgshare/"ohos").mkpath
     hap = libexec/"genoffice-desktop-unsigned.hap"
     hap_sha = Digest::SHA256.file(hap).hexdigest
     JSON.parse(Utils.safe_popen_read("unzip", "-p", hap, "module.json"))
-    version_code = 1 # HAP 当前无 versionCode 字段；app.json 以此为准
+    version_code = 1 # The HAP has no versionCode field; app.json is authoritative.
     descriptor = {
       "schema_version" => 1,
       "id"             => "social4hyq/core/genoffice-desktop",
@@ -232,11 +224,10 @@ class GenofficeDesktop < Formula
   end
 
   test do
-    # 清场：不再有自造的 genoffice-app 装机命令；上游 CLI `genoffice` 由
-    # 独立 formula 交付。本 formula 只交付 HAP + descriptor。
+    # Only the HAP and descriptor are delivered; no app-level install command.
     refute_path_exists bin/"genoffice-app"
 
-    # descriptor 校验：schema/id/摘要/变体必须与 HAP 一致。
+    # Descriptor schema, id, digest and variants must match the HAP.
     descriptor = JSON.parse((pkgshare/"ohos/app.json").read)
     assert_equal 1, descriptor["schema_version"]
     assert_equal "social4hyq/core/genoffice-desktop", descriptor["id"]
