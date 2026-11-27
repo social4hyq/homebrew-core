@@ -12,9 +12,8 @@ class DeepseekHarnessDesktop < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/deepseek-harness-desktop-v0.2.3-alpha.2-r5"
-    rebuild 3
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "762e49c915d640819e7f260b666f58726057559f75998627bbe5f2ac33bf2c2d"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/deepseek-harness-desktop-v0.2.3-alpha.2-r6"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7ab974e68c25a385efeae30824fec0f54cab88122eac95868cc71ff5dcdc7070"
   end
 
   depends_on "coreutils"
