@@ -1,0 +1,189 @@
+name: next-private-ci
+
+# PR 0b：私有构建与发布演练。
+# 目标：在 next 分支上构建新架构组件/迁移 app，bottle 指向私有 root_url，
+# 下游从私有 bottle pour（不是 source fallback），全程零公开 tag/release、
+# 零回写 main。设计见 docs/ohos-app-private-ci-design.md。
+#
+# 直接内联 bottle-build.yml 的构建链（setup-container → build → test-gate →
+# bottle → upload-artifact），但 upload=false 且注入 PRIVATE_ROOT_URL。
+# 不复用 reusable workflow 是因为 job 级 uses 不能带 matrix strategy。
+# 本工作流本身不发布任何资产、不写回任何分支。
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Source branch to build from (must NOT be main)'
+        required: true
+        type: string
+        default: 'next'
+      formulae:
+        description: 'Comma-separated formula names to build, in dependency order'
+        required: true
+        type: string
+      private_root_url:
+        description: 'Private bottle root URL (bottle JSON root_url points here)'
+        required: true
+        type: string
+      verify_downstream:
+        description: 'Run the downstream pour verification (needs a second formula)'
+        required: false
+        type: boolean
+        default: false
+      downstream_formula:
+        description: 'Downstream formula that depends on the first built formula'
+        required: false
+        type: string
+        default: ''
+  workflow_call:
+    inputs:
+      branch:
+        required: true
+        type: string
+      formulae:
+        required: true
+        type: string
+      private_root_url:
+        required: true
+        type: string
+      verify_downstream:
+        required: false
+        type: boolean
+        default: false
+      downstream_formula:
+        required: false
+        type: string
+        default: ''
+
+defaults:
+  run:
+    shell: bash -euo pipefail {0}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: next-private-ci-${{ inputs.branch }}
+  cancel-in-progress: false
+
+jobs:
+  guard:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 5
+    outputs:
+      formulae_json: ${{ steps.parse.outputs.formulae_json }}
+      downstream: ${{ steps.parse.outputs.downstream }}
+    env:
+      BRANCH: ${{ inputs.branch }}
+      FORMULAE: ${{ inputs.formulae }}
+      PRIVATE_ROOT_URL: ${{ inputs.private_root_url }}
+      DOWNSTREAM_FORMULA: ${{ inputs.downstream_formula }}
+    steps:
+      - name: Validate and parse inputs
+        id: parse
+        run: |
+          [[ "$BRANCH" =~ ^[A-Za-z0-9._/-]+$ ]] || { echo "::error::invalid branch"; exit 1; }
+          [[ "$BRANCH" != "main" && "$BRANCH" != "master" ]] \
+            || { echo "::error::next-private-ci must not run on main/master"; exit 1; }
+          [[ -n "$PRIVATE_ROOT_URL" ]] || { echo "::error::private_root_url is required"; exit 1; }
+          [[ "$PRIVATE_ROOT_URL" != *atomgit.com* ]] \
+            || { echo "::error::private_root_url must not point at the public atomgit release host"; exit 1; }
+          [[ "$FORMULAE" =~ ^[A-Za-z0-9@+._,-]+$ ]] || { echo "::error::invalid formulae list"; exit 1; }
+          JSON=$(printf '%s' "$FORMULAE" | jq -Rc 'split(",") | map(select(length > 0))')
+          echo "formulae_json=$JSON" >> "$GITHUB_OUTPUT"
+          echo "downstream=$DOWNSTREAM_FORMULA" >> "$GITHUB_OUTPUT"
+          echo "branch=$BRANCH formulae=$JSON private_root=$PRIVATE_ROOT_URL"
+
+  build:
+    needs: guard
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 360
+    permissions:
+      contents: read
+      packages: read
+    env:
+      IMAGE: ${{ vars.OHOS_CI_IMAGE }}
+      CONTAINER: ohos
+      TAP_IN_CONTAINER: /storage/Users/currentUser/.harmonybrew/Homebrew/Library/Taps/social4hyq/homebrew-core
+      FORMULA: ${{ matrix.formula }}
+      UPLOAD: 'false'
+      PUSH_REF: ${{ inputs.branch }}
+      RUN_NUMBER: ${{ github.run_number }}
+      PRIVATE_ROOT_URL: ${{ inputs.private_root_url }}
+    strategy:
+      fail-fast: true
+      max-parallel: 1
+      matrix:
+        formula: ${{ fromJSON(needs.guard.outputs.formulae_json) }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.branch }}
+          fetch-depth: 0
+
+      - name: Validate input
+        run: |
+          [[ "$FORMULA" =~ ^[A-Za-z0-9@+._-]+$ ]] \
+            || { echo "::error::invalid formula name: $FORMULA"; exit 1; }
+
+      - name: Start OHOS container
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: .github/scripts/setup-container.sh
+
+      - name: Build from source
+        run: .github/scripts/build.sh
+
+      - name: brew test gate
+        run: .github/scripts/test-gate.sh
+
+      - name: Bottle with private root URL
+        id: bottle
+        run: .github/scripts/bottle.sh
+
+      - name: Upload bottle as artifact
+        if: success()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: bottle-${{ matrix.formula }}-run${{ github.run_number }}
+          path: bottle-out/
+          retention-days: 14
+
+  verify:
+    needs: [guard, build]
+    if: inputs.verify_downstream
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 180
+    env:
+      DOWNSTREAM: ${{ needs.guard.outputs.downstream }}
+      PRIVATE_ROOT_URL: ${{ inputs.private_root_url }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.branch }}
+          fetch-depth: 0
+
+      - name: Download all private bottle artifacts
+        uses: actions/download-artifact@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.2
+        with:
+          path: private-artifacts/
+
+      - name: Build private index and verify downstream pour
+        run: |
+          .github/scripts/private-bottle-index.sh \
+            --artifacts private-artifacts \
+            --root-url "$PRIVATE_ROOT_URL" \
+            --out private-index
+          .github/scripts/private-pour-verify.sh \
+            --formula "$DOWNSTREAM" \
+            --index private-index \
+            --root-url "$PRIVATE_ROOT_URL"
+
+      - name: Assert no public side effects
+        run: |
+          git -C "$GITHUB_WORKSPACE" status --short
+          if git -C "$GITHUB_WORKSPACE" log -1 --format='%s' | grep -q ' bottle.'; then
+            echo "::error::unexpected bottle write-back commit in private CI"
+            exit 1
+          fi
