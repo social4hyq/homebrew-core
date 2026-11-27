@@ -1,9 +1,8 @@
 class OhosApp < Formula
   desc "Orchestrate explicit OpenHarmony HAP app deployment (L0 v1)"
   homepage "https://github.com/social4hyq/homebrew-core"
-  # Resources-delivered driver (cf. claude-code / ohos-hap / ohos-device):
-  # install() copies from the checked-out tap, not the tarball. Fork brew
-  # mandates a real sha256; pin a fixed already-merged commit archive.
+  # Resources-delivered driver: install() copies from the checked-out tap,
+  # not the downloaded tarball. The bottle URL pins a fixed commit archive.
   url "https://github.com/social4hyq/homebrew-core/archive/977e355d9b424e8fa404eacd3cc9ca8427d99161.tar.gz"
   version "1.0.0"
   sha256 "0f37124f93b2431ebba47ba7f8f91ceb8ec2324c02ae6689399aa5359e9b3a7e"
