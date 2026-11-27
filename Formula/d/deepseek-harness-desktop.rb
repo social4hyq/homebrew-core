@@ -11,6 +11,11 @@ class DeepseekHarnessDesktop < Formula
     regex(/^dsh-v(\d+\.\d+\.\d+(?:-(?:alpha|rc)\.\d+)?)$/i)
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/deepseek-harness-desktop-v0.2.3-alpha.2-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5d0b94ea2b5e7d4b28cf7c7d686e3a7d98984e013c9cb3df3fe9e3f03ec77ffd"
+  end
+
   depends_on "coreutils"
   depends_on "curl"
   depends_on "deepseek-harness"
