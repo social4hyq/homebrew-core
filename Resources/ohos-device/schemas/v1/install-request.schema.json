@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/social4hyq/homebrew-core/contracts/ohos-app/v1/device/install-request.schema.json",
+  "title": "InstallRequest — ohos-app → ohos-device",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocol_version", "method", "device", "hap_path", "hap_sha256", "expected", "wait"],
+  "properties": {
+    "protocol_version": { "const": 1 },
+    "method": { "enum": ["hdc", "sideload"] },
+    "device": { "type": "string" },
+    "hap_path": { "type": "string", "description": "signed HAP only" },
+    "hap_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "expected": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bundle_id", "version_code"],
+      "properties": {
+        "bundle_id": { "type": "string" },
+        "version_name": { "type": "string" },
+        "version_code": { "type": "integer", "minimum": 1 },
+        "certificate_fingerprint": { "type": "string" },
+        "requested_permissions": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "wait": { "type": "boolean", "description": "true = keep foreground until terminal or timeout" },
+    "timeout_ms": { "type": "integer", "minimum": 1 }
+  }
+}
