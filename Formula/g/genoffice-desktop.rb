@@ -1,4 +1,4 @@
-class GenofficeApp < Formula
+class GenofficeDesktop < Formula
   desc "GenOffice AI office suite (docs, sheets, slides, PDF, Markdown, HTML) as a HAP"
   homepage "https://github.com/genspark-ai/genoffice"
   url "https://github.com/genspark-ai/genoffice/archive/refs/tags/v0.13.886.tar.gz"
@@ -12,24 +12,11 @@ class GenofficeApp < Formula
     strategy :github_latest
   end
 
-  bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/genoffice-app-v0.13.886-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "f3b902b70e9d5d43b7802fbf3923a5c88227287952f1a606ce4cfce48ec26efa"
-  end
-
   depends_on "genoffice" => :build
-  depends_on "app-installer"
   depends_on "node"
   depends_on "ohos-sdk-toolchains"
   depends_on "unzip"
   depends_on "zip"
-
-  # The unused-resource audit requires literal tap paths.
-  RESOURCE_FILES = %w[
-    Resources/_shared/hap-app/install-lib.sh
-    Resources/genoffice-app/scripts/genoffice-app.sh
-    Resources/genoffice-app/scripts/install-desktop.sh
-  ].freeze
 
   resource "electron-ohos" do
     url "https://gitcode.com/CPF-Electron/Electron/releases/download/v40.0.1/v40.0.1.20261028.2-release.zip"
@@ -37,22 +24,18 @@ class GenofficeApp < Formula
   end
 
   patch_root = Pathname(__dir__).parent.parent
-  Dir[(patch_root/"Patches/genoffice-app/ohos/*.patch").to_s].each do |path|
+  Dir[(patch_root/"Patches/genoffice-desktop/ohos/*.patch").to_s].each do |path|
     patch do
       file Pathname(path).relative_path_from(patch_root).to_s
     end
   end
 
   def install
-    tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
-    res = tap_root/"Resources/genoffice-app"
-    RESOURCE_FILES.each { |file| odie "missing tap resource: #{file}" unless (tap_root/file).exist? }
-
     # The xlsx sidecar comes from the `genoffice` formula (same release); keep
     # the two in sync.
     genoffice_version = Formula["genoffice"].version.to_s
     if genoffice_version != version.to_s
-      odie "genoffice #{genoffice_version} does not match genoffice-app #{version}"
+      odie "genoffice #{genoffice_version} does not match genoffice-desktop #{version}"
     end
 
     # Build like `npm run build:all`, skipping the root postinstall (it would
@@ -171,7 +154,7 @@ class GenofficeApp < Formula
     # The proprietary CLT is supplied by the CI image, not distributed by the tap.
     clt = Pathname.new("/opt/electron-ohos-clt")
     unless (clt/"hvigor/bin/hvigorw.js").exist?
-      odie "genoffice-app builds only in electron-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES['genoffice-app']"
+      odie "genoffice-desktop builds only in electron-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES['genoffice-desktop']"
     end
 
     # ohos_packing_tool needs SDK libraries outside brew's sanitized search path.
@@ -206,79 +189,58 @@ class GenofficeApp < Formula
     end
     (pkgshare/"module-acl.json").write JSON.generate(module_json)
 
-    # Pathname#install would move files out of the read-only CI tap.
-    pkgshare.mkpath
-    cp res/"scripts/install-desktop.sh", pkgshare/"install-desktop.sh"
-    chmod 0755, pkgshare/"install-desktop.sh"
-    cp tap_root/"Resources/_shared/hap-app/install-lib.sh", pkgshare/"hap-app-install-lib.sh"
-    chmod 0755, pkgshare/"hap-app-install-lib.sh"
-    cp res/"scripts/genoffice-app.sh", libexec/"genoffice-desktop.sh"
-    chmod 0755, libexec/"genoffice-desktop.sh"
-    (bin/"genoffice-app").write_env_script libexec/"genoffice-desktop.sh",
-      GENOFFICE_DESKTOP_UNSIGNED_HAP:   libexec/"genoffice-desktop-unsigned.hap",
-      GENOFFICE_DESKTOP_INSTALL_SCRIPT: pkgshare/"install-desktop.sh",
-      GENOFFICE_DESKTOP_MODULE_ACL:     pkgshare/"module-acl.json",
-      GENOFFICE_DESKTOP_HDC_DEFAULT:    formula_opt_prefix("ohos-sdk-toolchains")/"hdc",
-      PATH:                             "#{formula_opt_bin("node")}:$PATH"
-  end
+    # 清场：不再交付自造的 `genoffice-app` 装机命令，也不再做 post_install
+    # 自动装机。桌面 HAP 通过 app.json descriptor 交付，由用户显式
+    # `ohos-app install genoffice-desktop` 部署。上游 CLI `genoffice` 保持独立。
 
-  post_install_steps do
-    run "{{HOMEBREW_PREFIX}}/bin/hap-app",
-        args: ["auto-install", "genoffice-app", "com.social4hyq.genoffice"],
-        must_succeed: false, print_stdout: true, network_access: true
+    # Descriptor：构建期写入实际 HAP 摘要与版本，放 pkgshare/ohos/app.json，
+    # ohos-app 从 opt/<formula>/share/<formula>/ohos/app.json 发现它。
+    (pkgshare/"ohos").mkpath
+    hap = libexec/"genoffice-desktop-unsigned.hap"
+    hap_sha = Digest::SHA256.file(hap).hexdigest
+    JSON.parse(Utils.safe_popen_read("unzip", "-p", hap, "module.json"))
+    version_code = 1 # HAP 当前无 versionCode 字段；app.json 以此为准
+    descriptor = {
+      "schema_version" => 1,
+      "id"             => "social4hyq/core/genoffice-desktop",
+      "artifact"       => {
+        "format"       => "hap",
+        "path"         => "../../libexec/genoffice-desktop-unsigned.hap",
+        "sha256"       => hap_sha,
+        "api"          => 12,
+        "abis"         => ["arm64-v8a"],
+        "bundle_id"    => "com.social4hyq.genoffice",
+        "version_name" => version.to_s,
+        "version_code" => version_code,
+      },
+      "launch"         => { "module" => "electron", "ability" => "EntryAbility" },
+      "variants"       => {
+        "default"     => "acl",
+        "definitions" => {
+          "basic" => {},
+          "acl"   => { "module_overlay" => "module-acl.json",
+                       "sha256"         => Digest::SHA256.file(pkgshare/"module-acl.json").hexdigest },
+        },
+      },
+    }
+    (pkgshare/"ohos/app.json").write JSON.pretty_generate(descriptor) + "\n"
   end
 
   test do
-    assert_match "Usage: genoffice-app", shell_output("#{bin}/genoffice-app --help")
+    # 清场：不再有自造的 genoffice-app 装机命令；上游 CLI `genoffice` 由
+    # 独立 formula 交付。本 formula 只交付 HAP + descriptor。
+    refute_path_exists bin/"genoffice-app"
 
-    # The CLI matrix: start/stop/status address the device; uninstall goes
-    # through app-installer and keeps the app's data unless --purge is given.
-    fake_bin = testpath/"cli-bin"
-    fake_bin.mkpath
-    hdc_log = testpath/"cli-hdc-log"
-    (fake_bin/"hdc").write <<~SH
-      #!/bin/sh
-      printf '%s\\n' "$*" >> #{hdc_log}
-      if [ "$1" = "shell" ] && [ "$2" = "ps -ef" ]; then
-        if [ -z "${FAKE_STOPPED:-}" ]; then
-          printf '%s\\n' "u 1 1 1 1 ? 00:00:00 com.social4hyq.genoffice"
-        fi
-        printf '%s\\n' "u 1 1 1 1 ? 00:00:00 sh -c echo com.social4hyq.genoffice"
-      fi
-    SH
-    chmod 0755, fake_bin/"hdc"
-    installer_args = testpath/"cli-installer-args"
-    (fake_bin/"app-installer").write <<~SH
-      #!/bin/sh
-      printf '%s\\n' "$@" > #{installer_args}
-    SH
-    chmod 0755, fake_bin/"app-installer"
-    cli_env = {
-      "GENOFFICE_DESKTOP_HDC"       => (fake_bin/"hdc").to_s,
-      "GENOFFICE_DESKTOP_INSTALLER" => (fake_bin/"app-installer").to_s,
-      "PATH"                        => "#{fake_bin}:#{ENV.fetch("PATH")}",
-    }
-    with_env(cli_env) do
-      shell_output("#{bin}/genoffice-app start --device tablet-1")
-      assert_match "-t tablet-1 shell aa start", (testpath/"cli-hdc-log").read
-      shell_output("#{bin}/genoffice-app stop")
-      assert_match "shell aa force-stop com.social4hyq.genoffice", (testpath/"cli-hdc-log").read
-      assert_match "running", shell_output("#{bin}/genoffice-app status")
-      with_env("FAKE_STOPPED" => "1") do
-        assert_match "not running", shell_output("#{bin}/genoffice-app status 2>&1", 1)
-      end
-      shell_output("#{bin}/genoffice-app uninstall --purge --device tablet-1")
-      assert_equal %w[uninstall --bundle-id com.social4hyq.genoffice --device tablet-1 --purge],
-                   installer_args.read.lines(chomp: true)
-      shell_output("#{bin}/genoffice-app uninstall")
-      assert_equal %w[uninstall --bundle-id com.social4hyq.genoffice], installer_args.read.lines(chomp: true)
-    end
-    with_env({ "HDC_TARGET" => "env-device" }.merge(cli_env)) do
-      shell_output("#{bin}/genoffice-app uninstall")
-    end
-    assert_equal %w[uninstall --bundle-id com.social4hyq.genoffice --device env-device],
-                 installer_args.read.lines(chomp: true)
-    assert_match "uninstall", shell_output("#{bin}/genoffice-app --help")
+    # descriptor 校验：schema/id/摘要/变体必须与 HAP 一致。
+    descriptor = JSON.parse((pkgshare/"ohos/app.json").read)
+    assert_equal 1, descriptor["schema_version"]
+    assert_equal "social4hyq/core/genoffice-desktop", descriptor["id"]
+    hap = libexec/"genoffice-desktop-unsigned.hap"
+    assert_equal Digest::SHA256.file(hap).hexdigest, descriptor.dig("artifact", "sha256")
+    assert_equal "com.social4hyq.genoffice", descriptor.dig("artifact", "bundle_id")
+    assert_equal "acl", descriptor.dig("variants", "default")
+    assert_equal Digest::SHA256.file(pkgshare/"module-acl.json").hexdigest,
+                 descriptor.dig("variants", "definitions", "acl", "sha256")
 
     hap = libexec/"genoffice-desktop-unsigned.hap"
     listing = shell_output("unzip -l #{hap}")
