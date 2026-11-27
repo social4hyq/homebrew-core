@@ -1,10 +1,10 @@
 #!/bin/bash
-# 汇总 bottle-build(upload=false) 产出的多个 bottle artifact，建立私有 bottle 索引。
-# 供下游 pour 验证使用。本脚本只消费 artifact，不联网、不发布、不改仓库。
+# Aggregate bottle artifacts from bottle-build(upload=false) into a private index.
+# Consumes artifacts only; no network, no publish, no repo changes.
 #
-# 用法：private-bottle-index.sh --artifacts DIR --root-url URL --out DIR
-#   DIR 内是 actions/download-artifact 的产物：每个子目录是一个 artifact，
-#   内含 <formula>-<ver>.*.bottle*.tar.gz 与同名 .json（bottle.sh 产出）。
+# Usage: private-bottle-index.sh --artifacts DIR --root-url URL --out DIR
+#   DIR holds download-artifact output; each subdir is one artifact containing
+#   <formula>-<ver>.*.bottle*.tar.gz and the matching .json from bottle.sh.
 set -euo pipefail
 
 ARTIFACTS=""
@@ -29,18 +29,18 @@ MANIFEST="$OUT/manifest.json"
 count=0
 : > "$MANIFEST.tmp"
 
-# 收集所有 bottle tarball + json（artifact 可能嵌套一层）。
+# Collect all bottle tarballs and JSON files (artifacts may nest one level).
 while IFS= read -r -d '' tarball; do
   base="$(basename "$tarball")"
   json="${tarball%.tar.gz}.json"
-  # bottle.sh 的 json 与 tarball 同名，但 rebuild 变体是 *.N.bottle.tar.gz，
-  # 对应 json 名去掉 .tar.gz 即可；找不到时按通配找同目录 *.bottle.json。
+  # bottle.sh names the JSON after the tarball; rebuild variants use *.N.bottle.tar.gz.
+  # Strip .tar.gz for the JSON name; fall back to any *.bottle.json in the same dir.
   if [[ ! -f "$json" ]]; then
     json="$(find "$(dirname "$tarball")" -maxdepth 1 -name '*.bottle*.json' -print -quit 2>/dev/null || true)"
   fi
   [[ -n "$json" && -f "$json" ]] || { echo "no bottle json for $base" >&2; exit 1; }
 
-  # JSON 必须声明 root_url 已指向私有地址（由 bottle.sh 的 PRIVATE_ROOT_URL 注入）。
+  # Each bottle JSON must declare a root_url under the private root (set by bottle.sh).
   json_root="$(jq -r '.. | objects | .root_url? // empty' "$json" 2>/dev/null | head -1 || true)"
   if [[ -n "$json_root" ]]; then
     [[ "$json_root" == "$ROOT_URL"* ]] || {
