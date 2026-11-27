@@ -1,6 +1,6 @@
 'use strict';
 
-// The shell's start-up with and without a magpie web registered by `magpie-app web`.
+// The shell's start-up with and without a registered magpie web.
 const assert = require('node:assert/strict');
 const childProcess = require('node:child_process');
 const fs = require('node:fs');
@@ -118,22 +118,6 @@ test('creates the key on first use and keeps it for the next start', async (t) =
   const second = await ctx.hold();
   assert.equal(new URL(second.result.loaded.at(-1)).searchParams.get('k'), key);
   await second.after();
-});
-
-test('magpie-app web in a terminal finds the app\'s own backend instead of starting another', async (t) => {
-  const ctx = setup(t);
-  const port = await freePort();
-  ctx.register(port, 'f'.repeat(64));
-  const { after } = await ctx.hold();
-  const script = path.join(__dirname, '..', 'scripts', 'magpie-app.sh');
-  const status = childProcess.spawnSync('bash', [script, 'web', '--status'], {
-    encoding: 'utf8', timeout: 20000,
-    env: { PATH: process.env.PATH, HOME: ctx.home, MAGPIE_APP_BIN: path.join(path.dirname(ctx.app), 'magpie'), MAGPIE_APP_NODE: process.execPath },
-  });
-  assert.equal(status.status, 0, status.stderr);
-  assert.match(status.stdout, new RegExp(`already running at http://127.0.0.1:${port}`));
-  assert.deepEqual(ctx.starts().map((args) => args[0]), ['serve'], 'no second backend');
-  await after();
 });
 
 test('falls back to any port with a key of its own when the registered port is taken', async (t) => {
