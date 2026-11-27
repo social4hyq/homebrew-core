@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/social4hyq/homebrew-core/contracts/ohos-app/v1/descriptor/plugin-descriptor.schema.json",
+  "title": "plugin descriptor v1 — typed built-in XOR external executable (mutually exclusive)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocol", "role"],
+  "properties": {
+    "protocol": { "type": "integer", "const": 1 },
+    "role": { "enum": ["assembler", "personalizer", "host-integration"] },
+    "builtin": { "type": "string", "description": "typed built-in name, e.g. electron-asar" },
+    "exec": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "pattern": "^[A-Za-z0-9._/-]+$" },
+      "description": "argv array to spawn; never a shell string"
+    },
+    "config": { "type": "object" },
+    "capabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "network": { "type": "boolean", "default": false },
+        "device": { "type": "boolean", "default": false },
+        "host_write": { "type": "boolean", "default": false }
+      }
+    }
+  },
+  "oneOf": [
+    { "required": ["builtin"], "not": { "required": ["exec"] } },
+    { "required": ["exec"], "not": { "required": ["builtin"] } }
+  ]
+}

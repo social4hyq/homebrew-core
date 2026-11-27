@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/social4hyq/homebrew-core/contracts/ohos-app/v1/l2/assembly-result.schema.json",
+  "title": "assembly result — assembler plugin → engine",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocol_version", "ok", "out_hap"],
+  "properties": {
+    "protocol_version": { "const": 1 },
+    "ok": { "type": "boolean" },
+    "out_hap": { "type": "string", "description": "deterministic unsigned HAP path" },
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "error": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code"],
+      "properties": { "code": { "type": "string" }, "detail": { "type": "string" } }
+    }
+  }
+}

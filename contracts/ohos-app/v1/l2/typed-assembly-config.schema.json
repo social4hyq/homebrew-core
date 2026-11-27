@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/social4hyq/homebrew-core/contracts/ohos-app/v1/l2/typed-assembly-config.schema.json",
+  "title": "typed assembler config — closed parameter vocabulary",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["type", "protocol"],
+  "properties": {
+    "type": { "enum": ["electron-asar", "vendor-deb-extract", "config-inject"] },
+    "protocol": { "type": "integer", "const": 1 },
+    "target": { "type": "string", "description": "for config-inject: approved fixed in-HAP path only, no host config" },
+    "params": { "type": "object", "description": "closed set per type; validated by engine, not arbitrary paths/commands" }
+  }
+}

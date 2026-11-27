@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/social4hyq/homebrew-core/contracts/ohos-app/v1/l2/fetch-request.schema.json",
+  "title": "fetch request — engine → generic fetcher (argv/JSON, no shell)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocol_version", "source_name", "urls", "sha256", "size", "out_path"],
+  "properties": {
+    "protocol_version": { "const": 1 },
+    "source_name": { "type": "string", "pattern": "^[A-Za-z0-9._-]+$" },
+    "urls": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "size": { "type": "integer", "minimum": 1 },
+    "out_path": { "type": "string" },
+    "offline_source": { "type": "string", "description": "--source local override; must still match sha256" },
+    "credential_ref": { "type": "string", "description": "secret REF only, never a token value" }
+  }
+}

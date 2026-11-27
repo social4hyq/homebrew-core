@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/social4hyq/homebrew-core/contracts/ohos-app/v1/sign/request.schema.json",
+  "title": "SigningRequest — ohos-app → ohos-hap (no device args, no secrets in clear)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocol_version", "input_hap", "input_sha256", "output_path", "signing_profile_name", "expected"],
+  "properties": {
+    "protocol_version": { "const": 1 },
+    "input_hap": { "type": "string" },
+    "input_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "output_path": { "type": "string" },
+    "signing_profile_name": { "type": "string", "pattern": "^[a-zA-Z0-9._-]+$" },
+    "expected": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "bundle_id": { "type": "string" },
+        "version_code": { "type": "integer", "minimum": 1 }
+      }
+    }
+  }
+}

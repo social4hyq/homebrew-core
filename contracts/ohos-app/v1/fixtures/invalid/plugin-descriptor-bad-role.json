@@ -1,0 +1,1 @@
+{"_schema":"plugin-descriptor","protocol":1,"role":"installer","exec":["install.sh"]}

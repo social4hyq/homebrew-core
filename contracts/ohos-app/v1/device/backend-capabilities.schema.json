@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/social4hyq/homebrew-core/contracts/ohos-app/v1/device/backend-capabilities.schema.json",
+  "title": "backend capabilities report (structured, not text guessing)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["backend", "available"],
+  "properties": {
+    "backend": { "enum": ["hdc", "sideload"] },
+    "available": { "type": "boolean" },
+    "targets": { "type": "array", "items": { "type": "string" } },
+    "features": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "enum": ["interactive_confirmation", "install_status", "bundle_verify", "certificate_verify", "permission_verify"] }
+    },
+    "unavailable_reason": { "type": "string" }
+  }
+}

@@ -1,0 +1,1 @@
+{"_schema":"install-request","protocol_version":2,"method":"hdc","device":"local","hap_path":"/a.hap","hap_sha256":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","expected":{"bundle_id":"com.x","version_code":1},"wait":true}

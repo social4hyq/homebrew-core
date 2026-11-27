@@ -1,0 +1,1 @@
+{"_schema":"install-request","protocol_version":1,"method":"sideload","device":"local","hap_path":"/private/app-signed.hap","hap_sha256":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","expected":{"bundle_id":"com.example.app","version_code":123},"wait":true,"timeout_ms":600000}

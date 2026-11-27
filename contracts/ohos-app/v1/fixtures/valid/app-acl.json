@@ -1,0 +1,27 @@
+{
+  "_schema": "app",
+  "schema_version": 1,
+  "id": "social4hyq/core/multica-desktop",
+  "requires": { "features": ["hap-zip64", "personalize-v1"] },
+  "artifact": {
+    "format": "hap",
+    "path": "../../libexec/multica-desktop-unsigned.hap",
+    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "api": 12,
+    "abis": ["arm64-v8a"],
+    "bundle_id": "com.social4hyq.multica",
+    "version_name": "0.13.0",
+    "version_code": 123
+  },
+  "launch": { "module": "electron", "ability": "EntryAbility" },
+  "variants": {
+    "default": "acl",
+    "definitions": {
+      "basic": {},
+      "acl": { "module_overlay": "module-acl.json" }
+    }
+  },
+  "sources": { "lockfile": "sources.lock.json" },
+  "assembly": { "protocol": 1, "plugin": "assembler/plugin.json" },
+  "personalization": { "protocol": 1, "plugin": "personalizer/plugin.json" }
+}

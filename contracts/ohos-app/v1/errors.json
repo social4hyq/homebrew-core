@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "description": "Stable error codes shared by ohos-app / ohos-hap / ohos-device. Machine consumers MUST use code, never human text.",
+  "codes": {
+    "ERR_INVALID_REQUEST": "request failed contract validation (missing/unknown field, wrong type, version mismatch)",
+    "ERR_UNSUPPORTED_FEATURE": "a required feature is not supported by the selected backend/engine",
+    "ERR_UNSUPPORTED_PROTOCOL": "protocol/schema major version not supported; fail closed, never fall back to a legacy command",
+    "ERR_PATH_ESCAPE": "a relative path escaped the canonical keg root or traversed a symlink",
+    "ERR_SECRET_IN_CLEAR": "a secret value (not a ref) appeared in a request, argv, log or descriptor",
+    "ERR_BACKEND_UNAVAILABLE": "requested install backend is not available; explicit hdc/sideload fails without fallback",
+    "ERR_INSTALL_REJECTED": "user rejected the system installer confirmation",
+    "ERR_INSTALL_CANCELLED": "user or system cancelled the install",
+    "ERR_INSTALL_FAILED": "system install failed; official error code preserved in detail",
+    "ERR_WAIT_TIMEOUT": "local wait for the interactive install ended; NOT an install failure — operation_id + last state retained",
+    "ERR_WAIT_INTERRUPTED": "local wait was interrupted; operation_id retained, no auto-retry",
+    "ERR_STATUS_QUERY_UNSUPPORTED": "backend cannot query operation status; no pending DB may be fabricated",
+    "ERR_OPERATION_UNKNOWN": "operation id not found / handle expired; query bundle state before deciding",
+    "ERR_POST_INSTALL_VERIFY_FAILED": "bm dump post-check did not match requested bundle/version/cert/permissions",
+    "ERR_SIGN_FAILED": "signing backend failed; output not published",
+    "ERR_SIGN_VERIFY_FAILED": "post-sign structural/signature verification failed; output not published",
+    "ERR_DECODER_LAYOUT_UNKNOWN": "DevEco decoder layout unrecognised; fail closed before any network/profile operation",
+    "ERR_VENDOR_AUTH_REQUIRED": "vendor debug signing needs an explicit login/refresh; no implicit browser popup"
+  }
+}
