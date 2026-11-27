@@ -15,6 +15,11 @@ class OrcaDesktop < Formula
     strategy :github_latest
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/orca-desktop-v1.4.277-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7864ce56db336d9939c34ea24cf799c1c0fb424cc2c7897a627c543d980a7fac"
+  end
+
   depends_on "openjdk" => :build
   depends_on "node"
   depends_on "ohos-sdk-toolchains"
