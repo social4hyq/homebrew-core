@@ -59,6 +59,11 @@ on:
         required: false
         type: string
         default: ''
+      private_root_url:
+        description: 'PR 0b: private bottle root URL, only honored when upload=false. Never set for public publishes.'
+        required: false
+        type: string
+        default: ''
   workflow_call:
     inputs:
       formula:
@@ -77,6 +82,10 @@ on:
         type: string
         default: ''
       image:
+        required: false
+        type: string
+        default: ''
+      private_root_url:
         required: false
         type: string
         default: ''
@@ -107,6 +116,8 @@ env:
   UPLOAD: ${{ inputs.upload }}
   PUSH_REF: ${{ inputs.push_ref }}
   RUN_NUMBER: ${{ github.run_number }}
+  # PR 0b: forwarded to bottle.sh; only consumed on the upload=false branch.
+  PRIVATE_ROOT_URL: ${{ inputs.private_root_url }}
 
 jobs:
   build:

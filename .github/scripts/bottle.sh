@@ -35,6 +35,15 @@ if [ "$UPLOAD" = "true" ]; then
 else
   TAG="${BASE}-ci${RUN_NUMBER}"
   ROOT="https://github.com/social4hyq/homebrew-core/releases/download/$TAG"
+  # PR 0b private CI: when PRIVATE_ROOT_URL is set (and only on the upload=false
+  # branch), point the bottle JSON's root_url at private storage. The public
+  # upload=true path above is untouched. Refuse a public atomgit host here too.
+  if [ -n "${PRIVATE_ROOT_URL:-}" ]; then
+    case "$PRIVATE_ROOT_URL" in
+      *atomgit.com*) echo "::error::PRIVATE_ROOT_URL must not point at the public atomgit host"; exit 1 ;;
+    esac
+    ROOT="$PRIVATE_ROOT_URL"
+  fi
 fi
 
 echo "tag=$TAG" >> "$GITHUB_OUTPUT"
