@@ -16,8 +16,8 @@ class OrcaDesktop < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/orca-desktop-v1.4.277-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7864ce56db336d9939c34ea24cf799c1c0fb424cc2c7897a627c543d980a7fac"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/orca-desktop-v1.4.277-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "261d3eeac62d29d1dbc99ebd03bbf8d7a2f2c876f438db61c6d91a30c3bd1d63"
   end
 
   depends_on "openjdk" => :build
