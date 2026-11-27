@@ -12,6 +12,11 @@ class HerdrDesktop < Formula
     strategy :git
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/herdr-desktop-v0.1.18-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "60d96920a6b2263aeea04355ec489685fe46b8fa01b85b0d7323fa9dcfe9ffd2"
+  end
+
   depends_on "node" => :build
   depends_on "ohos-sdk" => :build
   depends_on "rust" => :build
