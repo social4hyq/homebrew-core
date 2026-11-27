@@ -8,6 +8,11 @@ class QtOhosSdk < Formula
   version "6.13.0-alpha1"
   license "LGPL-3.0-or-later"
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/qt-ohos-sdk-v6.13.0-alpha1-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6b28f69769f5fabb415a66b9d8e79058be7323c120c91f6ea876735c45ef794c"
+  end
+
   depends_on "cmake" => :build
   depends_on "git" => :build
   depends_on "ninja" => :build
