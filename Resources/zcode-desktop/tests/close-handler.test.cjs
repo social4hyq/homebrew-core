@@ -10,7 +10,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const test = require('node:test');
 
-const formula = fs.readFileSync(path.join(__dirname, '..', '..', '..', 'Formula', 'z', 'zcode-app.rb'), 'utf8');
+const formula = fs.readFileSync(path.join(__dirname, '..', '..', '..', 'Formula', 'z', 'zcode-desktop.rb'), 'utf8');
 
 function injectedLines() {
   const match = formula.match(/close_handler = \[\n([\s\S]*?)\n\s*\]\.join\("\\n"\)/);
