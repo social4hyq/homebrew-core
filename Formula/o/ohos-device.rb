@@ -9,8 +9,9 @@ class OhosDevice < Formula
   license "MIT"
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-device-v1.0.0-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "8b3459827fe7ebe3d5d095d901c1fcc4991113dd5ecb98a1ce3b3518371ab37a"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-device-v1.0.0-r2"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "04a58f2fc9f7ab00f90e0887413407ea0176a264d8871adf791919c3316b37e3"
   end
 
   depends_on "node"
