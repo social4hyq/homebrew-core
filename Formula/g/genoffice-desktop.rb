@@ -12,6 +12,11 @@ class GenofficeDesktop < Formula
     strategy :github_latest
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/genoffice-desktop-v0.13.886-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9d6ac9f7a5ce9fc8342e3f74df2f62e168ce857dda0ed184cd77b87dbff7058c"
+  end
+
   depends_on "genoffice" => :build
   depends_on "node"
   depends_on "ohos-sdk-toolchains"
