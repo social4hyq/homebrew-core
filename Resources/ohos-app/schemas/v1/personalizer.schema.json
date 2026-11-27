@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/social4hyq/homebrew-core/contracts/ohos-app/v1/plugins/personalizer.schema.json",
+  "title": "personalizer plugin — reads user config, writes private intermediate only",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocol", "role", "config_root", "output_tree"],
+  "properties": {
+    "protocol": { "const": 1 },
+    "role": { "const": "personalizer" },
+    "config_root": { "type": "string", "description": "explicit user config dir, e.g. XDG_STATE_HOME/ohos-app/integrations/<id>" },
+    "output_tree": { "type": "string", "description": "this-run private intermediate; must NOT persist deployment progress" },
+    "secret_refs": { "type": "array", "items": { "type": "string" }, "description": "refs only, never values; read via restricted fd/file" },
+    "forbidden": { "type": "array", "const": ["brew", "ohos-app", "ohos-device", "persistent_process"] }
+  }
+}
