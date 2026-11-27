@@ -1,6 +1,6 @@
 {
   "name": "OpenCode",
-  "command": "opencode-app",
+  "command": "ohos-app install opencode-desktop",
   "subtitle": "让想法，继续成为作品。",
   "accent": "6c77d7",
   "wash": "e9ecff",
