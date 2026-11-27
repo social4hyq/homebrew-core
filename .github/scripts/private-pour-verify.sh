@@ -1,8 +1,8 @@
 #!/bin/bash
-# 验证下游 formula 从私有 bottle pour，而非 source fallback。
-# 用法：private-pour-verify.sh --formula NAME --index DIR --root-url URL [--brew-cmd "brew"]
-# 说明：本脚本只做"是否 pour"的合同验证；真实签名/真机由后续 stage 负责。
-#   --brew-cmd 可注入 fake brew 做本地合同测试（CI 里用真实 brew）。
+# Verify a downstream formula pours from a private bottle, not a source fallback.
+# Usage: private-pour-verify.sh --formula NAME --index DIR --root-url URL [--brew-cmd "brew"]
+# Contract check only; real signing and device acceptance are separate stages.
+# --brew-cmd allows a fake brew for local contract tests.
 set -euo pipefail
 
 FORMULA=""
@@ -24,14 +24,13 @@ done
 [[ -n "$ROOT_URL" && "$ROOT_URL" != *atomgit.com* ]] || { echo "invalid/private root url required" >&2; exit 2; }
 command -v "$BREW" >/dev/null 2>&1 || { echo "brew command not found: $BREW" >&2; exit 127; }
 
-# 索引里必须有目标 formula 的 bottle（按文件名前缀匹配）。
+# The index must contain a bottle for the target formula (matched by filename prefix).
 MATCH=$(jq -r --arg f "$FORMULA" '.[] | select(.bottle | startswith($f + "-")) | .bottle' "$INDEX/manifest.json" 2>/dev/null | head -1 || true)
 [[ -n "$MATCH" ]] || { echo "no private bottle indexed for $FORMULA" >&2; exit 1; }
 
 echo "verifying pour: formula=$FORMULA bottle=$MATCH root=$ROOT_URL"
 
-# 合同验证：删 keg 后重装，断言 poured_from_bottle=true。
-# 用 --formulae（精确装 formula，不触发 cask/依赖连带卸载），沿用 verify-poured.sh 的语义。
+# Remove the keg, reinstall, and assert poured_from_bottle=true, matching verify-poured.sh.
 set +e
 "$BREW" install --formula "$FORMULA" >/tmp/private-pour-install.log 2>&1
 install_rc=$?
@@ -45,7 +44,7 @@ if [[ "$POURED" != "true" ]]; then
   exit 1
 fi
 
-# 确认未发生 source fallback 的日志特征（若 brew 输出可被检查）。
+# Check the install log for source-fallback markers when available.
 if grep -qiE 'build.from.source|--build-from-source' /tmp/private-pour-install.log; then
   echo "FAIL: source fallback detected in install log" >&2
   exit 1
