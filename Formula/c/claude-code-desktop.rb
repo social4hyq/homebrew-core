@@ -5,8 +5,8 @@ class ClaudeCodeDesktop < Formula
       using: :nounzip
   version "6.28899.6"
   sha256 "239c20d218456cacc656d48382fd59116325ac679aa4e476377af1456ac85715"
-  revision 8
   license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
+  revision 8
 
   livecheck do
     url "https://downloads.claude.ai/claude-desktop/apt/stable/dists/stable/main/binary-arm64/Packages"
