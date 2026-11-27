@@ -13,9 +13,8 @@ class AntigravityDesktop < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/antigravity-desktop-v2.34.0-r2"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a87c56d1d960e00bb05b2764fc7b9cd466838e21ae1158df5bdc2ce988dcc9d9"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/antigravity-desktop-v2.34.0-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "eb0040250630dfcbb94e87d209d4ebec7494133672a311471a37241aa11b03f8"
   end
 
   depends_on "glibc"
