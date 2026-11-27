@@ -11,6 +11,11 @@ class OhosHap < Formula
   sha256 "bd48e6006801d1a4211837bb38b729d3ccf868acdca2831d27a5cab6cfefac53"
   license "MIT"
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-hap-v1.0.0-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c51c62d43489bd298c5a9956755d534a1ce360ba9a314f828715316be7ea1eff"
+  end
+
   depends_on "node"
   depends_on "unzip" # inspect reads module.json from the final signed HAP
 
