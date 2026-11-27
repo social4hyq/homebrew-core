@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/social4hyq/homebrew-core/contracts/ohos-app/v1/plugins/host-integration.schema.json",
+  "title": "host-integration plugin — explicit configure only, no device/signing",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocol", "role", "config_root"],
+  "properties": {
+    "protocol": { "const": 1 },
+    "role": { "const": "host-integration" },
+    "config_root": { "type": "string", "description": "app-private config root only" },
+    "idempotent": { "type": "boolean", "const": true },
+    "secret_refs": { "type": "array", "items": { "type": "string" } },
+    "forbidden": { "type": "array", "const": ["device", "signing", "ohos-app", "ohos-device", "ohos-hap", "auto_login", "persistent_process"] }
+  }
+}

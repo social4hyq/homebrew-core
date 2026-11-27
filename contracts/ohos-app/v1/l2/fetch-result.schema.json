@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/social4hyq/homebrew-core/contracts/ohos-app/v1/l2/fetch-result.schema.json",
+  "title": "fetch result — generic fetcher → engine",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocol_version", "ok", "source_name"],
+  "properties": {
+    "protocol_version": { "const": 1 },
+    "ok": { "type": "boolean" },
+    "source_name": { "type": "string" },
+    "path": { "type": "string", "description": "content-addressed path of verified artifact" },
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "from_cache": { "type": "boolean" },
+    "error": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code"],
+      "properties": {
+        "code": { "type": "string" },
+        "detail": { "type": "string", "description": "no secret values" }
+      }
+    }
+  }
+}

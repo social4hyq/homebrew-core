@@ -1,0 +1,1 @@
+{"_schema":"app","schema_version":1,"id":"social4hyq/core/x","artifact":{"format":"hap","path":"x.hap","sha256":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","bundle_id":"com.x","version_name":"1","version_code":1},"launch":{"module":"e","ability":"A"},"variants":{"default":"basic","definitions":{"basic":{}}},"runtime":{"command":"codex"}}

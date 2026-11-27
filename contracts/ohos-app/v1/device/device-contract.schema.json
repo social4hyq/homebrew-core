@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/social4hyq/homebrew-core/contracts/ohos-app/v1/device/device-contract.schema.json",
+  "title": "ohos-app ⇄ ohos-device protocol major-version lock",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocol_major", "supported_install_states", "terminal_states"],
+  "properties": {
+    "protocol_major": { "const": 1 },
+    "supported_install_states": {
+      "type": "array",
+      "const": ["awaiting_user_confirmation", "installing", "installed", "rejected", "cancelled", "failed", "unknown"]
+    },
+    "terminal_states": { "type": "array", "const": ["installed", "rejected", "cancelled", "failed", "unknown"] },
+    "status_query": { "type": "boolean", "description": "backend declares whether install-status is supported; no pending DB may be fabricated" }
+  }
+}

@@ -1,0 +1,1 @@
+{"_schema":"request","protocol_version":1,"input_hap":"/private/app.hap","input_sha256":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","output_path":"/private/app-signed.hap","signing_profile_name":"default","expected":{"bundle_id":"com.example.app","version_code":123}}

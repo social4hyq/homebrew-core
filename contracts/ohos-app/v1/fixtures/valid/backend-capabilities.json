@@ -1,0 +1,1 @@
+{"_schema":"backend-capabilities","backend":"sideload","available":false,"targets":["local"],"features":["interactive_confirmation","install_status"],"unavailable_reason":"system API not published"}

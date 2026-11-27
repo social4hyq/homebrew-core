@@ -1,0 +1,1 @@
+{"_schema":"sources-lock","schema_version":1,"sources":{"desktop":{"urls":["https://vendor.example/package.deb"],"sha256":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","size":123,"filename":"package.deb","license":"proprietary-no-redistribution"}}}

@@ -1,0 +1,1 @@
+{"_schema":"install-result","protocol_version":1,"type":"install_result","operation_id":"op-1","backend":"sideload","state":"installed","bundle":{"bundle_id":"com.example.app","version_code":123},"verification":{"bundle_matched":true,"version_matched":true,"certificate_matched":null,"permissions_matched":null,"unsupported":["certificate_verify","permission_verify"]},"error":null}
