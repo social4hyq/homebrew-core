@@ -16,7 +16,7 @@
 流程（host 模式，workflow 默认入口）：
   1. gh 解析 PR，要求恰好改一个 formula（官方同款约束），且触发标签仍在
      （防并发重复触发：标签开跑即被摘掉，第二次 labeled 事件进来时已无）
-  2. 标签交接：摘 request-ai-bump / ci-failed / 上次结果，打 ai-running；
+  2. 标签交接：摘 request-ai-bump / 上次 ai-* 结果，打 ai-running；
      评论里留 run 链接（官方留 buildbot 流水线编号）
   3. docker exec 进 OHOS 容器跑 --agent 阶段：brew update、把 PR 分支
      rebase 到 origin/main、装 deepseek-harness、跑一次性 dsh 任务、校验
@@ -25,8 +25,11 @@
      进原顶端提交后 BOT_PUSH_TOKEN push -f。用 BOT_PUSH_TOKEN（管理员 PAT）
      是有意的：GITHUB_TOKEN 的推送不触发任何 workflow，AI 修复后的 head
      必须重触发 pr-validate 门禁重新裁决；bot 名下 bump-* 分支被 pr-validate
-     拦进 action_required 的场景由 automerge-autobump.yml 的小时扫描自动
-     approve（与 bottle 回写 push 同一套兜底）
+     拦进 action_required 时，automerge-autobump.yml 的小时扫描只自动 approve
+     allowlist 内的分支；HAP/app 类分支留人工审批（真机验收门禁）。
+     容器镜像由 workflow 起容器前用 --resolve-image 解析：取该 formula 在
+     OHOS_CI_IMAGE_OVERRIDES 里的私有镜像（缺私有 CLT/SDK 时 brew test 无法
+     验证，AI 会误判失败），无 override 则回落默认镜像。
   5. 报告发 PR 评论，标签按结果换成 ai-success / ai-failed
 
 安全边界（与官方一致）：容器内跑的是 AI 自主生成的命令 + PR 自带代码，只向
@@ -45,15 +48,15 @@ import subprocess
 import sys
 import tempfile
 
-# 触发标签与运行状态标签（与 pr-validate 的 request-ci/ci-passed/ci-failed 语义对称，
-# 命名沿用官方 ai_bump.py）
+# 触发标签与本次运行的 ai-* 状态标签。本 tap 的 pr-validate 只产出 ci-passed
+# （经 set-ci-label.sh），没有 request-ci/ci-failed —— 那两个是上游 Harmonybrew/ci
+# 的标签，移植时不应假设存在。
 REQUEST_LABEL = "request-ai-bump"
 AI_RUNNING_LABEL = "ai-running"
 AI_SUCCESS_LABEL = "ai-success"
 AI_FAILED_LABEL = "ai-failed"
-# 开跑时摘掉的旧状态标签：ci-failed 描述的是 AI 改动前的旧代码，留着会和
-# ai-success/ai-failed 同框打架（官方同款处理）
-STALE_LABELS = [REQUEST_LABEL, AI_RUNNING_LABEL, AI_SUCCESS_LABEL, AI_FAILED_LABEL, "ci-failed"]
+# 开跑时摘掉的旧状态标签：上一轮的 ai-* 结果留着会和本轮同框打架。
+STALE_LABELS = [REQUEST_LABEL, AI_RUNNING_LABEL, AI_SUCCESS_LABEL, AI_FAILED_LABEL]
 
 # workflow 的 Ensure labels 步骤负责创建，这里只留颜色约定做单一事实源
 LABEL_COLORS = {
@@ -495,12 +498,35 @@ def host_main():
             pass
 
 
+def resolve_image():
+    """Runner host 上、起容器前运行：查该 PR formula 的 CI 镜像并写 GITHUB_OUTPUT。
+
+    HAP/Electron formula 的 `brew test` 要私有 CLT/SDK（例如 /opt/electron-ohos-clt），
+    默认 OHOS_CI_IMAGE 没有，AI 会因此声明失败——即使修复本身是对的。复用
+    bottle-build 的 OHOS_CI_IMAGE_OVERRIDES 映射选中对应镜像，让 AI 的验证环境和
+    真正出 bottle 的 pr-validate 构建环境一致。无 override 时回落默认镜像。
+    """
+    require_env("PR_NUMBER", "OVERRIDES", "DEFAULT_IMAGE")
+    formula, _, _, _ = resolve_formula(os.environ["PR_NUMBER"])
+    try:
+        overrides = json.loads(os.environ["OVERRIDES"] or "{}")
+    except json.JSONDecodeError as e:
+        raise RuntimeError(f"OHOS_CI_IMAGE_OVERRIDES 无法解析（{e}）")
+    image = overrides.get(formula) or os.environ["DEFAULT_IMAGE"]
+    with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as fh:
+        fh.write(f"image={image}\n")
+    print(f"resolved image for {formula}: {image}", flush=True)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--agent", action="store_true", help="OHOS 容器内运行：准备 tap 环境并执行 AI 修复")
     parser.add_argument("--host", action="store_true", help="runner host 上运行（默认）：编排 agent 阶段并推送结果/评论")
+    parser.add_argument("--resolve-image", action="store_true", help="runner host 上起容器前运行：解析该 PR formula 的 CI 镜像")
     args = parser.parse_args()
-    if args.agent:
+    if args.resolve_image:
+        resolve_image()
+    elif args.agent:
         run_agent()
     else:
         host_main()
