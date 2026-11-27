@@ -1,0 +1,18 @@
+Bootstrap host packages when the source-build archive is already cached.
+
+--- a/prep-source-build.sh
++++ b/prep-source-build.sh
+@@ -344,10 +344,10 @@
+ # Read the eng/Versions.props to get the archives to download and download them
+ if [ "$downloadPsbArtifacts" == true ]; then
+   DownloadArchive "previously source-built artifacts" "PrivateSourceBuiltArtifactsVersion" true "$artifactsRid" "$packagesArchiveDir"
++fi
+ 
+-  if [ "$buildBootstrap" == true ]; then
+-    BootstrapArtifacts "$packagesArchiveDir"
+-  fi
++if [ "$downloadArtifacts" == true ] && [ "$buildBootstrap" == true ]; then
++  BootstrapArtifacts "$packagesArchiveDir"
+ fi
+ 
+ if [ "$downloadPrebuilts" == true ]; then

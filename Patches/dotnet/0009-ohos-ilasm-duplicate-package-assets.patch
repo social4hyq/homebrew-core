@@ -1,0 +1,22 @@
+--- a/src/runtime/src/tools/ilasm/src/ilasm/ilasm.props
++++ b/src/runtime/src/tools/ilasm/src/ilasm/ilasm.props
+@@ -17,6 +17,8 @@
+     <PackageIconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</PackageIconUrl>
+     <EnablePackageValidation>false</EnablePackageValidation>
+     <NoWarn>$(NoWarn);NU5128</NoWarn>
++    <!-- These self-contained tools can emit duplicate host libraries for this RID. -->
++    <NoWarn Condition="'$(TargetRid)' == 'openharmony-arm64'">$(NoWarn);NU5118</NoWarn>
+   </PropertyGroup>
+ 
+   <ItemGroup>
+--- a/src/runtime/src/tools/ildasm/src/ildasm/ildasm.props
++++ b/src/runtime/src/tools/ildasm/src/ildasm/ildasm.props
+@@ -17,6 +17,8 @@
+     <PackageIconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</PackageIconUrl>
+     <EnablePackageValidation>false</EnablePackageValidation>
+     <NoWarn>$(NoWarn);NU5128</NoWarn>
++    <!-- These self-contained tools can emit duplicate host libraries for this RID. -->
++    <NoWarn Condition="'$(TargetRid)' == 'openharmony-arm64'">$(NoWarn);NU5118</NoWarn>
+   </PropertyGroup>
+ 
+   <ItemGroup>

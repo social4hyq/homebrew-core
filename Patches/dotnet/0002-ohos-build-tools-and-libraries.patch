@@ -1,0 +1,184 @@
+--- a/repo-projects/runtime.proj
++++ b/repo-projects/runtime.proj
+@@ -39,6 +39,7 @@
+     <BuildArgs Condition="'$(CppCompilerAndLinker)' != ''">$(BuildArgs) /p:CppCompilerAndLinker=$(CppCompilerAndLinker)</BuildArgs>
+ 
+     <!-- Handle system libraries -->
++    <BuildArgs Condition="'$(TargetOS)' == 'openharmony' and '$(DotNetOhosSystemRoot)' != ''">$(BuildArgs) --cmakeargs -DCMAKE_FIND_ROOT_PATH=$(DotNetOhosSystemRoot) --cmakeargs -DCMAKE_EXECUTABLE_FORMAT=ELF</BuildArgs>
+     <BuildArgs Condition="$(UseSystemLibs.Contains('+brotli')) or $(UseSystemLibs.Contains('+all'))">$(BuildArgs) --cmakeargs -DCLR_CMAKE_USE_SYSTEM_BROTLI=true</BuildArgs>
+     <BuildArgs Condition="$(UseSystemLibs.Contains('+libunwind')) or $(UseSystemLibs.Contains('+all'))">$(BuildArgs) --cmakeargs -DCLR_CMAKE_USE_SYSTEM_LIBUNWIND=true</BuildArgs>
+     <!-- TODO: llvm-libunwind -->
+--- a/repo-projects/fsharp.proj
++++ b/repo-projects/fsharp.proj
+@@ -14,6 +14,7 @@
+     <BuildActions Condition="'$(BuildOS)' == 'windows' and '$(ForceDotNetMSBuildEngine)' != 'false'">$(BuildActions) $(FlagParameterPrefix)noVisualStudio</BuildActions>
+ 
+     <BuildArgs>$(BuildArgs) /p:GenerateResourceUsePreserializedResources=true</BuildArgs>
++    <BuildArgs Condition="'$(TargetOS)' == 'openharmony'">$(BuildArgs) /p:EnablePublishReadyToRun=false</BuildArgs>
+     <BuildArgs Condition="'$(DotNetBuildSourceOnly)' == 'true'">$(BuildArgs) $(FlagParameterPrefix)tfm $(NetCurrent)</BuildArgs>
+   </PropertyGroup>
+ 
+--- a/src/runtime/eng/native/build-commons.sh
++++ b/src/runtime/eng/native/build-commons.sh
+@@ -59,6 +59,13 @@
+     target="$5"
+     cmakeArgs="$6"
+     message="$7"
++    local hostCxxFlags=""
++    if [[ "$__TargetOS" == openharmony && "$targetOS" != openharmony ]]; then
++        # The CI CMake cannot find its compiler ID modules. Keep the ABI probe
++        # enabled and select C++17 explicitly because the compiler version is unknown.
++        cmakeArgs="-DCMAKE_C_COMPILER_ID=Clang -DCMAKE_CXX_COMPILER_ID=Clang $cmakeArgs"
++        hostCxxFlags="-std=gnu++17"
++    fi
+ 
+     # When sccache is enabled, use it as the compiler launcher.
+     # On macOS, CMake wraps PCH includes with -Xarch_<arch> which sccache
+@@ -86,7 +93,7 @@
+     # These flags MUST be exported before gen-buildsys.sh runs or cmake will ignore them
+     #
+     export CFLAGS="${CFLAGS} ${EXTRA_CFLAGS}"
+-    export CXXFLAGS="${CXXFLAGS} ${EXTRA_CXXFLAGS}"
++    export CXXFLAGS="${CXXFLAGS} ${EXTRA_CXXFLAGS} ${hostCxxFlags}"
+     export LDFLAGS="${LDFLAGS} ${EXTRA_LDFLAGS}"
+ 
+     if [[ "$targetOS" == osx || "$targetOS" == maccatalyst ]]; then
+@@ -146,9 +153,9 @@
+             exit 1
+         fi
+ 
+-        local ohosToolchainFile="$OHOS_NDK_HOME/native/build/cmake/ohos.toolchain.cmake"
+-        if [[ ! -f "$ohosToolchainFile" ]]; then
+-            echo "Error: OHOS CMake toolchain file not found at $ohosToolchainFile. Verify OHOS_NDK_HOME."
++        local ohosToolchainFile="$__RepoRootDir/eng/native/ohos-harmonybrew.toolchain.cmake"
++        if [[ ! -f "$OHOS_NDK_HOME/native/build/cmake/ohos.toolchain.cmake" ]]; then
++            echo "Error: OHOS CMake toolchain file not found under $OHOS_NDK_HOME. Verify OHOS_NDK_HOME."
+             exit 1
+         fi
+ 
+--- /dev/null
++++ b/src/runtime/eng/native/ohos-harmonybrew.toolchain.cmake
+@@ -0,0 +1,16 @@
++include("$ENV{OHOS_NDK_HOME}/native/build/cmake/ohos.toolchain.cmake")
++
++# The OHOS build container's CMake glob misses its compiler detection modules.
++set(CMAKE_C_COMPILER_ID Clang CACHE INTERNAL "OpenHarmony NDK C compiler ID")
++set(CMAKE_CXX_COMPILER_ID Clang CACHE INTERNAL "OpenHarmony NDK C++ compiler ID")
++
++# The NDK Clang uses its own sysroot and rejects CMake's -gcc-toolchain flag.
++unset(CMAKE_C_COMPILER_EXTERNAL_TOOLCHAIN)
++unset(CMAKE_CXX_COMPILER_EXTERNAL_TOOLCHAIN)
++unset(CMAKE_ASM_COMPILER_EXTERNAL_TOOLCHAIN)
++set(CMAKE_C_COMPILER_VERSION "${CMAKE_ASM_COMPILER_VERSION}" CACHE INTERNAL "OpenHarmony NDK C compiler version")
++set(CMAKE_CXX_COMPILER_VERSION "${CMAKE_ASM_COMPILER_VERSION}" CACHE INTERNAL "OpenHarmony NDK C++ compiler version")
++set(CMAKE_C_STANDARD_COMPUTED_DEFAULT 17 CACHE INTERNAL "OpenHarmony NDK C standard")
++set(CMAKE_CXX_STANDARD_COMPUTED_DEFAULT 14 CACHE INTERNAL "OpenHarmony NDK C++ standard")
++set(CMAKE_C_EXTENSIONS_COMPUTED_DEFAULT ON CACHE INTERNAL "OpenHarmony NDK C extensions")
++set(CMAKE_CXX_EXTENSIONS_COMPUTED_DEFAULT ON CACHE INTERNAL "OpenHarmony NDK C++ extensions")
+--- a/src/runtime/src/coreclr/pal/src/CMakeLists.txt
++++ b/src/runtime/src/coreclr/pal/src/CMakeLists.txt
+@@ -10,6 +10,11 @@
+   include_directories(SYSTEM $ENV{ROOTFS_DIR}/usr/local/include)
+ endif()
+ 
++set(CLR_PAL_USES_OPENHARMONY_LIBC ${CLR_CMAKE_TARGET_OPENHARMONY})
++if(CLR_CROSS_COMPONENTS_BUILD AND CLI_CMAKE_FALLBACK_OS STREQUAL "openharmony")
++  set(CLR_PAL_USES_OPENHARMONY_LIBC ON)
++endif()
++
+ if(NOT CLR_CMAKE_USE_SYSTEM_LIBUNWIND AND NOT CLR_CMAKE_HOST_ARCH_WASM)
+   include_directories(${CLR_SRC_NATIVE_DIR}/external/libunwind/include)
+   include_directories(${CLR_SRC_NATIVE_DIR}/external/libunwind/include/tdep)
+@@ -19,6 +24,11 @@
+   add_subdirectory(${CLR_SRC_NATIVE_DIR}/external/libunwind_extras ${CLR_ARTIFACTS_OBJ_DIR}/external/libunwind)
+ elseif(NOT CLR_CMAKE_TARGET_APPLE AND NOT CLR_CMAKE_HOST_ARCH_WASM)
+   find_unwind_libs(UNWIND_LIBS)
++  if(CLR_PAL_USES_OPENHARMONY_LIBC)
++    find_path(UNWIND_INCLUDE_DIR libunwind.h REQUIRED)
++    include_directories(SYSTEM ${UNWIND_INCLUDE_DIR})
++    list(APPEND CMAKE_REQUIRED_INCLUDES ${UNWIND_INCLUDE_DIR})
++  endif()
+ elseif(CLR_CMAKE_TARGET_APPLE)
+   add_subdirectory(${CLR_SRC_NATIVE_DIR}/external/libunwind_extras ${CLR_ARTIFACTS_OBJ_DIR}/external/libunwind)
+ endif(NOT CLR_CMAKE_USE_SYSTEM_LIBUNWIND AND NOT CLR_CMAKE_HOST_ARCH_WASM)
+@@ -244,18 +254,18 @@
+ 
+ if(CLR_CMAKE_TARGET_LINUX)
+   # On Android and OpenHarmony, we don't need to link with gcc_s, pthread and rt
+-  if(NOT CLR_CMAKE_TARGET_ANDROID AND NOT CLR_CMAKE_TARGET_OPENHARMONY)
++  if(NOT CLR_CMAKE_TARGET_ANDROID AND NOT CLR_PAL_USES_OPENHARMONY_LIBC)
+     target_link_libraries(coreclrpal
+       PUBLIC
+       gcc_s
+       pthread
+       rt
+     )
+-  else(NOT CLR_CMAKE_TARGET_ANDROID)
++  else()
+     target_link_libraries(coreclrpal
+       PUBLIC
+       ${ANDROID_GLOB})
+-  endif(NOT CLR_CMAKE_TARGET_ANDROID)
++  endif()
+ 
+   target_link_libraries(coreclrpal
+     PUBLIC
+--- a/src/runtime/src/native/libs/System.IO.Compression.Native/CMakeLists.txt
++++ b/src/runtime/src/native/libs/System.IO.Compression.Native/CMakeLists.txt
+@@ -27,6 +27,17 @@
+     include(${CLR_SRC_NATIVE_DIR}/external/zstd.cmake)
+ endif()
+ 
++if(CLR_CMAKE_TARGET_OPENHARMONY)
++    if(CLR_CMAKE_USE_SYSTEM_BROTLI)
++        find_path(BROTLI_INCLUDE_DIR brotli/decode.h REQUIRED)
++        include_directories(SYSTEM ${BROTLI_INCLUDE_DIR})
++    endif()
++    if(CLR_CMAKE_USE_SYSTEM_ZSTD)
++        find_path(ZSTD_INCLUDE_DIR zstd.h REQUIRED)
++        include_directories(SYSTEM ${ZSTD_INCLUDE_DIR})
++    endif()
++endif()
++
+ if (STATIC_LIBS_ONLY)
+     # For every vendored library that we're actually vendoring (and not referencing the system one)
+     # mark it as "no interprocedural optimization" so that it's compatible with our NativeAOT shipping story.
+--- a/src/runtime/src/native/corehost/CMakeLists.txt
++++ b/src/runtime/src/native/corehost/CMakeLists.txt
+@@ -90,6 +90,9 @@
+ 
+     if ((NOT DEFINED CLR_CMAKE_USE_SYSTEM_RAPIDJSON) OR (NOT CLR_CMAKE_USE_SYSTEM_RAPIDJSON))
+         include_directories(${CLR_SRC_NATIVE_DIR}/external/)
++    elseif(CLR_CMAKE_TARGET_OPENHARMONY)
++        find_path(RAPIDJSON_INCLUDE_DIR rapidjson/document.h REQUIRED)
++        include_directories(SYSTEM ${RAPIDJSON_INCLUDE_DIR})
+     endif()
+ 
+     add_subdirectory(${CLR_SRC_NATIVE_DIR}/minipal minipal)
+--- a/src/runtime/src/coreclr/debug/createdump/CMakeLists.txt
++++ b/src/runtime/src/coreclr/debug/createdump/CMakeLists.txt
+@@ -44,6 +44,11 @@
+       include_directories(SYSTEM $ENV{ROOTFS_DIR}/usr/local/include)
+     endif()
+ 
++    if(CLR_CMAKE_TARGET_OPENHARMONY AND CLR_CMAKE_USE_SYSTEM_LIBUNWIND)
++      find_path(UNWIND_INCLUDE_DIR libunwind.h REQUIRED)
++      include_directories(SYSTEM ${UNWIND_INCLUDE_DIR})
++    endif()
++
+     include(configure.cmake)
+ 
+     # Set the RPATH of createdump so that it can find dependencies without needing to set LD_LIBRARY_PATH
+--- a/src/runtime/src/coreclr/CMakeLists.txt
++++ b/src/runtime/src/coreclr/CMakeLists.txt
+@@ -81,6 +81,10 @@
+ #---------------------------
+ if(NOT CLR_CROSS_COMPONENTS_BUILD AND NOT CLR_CMAKE_TARGET_APPLE_MOBILE AND NOT CLR_CMAKE_TARGET_ARCH_WASM)
+   set(CLR_SINGLE_FILE_HOST_ONLY 1)
++  if(CLR_CMAKE_TARGET_OPENHARMONY AND CLR_CMAKE_USE_SYSTEM_RAPIDJSON)
++    find_path(RAPIDJSON_INCLUDE_DIR rapidjson/document.h REQUIRED)
++    include_directories(SYSTEM ${RAPIDJSON_INCLUDE_DIR})
++  endif()
+   add_subdirectory(${CLR_SRC_NATIVE_DIR}/corehost/apphost/static Corehost.Static)
+   add_dependencies(runtime singlefilehost)
+ endif()
