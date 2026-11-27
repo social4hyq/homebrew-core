@@ -122,6 +122,7 @@ class ClaudeCodeDesktop < Formula
   end
 
   test do
+    tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
     # Only the HAP and descriptor are delivered; no app-level install command.
     refute_path_exists bin/"claude-code-app"
 
