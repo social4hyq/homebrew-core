@@ -154,7 +154,7 @@ class GenofficeDesktop < Formula
     # The proprietary CLT is supplied by the CI image, not distributed by the tap.
     clt = Pathname.new("/opt/electron-ohos-clt")
     unless (clt/"hvigor/bin/hvigorw.js").exist?
-      odie "genoffice-desktop builds only in electron-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES['genoffice-desktop']"
+      odie "#{name} builds only in electron-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES['#{name}']"
     end
 
     # ohos_packing_tool needs SDK libraries outside brew's sanitized search path.
