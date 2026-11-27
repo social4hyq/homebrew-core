@@ -13,6 +13,11 @@ class ClaudeCodeDesktop < Formula
     regex(%r{^Filename: pool/main/c/claude-desktop/claude-desktop_(\d+(?:\.\d+)+)_arm64\.deb$}i)
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-desktop-v6.28899.6-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "74a638e03a5865b008643b8c816cccfa374f1b2b91827d1416a83d1f0ca3e173"
+  end
+
   depends_on "claude-code.latest"
   depends_on "node"
   depends_on "ohos-sdk-toolchains"
