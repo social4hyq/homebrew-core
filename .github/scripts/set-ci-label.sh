@@ -6,12 +6,12 @@
 # behind. Force-push, rerun and bottle write-back all used to leave a green
 # label on a red PR because the label job was skipped on failure.
 #
-# The label is also withheld when any commit in the PR has a failing gate
-# check. A bottle write-back commit re-triggers pr-validate with its changed
-# list empty (detect-changes.sh short-circuits), so light-check and build are
-# skipped in that run even when the commit that produced the bottle failed
-# them. Without the history check that self-triggered run launders a failed
-# PR into ci-passed.
+# The label is also withheld when any gate check in the PR's history has a
+# failing verdict. Gate checks are aggregated across all commits by name,
+# taking the last non-skipped conclusion: an explicit rerun/dispatch that
+# turned a check green clears an older failure, while a bottle write-back
+# re-trigger whose light-check/build are skipped cannot launder a failure on
+# an earlier code commit (skipped is not a verdict).
 set -euo pipefail
 
 GH="${GH:-gh}"
@@ -50,29 +50,38 @@ if [ -z "$reason" ]; then
   done
 fi
 
-# History check: every commit in the PR must have clean gate checks. Use the
-# latest conclusion per check name so a rerun that turned red -> green is not
-# mistaken for a failure.
+# History check: aggregate gate checks across every commit in the PR by check
+# name, taking the LAST NON-skipped conclusion as the real verdict. This has
+# two properties that a per-commit scan misses:
+#   - a rerun or an explicit dispatch that turned a check green (newer check
+#     run id) clears an older failure, even if that failure lives on a
+#     different commit (e.g. a bottle write-back ran the successful rebuild);
+#   - a bottle write-back commit whose light-check/build are `skipped` cannot
+#     launder a failure on an earlier code commit, because skipped is ignored
+#     rather than treated as a newer verdict.
 if [ -z "$reason" ]; then
   if ! commits="$($GH api "repos/$REPO/pulls/$PR/commits?per_page=100" --jq '.[].sha' 2>/dev/null)"; then
     reason="could not list PR commits"
     commits=""
   fi
   if [ -z "$reason" ]; then
+    checks="$(mktemp "${TMPDIR:-/tmp}/ci-label-checks.XXXXXX")"
+    trap 'rm -f "$checks"' EXIT
+    : > "$checks"
     for sha in $commits; do
-      if ! failures="$($GH api "repos/$REPO/commits/$sha/check-runs?per_page=100" \
-        --jq '[.check_runs | group_by(.name)[] | .[-1]
-               | select(.name | test("^(lint-commits|hap-checks|light-check|build)"))
-               | select(.conclusion == "failure" or .conclusion == "cancelled" or .conclusion == "timed_out")] | length' \
-        2>/dev/null)"; then
+      if ! $GH api "repos/$REPO/commits/$sha/check-runs?per_page=100" \
+        --jq '.check_runs[] | [.id, .name, (.conclusion // "pending")] | @tsv' \
+        >> "$checks" 2>/dev/null; then
         reason="could not read check-runs for ${sha:0:9}"
         break
       fi
-      if [ "${failures:-0}" -gt 0 ]; then
-        reason="commit ${sha:0:9} has ${failures} failing gate check(s)"
-        break
-      fi
     done
+    if [ -z "$reason" ]; then
+      failures="$(sort -t"$(printf '\t')" -k1,1n "$checks" | awk -F'\t' '$3 == "skipped" || $3 == "pending" { next } { last[$2] = $3 } END { for (name in last) if (name ~ /^(lint-commits|hap-checks|light-check|build)/ && (last[name] == "failure" || last[name] == "cancelled" || last[name] == "timed_out")) print name "=" last[name] }')"
+      if [ -n "$failures" ]; then
+        reason="failing gate check(s) in PR history: $(echo "$failures" | tr '\n' ' ')"
+      fi
+    fi
   fi
 fi
 
