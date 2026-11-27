@@ -15,6 +15,11 @@ class BrunoDesktop < Formula
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bruno-desktop-v4.4.0-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a0ea1cdcf8d19ef62f4f87234b1c3c0666340c795d86e731110d7eb2727d1a3d"
+  end
+
   depends_on "node"
   depends_on "ohos-sdk-toolchains"
   depends_on "python@3.15"
