@@ -6,10 +6,10 @@ class ZcodeDesktop < Formula
   url "https://github.com/zai-org/ZCode.git",
       revision: "a4b4445141eb7d3b3e99eada9292775383bfc44e"
   version "4.0.0"
-  revision 1
   # Tap-authored shell scripts (MIT) on the CPF-Electron runtime (mixed
   # MIT/BSD/LGPL).
   license :cannot_represent
+  revision 2
 
   livecheck do
     url "https://raw.githubusercontent.com/zai-org/ZCode/main/package.json"
@@ -19,9 +19,8 @@ class ZcodeDesktop < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-desktop-v4.0.0-r1"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c1af0ea2695f19c318aca9596dd9d70a5da7a006f6f8bc4a53135e9b894c96b0"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-desktop-v4.0.0-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "328930981eb6f1d6ba2b2c13f6a93786149c15f68e8c249d47e6a752d060b659"
   end
 
   depends_on "bun"
@@ -207,7 +206,7 @@ class ZcodeDesktop < Formula
       "id"             => "social4hyq/core/zcode-desktop",
       "artifact"       => {
         "format"       => "hap",
-        "path"         => "../../libexec/zcode-desktop-unsigned.hap",
+        "path"         => "../../../libexec/zcode-desktop-unsigned.hap",
         "sha256"       => hap_sha,
         "api"          => 12,
         "abis"         => ["arm64-v8a"],

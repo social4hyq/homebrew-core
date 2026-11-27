@@ -4,7 +4,7 @@ class HerdrDesktop < Formula
   url "https://github.com/herdrdev/herdr-app/archive/refs/tags/v0.1.18.tar.gz"
   sha256 "0c442fd54231dee2aca661661b50f4177ca04b55966c572f26cf06c629e9e59d"
   license "Apache-2.0"
-  revision 6
+  revision 7
 
   livecheck do
     url "https://github.com/herdrdev/herdr-app.git"
@@ -13,8 +13,8 @@ class HerdrDesktop < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/herdr-desktop-v0.1.18-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "60d96920a6b2263aeea04355ec489685fe46b8fa01b85b0d7323fa9dcfe9ffd2"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/herdr-desktop-v0.1.18-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9a6b7341033d05e4847810334232ec45fe72ccd2583c32f1e6b7f783585740e4"
   end
 
   depends_on "node" => :build
@@ -196,7 +196,7 @@ class HerdrDesktop < Formula
       "id"             => "social4hyq/core/herdr-desktop",
       "artifact"       => {
         "format"       => "hap",
-        "path"         => "../../libexec/herdr-desktop-unsigned.hap",
+        "path"         => "../../../libexec/herdr-desktop-unsigned.hap",
         "sha256"       => hap_sha,
         "api"          => 12,
         "abis"         => ["arm64-v8a"],

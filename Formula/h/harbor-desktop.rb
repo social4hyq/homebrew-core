@@ -4,7 +4,7 @@ class HarborDesktop < Formula
   url "https://github.com/social4hyq/harbor-app/archive/refs/tags/v0.4.1.tar.gz"
   sha256 "74b6d19cc0af97b1b88972248eb67d6a0cbed8b989ff82bf1d15170761b2b7ee"
   license "MIT"
-  revision 1
+  revision 2
 
   livecheck do
     url :stable
@@ -12,8 +12,8 @@ class HarborDesktop < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/harbor-desktop-v0.4.1-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "63cc9db9d80309188733bfabea3e254b24ecea6c3ab81a4b7732fcf4df419c12"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/harbor-desktop-v0.4.1-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "91e0071e4c21b7108a19c1fad12650da9502a9474dbcb38688056de8f38998de"
   end
 
   depends_on "node" => :build
@@ -91,7 +91,7 @@ class HarborDesktop < Formula
       "id"             => "social4hyq/core/harbor-desktop",
       "artifact"       => {
         "format"       => "hap",
-        "path"         => "../../libexec/harbor-desktop-unsigned.hap",
+        "path"         => "../../../libexec/harbor-desktop-unsigned.hap",
         "sha256"       => hap_sha,
         "api"          => 12,
         "abis"         => ["arm64-v8a"],

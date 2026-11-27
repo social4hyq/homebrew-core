@@ -6,7 +6,7 @@ class ClaudeCodeDesktop < Formula
   version "6.28899.6"
   sha256 "239c20d218456cacc656d48382fd59116325ac679aa4e476377af1456ac85715"
   license :cannot_represent # Anthropic Legal Agreements (Commercial ToS)
-  revision 8
+  revision 9
 
   livecheck do
     url "https://downloads.claude.ai/claude-desktop/apt/stable/dists/stable/main/binary-arm64/Packages"
@@ -14,8 +14,8 @@ class ClaudeCodeDesktop < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-desktop-v6.28899.6-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "74a638e03a5865b008643b8c816cccfa374f1b2b91827d1416a83d1f0ca3e173"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-desktop-v6.28899.6-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "6a27116a0070ab0033c102973f89a45071cc60ddceed9e7ca5eb69d25aee1b8b"
   end
 
   depends_on "claude-code.latest"
@@ -112,7 +112,7 @@ class ClaudeCodeDesktop < Formula
       "id"             => "social4hyq/core/claude-code-desktop",
       "artifact"       => {
         "format"       => "hap",
-        "path"         => "../../libexec/claude-code-desktop-unsigned.hap",
+        "path"         => "../../../libexec/claude-code-desktop-unsigned.hap",
         "sha256"       => hap_sha,
         "api"          => 12,
         "abis"         => ["arm64-v8a"],

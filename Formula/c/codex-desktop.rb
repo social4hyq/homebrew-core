@@ -6,7 +6,7 @@ class CodexDesktop < Formula
   version "26.1120.50957"
   sha256 "d11adb9a13d21bc5f514885924207af0e8689a978328550e3a43895a69603d89"
   license :cannot_represent # OpenAI service and software terms
-  revision 1
+  revision 2
 
   livecheck do
     url "https://persistent.oaistatic.com/codex-app-prod/linux/deb/dists/stable/main/binary-arm64/Packages"
@@ -14,9 +14,8 @@ class CodexDesktop < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codex-desktop-v26.1120.50957-r2"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "912dbacacd92009bf4acae86b2bc9cabb5679b34a12913378bd93b7639206e0f"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codex-desktop-v26.1120.50957-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "76e45f3116c7fa12ef604291dc4e1fcfca83b5fecaaba1eae3e6549445dd7ca1"
   end
 
   depends_on "codex"
@@ -126,7 +125,7 @@ class CodexDesktop < Formula
       "id"             => "social4hyq/core/codex-desktop",
       "artifact"       => {
         "format"       => "hap",
-        "path"         => "../../libexec/codex-desktop-unsigned.hap",
+        "path"         => "../../../libexec/codex-desktop-unsigned.hap",
         "sha256"       => hap_sha,
         "api"          => 12,
         "abis"         => ["arm64-v8a"],

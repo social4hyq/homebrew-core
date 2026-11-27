@@ -4,7 +4,7 @@ class BrewoDesktop < Formula
   url "https://github.com/social4hyq/brewo-app/archive/refs/tags/v0.3.2.tar.gz"
   sha256 "49d33aebf153347db7a2d8d80195f8b549d7696974304466ddebbaa1312aa16b"
   license "AGPL-3.0-only"
-  revision 1
+  revision 2
 
   livecheck do
     url :stable
@@ -12,9 +12,8 @@ class BrewoDesktop < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/brewo-desktop-v0.3.2-r1"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "13d6c0b358c08fff310233f8d6010402d0de45810a404c22ba0f9341246db5d4"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/brewo-desktop-v0.3.2-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "84f907a52770dd9365fb89588c0cd010b365d2b769b09668158c2ab12ffad7bd"
   end
 
   depends_on "node" => :build
@@ -87,7 +86,7 @@ class BrewoDesktop < Formula
       "id"             => "social4hyq/core/brewo-desktop",
       "artifact"       => {
         "format"       => "hap",
-        "path"         => "../../libexec/brewo-desktop-unsigned.hap",
+        "path"         => "../../../libexec/brewo-desktop-unsigned.hap",
         "sha256"       => hap_sha,
         "api"          => 12,
         "abis"         => ["arm64-v8a"],

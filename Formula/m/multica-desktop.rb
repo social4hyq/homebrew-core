@@ -4,7 +4,7 @@ class MulticaDesktop < Formula
   url "https://github.com/multica-ai/multica/archive/refs/tags/v0.13.0.tar.gz"
   sha256 "8a2e69492f1640b33213105cb3aa0d7e633d77993cdf15d7d847cd54d8859817"
   license :cannot_represent # Multica License (Apache-2.0 plus additional conditions)
-  revision 1
+  revision 2
 
   livecheck do
     url :stable
@@ -12,8 +12,8 @@ class MulticaDesktop < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-desktop-v0.13.0-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "7008fa4e21955a095cf258d531f506ca66a684e465f6975f43f3c8e7472181a6"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/multica-desktop-v0.13.0-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "57feb4da75807f5d80d77c4d4df7dd2c29a3cd411d6dcb2dd985ae55e5a0c2c6"
   end
 
   depends_on "node" => :build
@@ -200,7 +200,7 @@ class MulticaDesktop < Formula
       "id"             => "social4hyq/core/multica-desktop",
       "artifact"       => {
         "format"       => "hap",
-        "path"         => "../../libexec/multica-desktop-unsigned.hap",
+        "path"         => "../../../libexec/multica-desktop-unsigned.hap",
         "sha256"       => hap_sha,
         "api"          => 12,
         "abis"         => ["arm64-v8a"],

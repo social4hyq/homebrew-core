@@ -4,7 +4,7 @@ class MagpieDesktop < Formula
   url "https://github.com/yetone/magpie/archive/refs/tags/v0.1.4828.tar.gz"
   sha256 "6db17effe70b15e25991c0524f81b1233361ffa287b50b982e3977d7d215cd30"
   license :cannot_represent
-  revision 1
+  revision 2
 
   livecheck do
     url :stable
@@ -12,8 +12,8 @@ class MagpieDesktop < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/magpie-desktop-v0.1.4828-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cc6c1996d8e1ce8eabd0658540fda917166d85d6357e887ebb29f1741badbdd6"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/magpie-desktop-v0.1.4828-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c35c298ed3bdebe2012c9242ed462bb338a247c572468c942e3bbb2d84068787"
   end
 
   depends_on "node"
@@ -167,7 +167,7 @@ class MagpieDesktop < Formula
       "id"             => "social4hyq/core/magpie-desktop",
       "artifact"       => {
         "format"       => "hap",
-        "path"         => "../../libexec/magpie-desktop-unsigned.hap",
+        "path"         => "../../../libexec/magpie-desktop-unsigned.hap",
         "sha256"       => hap_sha,
         "api"          => 12,
         "abis"         => ["arm64-v8a"],

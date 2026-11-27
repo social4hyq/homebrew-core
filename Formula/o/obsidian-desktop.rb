@@ -7,7 +7,7 @@ class ObsidianDesktop < Formula
   # host payload in Resources/obsidian-desktop is version-independent and the
   # asar is not bundled in the HAP.
   license :cannot_represent
-  revision 16
+  revision 17
 
   # desktop-releases.json carries the latest desktop version, asar URL and
   # sha256.
@@ -19,8 +19,8 @@ class ObsidianDesktop < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/obsidian-desktop-v1.15.1-r6"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6845a7d9fba90be1e659c2e3148f9ef73651690a03471d27c33e9d398b1175fd"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/obsidian-desktop-v1.15.1-r7"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5d4389ec87116b71391ad2a92fafb4dec914a3b8e46b7e69bd07e133af5ddd34"
   end
 
   depends_on "curl"
@@ -248,7 +248,7 @@ class ObsidianDesktop < Formula
       "id"             => "social4hyq/core/obsidian-desktop",
       "artifact"       => {
         "format"       => "hap",
-        "path"         => "../../libexec/obsidian-desktop-unsigned.hap",
+        "path"         => "../../../libexec/obsidian-desktop-unsigned.hap",
         "sha256"       => hap_sha,
         "api"          => 12,
         "abis"         => ["arm64-v8a"],

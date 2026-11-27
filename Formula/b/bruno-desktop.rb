@@ -8,7 +8,7 @@ class BrunoDesktop < Formula
       using: :nounzip
   sha256 "0264f6bd80deec178e89bdbe229e41747fa59e6fce1ef9bf9f3764924f362d7c"
   license "MIT"
-  revision 3
+  revision 4
 
   livecheck do
     url :stable
@@ -16,8 +16,8 @@ class BrunoDesktop < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bruno-desktop-v4.4.0-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "a0ea1cdcf8d19ef62f4f87234b1c3c0666340c795d86e731110d7eb2727d1a3d"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bruno-desktop-v4.4.0-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cdc4f0d449b4f2c6d6758ed1f72b1a0babcf6542a8f601f3d6635ba71f70d141"
   end
 
   depends_on "node"
@@ -141,7 +141,7 @@ class BrunoDesktop < Formula
       "id"             => "social4hyq/core/bruno-desktop",
       "artifact"       => {
         "format"       => "hap",
-        "path"         => "../../libexec/bruno-desktop-unsigned.hap",
+        "path"         => "../../../libexec/bruno-desktop-unsigned.hap",
         "sha256"       => hap_sha,
         "api"          => 12,
         "abis"         => ["arm64-v8a"],
