@@ -1,0 +1,11 @@
+--- a/src/runtime/src/libraries/pretest.proj
++++ b/src/runtime/src/libraries/pretest.proj
+@@ -173,1 +173,8 @@
++    <ItemGroup>
++      <RuntimePackNativeFile Update="@(RuntimePackNativeFile)"
++                             Condition="'%(RuntimePackNativeFile.Filename)%(RuntimePackNativeFile.Extension)' == 'libhostfxr.so' or '%(RuntimePackNativeFile.Filename)%(RuntimePackNativeFile.Extension)' == 'libhostpolicy.so'">
++        <DropFromSingleFile>true</DropFromSingleFile>
++      </RuntimePackNativeFile>
++    </ItemGroup>
++
+     <CreateFrameworkListFile Files="@(RuntimePackLibFile);@(RuntimePackNativeFile)"

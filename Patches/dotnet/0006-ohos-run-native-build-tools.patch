@@ -1,0 +1,69 @@
+--- a/src/runtime/eng/Subsets.props
++++ b/src/runtime/eng/Subsets.props
+@@ -114,6 +114,7 @@
+     <BootstrapSubsets>host.native+libs.sfx+libs.pretest</BootstrapSubsets>
+     <BootstrapSubsets Condition="'$(UseNativeAotForComponents)' != 'true'">$(BootstrapSubsets)+clr.runtime+clr.corelib</BootstrapSubsets>
+     <BootstrapSubsets Condition="'$(UseNativeAotForComponents)' == 'true'">$(BootstrapSubsets)+clr.nativeaotlibs+clr.nativeaotruntime+libs.native</BootstrapSubsets>
++    <BootstrapSubsets Condition="'$(TargetsOpenHarmony)' == 'true' and '$(DotNetOhosSystemRoot)' != ''">$(BootstrapSubsets)+libs.native</BootstrapSubsets>
+ 
+     <SwapNativeForIL Condition="$(_subset.Contains('+bootstrap+')) and '$(RuntimeFlavor)' == 'CoreCLR'">true</SwapNativeForIL>
+ 
+--- a/src/runtime/src/coreclr/tools/aot/crossgen2/crossgen2_inbuild.csproj
++++ b/src/runtime/src/coreclr/tools/aot/crossgen2/crossgen2_inbuild.csproj
+@@ -15,6 +15,12 @@
+     <PublishReadyToRunComposite>true</PublishReadyToRunComposite>
+   </PropertyGroup>
+ 
++  <PropertyGroup Condition="'$(TargetsOpenHarmony)' == 'true' and '$(DotNetOhosSystemRoot)' != '' and '$(UseBootstrap)' == 'true'">
++    <RuntimeIdentifier>$(PortableTargetRid)</RuntimeIdentifier>
++    <UseBootstrapLayout>true</UseBootstrapLayout>
++    <PublishReadyToRun>false</PublishReadyToRun>
++  </PropertyGroup>
++
+   <Import Project="crossgen2.props" />
+ 
+ </Project>
+--- a/src/runtime/src/coreclr/tools/aot/ILCompiler/ILCompiler_inbuild.csproj
++++ b/src/runtime/src/coreclr/tools/aot/ILCompiler/ILCompiler_inbuild.csproj
+@@ -14,5 +14,10 @@
+     <PublishReadyToRun>true</PublishReadyToRun>
+     <PublishReadyToRunComposite>true</PublishReadyToRunComposite>
+   </PropertyGroup>
++  <PropertyGroup Condition="'$(TargetsOpenHarmony)' == 'true' and '$(DotNetOhosSystemRoot)' != '' and '$(UseBootstrap)' == 'true'">
++    <RuntimeIdentifier>$(PortableTargetRid)</RuntimeIdentifier>
++    <UseBootstrapLayout>true</UseBootstrapLayout>
++    <PublishReadyToRun>false</PublishReadyToRun>
++  </PropertyGroup>
+   <Import Project="ILCompiler.props" />
+ </Project>
+--- a/src/runtime/src/coreclr/tools/Common/CommandLineHelpers.cs
++++ b/src/runtime/src/coreclr/tools/Common/CommandLineHelpers.cs
+@@ -64,7 +64,8 @@
+             {
+                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                     return TargetOS.Windows;
+-                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
++                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ||
++                         RuntimeInformation.IsOSPlatform(OSPlatform.Create("OPENHARMONY")))
+                     return TargetOS.Linux;
+                 else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                     return TargetOS.OSX;
+--- a/src/runtime/src/native/corehost/apphost/static/CMakeLists.txt
++++ b/src/runtime/src/native/corehost/apphost/static/CMakeLists.txt
+@@ -84,6 +84,16 @@
+ endif()
+ 
+ add_executable(singlefilehost ${SOURCES})
++
++if(CLR_CMAKE_TARGET_OPENHARMONY AND DEFINED ENV{DotNetOhosSystemRoot})
++    # This host is copied into bundles, so keep the system library paths in the ELF.
++    string(REPLACE ":" ";" systemPrefixes "$ENV{CMAKE_PREFIX_PATH}")
++    foreach(prefix IN LISTS systemPrefixes)
++        if(IS_DIRECTORY "${prefix}/lib")
++            target_link_options(singlefilehost PRIVATE "LINKER:-rpath,${prefix}/lib")
++        endif()
++    endforeach()
++endif()
+ 
+ add_sanitizer_runtime_support(singlefilehost)
+ 

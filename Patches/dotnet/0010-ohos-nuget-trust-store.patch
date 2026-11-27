@@ -1,0 +1,19 @@
+--- a/src/nuget-client/src/NuGet.Core/NuGet.Packaging/Signing/TrustStore/X509TrustStore.cs
++++ b/src/nuget-client/src/NuGet.Core/NuGet.Packaging/Signing/TrustStore/X509TrustStore.cs
+@@ -7,6 +7,7 @@
+ 
+ #if NET5_0_OR_GREATER
+ using System.Globalization;
++using System.Runtime.InteropServices;
+ #endif
+ 
+ namespace NuGet.Packaging.Signing
+@@ -137,7 +138,7 @@
+                 return new NoCertificateBundleX509ChainFactory();
+             }
+ 
+-            if (RuntimeEnvironmentHelper.IsMacOSX)
++            if (RuntimeEnvironmentHelper.IsMacOSX || RuntimeInformation.IsOSPlatform(OSPlatform.Create("OPENHARMONY")))
+             {
+                 if (FallbackCertificateBundleX509ChainFactory.TryCreate(
+                     storePurpose,

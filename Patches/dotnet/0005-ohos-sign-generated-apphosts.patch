@@ -1,0 +1,51 @@
+--- a/src/sdk/src/Tasks/Microsoft.NET.Build.Tasks/targets/Microsoft.NET.Sdk.targets
++++ b/src/sdk/src/Tasks/Microsoft.NET.Build.Tasks/targets/Microsoft.NET.Sdk.targets
+@@ -855,6 +855,9 @@
+       <_UseWindowsGraphicalUserInterface Condition="($(RuntimeIdentifier.StartsWith('win')) or $(DefaultAppHostRuntimeIdentifier.StartsWith('win'))) and '$(OutputType)'=='WinExe'">true</_UseWindowsGraphicalUserInterface>
+       <_EnableMacOSCodeSign Condition="'$(_EnableMacOSCodeSign)' == '' and
+                                       ($(RuntimeIdentifier.StartsWith('osx')) or $(AppHostRuntimeIdentifier.StartsWith('osx')))">true</_EnableMacOSCodeSign>
++      <EnableOpenHarmonyCodeSign Condition="'$(EnableOpenHarmonyCodeSign)' == '' and
++                                            $(NETCoreSdkRuntimeIdentifier.StartsWith('openharmony')) and
++                                            $(AppHostRuntimeIdentifier.StartsWith('openharmony'))">true</EnableOpenHarmonyCodeSign>
+       <_UseSingleFileHostForPublish Condition="'$(PublishSingleFile)' == 'true' and
+                                                '$(SelfContained)' == 'true' and
+                                                '$(SingleFileHostSourcePath)' != '' and
+@@ -895,6 +898,8 @@
+                    EnableMacOSCodeSign="$(_EnableMacOSCodeSign)"
+                    DisableCetCompat="$(_DisableCetCompat)"
+                    />
++    <Exec Condition="'$(EnableOpenHarmonyCodeSign)' == 'true'"
++          Command="selfsign --force &quot;$(AppHostIntermediatePath)&quot;" />
+   </Target>
+ 
+   <!--
+--- a/src/sdk/src/Tasks/Microsoft.NET.Build.Tasks/targets/Microsoft.NET.Publish.targets
++++ b/src/sdk/src/Tasks/Microsoft.NET.Build.Tasks/targets/Microsoft.NET.Publish.targets
+@@ -881,6 +881,8 @@
+                    DotNetSearchLocations="$(AppHostDotNetSearch)"
+                    AppRelativeDotNet="$(AppHostRelativeDotNet)"
+                    />
++    <Exec Condition="'$(EnableOpenHarmonyCodeSign)' == 'true'"
++          Command="selfsign --force &quot;$(AppHostForPublishIntermediatePath)&quot;" />
+   </Target>
+ 
+   <!--
+@@ -1354,6 +1356,9 @@
+     <PropertyGroup>
+       <TraceSingleFileBundler Condition="'$(TraceSingleFileBundler)' == ''">false</TraceSingleFileBundler>
+       <EnableCompressionInSingleFile Condition="'$(EnableCompressionInSingleFile)' == ''">false</EnableCompressionInSingleFile>
++      <EnableOpenHarmonyCodeSign Condition="'$(EnableOpenHarmonyCodeSign)' == '' and
++                                            $(NETCoreSdkRuntimeIdentifier.StartsWith('openharmony')) and
++                                            $(RuntimeIdentifier.StartsWith('openharmony'))">true</EnableOpenHarmonyCodeSign>
+     </PropertyGroup>
+ 
+     <NETSdkError Condition="'$(IncludeAllContentForSelfExtract)' == 'true' And '$(IncludeNativeLibrariesForSelfExtract)' != 'true'"
+@@ -1380,6 +1385,8 @@
+                     EnableMacOSCodeSign="$(_EnableMacOSCodeSign)">
+       <Output TaskParameter="ExcludedFiles" ItemName="_FilesExcludedFromBundleByTask"/>
+     </GenerateBundle>
++    <Exec Condition="'$(EnableOpenHarmonyCodeSign)' == 'true'"
++          Command="selfsign --force &quot;$(PublishedSingleFilePath)&quot;" />
+ 
+     <!-- Note: We don't add _FilesExcludedFromBundleByTask to ResolvedFileToPublish here because
+          those files should have already been added by _ComputeFilesToBundle.
