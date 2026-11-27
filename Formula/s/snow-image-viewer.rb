@@ -4,6 +4,7 @@ class SnowImageViewer < Formula
   url "https://github.com/mg-chao/snow-shot/archive/refs/tags/v1.6.5_snow-shot.tar.gz"
   sha256 "125059b53d029b9fba8307868595c2eed478b4bf129b88c22d4a4dbb0f30c0d6"
   license "GPL-3.0-or-later"
+  revision 1
 
   livecheck do
     url "https://github.com/mg-chao/snow-shot.git"
@@ -12,8 +13,8 @@ class SnowImageViewer < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-image-viewer-v1.6.5-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9c5cfe9c4f7bc766910d5cbc143acff7be11c9399a20e0bb8e00ad625833fdb5"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-image-viewer-v1.6.5-r2"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "00141bb440ebaa5aef17185fce105a0c86fa540501f64586073def69b40b0b70"
   end
 
   # These libraries are copied into the HAP after their ELF dependency graph
@@ -28,6 +29,8 @@ class SnowImageViewer < Formula
   depends_on "ninja" => :build
   depends_on "node" => :build # hvigorw.js is a node script
   depends_on "ohos-sdk" => :build
+  depends_on "openjdk" => :build
+  depends_on "qt-ohos-sdk" => :build
   depends_on "zlib" => :build
   # Qt6Core links zstd (rcc compresses resources); the NDK sysroot has none.
   depends_on "zstd" => :build
@@ -37,6 +40,11 @@ class SnowImageViewer < Formula
   resource "jthread" do
     url "https://github.com/josuttis/jthread/archive/0fa8d394254886c555d6faccd0a3de819b7d47f8.tar.gz"
     sha256 "d3a20e0c1b2758c4545b0a97490afa2986e39c8b4387c3dba2007def742cbeb0"
+  end
+
+  resource "command-line-tools" do
+    url "https://s3.oheco.org/command-line-tools/26.0.0.201/commandline-tools-harmonyos-26.0.0.201.tar.gz"
+    sha256 "60929c00ae486cc038ea48145497ad34dbd4ac6a25c3f2fa895ce74afb4607f5"
   end
 
   # Accept the 6.13.0 kit (upstream pins 6.12.0 EXACT for their audits).
@@ -53,28 +61,76 @@ class SnowImageViewer < Formula
   end
 
   def install
-    # CI runs in the private qt-ohos-ci image (selected via
-    # OHOS_CI_IMAGE_OVERRIDES): the HAP toolchain from electron-ohos-ci plus
-    # the augmented Qt 6.13 OHOS SDK at /opt/qt-ohos (qtbase + qtsvg +
-    # linguist tools + Vulkan shim; recipe in the ohos-snow project).
-    qt = Pathname.new("/opt/qt-ohos/qt-6.13.0-dev")
-    clt = Pathname.new("/opt/electron-ohos-clt")
-    odie "snow-image-viewer builds only in the qt-ohos-ci CI image" unless (qt/"lib/cmake/Qt6/Qt6Config.cmake").exist?
+    qt = formula_opt_prefix("qt-ohos-sdk")/"libexec/qt-6.13.0-dev"
+    odie "Qt OHOS SDK missing" unless (qt/"lib/cmake/Qt6/Qt6Config.cmake").exist?
+    clt = buildpath/"command-line-tools"
+    resource("command-line-tools").stage clt
+    odie "HAP CLT missing" unless (clt/"hvigor/bin/hvigorw.js").exist?
+    # The CI container uses an OHOS Node runtime with a Linux kernel.
+    %w[hvigor hvigor-ohos-plugin].each do |package|
+      inreplace clt/"hvigor/#{package}/node_modules/@ohos/hvigor-common/src/util/system-util.js",
+                'return"HarmonyOS"===os_1.default.type()',
+                'return process.platform==="openharmony"||"HarmonyOS"===os_1.default.type()'
+    end
 
     resource("jthread").stage do
       cp_r "source", buildpath/"jthread-source"
     end
     ohos_sdk = formula_opt_prefix("ohos-sdk")
 
+    # es2abc expects the device HiLog API even when running in the build container.
+    hilog_source = buildpath/"hilog-stderr.c"
+    hilog_source.write <<~C
+      #include <stdarg.h>
+      #include <stdio.h>
+
+      int HiLogPrint(int type, int level, unsigned int domain, const char *tag, const char *format, ...) {
+        (void)type;
+        (void)level;
+        (void)domain;
+        char clean[4096];
+        size_t length = 0;
+        for (size_t i = 0; format && format[i] && length + 1 < sizeof(clean); ++i) {
+          if (format[i] == '%' && format[i + 1] == '{') {
+            clean[length++] = '%';
+            i += 2;
+            while (format[i] && format[i] != '}') ++i;
+            if (!format[i]) break;
+          } else {
+            clean[length++] = format[i];
+          }
+        }
+        clean[length] = '\\0';
+        fprintf(stderr, "[%s] ", tag ? tag : "");
+        va_list args;
+        va_start(args, format);
+        int count = vfprintf(stderr, clean, args);
+        va_end(args);
+        fputc('\\n', stderr);
+        return count;
+      }
+    C
+    (clt/"lib").mkpath
+    system ohos_sdk/"bin/clang", "-shared", "-fPIC", "-Wl,-soname,libhilog.so",
+           hilog_source, "-o", clt/"lib/libhilog.so"
+
     # Build-time Qt tools (moc/rcc/lrelease) are OHOS ELFs running natively
     # in the aarch64 container; hvigor additionally needs the CLT clang
     # runtimes and the libhilog stderr adapter.
-    ld_path = "#{qt}/lib:#{clt}/lib:" \
-              "#{clt}/sdk/default/openharmony/native/llvm/lib/clang/15.0.4/lib/aarch64-linux-ohos:" \
-              "#{formula_opt_prefix("zstd")}/lib"
-    ENV["LD_LIBRARY_PATH"] = ld_path
+    clang_lib = (clt/"sdk/default/openharmony/native/llvm/lib").glob("clang/*/lib/aarch64-linux-ohos").first
+    odie "CLT clang runtime missing" unless clang_lib
+    ENV["LD_LIBRARY_PATH"] = [
+      qt/"lib",
+      clt/"lib",
+      clt/"sdk/default/hms/toolchains/lib",
+      clt/"sdk/default/openharmony/toolchains/lib",
+      clang_lib,
+      formula_opt_lib("zstd"),
+    ].join(":")
     ENV["DEVECO_SDK_HOME"] = (clt/"sdk").to_s
     ENV["HOS_SDK_HOME"] = (clt/"sdk").to_s
+    ENV["JAVA_HOME"] = formula_opt_prefix("openjdk").to_s
+    ENV.prepend_path "PATH", formula_opt_bin("openjdk")
     # A container inheriting RLIMIT_NOFILE near 1e9 drives the musl FD-table
     # sizing into a refused mapping; cap it (only ever lowering).
     soft_cap, hard_cap = Process.getrlimit(Process::RLIMIT_NOFILE)
@@ -84,7 +140,7 @@ class SnowImageViewer < Formula
            "-DCMAKE_TOOLCHAIN_FILE=#{qt}/lib/cmake/Qt6/qt.toolchain.cmake",
            "-DQT_CHAINLOAD_TOOLCHAIN_FILE=#{ohos_sdk}/native/build/cmake/ohos.toolchain.cmake",
            "-DOHOS_ARCH=arm64-v8a",
-           "-DVulkanHeaders_DIR=/opt/qt-ohos/vk-shim/lib/cmake/VulkanHeaders",
+           "-DVulkanHeaders_DIR=#{qt}/share/vk-shim/lib/cmake/VulkanHeaders",
            "-DCMAKE_CXX_FLAGS=-I#{buildpath}/jthread-source -march=armv8-a+crc",
            "-DCMAKE_EXE_LINKER_FLAGS=-L#{qt}/lib -lc++_shared",
            "-DCMAKE_SHARED_LINKER_FLAGS=-L#{qt}/lib -lc++_shared",
@@ -95,7 +151,7 @@ class SnowImageViewer < Formula
     # The compiler's own codesign section lets executables run but the app
     # library is dlopen'd on device: re-sign with binary-sign-tool.
     app_lib = buildpath/"build/libsnow_image_viewer.so"
-    sign_tool = clt/"sdk/default/openharmony/toolchains/lib/binary-sign-tool"
+    sign_tool = ohos_sdk/"bin/binary-sign-tool"
     system sign_tool, "sign", "-selfSign", "1", "-inFile", app_lib,
            "-outFile", buildpath/"libsnow_image_viewer.signed"
     # NB: `install` here would recurse into Formula#install (arity 0).
