@@ -1,15 +1,54 @@
-# HAP 应用 formula 规范
+# HAP 桌面应用 formula 规范
 
-本 tap 里以 HAP 形态交付的应用（`*-app`、`app-installer`）遵循以下约定。
+本 tap 以 HAP 形态交付的桌面应用（`*-desktop`）遵循以下约定。架构和验收合同见 [ohos-app-refactor-plan.md](ohos-app-refactor-plan.md)，本文是日常维护规范。
+
+## 交付模型
+
+`brew install <name>-desktop` **只交付文件**：一个未签名 HAP、一份 `app.json` descriptor、ACL 版本清单。它不访问设备、不登录、不弹安装器、不启动服务、不改宿主配置。部署是显式动作：
+
+```
+ohos-app install <name>-desktop
+```
+
+没有 `post_install` 自动装机、没有 pending 队列、没有自动登录、没有后台补装进程。安装失败返回非零，由调用方决定如何处理。
+
+## 三个公开命令
+
+tap 自有的公开命令只有三个，各自职责单一，通过版本化的 L0 进程协议通信：
+
+| 命令 | 职责 |
+|---|---|
+| `ohos-app` | 编排：发现 descriptor，驱动签名与设备部署 |
+| `ohos-hap` | 签名 / 验证 / inspect HAP |
+| `ohos-device` | 设备操作（hdc / sideload）、安装状态与生命周期 |
+
+上游 CLI（如 `codex`、`opencode`、`claude-code`）是独立 formula，不属于这三个命令，也不被它们占用或包装。`ohos-app` 不实现签名、设备 I/O、装配、宿主服务管理，也不回调任何 `<app> install` 命令。
+
+`ohos-app` 的接口：
+
+```
+ohos-app list [--json]
+ohos-app info <id> [--json]
+ohos-app configure <id>
+ohos-app install <id> [--device SEL] [--variant NAME] [--signing-profile NAME]
+               [--method hdc|sideload|auto] [--start] [--json]
+ohos-app uninstall <id> [--device SEL] [--purge]
+ohos-app start|stop|status <id> [--device SEL] [--json]
+ohos-app logs <id> [--device SEL]
+ohos-app doctor [<id>] [--json]
+ohos-app cache list|prune
+```
+
+descriptor 从 `$HOMEBREW_PREFIX/opt/*/share/*/ohos/app.json` 发现，没有中央注册表。`uninstall` 默认保留设备数据，`--purge` 只清设备沙箱数据。
 
 ## 目录
 
 | 目录 | 放什么 |
 |---|---|
-| `Formula/<x>/<name>.rb` | formula，单文件自包含，不写 tap 级共享 Ruby |
-| `Patches/<name>/` | 只放对上游源码或第三方 resource 打的 `*.patch` |
-| `Resources/<name>/` | tap 自写的非补丁文件：`app/`（Electron 壳源码）、`assets/`（图标）、`scripts/`（启动器、`install-desktop.sh`、桥接脚本）、`hap/`（原生 HAP 工程模板）、`support/`（构建期辅助脚本）、`tests/`（`test do` 用的辅助文件） |
-| `Resources/_shared/<group>/` | 多个 formula 共用、逐字节相同的文件（如 `electron-shell/tray.cjs`） |
+| `Formula/<x>/<name>-desktop.rb` | formula，单文件自包含，不写 tap 级共享 Ruby |
+| `Patches/<name>-desktop/` | 只放对上游源码或第三方 resource 打的 `*.patch` |
+| `Resources/<name>-desktop/` | tap 自写的非补丁文件：`app/`（Electron 壳源码）、`assets/`（图标）、`tests/`（`test do` 用的辅助文件）、`app.json.in`（descriptor 模板） |
+| `Resources/_shared/<group>/` | 多个 formula 共用、逐字节相同的文件（如 `waiting-page/`） |
 
 不要把非补丁文件放进 `Patches/`。`remove-unused-patches` 逐文件判断引用，拼出来的路径（循环取文件、整目录拷贝）会被误判为未使用而删除。
 
@@ -27,210 +66,62 @@
 
 `pr-validate` 和 `publish-on-merge` 在 `Formula/**`、`Patches/**`、`Resources/**` 变化时触发。`detect-changes.sh` 把 `Patches/<name>/`、`Resources/<name>/` 的变化映射到 formula `<name>`，把 `Resources/_shared/<group>/` 的变化映射到所有引用它的 formula，这些 formula 一律重建（不适用 bottle-only、comment-only 的跳过）。
 
-只改 `Patches/` 或 `Resources/`、不动上游版本时，同样要给 formula 的 `revision` 加 1（见 skill 的 own-tap 第 10 条）。
+只改 `Patches/` 或 `Resources/`、不动上游版本时，同样要给 formula 的 `revision` 加 1。
 
 ## Electron 壳 formula 骨架
 
-底本是 `Formula/o/orca-app.rb`。段落顺序固定：
+底本是 `Formula/g/genoffice-desktop.rb`。段落顺序固定：
 
-1. 头部：`desc / homepage / url / sha256 / license / revision / livecheck / bottle`
-2. `depends_on`：`app-installer`、`node`、`ohos-sdk-toolchains`、`unzip`、`zip`、后端 formula（与官方 core 重名时写全限定名），app 专属依赖排最后
-3. `resource "electron-ohos"`：各 formula 使用同一个版本 pin
-4. `RESOURCE_FILES = %w[...]`：字面列出用到的每个文件；`install` 开头逐个检查，缺失就 `odie "missing tap resource: ..."`
-5. `install`：解包并拷入壳文件 → 品牌（bundleName、vendor、图标、所有 `*/element/string.json`）→ 去签名配置、`extractNativeLibs`、收窄权限 → `windowStageClose` 拦截 → CLT 守卫与环境、rlimit → `ohpm install` + `hvigorw assembleHap` → `libexec` 放未签名 HAP、`pkgshare/module-acl.json` 放 ACL 版本 → 脚本用 `cp` + `chmod 0755`（不用 `Pathname#install`，CI 里 tap 只读）→ `write_env_script`
-6. `caveats`：装机命令、子命令列表、ACL 与 `--no-acl` 的说明
-7. `test do`：`HOME` 与 `XDG_CONFIG_HOME` 都指进 `testpath`；假的 `hdc` 和 `app-installer`；默认与 `--no-acl` 两种变体的权限集；`free_port` 下的 `status`/`stop`；真实 HAP 的 `unzip -l` 与内容断言
+1. 头部：`desc / homepage / url / sha256 / license / livecheck / bottle`
+2. `depends_on`：上游 CLI（与官方 core 重名时写全限定名）、`node`、`ohos-sdk-toolchains`、`unzip`、`zip`
+3. `resource "electron-ohos"`：所有 formula 使用同一个版本 pin
+4. `patch` 块：遍历 `Patches/<name>-desktop/ohos/*.patch` 动态挂载
+5. `RESOURCE_FILES = %w[...]`：字面列出用到的每个文件；`install` 开头逐个检查，缺失就 `odie "missing tap resource: ..."`
+6. `install`：解包并拷入壳文件 → 品牌（bundleName、vendor、图标、`*/element/string.json`）→ 去签名配置、`extractNativeLibs`、收窄权限 → `windowStageClose` 拦截 → CLT 守卫与环境、rlimit → `ohpm install` + `hvigorw assembleHap` → `libexec` 放未签名 HAP、`pkgshare/module-acl.json` 放 ACL 版本 → 渲染等待页 → 写 `pkgshare/ohos/app.json` descriptor
+7. `test do`：校验 descriptor（schema/id/sha256/bundle_id/variant）、HAP 内容、壳源码语法与 node 测试；不访问设备
 
-`multica-app`、`herdr-app`、`snow-shot-app` 的构建路径不同，只遵守目录约定和 `RESOURCE_FILES` 清单。
+脚本用 `cp` + `chmod 0755`，不用 `Pathname#install`（CI 里 tap 只读）。
 
-## CLI 约定
+CLT 私有路径（`/opt/electron-ohos-clt`）由 CI 镜像提供，formula 只校验其存在并在缺失时 `odie`，不改 PATH 去猜。
 
-每个桌面 app 的命令是 `<name>-app`（已发布的 app 同时保留 `<name>-desktop` 符号链接），子命令：
+## descriptor（`app.json`）
 
-| 子命令 | 作用 |
-|---|---|
-| `install` | 往 HAP 的副本里注入本机配置，签名并安装 |
-| `start` / `stop` / `status` | 打开应用、停止、查看状态（有宿主后端的 app 同时管理后端） |
-| `serve` | 只启动宿主后端（浏览器或 CLI 使用）；仅确有宿主后端的 app 提供 |
-| `uninstall` | 从设备卸载本 app（`bm uninstall -k`，**默认保留**沙箱用户数据；仅 `--purge` 删数据） |
+`install` 生成 `pkgshare/ohos/app.json`，由 `ohos-app` 发现。关键字段：
 
-无宿主后端的 app 的 `stop` 是设备侧 `aa force-stop`，`status` 报告设备上是否在运行。
-每个 `<app>-app uninstall` 接受 `--device ID`（缺省用 `HDC_TARGET` 环境变量或 hdc
-第一个设备），对已不存在的 HAP 幂等成功。卸载逻辑统一走 `app-installer uninstall`
-（默认 `-k` 保留数据，`--purge` 删除数据，多设备无 `--device` 时报错列出设备）。
+- `schema_version`：1
+- `id`：`social4hyq/core/<name>-desktop`
+- `artifact`：`format: hap`、`path`、`sha256`、`api`、`abis`、`bundle_id`、`version_name`、`version_code`
+- `launch`：`module`、`ability`
+- `variants`：`default` 与 `definitions`（`basic` / `acl`，acl 带 `module_overlay` 与其 sha256）
 
-`install` 的选项：`--hap PATH`、`--config PATH`、`--device ID`、`--no-acl`、`--keep`。约定：结果行（`installed (<bundle>, <variant>)`）写 stdout，进度和错误写 stderr，这样 `brew test` 和调用方可以只读 stdout。
-
-wrapper（`write_env_script`）的环境变量统一用 `<PREFIX>_` 加这些后缀：`UNSIGNED_HAP`、`INSTALL_SCRIPT`、`MODULE_ACL`、`HDC_DEFAULT`、`<BACKEND>_BIN`，另有可覆盖的 `BUNDLE`、`APP_NAME`、`HDC`。前缀见下面的历史例外表。
-
-## `brew install` 后自动装机
-
-每个 HAP app 的 formula 在 `install` 之后、`caveats` 之前声明一步 post-install：
-
-```ruby
-post_install_steps do
-  run "{{HOMEBREW_PREFIX}}/bin/hap-app",
-      args: ["auto-install", "orca-app", "com.social4hyq.orca"],
-      must_succeed: false, print_stdout: true, network_access: true
-end
-```
-
-`hap-app` 由 `app-installer` 提供（所有 app 都依赖它）。Homebrew 在 link 之后执行
-`post_install_steps`，bottle 安装与 `brew upgrade` 都会走；`--build-bottle` 与
-`--skip-post-install` 会跳过，所以 CI 构建不会碰设备。**不要用 `def post_install`**：
-`brew style` 的 `InstallSteps` cop 已禁止，必须用 `post_install_steps`。
-
-行为：
-
-- 设备已连接、华为开发者已登录：立刻签名安装，装完用 `bm dump` 校验权限。
-  默认只打印准备、签名、上传、安装、权限等简洁阶段和最终结果，完整安装输出写
-  `~/.cache/hap-app/logs/`；失败时打印原因、下一步和日志路径
-  （`verbose=1` 或 `HAP_APP_VERBOSE=1` 可流式显示完整输出）。
-- 设备已连接但没登录：默认打开浏览器并最多等 120s，登录成功后继续安装；
-  登录未完成时入队，10 分钟内不为后续 app 重复弹登录。
-- 设备没连、多个设备、登录未完成、装机失败、权限未授予：不报错、不阻塞 brew，
-  把 `<command>` 登记到 `~/.cache/hap-app/pending/<command>.json`，
-  提示运行 `hap-app install-pending`；补装时登录只做一次。
-- 自动路径**不启动** app：`hap-app` 导出 `HAP_INSTALLER_NO_START=1`，app-installer
-  据此不 `aa start`；app 自己的 `install` 脚本如果会打开窗口（目前只有 `orca-app`），
-  也必须遵守这个变量（非 0 时只安装、不打开），不要把这种例外塞进共享的 `hap-app`。
-  `HAP_APP_AUTO_LOGIN=0`（或配置文件 `auto_login=0`）可关闭自动登录。
-- 自动签名前总会执行 `devecocli signature generate --product default` 刷新本地调试
-  profile，成功后重新签名安装；续签失败按 `sign` 入队。外部 `--profile` 和自有
-  `--keystore` 材料不经过这条自动续签路径，也不加后台定时续签进程。
-- 手动 `<app>-app install` 行为不变：仍会启动 app、仍会阻塞登录。
-- 权限：自动路径永远用默认 ACL 变体，不传 `--no-acl`；`hap-app` 从 app wrapper
-  的 `*_MODULE_ACL` 取 ACL 清单传给 `app-installer permissions --expect-acl`，
-  既确认装的是 ACL 变体，也只要求 `system_grant`（安装时授予）的权限为 granted；
-  `user_grant` 权限（粘贴、截屏等）装机后是 -1，只报告不判失败。
-- 失败会带原因（`tls` / `network` / `login` / `device` / `permissions` /
-  `install-failed`）入队，并记录 `attempts` 和最近一次失败的 `detail`；
-  `hap-app status` 按原因给出下一步和最近失败，`hap-app status --tsv` 保留机器可读的
-  四列输出。新条目写入 `v: 1`；没有版本号的历史条目继续按 v1 处理，未来版本和损坏的
-  队列条目不会被静默删除或覆盖，`status` 可见，用 `hap-app forget` 移除。
-- CI、root、`HAP_APP_AUTO_INSTALL=0`（或配置文件 `~/.config/hap-app/config`
-  里 `auto_install=0`）下静默 no-op。
-- 逃生口：`brew install --skip-post-install`；补跑用 `brew postinstall <app>`。
-
-Homebrew 的 `post_install` 不在用户的 shell 环境里跑：它把 `HOME` 换成
-`$TMPDIR/<formula>-postinstall-*`、清掉大多数环境变量，`/proc/<pid>/environ`
-也读不到，所以 `hdc`（`~/.harmony` 的鉴权密钥、`~/.HDCServer.pid`）、
-`devecocli`（登录态）和 `app-installer`（`~/.hap-installer/projects`）都找不到
-用户会话。`hap-app` 因此从 prefix 的父目录恢复真实 `HOME`：有家目录标记
-（`.HDCServer.pid`、`.harmony`、`.hap-installer`、`.app-installer`）即采信；
-全新机器一个标记都没有时，只要父目录里确实有 `.harmonybrew`（本 tap 的约定）
-且可写也采信。可用 `HAP_APP_USER_HOME` 覆盖。状态目录跟真实 `HOME` 走
-（`~/.cache/hap-app`、`~/.config/hap-app`），保证 post_install 与用户 shell 看到同一份。
-
-`hap-app` 子命令：`auto-install`（formula 用）、`install-pending`、`status [--tsv]`、
-`logs [app-command]`、`doctor [--network]`、`login`、`forget`。`status` 即使没有待装项也显示
-配置和日志目录；`logs` 不带参数列出保留的日志，带应用名输出最近一次完整日志。
-`app-installer` 另有 `ready`（无侧作用预检，输出 `ok <device>` / `no-device` /
-`no-login` / `no-hdc` / `multiple-devices`）、`login`、`permissions`。
-
-安静模式的阶段反馈使用内部协议：`hap-app` 设 `HAP_APP_PROGRESS=1`，`app-installer` 只在
-此时输出 `HAP_APP_STAGE<TAB><stage>`，阶段限定为 `profile/sign/upload/install`。`hap-app`
-把完整原文写日志，只显示白名单阶段，不解析 curl/DevEco 的人类可读输出；verbose 模式不启用
-该协议。应用安装脚本无需修改，也不要自行打印这个内部前缀。
-
-### 厂商二进制在安装时下载
-
-闭源上游的官方包不进 bottle（避免二次分发）：`codex-app` 的 ChatGPT `.deb`、
-`claude-code-app` 的 Claude Desktop `.deb` 都由 `<app> install` 在安装时下载并校验
-sha256，缓存到 `~/.cache/<app>/vendor/`，再合成 HAP、签名安装。`obsidian-app` 一直
-是同样的模式（安装时下载官方 asar）。
-
-- 离线安装：`<app> install --deb PATH`（仍会校验 sha256）。
-- 清理缓存：`<app> install --clean-cache`。
-- 首次 `brew install` 会多一次大文件下载（codex-app 约 519 MB）；下载/网络失败按
-  `network` 入队，`hap-app install-pending` 重试时命中缓存不重复下载。
-
-### TLS / 代理与日志（新 PC 排障）
-
-Homebrew 跑 `post_install` 时清空环境变量，所以**在 shell 里 export 的
-`NODE_EXTRA_CA_CERTS` / `NODE_TLS_REJECT_UNAUTHORIZED` / `HTTPS_PROXY` 不会传给
-DevEco CLI 或厂商包下载的 curl**——公司电脑上常见的失败就是签名报
-`self-signed certificate in certificate chain`、厂商包直连超时，而手动
-`hap-app install-pending` 又正常。把网络设置写进文件（不会被清掉）：
-
-```ini
-# ~/.app-installer/config
-tls_ca=/absolute/path/to/proxy-ca.pem     # 首选：信任代理/VPN 的 CA
-# https_proxy=http://127.0.0.1:7890       # 可选
-# no_proxy=localhost,127.0.0.1            # 可选；与代理配置独立
-# tls_insecure=1                          # 最后手段：完全关掉证书校验
-```
-
-- `https_proxy` 和 `no_proxy` 由 `hap-app` 在恢复真实 HOME 后分别导出为大小写两套
-  环境变量，DevEco 签名和厂商包下载都会继承。shell 里已有 `HTTPS_PROXY` 或
-  `https_proxy` 时优先使用 shell 的代理；`NO_PROXY` 或 `no_proxy` 同理。两组设置独立，
-  shell 只设代理时仍会读取文件里的 `no_proxy`。
-- `tls_ca` 只影响 app-installer 调 DevEco 签名的环境，指向不存在的文件会直接报错。
-- `tls_insecure=1` 会给 DevEco CLI（及其子进程）设上
-  `NODE_TLS_REJECT_UNAUTHORIZED=0`，并给上述三个厂商包的 curl 下载加 `--insecure`，
-  即彻底不校验证书。shell 里已有 `HAP_INSTALLER_TLS_INSECURE` 时优先使用 shell（包括
-  显式设为 `0`）。curl 禁用证书校验不会关闭下载后的 sha256 校验；不使用全局 `.curlrc`。
-  该设置也能穿透 brew post_install 清环境，但代价是华为登录 token、签名响应和厂商下载
-  在链路上可被读取/伪造；每次运行都会打 WARNING，`doctor` 显示
-  `warn TLS config (... disabled)`。证书能装就优先用 `tls_ca`，把它当临时手段并在修好后删掉。
-- `app-installer doctor`（也可运行 `hap-app doctor`）显示当前 TLS 配置；
-  `app-installer doctor --network` 会用同样的 TLS 设置探测
-  `https://developer.huawei.com`（配了 HTTPS 代理时跳过，因为 DevEco 可能走不同路由）；
-  确认证书不被信任时按提示改配置再重试，不用重装 brew 包。
-- doctor 还通过 `app-installer-sign --check-decoder` 预检随包 DevEco CLI 的私有密码解码器，
-  不需要 HAP、profile 或真实密码。压缩代码识别和受限 `vm` 调用独立在
-  `Resources/app-installer/deveco-decoder.cjs`，布局不识别时 fail closed；升级 CLI 时必须保留
-  随包真实 CLI 测试，不能用自有 `--keystore` 路径的通过结果代替。
-- 同一轮 brew 里如果签名已因证书链失败，10 分钟内（且 `~/.app-installer/config`
-  没变）后续 app 直接入队、不再重复尝试；`hap-app install-pending` 会清除这个标记，
-  所以改完配置手动补装一定能重试。
-- `~/.config/hap-app/config` 管行为：`auto_install=0`、`auto_login=0`、`verbose=1`。
-- 日志在 `~/.cache/hap-app/logs/`，创建时请求目录 0700、文件 0600（hmdfs 可能强制其他
-  权限模式，以其为准），保留最近 20 个；失败时结果里会打印路径，也可用 `hap-app logs`
-  列出日志或 `hap-app logs <app-command>` 查看最近全文。
-
-## 共享安装库
-
-`Resources/_shared/hap-app/install-lib.sh` 是 Electron 壳 app 共用的安装流程：解析参数、检查工具、ACL 的 `module.json` 与 HAP 的 bundle 一致性预检、暂存目录、把要注入的文件加进 HAP 副本、流式调用 `app-installer`、`--keep`、结果行。formula 把它 `cp` 到 `pkgshare/"hap-app-install-lib.sh"`，与每个 app 自己的薄脚本 `install-desktop.sh` 放在同一目录，薄脚本 `source` 它。
-
-薄脚本设置 `APP_CMD`、`ENV_PREFIX`、`BUNDLE_ID_DEFAULT`、`APP_NAME_DEFAULT`，并定义 `stage_tree CONFIG TREE`（把要放进 HAP 的文件写到 `TREE` 下，路径与 HAP 根一致）；可选的 `NEED_CONFIG`、`EXTRA_TOOLS`、`KEEP_BASENAME`、`MODULE`、`ABILITY`、`app_usage_extra`、`app_parse_option`、`app_prepare` 见库文件头部的注释。库的行为由 `.github/scripts/test-hap-install-lib.sh` 独立测试，改库前先跑它。
-
-注意：`Resources/_shared/hap-app/` 的任何改动会让所有引用它的 formula 重建，所以库要少改。
+`test do` 必须核对 descriptor 的 sha256 与实际 HAP 一致，防止描述与交付物漂移。
 
 ## 共享的等待页（`waiting.html`）
 
-Electron 壳启动时先显示的等待页，各 app 之前各存一份，现在由一份模板加每个 app 的文案在构建时生成：
+Electron 壳启动时先显示的等待页，由一份模板加每个 app 的文案在构建时生成：
 
 - `Resources/_shared/waiting-page/waiting.html.in`：模板，占位符 `{{name}}`、`{{command}}`、`{{subtitle}}`、`{{accent}}`、`{{wash}}`、`{{washDark}}`。
-- `Resources/_shared/waiting-page/render-waiting.cjs`：渲染器（node）。它是严格的：占位符缺值、值没被用到、值里带 `< > & ' " \` 或换行或 `{{`、占位符格式不对，都是错误。
+- `Resources/_shared/waiting-page/render-waiting.cjs`：渲染器（node）。严格：占位符缺值、值没被用到、值里带 `< > & ' " \` 或换行或 `{{`、占位符格式不对，都是错误。
 - `Resources/<app>/app/waiting.json`：每个 app 的文案（名字、命令、副标题、三个颜色）。
 - formula 在 `install` 里调用渲染器，输出到 HAP 的 `app/waiting.html`，并把渲染器、模板和 `waiting.json` 列进 `RESOURCE_FILES`。
-- `Resources/_shared/waiting-page/expected.sha256` 固定每个 app 渲染结果的 sha256（迁移时等于被替换的原页面）。要有意改某个页面，就在同一个 PR 里更新这里的哈希；`test-waiting-page.sh` 会在 `hap-checks` 里检查，所以页面不会被悄悄改掉。
+
+文案改动直接体现在 `waiting.json` 的 diff 里，由 code review 把关；不锁定渲染结果的哈希。
 
 ## CI 检查
 
-`pr-validate` 里的 `hap-checks` job 不依赖 `detect`，在构建之前几秒内跑完，失败时不会进入构建：
+`pr-validate` 的 `hap-checks` job 不依赖 `detect`，在构建之前几秒内跑完，失败时不进入构建：
 
-- `.github/scripts/check-hap-formulae.py`：有 `Resources/<name>/` 的 formula 必须有字面 `RESOURCE_FILES`，清单与目录里的文件逐项一致，清单里的路径都存在，并有 `odie "missing tap resource"` 检查；所有 formula 的 `electron-ohos` 版本（url 与 sha256）一致；从 tap 取文件不能用 `.install`（只能 `cp`）。
-- `.github/scripts/test-hap-install-lib.sh`：用假的 `app-installer` 和现做的最小 HAP 测共享安装库。
-- `.github/scripts/test-waiting-page.sh`：渲染每个用到共享等待页的 app，结果必须等于 `expected.sha256` 里固定的哈希，并检查渲染器的严格性。
+- `.github/scripts/check-hap-formulae.py`：有 `Resources/<name>/` 的 formula 必须有字面 `RESOURCE_FILES`，清单与目录文件逐项一致、路径都存在，并有 `odie "missing tap resource"` 检查；所有 formula 的 `electron-ohos` 版本（url 与 sha256）一致；从 tap 取文件不能用 `.install`（只能 `cp`）。
+- `.github/scripts/test-detect-changes.sh`：变更检测的单元测试。
+- `.github/scripts/test-waiting-page.sh`：渲染每个用到共享等待页的 app，并检查渲染器严格性。
 
-本机运行：`python3 .github/scripts/check-hap-formulae.py`、`.github/scripts/test-hap-install-lib.sh`（需要 bash、node、zip、unzip）。
+本机运行：`python3 .github/scripts/check-hap-formulae.py`、`.github/scripts/test-detect-changes.sh`、`.github/scripts/test-waiting-page.sh`（需要 bash、node）。
+
+源码构建与 bottle 发布在 CI 容器内进行；本机 `--build-from-source` / `--build-bottle` 被禁用，只能跑 `brew readall` / `style` / `audit`。
 
 ## 标识命名与历史例外
 
-新 app 使用：bundle ID `com.social4hyq.<name>`，命令 `<name>-app`，环境变量前缀 `<NAME>_DESKTOP_`，状态目录 `~/.config/<name>-app`。
-
-已发布的 app 不改标识（改 bundle ID 会丢失已装应用沙箱里的数据，改状态目录需要迁移），现状如下：
-
-| formula | bundle ID | 状态目录 | 环境变量前缀 |
-|---|---|---|---|
-| opencode-app | `com.social4hyq.opencodedesktop` | `~/.config/opencode-desktop` | `OPENCODE_DESKTOP_` |
-| orca-app | `com.social4hyq.orca` | `~/.config/orca-app` | `ORCA_DESKTOP_` |
-| zcode-app | `com.social4hyq.zcodedesktop` | `~/.config/zcode-desktop` | `ZCODE_DESKTOP_` |
-| deepseek-harness-app | `com.social4hyq.deepseekharness` | `~/.config/deepseek-harness-desktop` | `DSH_DESKTOP_`、`DSH_APP_` |
-| magpie-app | `com.social4hyq.magpiedesktop` | — | `MAGPIE_APP_` |
-| obsidian-app | `com.social4hyq.obsidiandesktop` | — | `OBSIDIAN_DESKTOP_` |
+新 app 使用：bundle ID `com.social4hyq.<name>`，formula 名 `<name>-desktop`。bundle ID 保持不变（改它会导致已装应用丢沙箱数据）。已发布的 app 沿用既有 bundle ID，见各 formula 的 descriptor。
 
 ## 迁移检查清单（`Patches/<name>` → `Resources/<name>`）
 

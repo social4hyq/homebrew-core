@@ -82,9 +82,9 @@ brew install bun
 
 `ohos-compat-shim` 只处理部分已知的系统调用与运行库差异，并非所有工具都会自动加载。需要诊断时可运行 `ohos-shim check`，兼容层的使用方式见其[项目说明](https://github.com/social4hyq/ohos-compat-shim)。历史限制与排查线索见 [docs/known-limitations.md](docs/known-limitations.md)；具体表现以当前系统和工具版本为准。
 
-## HAP 应用 formula
+## HAP 桌面应用 formula
 
-`*-app` 类 formula 的目录布局（`Patches/` 与 `Resources/`）、标准骨架和命名约定见 [docs/hap-app-formulae.md](docs/hap-app-formulae.md)。
+`*-desktop` 类 formula 的交付模型、三命令架构、目录布局（`Patches/` 与 `Resources/`）、标准骨架和命名约定见 [docs/hap-app-formulae.md](docs/hap-app-formulae.md)。发版与从旧版升级的清理顺序见 [docs/desktop-app-release-notes.md](docs/desktop-app-release-notes.md)。
 
 ## 反馈与仓库
 
