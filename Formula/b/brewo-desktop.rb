@@ -11,6 +11,12 @@ class BrewoDesktop < Formula
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/brewo-desktop-v0.3.2-r1"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "13d6c0b358c08fff310233f8d6010402d0de45810a404c22ba0f9341246db5d4"
+  end
+
   depends_on "node" => :build
   depends_on "ohos-sdk" => :build
   depends_on "zip" => :build
