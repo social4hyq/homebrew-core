@@ -3,8 +3,8 @@ class OrcaApp < Formula
   homepage "https://github.com/stablyai/orca"
   # Version follows the Orca release; shell sources live in Resources/orca-app
   # and the host runtime comes from the `orca` formula (same upstream tag).
-  url "https://github.com/stablyai/orca/archive/refs/tags/v1.4.277.tar.gz"
-  sha256 "9585018402f8ccf175127a23e37db81ad82d4af120fb063d94da5636bcc559a7"
+  url "https://github.com/stablyai/orca/archive/refs/tags/v1.4.279.tar.gz"
+  sha256 "28b5bc256f126651088283416c1110b9904380970d6e9dc5cbe711c439f4e54e"
   # Tap-authored shell scripts (MIT) on the CPF-Electron runtime (mixed
   # MIT/BSD/LGPL).
   license :cannot_represent
