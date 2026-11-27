@@ -175,7 +175,7 @@ SigningProfile：`name` / `kind`（external-material | vendor-debug）/ p7b / ke
 - 非秘密配置放 `XDG_CONFIG_HOME/ohos-hap/`；私钥不复制到项目树/bottle/缓存；厂商 debug token 留在厂商 CLI/OS 凭据设施，ohos-hap 只持引用。
 - 外部材料是首选稳定后端，可离线签名；厂商 debug 路径单独 `ohos-hap auth login` / `profile refresh`。
 - DevEco ToolProvider/decoder/axios 差异封装在 vendor adapter，按 CLI/SDK/Node/adapter 协议锁兼容矩阵，未知布局 fail closed。
-- **密码绝不进 argv**：优先受保护 fd/stdin、keychain、签名 agent；若工具只支持明文 argv，目标架构拒绝该后端，不以"临时兼容"恢复泄漏。签名后必须验证，失败不发布输出。
+- **密码输入（实测修正，见 `docs/signing-argv-protection-findings.md`）**：优先受保护 fd/stdin/keychain/签名 agent。实测当前 SDK 的 `hap-sign-tool -pwdInputMode 1` 是 **TTY 交互**（pipe/stdin 喂入报 `failed to get keystorePwd, please check terminal permissions`），不是受保护 fd 输入，自动化场景不可用；因此当前 SDK 的自动化路径仍是 argv 密码，"绝不进 argv"暂不可达。处置：外部材料/keystore 由用户控制密码来源，残余风险写入已知限制，不自动登录；推动上游支持受保护 fd 后再收紧。签名后必须验证，失败不发布输出。
 - **侧载不改变 kind**：`--method` 只传 `ohos-device`，绝不触发 ohos-hap 登录/刷新；只有官方出现现有 kind 无法表达的新凭据行为时才新增版本化 kind。
 
 ### 5.2 设备层（`ohos-device`，多后端）
@@ -408,7 +408,7 @@ L2 代码在 `ohos-app` 单 PR 合入（归属见 §6.5）；第一个厂商 des
 3. **上游透明**：`claude install/stop`、`opencode uninstall/service`、`magpie status/uninstall`、`harbor start/stop` 保持上游语义，不触发 HAP 操作。
 4. **无回环**：运行追踪只有 `ohos-app → artifact/sign/device` 单向调用，插件不能回调高层入口。
 5. **显式部署**：只有 `ohos-app install`/底层显式命令才签名部署，默认不启动，失败非零，无后台补装。
-6. **签名独立**：无设备可 inspect/sign/verify；未登录不影响不需新签名的查询/卸载；秘密不进 argv/日志/descriptor/共享缓存。
+6. **签名独立**：无设备可 inspect/sign/verify；未登录不影响不需新签名的查询/卸载；秘密值不进日志/descriptor/共享缓存；argv 密码按实测限制处理（当前 SDK 自动化不可免，见 `docs/signing-argv-protection-findings.md`），不自动登录。
 7. **设备可信**：安装成功以 `bm dump` 后置状态为准；多设备不歧义；默认保留数据，purge 不碰宿主数据。
 8. **运行时不混层**：`ohos-app start/stop/status` 只操作设备 HAP；daemon/bridge 只能由上游 CLI/brew services 显式控制。
 9. **缓存正确**：assembler/厂商包/shell HAP/variant/ABI 任一变化使共享缓存失效；配对配置和签名材料永不进共享缓存。
