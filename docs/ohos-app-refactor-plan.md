@@ -242,6 +242,40 @@ install_result: { type, operation_id, backend, state: "installed",
 
 ---
 
+## 6.2 Homebrew Cask 对标研究（权威，实测文档）
+
+依据 `docs.brew.sh/Cask-Cookbook` 与 `How-to-Create-and-Maintain-a-Tap`（2026-11 抓取）。Cask 是 Homebrew 交付 GUI 应用的官方形态，是本设计最贴近的业界参照。结论：**Cask 的声明式交付、token 命名、uninstall/zap 分离强烈支持本方案；但 Cask 不签名、不部署到外部设备，这部分必须自研。**
+
+### 6.2.1 直接印证本方案的 Cask 机制
+
+| Cask 机制 | 本方案对应 | 判定 |
+|---|---|---|
+| 声明式 stanza：作者只声明"装什么"（version/sha256/url/app/binary），顺序无关，Homebrew 决定如何装 | `app.json` manifest 声明 artifact/variant/hook，引擎决定流程 | **一致**。强化了"公式只声明、引擎执行"的边界 |
+| `app`/`binary`/`pkg`/`installer`/`command_wrapper` artifact stanza：声明要安装的制品，不是命令式脚本 | `app.json` 的 artifact + 类型化 assembler | **一致**，且 Cask 的 `command_wrapper`（无 CLI 时生成 shim、透明 exec）正对应"无上游 CLI 就不造命令" |
+| `zap`（更彻底卸载，含用户文件/共享资源）与 `uninstall` **分离**，官方 cask 必须有 zap | `ohos-app uninstall [--purge]`：默认 `bm uninstall -k` 保留数据，`--purge` 才清沙箱 | **一致**（`--purge` 即 zap 语义，且明确不碰宿主配置）。Cask 把 zap 设为官方 cask 必需，佐证"purge 是独立、显式的破坏性操作" |
+| `brew install --cask` 只把 app 移入 `/Applications`，**不自动启动** | `ohos-app install` 默认不启动，`--start` 才 `aa start` | **强一致**。Cask 从不因安装而启动 app，直接印证删除 post_install 自动启动/自动装机 |
+| `auto_updates`：声明 app 自行更新，Homebrew 不干预 | Homebrew 管 package version，HAP 管 versionName/versionCode；不另造版本 channel | **一致**。Cask 也把"应用自更新"排除在包管理器之外 |
+| Cask token 全局唯一、简化命名、与 formula 区分 | `<name>-desktop` 包名 + 上游 CLI 名分离，四种身份独立 | **一致**。Cask 明确要求 cask 名全局唯一且不能与 formula 冲突 |
+| 结构化 `preflight_steps`/`postflight_steps`：只含字面参数的支持步骤、可序列化进 JSON API、不加载 cask Ruby、禁任意 Ruby | 版本化 manifest + fd JSON 插件协议、禁 `source`、禁回调 | **方向一致**。Cask 用"受限 DSL + JSON API"取代可执行 Ruby，正是本方案"插件外部进程 + 结构化合同"的同类思路 |
+| `{{temp}}` 私有 0700 临时目录、install-time token、`{{...}}` 延迟展开 | secret 只传引用、0700 工作目录、不拼 shell 字符串 | **一致** |
+| `installer script`/`pkg` **不在沙箱运行**（需广泛写权限/root），官方明确承认 | 压测 P0：进程隔离不是安全沙箱，v1 只执行受信 tap 插件、不以 root 跑 | **强印证**。Cask 官方承认 installer 不沙箱，正是本方案"不宣传强制隔离"的权威依据 |
+| Caskroom 版本化 `$(brew --caskroom)/<token>/<version>/` + 不可变制品 | bottle 不可变 + opt 稳定路径 + 内容寻址缓存 | **一致** |
+
+### 6.2.2 Cask 不覆盖、必须自研的部分
+
+- **签名与凭据**：Cask 依赖 macOS Gatekeeper/公证，开发者签名由 Apple 生态处理；OHOS 需本地 debug profile + DevEco/AGC 登录 + `hap-sign-tool`，且密码不能进 argv（Cask 无对应概念）。
+- **外部设备部署**：Cask 是**本机**安装（移入 `/Applications`）；本方案要把 signed HAP 部署到 hdc 设备或系统侧载安装器，含多设备选择、分片上传、`bm install`、后置核验、用户确认协议——全部无 Cask 对应物。
+- **ACL 权限变体**：OHOS `basic`/`acl` 变体与权限清单是平台特有，Cask 无对应。
+- **宿主 bridge/配对**：OHOS 沙箱读不到宿主、需 loopback 令牌桥；Cask 的 app 直接跑在本机，无此问题。
+
+### 6.2.3 由 Cask 研究触发的方案微调
+
+1. `uninstall --purge` 的文档表述统一为"**zap 语义**：只清设备沙箱数据，不碰宿主配置/缓存/token"，与 Cask zap 对齐，避免用户误以为 purge 会清一切。
+2. 强调 `app.json` 是**声明式、顺序无关**的 manifest——实施 PR 1 schema 时禁止把 hook 写成有序命令列表（Cask 只有 `*_steps` 是有序的，本方案的 assembler 是类型化输入输出合同，不是 DAG）。
+3. `ohos-app configure` 的定位对标 Cask `postflight_steps`：是受限、显式、可序列化的补充步骤，不是任意 shell；宿主配置写入走应用私有配置根。
+
+---
+
 ## 6.5 第六轮压测修正（Codex 6.2-sol，权威补充）
 
 本节来自对定稿的第六轮对抗压测（`/data/storage/el2/base/cache/stress-final.md`）。它**不改变清场目标**，但修正了实施顺序和几处会导致第一周翻车的细节。与本节冲突时以本节为准。
