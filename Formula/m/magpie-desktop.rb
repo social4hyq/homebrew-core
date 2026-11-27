@@ -11,6 +11,11 @@ class MagpieDesktop < Formula
     strategy :github_latest
   end
 
+  bottle do
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/magpie-desktop-v0.1.4828-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "cc6c1996d8e1ce8eabd0658540fda917166d85d6357e887ebb29f1741badbdd6"
+  end
+
   depends_on "node"
   depends_on "ohos-sdk-toolchains"
   depends_on "social4hyq/core/magpie"
