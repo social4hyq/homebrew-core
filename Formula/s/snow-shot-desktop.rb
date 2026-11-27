@@ -1,9 +1,10 @@
-class SnowShotApp < Formula
+class SnowShotDesktop < Formula
   desc "Screenshot and annotation utility from Snow Apps, unsigned OHOS HAP"
   homepage "https://github.com/mg-chao/snow-shot"
   url "https://github.com/mg-chao/snow-shot/archive/refs/tags/v1.6.5_snow-shot.tar.gz"
   sha256 "125059b53d029b9fba8307868595c2eed478b4bf129b88c22d4a4dbb0f30c0d6"
   license "GPL-3.0-or-later"
+  revision 1
 
   livecheck do
     url "https://github.com/mg-chao/snow-shot.git"
@@ -12,8 +13,8 @@ class SnowShotApp < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-app-v1.6.5-r1"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "9ce814e61030868a6183ca715b28b3f46155ddf5f67a478be2e0a6249959e904"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-desktop-v1.6.5-r1"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "42321b3bc12e923648105e44cd0c64236807735e0567c07b13d41e530597bae3"
   end
 
   depends_on "brotli" => :build
@@ -49,7 +50,6 @@ class SnowShotApp < Formula
   depends_on "webp" => :build
   depends_on "zlib-ng-compat" => :build
   depends_on "zstd" => :build
-  depends_on "app-installer"
   depends_on "ohos-sdk-toolchains"
 
   resource "ocr-detection-model" do
@@ -79,7 +79,7 @@ class SnowShotApp < Formula
     sha256 "e33a186d63d201560416f8bc215c76198307704975b7f61bb1e9196c9bf25296"
 
     patch do
-      file "Patches/snow-shot-app/ocr/src_runtime.rs.patch"
+      file "Patches/snow-shot-desktop/ocr/src_runtime.rs.patch"
     end
   end
 
@@ -122,7 +122,7 @@ class SnowShotApp < Formula
   end
 
   patch_root = Pathname(__dir__).parent.parent
-  Dir[(patch_root/"Patches/snow-shot-app/ohos/*.patch").to_s].each do |path|
+  Dir[(patch_root/"Patches/snow-shot-desktop/ohos/*.patch").to_s].each do |path|
     patch do
       file Pathname(path).relative_path_from(patch_root).to_s
     end
@@ -130,35 +130,36 @@ class SnowShotApp < Formula
 
   # The unused-resource audit requires literal tap paths.
   RESOURCE_FILES = %w[
-    Resources/snow-shot-app/ohos-template/AppScope/resources/base/media/app_icon.png
-    Resources/snow-shot-app/ohos-template/assets/README.md
-    Resources/snow-shot-app/ohos-template/assets/app-icon.svg
-    Resources/snow-shot-app/ohos-template/assets/app-labels.json
-    Resources/snow-shot-app/ohos-template/entry/src/main/cpp/types/libsnow_shot/index.d.ts
-    Resources/snow-shot-app/ohos-template/entry/src/main/ets/qability/QAbility.ets
-    Resources/snow-shot-app/ohos-template/entry/src/main/ets/statusbar/StatusBarAbility.ets
-    Resources/snow-shot-app/ohos-template/entry/src/main/ets/statusbar/StatusBarPage.ets
-    Resources/snow-shot-app/ohos-template/entry/src/main/resources/base/media/background.png
-    Resources/snow-shot-app/ohos-template/entry/src/main/resources/base/media/foreground.png
-    Resources/snow-shot-app/ohos-template/entry/src/main/resources/base/media/startIcon.png
-    Resources/snow-shot-app/snow-shot-install.sh
-    Resources/snow-shot-app/support/scripts/add-ohos-module-permissions.py
-    Resources/snow-shot-app/support/scripts/finalize-ohos-ocr-manifest.py
-    Resources/snow-shot-app/support/scripts/merge-ohos-translations.py
-    Resources/snow-shot-app/support/scripts/stage-ohos-app-icon-assets.py
-    Resources/snow-shot-app/support/scripts/stage-ohos-app-label-assets.py
-    Resources/snow-shot-app/support/scripts/stage-ohos-ocr-assets.py
-    Resources/snow-shot-app/support/scripts/test-add-ohos-module-permissions.py
-    Resources/snow-shot-app/support/scripts/test-finalize-ohos-ocr-manifest.py
-    Resources/snow-shot-app/support/scripts/test-snow-shot-hap-runtime-closure.py
-    Resources/snow-shot-app/support/scripts/test-stage-ohos-ocr-assets.py
-    Resources/snow-shot-app/support/translations.json
+    Resources/snow-shot-desktop/ohos-template/AppScope/resources/base/media/app_icon.png
+    Resources/snow-shot-desktop/ohos-template/assets/README.md
+    Resources/snow-shot-desktop/ohos-template/assets/app-icon.svg
+    Resources/snow-shot-desktop/ohos-template/assets/app-labels.json
+    Resources/snow-shot-desktop/ohos-template/entry/src/main/cpp/types/libsnow_shot/index.d.ts
+    Resources/snow-shot-desktop/ohos-template/entry/src/main/ets/qability/QAbility.ets
+    Resources/snow-shot-desktop/ohos-template/entry/src/main/ets/statusbar/StatusBarAbility.ets
+    Resources/snow-shot-desktop/ohos-template/entry/src/main/ets/statusbar/StatusBarPage.ets
+    Resources/snow-shot-desktop/ohos-template/entry/src/main/resources/base/media/background.png
+    Resources/snow-shot-desktop/ohos-template/entry/src/main/resources/base/media/foreground.png
+    Resources/snow-shot-desktop/ohos-template/entry/src/main/resources/base/media/startIcon.png
+    Resources/snow-shot-desktop/support/scripts/add-ohos-module-permissions.py
+    Resources/snow-shot-desktop/support/scripts/finalize-ohos-ocr-manifest.py
+    Resources/snow-shot-desktop/support/scripts/merge-ohos-translations.py
+    Resources/snow-shot-desktop/support/scripts/stage-ohos-app-icon-assets.py
+    Resources/snow-shot-desktop/support/scripts/stage-ohos-app-label-assets.py
+    Resources/snow-shot-desktop/support/scripts/stage-ohos-ocr-assets.py
+    Resources/snow-shot-desktop/support/scripts/test-add-ohos-module-permissions.py
+    Resources/snow-shot-desktop/support/scripts/test-finalize-ohos-ocr-manifest.py
+    Resources/snow-shot-desktop/support/scripts/test-snow-shot-hap-runtime-closure.py
+    Resources/snow-shot-desktop/support/scripts/test-stage-ohos-ocr-assets.py
+    Resources/snow-shot-desktop/support/translations.json
   ].freeze
 
   def install
     qt = Pathname.new("/opt/qt-ohos/qt-6.13.0-dev")
     clt = Pathname.new("/opt/electron-ohos-clt")
-    odie "snow-shot builds only in the qt-ohos-ci CI image" unless (qt/"lib/cmake/Qt6/Qt6Config.cmake").exist?
+    unless (qt/"lib/cmake/Qt6/Qt6Config.cmake").exist?
+      odie "#{name} builds only in qt-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES['#{name}']"
+    end
 
     ohos_sdk = formula_opt_prefix("ohos-sdk")
     opencv = formula_opt_prefix("snow-shot-opencv")
@@ -178,7 +179,7 @@ class SnowShotApp < Formula
     resource("jthread").stage buildpath/"jthread"
     mkdir_p ocr_crate
     tap_root = Pathname(__FILE__).parent.parent.parent
-    res = tap_root/"Resources/snow-shot-app"
+    res = tap_root/"Resources/snow-shot-desktop"
     RESOURCE_FILES.each { |file| odie "missing tap resource: #{file}" unless (tap_root/file).exist? }
     system "python3", res/"support/scripts/merge-ohos-translations.py", buildpath/"snow_shot",
            res/"support/translations.json"
@@ -374,13 +375,34 @@ class SnowShotApp < Formula
 
     package_hap(qt, clt, ohos_sdk, qt_tls)
     unsigned_hap = "hap-proj/entry/build/default/outputs/default/entry-default-unsigned.hap"
-    libexec.install unsigned_hap => "snow-shot-unsigned.hap"
-    (libexec/"snow-shot-install").write (res/"snow-shot-install.sh").read
-    chmod 0555, libexec/"snow-shot-install"
-    (bin/"snow-shot-app").write_env_script libexec/"snow-shot-install",
-      SNOW_SHOT_HAP:         libexec/"snow-shot-unsigned.hap",
-      SNOW_SHOT_HDC_DEFAULT: formula_opt_prefix("ohos-sdk-toolchains")/"hdc"
-    bin.install_symlink "snow-shot-app" => "snow-shot"
+    libexec.install unsigned_hap => "snow-shot-desktop-unsigned.hap"
+
+    # The HAP is delivered through app.json; deployment is an explicit
+    # `ohos-app install snow-shot-desktop`. Snow Shot has no upstream CLI.
+    # Descriptor is written at build time with the real HAP digest and version.
+    (pkgshare/"ohos").mkpath
+    hap = libexec/"snow-shot-desktop-unsigned.hap"
+    hap_sha = Digest::SHA256.file(hap).hexdigest
+    descriptor = {
+      "schema_version" => 1,
+      "id"             => "social4hyq/core/snow-shot-desktop",
+      "artifact"       => {
+        "format"       => "hap",
+        "path"         => "../../libexec/snow-shot-desktop-unsigned.hap",
+        "sha256"       => hap_sha,
+        "api"          => 12,
+        "abis"         => ["arm64-v8a"],
+        "bundle_id"    => "com.social4hyq.snowshot",
+        "version_name" => version.to_s,
+        "version_code" => 1,
+      },
+      "launch"         => { "module" => "entry", "ability" => "QAbility" },
+      "variants"       => {
+        "default"     => "basic",
+        "definitions" => { "basic" => {} },
+      },
+    }
+    (pkgshare/"ohos/app.json").write JSON.pretty_generate(descriptor) + "\n"
   end
 
   def build_qt_tls(qt_sdk, native_sdk)
@@ -514,7 +536,7 @@ class SnowShotApp < Formula
     end
     ENV["DEVECO_SDK_HOME"] = (buildpath/"hap-sdk").to_s
     ENV["HOS_SDK_HOME"] = (buildpath/"hap-sdk").to_s
-    res = Pathname(__FILE__).parent.parent.parent/"Resources/snow-shot-app"
+    res = Pathname(__FILE__).parent.parent.parent/"Resources/snow-shot-desktop"
     stage = buildpath/"hap-proj"
     app_lib = buildpath/"build/snow_shot/libsnow_shot.so"
     runtime_lib_dirs = [app_lib.dirname.to_s] + recursive_dependencies.filter_map do |dependency|
@@ -610,75 +632,22 @@ class SnowShotApp < Formula
            "--system-lib-dir", sdk_lib_dir, "--system-lib-dir", clt_lib_dir
   end
 
-  post_install_steps do
-    run "{{HOMEBREW_PREFIX}}/bin/hap-app",
-        args: ["auto-install", "snow-shot-app", "com.social4hyq.snowshot"],
-        must_succeed: false, print_stdout: true, network_access: true
-  end
-
   test do
-    hap = libexec/"snow-shot-unsigned.hap"
-    assert_predicate bin/"snow-shot", :symlink?
-    assert_match "Usage: snow-shot-app <command>", shell_output("#{bin}/snow-shot --help")
-    assert_match "unknown command: bogus", shell_output("#{bin}/snow-shot-app bogus 2>&1", 2)
-    fake_bin = testpath/"bin"
-    fake_bin.mkpath
-    installer_args = testpath/"app-installer-args"
-    (fake_bin/"app-installer").write <<~SH
-      #!/bin/sh
-      printf '%s\\n' "$@" > #{installer_args}
-    SH
-    chmod 0755, fake_bin/"app-installer"
-    (fake_bin/"hdc").write "#!/bin/sh\necho 127.0.0.1:1\n"
-    chmod 0755, fake_bin/"hdc"
-    with_env(PATH: "#{fake_bin}:#{ENV["PATH"]}", SNOW_SHOT_HDC: (fake_bin/"hdc").to_s) do
-      assert_match "Usage: snow-shot-app <command>", shell_output(bin/"snow-shot-app")
-      refute_path_exists installer_args
-      shell_output("#{bin}/snow-shot-app install --no-start")
-    end
-    args = installer_args.read.lines(chomp: true)
-    assert_equal ["--hap", hap.to_s], args.first(2)
-    assert_equal %w[--bundle-id com.social4hyq.snowshot --app-name SnowShot --module entry
-                    --ability QAbility --no-start], args.drop(2)
+    # Only the HAP and descriptor are delivered; no app-level install command.
+    refute_path_exists bin/"snow-shot-app"
+    refute_path_exists bin/"snow-shot"
 
-    # The wider CLI matrix: start/stop/status address the device through the
-    # bundled hdc; uninstall goes through app-installer and keeps the app's
-    # data unless --purge is given.
-    hdc_log = testpath/"hdc-log"
-    (fake_bin/"hdc").delete
-    (fake_bin/"hdc").write <<~SH
-      #!/bin/sh
-      printf '%s\\n' "$*" >> #{hdc_log}
-      if [ "$1" = "shell" ] && [ "$2" = "ps -ef" ]; then
-        if [ -z "${FAKE_STOPPED:-}" ]; then
-          printf '%s\\n' "u 1 1 1 1 ? 00:00:00 com.social4hyq.snowshot"
-        fi
-        printf '%s\\n' "u 1 1 1 1 ? 00:00:00 sh -c echo com.social4hyq.snowshot"
-      fi
-    SH
-    chmod 0755, fake_bin/"hdc"
-    with_env("SNOW_SHOT_HDC" => (fake_bin/"hdc").to_s, "PATH" => "#{fake_bin}:#{ENV["PATH"]}") do
-      shell_output("#{bin}/snow-shot-app start --device tablet-1")
-      assert_match "-t tablet-1 shell aa start", (testpath/"hdc-log").read
-      shell_output("#{bin}/snow-shot-app stop")
-      assert_match "shell aa force-stop com.social4hyq.snowshot", (testpath/"hdc-log").read
-      assert_match "running", shell_output("#{bin}/snow-shot-app status")
-      with_env("FAKE_STOPPED" => "1") do
-        assert_match "not running", shell_output("#{bin}/snow-shot-app status 2>&1", 1)
-      end
-      shell_output("#{bin}/snow-shot-app uninstall --purge --device tablet-1")
-      assert_equal %w[uninstall --bundle-id com.social4hyq.snowshot --device tablet-1 --purge],
-                   installer_args.read.lines(chomp: true)
-      shell_output("#{bin}/snow-shot-app uninstall")
-      assert_equal %w[uninstall --bundle-id com.social4hyq.snowshot], installer_args.read.lines(chomp: true)
-    end
-    with_env("HDC_TARGET" => "env-device", "SNOW_SHOT_HDC" => (fake_bin/"hdc").to_s,
-             "PATH" => "#{fake_bin}:#{ENV["PATH"]}") do
-      shell_output("#{bin}/snow-shot-app uninstall")
-    end
-    assert_equal %w[uninstall --bundle-id com.social4hyq.snowshot --device env-device],
-                 installer_args.read.lines(chomp: true)
-    assert_match "uninstall", shell_output("#{bin}/snow-shot-app --help")
+    # Descriptor schema, id, digest and variants must match the HAP.
+    descriptor = JSON.parse((pkgshare/"ohos/app.json").read)
+    assert_equal 1, descriptor["schema_version"]
+    assert_equal "social4hyq/core/snow-shot-desktop", descriptor["id"]
+    hap = libexec/"snow-shot-desktop-unsigned.hap"
+    assert_equal Digest::SHA256.file(hap).hexdigest, descriptor.dig("artifact", "sha256")
+    assert_equal "com.social4hyq.snowshot", descriptor.dig("artifact", "bundle_id")
+    assert_equal "entry", descriptor.dig("launch", "module")
+    assert_equal "QAbility", descriptor.dig("launch", "ability")
+    assert_equal "basic", descriptor.dig("variants", "default")
+
     listing = shell_output("unzip -l #{hap}")
     %w[
       libsnow_shot.so libqohos.so libQt6Widgets.so.6
@@ -704,9 +673,9 @@ class SnowShotApp < Formula
            "libs/arm64-v8a/libsnow_ocr_inprocess.so", "-d", testpath/"ocr-check"
     ocr_manifest = JSON.parse((testpath/"ocr-check/resources/rawfile/ocr/asset-manifest.json").read)
     runtime = testpath/"ocr-check/libs/arm64-v8a/libsnow_ocr_inprocess.so"
-    descriptor = ocr_manifest.fetch("runtime").fetch("files").fetch(0)
-    assert_equal descriptor.fetch("size"), runtime.size
-    assert_equal descriptor.fetch("sha256"), Digest::SHA256.file(runtime).hexdigest
+    ocr_descriptor = ocr_manifest.fetch("runtime").fetch("files").fetch(0)
+    assert_equal ocr_descriptor.fetch("size"), runtime.size
+    assert_equal ocr_descriptor.fetch("sha256"), Digest::SHA256.file(runtime).hexdigest
     system "unzip", "-tq", hap
   end
 end
