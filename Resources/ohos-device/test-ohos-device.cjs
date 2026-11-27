@@ -104,7 +104,7 @@ test("explicit sideload: fail closed BEFORE any hdc call", () => {
 });
 
 test("no pending file created on failure", () => {
-  const rf = writeReq(req({ method: "sideload" }), "req-failcase.json"); // 名字勿含 "pending"
+  const rf = writeReq(req({ method: "sideload" }), "req-failcase.json"); // Do not include "pending" in the filename.
   const before = fs.readdirSync(tmp).filter((f) => f.startsWith("pending")).length;
   run(["install", "--request", rf], hdc);
   const after = fs.readdirSync(tmp).filter((f) => f.startsWith("pending")).length;
