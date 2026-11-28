@@ -128,6 +128,27 @@ function selectDevice(devBin, requested) {
   return devices[0];
 }
 
+function hapSigningEnv(hapBin, profileName) {
+  const env = { ...process.env };
+  if (env.HAP_SIGN_TOOL) return env;
+
+  // Let ohos-hap's profile-specific signer take precedence over auto-discovery.
+  const profileResult = spawnSync(hapBin, ["profile", "show", profileName], {
+    encoding: "utf8", timeout: 30000, env,
+  });
+  if (profileResult.status === 0) {
+    try {
+      if (JSON.parse(profileResult.stdout || "null")?.signer_path) return env;
+    } catch {}
+  }
+
+  const bundledSigner = path.join(prefix(), "opt", "ohos-sdk-toolchains", "lib", "hap-sign-tool");
+  if (fs.existsSync(bundledSigner) && fs.statSync(bundledSigner).isFile()) {
+    env.HAP_SIGN_TOOL = bundledSigner;
+  }
+  return env;
+}
+
 function cmdList() {
   const items = enumerateDescriptors().map((e) => {
     const d = JSON.parse(fs.readFileSync(e.path, "utf8"));
@@ -234,9 +255,10 @@ function cmdInstall(o) {
 
   // L3 sign: build SigningRequest, call ohos-hap.
   const signedOut = path.join(dir, `.ohos-app-signed-${process.pid}.hap`);
+  const signingProfileName = o.signing_profile || doc.signing_profile || "default";
   const signReq = { protocol_version: 1, input_hap: toSign,
     input_sha256: sha256File(toSign), output_path: signedOut,
-    signing_profile_name: o.signing_profile || doc.signing_profile || "default",
+    signing_profile_name: signingProfileName,
     expected: { bundle_id: doc.artifact.bundle_id, version_code: doc.artifact.version_code } };
   const signReqFile = path.join(dir, `.ohos-app-signreq-${process.pid}.json`);
   const signResFile = path.join(dir, `.ohos-app-signres-${process.pid}.json`);
@@ -246,7 +268,9 @@ function cmdInstall(o) {
     for (const file of ephemeralFiles) { try { fs.rmSync(file, { force: true }); } catch {} }
   });
   fs.writeFileSync(signReqFile, JSON.stringify(signReq), { mode: 0o600 });
-  const sr = spawnSync(hapBin, ["sign", "--request", signReqFile, "--result", signResFile], { stdio: "inherit", timeout: 300000 });
+  const sr = spawnSync(hapBin, ["sign", "--request", signReqFile, "--result", signResFile], {
+    stdio: "inherit", timeout: 300000, env: hapSigningEnv(hapBin, signingProfileName),
+  });
   if (sr.status !== 0) fail("ERR_SIGN_FAILED", "ohos-hap sign failed");
   if (!fs.existsSync(signedOut)) fail("ERR_SIGN_FAILED", "no signed HAP from ohos-hap");
 
