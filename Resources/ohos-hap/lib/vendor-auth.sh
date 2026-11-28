@@ -77,9 +77,12 @@ case "$subcommand" in
       if [ "$opened" -eq 0 ] && [[ "$line" =~ $url_re ]]; then
         opened=1
         if [ -x "$AA" ] && "$AA" start -b com.huawei.hmos.browser -a MainAbility -U "${BASH_REMATCH[0]}" >/dev/null 2>&1; then
-          printf '%s\n' 'vendor-auth: opened login page in the system browser; finish signing in there.'
+          # `aa start` returns success once the launch request is accepted; it
+          # does not prove a browser window appeared (sandboxed shells start
+          # the ability silently). Point the user at the printed URL either way.
+          printf '%s\n' 'vendor-auth: requested browser launch via aa; if no window appears, open the URL above manually.'
         else
-          printf '%s\n' 'vendor-auth: could not open browser automatically; open the URL above by hand.'
+          printf '%s\n' 'vendor-auth: could not request browser launch; open the URL above by hand.'
         fi
       fi
     done
