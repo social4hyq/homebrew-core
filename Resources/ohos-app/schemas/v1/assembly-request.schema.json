@@ -4,15 +4,24 @@
   "title": "assembly request — engine → assembler plugin",
   "type": "object",
   "additionalProperties": false,
-  "required": ["protocol_version", "unsigned_hap", "out_hap", "variant", "abi", "tree"],
+  "required": ["protocol_version", "unsigned_hap", "out_hap", "variant", "variant_definition", "abi", "tree", "config"],
   "properties": {
     "protocol_version": { "const": 1 },
     "unsigned_hap": { "type": "string", "description": "verified content-addressed path" },
     "out_hap": { "type": "string" },
     "variant": { "type": "string" },
+    "variant_definition": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "module_overlay": { "type": ["string", "null"] },
+        "sha256": { "type": ["string", "null"], "pattern": "^[a-f0-9]{64}$" }
+      }
+    },
     "abi": { "type": "string" },
     "api": { "type": "integer" },
     "tree": { "type": "string", "description": "0700 private staging dir for injected files" },
+    "personalized_tree": { "type": ["string", "null"], "description": "private output from the personalizer plugin for this install" },
     "verified_artifacts": { "type": "object", "description": "name → verified path (no URLs, no secrets)" },
     "config": { "type": "object", "description": "closed, non-secret config only" }
   }

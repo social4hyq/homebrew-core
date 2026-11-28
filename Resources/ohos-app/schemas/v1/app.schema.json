@@ -37,6 +37,7 @@
         "ability": { "type": "string", "minLength": 1 }
       }
     },
+    "signing_profile": { "type": "string", "pattern": "^[a-zA-Z0-9._-]+$", "description": "default logical ohos-hap profile for this app; --signing-profile overrides it" },
     "variants": {
       "type": "object",
       "additionalProperties": false,

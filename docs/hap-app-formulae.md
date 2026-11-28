@@ -22,7 +22,7 @@ tap 自有的公开命令只有三个，各自职责单一，通过版本化的 
 | `ohos-hap` | 签名 / 验证 / inspect HAP |
 | `ohos-device` | 设备操作（hdc / sideload）、安装状态与生命周期 |
 
-上游 CLI（如 `codex`、`opencode`、`claude-code`）是独立 formula，不属于这三个命令，也不被它们占用或包装。`ohos-app` 不实现签名、设备 I/O、装配、宿主服务管理，也不回调任何 `<app> install` 命令。
+上游 CLI（如 `codex`、`opencode`、`claude-code`）是独立 formula，不属于这三个命令，也不被它们占用或包装。`ohos-app` 不实现签名、设备 I/O、装配或宿主服务管理；需要个性化或组装的 app 通过 descriptor 声明 Node 插件，由 `ohos-app install` 按 personalization → assembly → sign → device 的顺序编排。插件不回调任何 `<app> install` 命令。
 
 `ohos-app` 的接口：
 
@@ -93,6 +93,8 @@ CLT 私有路径（`/opt/electron-ohos-clt`）由 CI 镜像提供，formula 只�
 - `artifact`：`format: hap`、`path`、`sha256`、`api`、`abis`、`bundle_id`、`version_name`、`version_code`
 - `launch`：`module`、`ability`
 - `variants`：`default` 与 `definitions`（`basic` / `acl`，acl 带 `module_overlay` 与其 sha256）
+- `signing_profile`：可选，指定该 app 默认使用的 `ohos-hap` 逻辑 profile；CLI 的 `--signing-profile` 优先级更高。
+- `personalization` / `assembly`：可选的 keg 内 Node 插件路径。`ohos-app install` 为本次安装创建私有 staging，先运行 personalizer（传入非秘密 HOME/PATH/XDG），再运行 assembler（传入所选 variant、已校验的 overlay 路径和 personalizer 输出），最后走统一签名与设备部署。无插件的现有 descriptor 保持直接签名 unsigned HAP 的行为。
 
 `test do` 必须核对 descriptor 的 sha256 与实际 HAP 一致，防止描述与交付物漂移。
 

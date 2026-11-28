@@ -91,6 +91,43 @@ function sha256File(p) {
   return crypto.createHash("sha256").update(fs.readFileSync(p)).digest("hex");
 }
 
+function runPlugin(dir, relativePath, requestPath, role) {
+  const plugin = resolvePath(dir, relativePath);
+  if (!fs.existsSync(plugin) || !fs.statSync(plugin).isFile()) {
+    fail("ERR_INVALID_REQUEST", `${role} plugin not found: ${relativePath}`);
+  }
+  const result = spawnSync(process.execPath, [plugin, "--protocol", "1", "--request", requestPath], {
+    stdio: "inherit", timeout: 300000,
+    env: { PATH: process.env.PATH || "", HOME: process.env.HOME || "" },
+  });
+  if (result.error || result.status !== 0) {
+    fail("ERR_INVALID_REQUEST", `${role} plugin failed (${result.status})`);
+  }
+}
+
+function hostContext() {
+  return {
+    home: process.env.HOME || "",
+    path: process.env.PATH || "",
+    xdg_config: process.env.XDG_CONFIG_HOME || "",
+    xdg_data: process.env.XDG_DATA_HOME || "",
+    xdg_state: process.env.XDG_STATE_HOME || "",
+  };
+}
+
+function selectDevice(devBin, requested) {
+  if (requested) return requested;
+  const result = spawnSync(devBin, ["list", "--json"], { encoding: "utf8", timeout: 30000 });
+  if (result.error || result.status !== 0) fail("ERR_BACKEND_UNAVAILABLE", "cannot enumerate devices");
+  let doc;
+  try { doc = JSON.parse((result.stdout || "").trim().split("\n").pop()); }
+  catch { fail("ERR_BACKEND_UNAVAILABLE", "device list returned invalid JSON"); }
+  const devices = Array.isArray(doc.devices) ? doc.devices : [];
+  if (devices.length === 0) return "local";
+  if (devices.length > 1) fail("ERR_INVALID_REQUEST", `multiple devices connected; pass --device (found ${devices.length})`);
+  return devices[0];
+}
+
 function cmdList() {
   const items = enumerateDescriptors().map((e) => {
     const d = JSON.parse(fs.readFileSync(e.path, "utf8"));
@@ -129,22 +166,68 @@ function cmdInstall(o) {
   const devBin = process.env.OHOS_APP_DEVICE_BIN || path.join(prefix(), "bin/ohos-device");
   if (!fs.existsSync(hapBin)) fail("ERR_BACKEND_UNAVAILABLE", `ohos-hap not found: ${hapBin}`);
   if (!fs.existsSync(devBin)) fail("ERR_BACKEND_UNAVAILABLE", `ohos-device not found: ${devBin}`);
+  const selectedDevice = selectDevice(devBin, o.device);
 
   const variantDef = doc.variants.definitions[variant];
-  // L2 assembly: if a type builtin or plugin is declared, run it (thin call —
-  // the engine does not implement assembler logic itself). For the simplest
-  // no-plugin case, the unsigned HAP is signed directly.
+  let moduleOverlay = null;
+  if (variantDef.module_overlay && doc.assembly?.plugin) {
+    moduleOverlay = resolvePath(dir, variantDef.module_overlay);
+    // Older desktop formulas placed module-acl.json beside ohos/app.json while
+    // storing a bare filename in the descriptor. Accept that layout during the
+    // transition; new descriptors should use an explicit relative path.
+    if (!fs.existsSync(moduleOverlay) && !variantDef.module_overlay.includes("/")) {
+      const adjacent = resolvePath(path.dirname(dir), variantDef.module_overlay);
+      if (fs.existsSync(adjacent)) moduleOverlay = adjacent;
+    }
+    const overlaySha = sha256File(moduleOverlay);
+    if (!variantDef.sha256 || overlaySha !== variantDef.sha256) {
+      fail("ERR_INVALID_REQUEST", `variant module_overlay sha256 mismatch: ${variant}`);
+    }
+  }
+  if (doc.personalization && !doc.assembly?.plugin) {
+    fail("ERR_INVALID_REQUEST", "personalization requires an assembly plugin");
+  }
+  const stage = path.join(dir, `.ohos-app-stage-${process.pid}-${crypto.randomBytes(6).toString("hex")}`);
+  fs.mkdirSync(stage, { recursive: true, mode: 0o700 });
+  process.on("exit", () => { try { fs.rmSync(stage, { recursive: true, force: true }); } catch {} });
+  const host = hostContext();
+  let personalizedTree = null;
+  if (doc.personalization?.plugin) {
+    personalizedTree = path.join(stage, "personalized");
+    fs.mkdirSync(personalizedTree, { mode: 0o700 });
+    const stateRoot = host.xdg_state || path.join(host.home, ".local", "state");
+    const declaredConfigRoot = doc.personalization.config_root || "$XDG_STATE_HOME/ohos-app/integrations/" +
+      doc.id.replaceAll("/", "_");
+    const configRoot = path.resolve(declaredConfigRoot.replaceAll("$XDG_STATE_HOME", stateRoot));
+    const personalizeReq = {
+      protocol_version: 1, config_root: configRoot, output_tree: personalizedTree, host,
+    };
+    const requestPath = path.join(stage, "personalization-request.json");
+    fs.writeFileSync(requestPath, JSON.stringify(personalizeReq), { mode: 0o600 });
+    runPlugin(dir, doc.personalization.plugin, requestPath, "personalizer");
+  }
+
+  // L2 assembly is delegated to the app's assembler plugin. The engine owns
+  // artifact/overlay verification and passes only verified paths plus the
+  // selected variant and private personalized tree.
   let toSign = unsigned;
   if (doc.assembly?.plugin) {
-    const plugin = resolvePath(dir, doc.assembly.plugin);
-    const tree = path.join(dir, ".ohos-app-stage-" + process.pid);
-    fs.mkdirSync(tree, { recursive: true });
-    const req = { protocol_version: 1, unsigned_hap: unsigned, out_hap: path.join(tree, "assembled.hap"),
-      variant, abi: doc.artifact?.abis?.[0] || "arm64-v8a", tree, config: doc.assembly.config || {} };
-    const rf = path.join(tree, "assembly-request.json");
-    fs.writeFileSync(rf, JSON.stringify(req));
-    const ar = spawnSync(plugin, ["--protocol", "1", "--request", rf], { stdio: "inherit", timeout: 300000 });
-    if (ar.status !== 0) fail("ERR_INVALID_REQUEST", `assembler plugin failed (${ar.status})`);
+    const req = {
+      protocol_version: 1,
+      unsigned_hap: unsigned,
+      out_hap: path.join(stage, "assembled.hap"),
+      variant,
+      variant_definition: { module_overlay: moduleOverlay, sha256: variantDef.sha256 || null },
+      abi: doc.artifact?.abis?.[0] || "arm64-v8a",
+      api: doc.artifact?.api || null,
+      tree: path.join(stage, "tree"),
+      personalized_tree: personalizedTree,
+      config: doc.assembly.config || {},
+    };
+    fs.mkdirSync(req.tree, { mode: 0o700 });
+    const rf = path.join(stage, "assembly-request.json");
+    fs.writeFileSync(rf, JSON.stringify(req), { mode: 0o600 });
+    runPlugin(dir, doc.assembly.plugin, rf, "assembler");
     toSign = req.out_hap;
     if (!fs.existsSync(toSign)) fail("ERR_INVALID_REQUEST", "assembler produced no output");
   }
@@ -153,22 +236,26 @@ function cmdInstall(o) {
   const signedOut = path.join(dir, `.ohos-app-signed-${process.pid}.hap`);
   const signReq = { protocol_version: 1, input_hap: toSign,
     input_sha256: sha256File(toSign), output_path: signedOut,
-    signing_profile_name: o.signing_profile || "default",
+    signing_profile_name: o.signing_profile || doc.signing_profile || "default",
     expected: { bundle_id: doc.artifact.bundle_id, version_code: doc.artifact.version_code } };
   const signReqFile = path.join(dir, `.ohos-app-signreq-${process.pid}.json`);
   const signResFile = path.join(dir, `.ohos-app-signres-${process.pid}.json`);
-  fs.writeFileSync(signReqFile, JSON.stringify(signReq));
+  const instReqFile = path.join(dir, `.ohos-app-instreq-${process.pid}.json`);
+  const ephemeralFiles = [signReqFile, signResFile, instReqFile, signedOut];
+  process.on("exit", () => {
+    for (const file of ephemeralFiles) { try { fs.rmSync(file, { force: true }); } catch {} }
+  });
+  fs.writeFileSync(signReqFile, JSON.stringify(signReq), { mode: 0o600 });
   const sr = spawnSync(hapBin, ["sign", "--request", signReqFile, "--result", signResFile], { stdio: "inherit", timeout: 300000 });
   if (sr.status !== 0) fail("ERR_SIGN_FAILED", "ohos-hap sign failed");
   if (!fs.existsSync(signedOut)) fail("ERR_SIGN_FAILED", "no signed HAP from ohos-hap");
 
   // L4 install: build InstallRequest, call ohos-device, stream its NDJSON.
-  const instReq = { protocol_version: 1, method: o.method || "auto", device: o.device || "local",
+  const instReq = { protocol_version: 1, method: o.method || "auto", device: selectedDevice,
     hap_path: signedOut, hap_sha256: sha256File(signedOut),
     expected: { bundle_id: doc.artifact.bundle_id, version_name: doc.artifact.version_name,
       version_code: doc.artifact.version_code }, wait: true };
-  const instReqFile = path.join(dir, `.ohos-app-instreq-${process.pid}.json`);
-  fs.writeFileSync(instReqFile, JSON.stringify(instReq));
+  fs.writeFileSync(instReqFile, JSON.stringify(instReq), { mode: 0o600 });
   const ir = spawnSync(devBin, ["install", "--request", instReqFile], { encoding: "utf8", timeout: 600000 });
   if (ir.stdout) process.stdout.write(ir.stdout);
   if (ir.stderr) process.stderr.write(ir.stderr);
@@ -188,6 +275,7 @@ function cmdInstall(o) {
   // cleanup temp artifacts (no persistent state)
   for (const f of [signReqFile, signResFile, instReqFile]) { try { fs.unlinkSync(f); } catch {} }
   try { fs.unlinkSync(signedOut); } catch {}
+  try { fs.rmSync(stage, { recursive: true, force: true }); } catch {}
   out({ protocol_version: 1, command: "install", id: doc.id, variant, state: "installed" });
 }
 function cmdUninstall(o) {

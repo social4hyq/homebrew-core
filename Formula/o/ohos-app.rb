@@ -7,6 +7,7 @@ class OhosApp < Formula
   version "1.0.0"
   sha256 "0f37124f93b2431ebba47ba7f8f91ceb8ec2324c02ae6689399aa5359e9b3a7e"
   license "MIT"
+  revision 2
 
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-app-v1.0.0-r1"
@@ -66,11 +67,12 @@ class OhosApp < Formula
       to sign and deploy the HAP to a device. It does not launch the app unless
       --start is passed, and failures are non-zero (no pending queue, no retry).
 
-      ohos-app only orchestrates: it reads the desktop formula's app.json
-      descriptor and drives ohos-hap (sign) and ohos-device (install/uninstall/
-      lifecycle) through their versioned L0 process contracts. It does NOT
-      implement signing, device I/O, assembly, host-service management, or call
-      any <app> install command — there is no loopback.
+      ohos-app orchestrates: it reads the desktop formula's app.json descriptor,
+      runs any declared personalization/assembly plugins, then drives ohos-hap
+      (sign) and ohos-device (install/uninstall/lifecycle) through their
+      versioned process contracts. The engine does not implement signing,
+      device I/O, assembly, or host-service management, and never calls an
+      <app> install command — there is no loopback.
 
       Descriptors are discovered from $HOMEBREW_PREFIX/opt/*/share/*/ohos/app.json
       (no central registry). Uninstall keeps device data by default; --purge

@@ -59,6 +59,7 @@ const fs=require("fs");
 const logf=process.env.FAKE_DEV_LOG||"/dev/null";
 fs.appendFileSync(logf, process.argv.slice(2).join(" ")+"\\n");
 const cmd=process.argv[2];
+if(cmd==="list") { console.log(JSON.stringify({protocol_version:1,devices:["device-1"]})); process.exit(0); }
 if(cmd==="install"){
   const req=JSON.parse(fs.readFileSync(process.argv[process.argv.indexOf("--request")+1],"utf8"));
   console.log(JSON.stringify({protocol_version:1,type:"install_state",operation_id:"op",backend:req.method||"auto",state:"installing",observed_at:"2026-11-27T00:00:00Z"}));
@@ -97,6 +98,51 @@ test("install: drives sign then device, streams events, no loopback", () => {
   const devlog = fs.readFileSync(env.FAKE_DEV_LOG, "utf8");
   assert.ok(devlog.includes("install"), "device install called");
   assert.ok(!devlog.includes("demo-desktop install"), "no <app> install loopback");
+});
+
+test("install: personalizes and assembles the selected variant before signing", () => {
+  const personalizedLog = path.join(tmp, "personalizer.json");
+  const assemblyLog = path.join(tmp, "assembler.json");
+  const appWithPlugins = makeApp("plugin-desktop", {
+    assembly: { protocol: 1, plugin: "assembler.cjs", config: {
+      bundle: "test", personalized_log: personalizedLog, assembly_log: assemblyLog,
+    } },
+    personalization: { protocol: 1, plugin: "personalizer.cjs" },
+    variants: { default: "acl", definitions: {
+      basic: {}, acl: { module_overlay: "module-acl.json", sha256: "" },
+    } },
+  });
+  const overlay = path.join(appWithPlugins.dir, "module-acl.json");
+  fs.writeFileSync(overlay, "{\"module\":{\"requestPermissions\":[{\"name\":\"acl\"}]}}\n");
+  appWithPlugins.doc.variants.definitions.acl.sha256 = sha(fs.readFileSync(overlay));
+  fs.writeFileSync(path.join(appWithPlugins.dir, "app.json"), JSON.stringify(appWithPlugins.doc));
+  fs.writeFileSync(path.join(appWithPlugins.dir, "personalizer.cjs"), `
+    const fs=require("node:fs"),path=require("node:path");
+    const r=JSON.parse(fs.readFileSync(process.argv[process.argv.indexOf("--request")+1],"utf8"));
+    fs.mkdirSync(r.output_tree,{recursive:true});
+    fs.writeFileSync(path.join(r.output_tree,"host.json"),JSON.stringify(r.host));
+  `);
+  fs.writeFileSync(path.join(appWithPlugins.dir, "assembler.cjs"), `
+    const fs=require("node:fs"),path=require("node:path");
+    const r=JSON.parse(fs.readFileSync(process.argv[process.argv.indexOf("--request")+1],"utf8"));
+    const host=JSON.parse(fs.readFileSync(path.join(r.personalized_tree,"host.json"),"utf8"));
+    fs.writeFileSync(r.config.personalized_log,JSON.stringify(host));
+    fs.writeFileSync(r.config.assembly_log,JSON.stringify(r));
+    fs.copyFileSync(r.unsigned_hap,r.out_hap);
+  `);
+  const res = run(["install", "plugin-desktop", "--method", "hdc"], {
+    ...env, HOME: "/test/home", XDG_CONFIG_HOME: "/test/config", PATH: process.env.PATH,
+  });
+  assert.equal(res.status, 0, res.stderr + res.stdout);
+  const personalized = JSON.parse(fs.readFileSync(personalizedLog, "utf8"));
+  assert.equal(personalized.home, "/test/home");
+  assert.equal(personalized.xdg_config, "/test/config");
+  const assembled = JSON.parse(fs.readFileSync(assemblyLog, "utf8"));
+  assert.equal(assembled.variant, "acl");
+  assert.equal(assembled.variant_definition.module_overlay, overlay);
+  assert.equal(assembled.variant_definition.sha256, appWithPlugins.doc.variants.definitions.acl.sha256);
+  assert.match(assembled.personalized_tree, /ohos-app-stage/);
+  assert.equal(assembled.config.bundle, "test");
 });
 
 test("install: fake L3 got signed HAP (not unsigned) — sign before device", () => {
