@@ -6,7 +6,7 @@ class OpencodeDesktop < Formula
   # Tap-authored shell sources (MIT) on the CPF-Electron runtime (mixed
   # MIT/BSD/LGPL).
   license :cannot_represent
-  revision 1
+  revision 2
 
   livecheck do
     url :stable
@@ -15,10 +15,11 @@ class OpencodeDesktop < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-desktop-v2.4.2-r9"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "edf12ec9580f55f7abb6c589e06bee804be5c5cf731d75e1bf5c475b7087f44d"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-desktop-v2.4.2-r10"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "2950cef5de28a47bf9e6f4b8bb8d1069491cf951983c56e28c613ed1d075f2c5"
   end
 
+  depends_on "ohos-hap-clt" => :build
   depends_on "curl"
   depends_on "node"
   depends_on "ohos-sdk-toolchains"
@@ -44,6 +45,13 @@ class OpencodeDesktop < Formula
   resource "electron-ohos" do
     url "https://gitcode.com/CPF-Electron/Electron/releases/download/v40.0.1/v40.0.1.20261028.2-release.zip"
     sha256 "5268fe3c994ec2ce48a999fd6b5029d9cb0e409b07c0395e2a6072e50cb3e1ac"
+  end
+
+  # Publicly mirrored official CLT replaces the private electron-ohos-ci image;
+  # ohos-hap-clt stage verifies the SHA-256 and lays it out for the build.
+  resource "command-line-tools" do
+    url "https://s3.oheco.org/command-line-tools/26.0.0.201/commandline-tools-harmonyos-26.0.0.201.tar.gz"
+    sha256 "60929c00ae486cc038ea48145497ad34dbd4ac6a25c3f2fa895ce74afb4607f5"
   end
 
   def install
@@ -130,25 +138,36 @@ class OpencodeDesktop < Formula
     inreplace shell/"web_engine/src/main/ets/ability/WebAbility.ets",
               "    super.onWindowStageCreate(windowStage);\n", close_handler
 
-    # The proprietary CLT is supplied by the CI image, not distributed by the tap.
-    clt = Pathname.new("/opt/electron-ohos-clt")
-    unless (clt/"hvigor/bin/hvigorw.js").exist?
-      odie "#{name} builds only in electron-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES['#{name}']"
-    end
+    # Stage the publicly mirrored CLI into the build tree: no private image.
+    clt = buildpath/"command-line-tools"
+    hap_clt = formula_opt_bin("ohos-hap-clt")/"ohos-hap-clt"
+    archive = resource("command-line-tools")
+    archive.fetch
+    system hap_clt.to_s, "stage", clt.to_s, archive.cached_download.to_s
 
-    # ohos_packing_tool needs SDK libraries outside brew's sanitized search path.
+    # The opencode source root is an ES module ("type": "module"). The staged
+    # CLT sits under that root, so Node would treat the CommonJS hvigorw.js as
+    # ESM. Pin the CLT subtree back to CommonJS with a nearest package.json.
+    (clt/"package.json").write JSON.generate("type" => "commonjs")
+
+    # ohpm and ohos_packing_tool need the staged SDK libraries on the search
+    # path; the hvigor wrapper extends this same value for the assemble step.
+    # Resolve the clang runtime by glob so the pinned CLT's version may differ.
+    clang_lib = (clt/"sdk/default/openharmony/native/llvm/lib").glob("clang/*/lib/aarch64-linux-ohos").first
+    odie "staged CLT missing clang runtime" if clang_lib.nil?
     ENV["DEVECO_SDK_HOME"] = (clt/"sdk").to_s
     ENV["HOS_SDK_HOME"] = (clt/"sdk").to_s
-    ENV["LD_LIBRARY_PATH"] =
-      "#{clt}/lib:#{clt}/sdk/default/openharmony/native/llvm/lib/clang/15.0.4/lib/aarch64-linux-ohos"
+    ENV["LD_LIBRARY_PATH"] = "#{clt}/lib:#{clang_lib}"
     ENV.delete("NODE_OPTIONS")
+    # The hvigor wrapper patches OHOS Node detection and HiLog logging that
+    # were previously baked into the private image.
     # An oversized RLIMIT_NOFILE breaks the musl FD table in hvigor.
     soft_cap, hard_cap = Process.getrlimit(Process::RLIMIT_NOFILE)
     Process.setrlimit(Process::RLIMIT_NOFILE, [soft_cap, 65_536].min, 65_536) if hard_cap > 65_536
 
     cd shell do
       system "node", clt/"ohpm/bin/pm-cli.js", "install"
-      system "node", clt/"hvigor/bin/hvigorw.js", "assembleHap",
+      system hap_clt.to_s, "hvigor", clt.to_s, "assembleHap",
              "--mode", "module", "-p", "product=default", "--no-daemon"
     end
 
