@@ -4,12 +4,24 @@
   "title": "personalizer plugin — reads user config, writes private intermediate only",
   "type": "object",
   "additionalProperties": false,
-  "required": ["protocol", "role", "config_root", "output_tree"],
+  "required": ["protocol", "role", "config_root", "output_tree", "host"],
   "properties": {
     "protocol": { "const": 1 },
     "role": { "const": "personalizer" },
     "config_root": { "type": "string", "description": "explicit user config dir, e.g. XDG_STATE_HOME/ohos-app/integrations/<id>" },
     "output_tree": { "type": "string", "description": "this-run private intermediate; must NOT persist deployment progress" },
+    "host": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["home", "path", "xdg_config", "xdg_data", "xdg_state"],
+      "properties": {
+        "home": { "type": "string" },
+        "path": { "type": "string" },
+        "xdg_config": { "type": "string" },
+        "xdg_data": { "type": "string" },
+        "xdg_state": { "type": "string" }
+      }
+    },
     "secret_refs": { "type": "array", "items": { "type": "string" }, "description": "refs only, never values; read via restricted fd/file" },
     "forbidden": { "type": "array", "const": ["brew", "ohos-app", "ohos-device", "persistent_process"] }
   }
