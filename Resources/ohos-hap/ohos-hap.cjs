@@ -16,6 +16,7 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const { spawnSync } = require("node:child_process");
+const { createRequire } = require("node:module");
 const devecoDecoder = require(path.join(__dirname, "lib", "deveco-decoder.cjs"));
 
 function fail(code, message) {
@@ -303,9 +304,67 @@ function cmdProfile(o) {
     return;
   }
   if (sub === "refresh") {
-    // Vendor login and profile generation stay explicit and out of this layer.
-    // Sign never calls this; the vendor CLI must be driven by the user.
-    fail("ERR_VENDOR_AUTH_REQUIRED", "vendor-debug material must be prepared by the vendor CLI; use `profile add <name> --kind external-material` with your own material");
+    // Generate/refresh vendor-debug signing material via an explicit vendor
+    // CLI flow. Never called from sign/install. Passwords are decoded and
+    // written to a 0600 secret file; profiles.json stores only a file: ref.
+    const name = o._[2];
+    if (!name) fail("ERR_INVALID_REQUEST", "profile refresh needs <name>");
+    if (!o.hap) fail("ERR_INVALID_REQUEST", "profile refresh needs --hap <unsigned.hap>");
+    if (!o.bundle_id) fail("ERR_INVALID_REQUEST", "profile refresh needs --bundle-id <id>");
+    if (!o.project) fail("ERR_INVALID_REQUEST", "profile refresh needs --project <dir>");
+    const cli = process.env.DEVECO_CLI_JS || process.env.OHOS_HAP_VENDOR_CLI || null;
+    if (!cli) fail("ERR_VENDOR_AUTH_REQUIRED", "profile refresh needs the vendor CLI (DEVECO_CLI_JS or OHOS_HAP_VENDOR_CLI)");
+
+    const script = path.join(__dirname, "lib", "profile-refresh.sh");
+    const env = { ...process.env };
+    if (!env.OHOS_HAP_VENDOR_CLI) env.OHOS_HAP_VENDOR_CLI = cli;
+    const prep = spawnSync("bash", [script, "--hap", path.resolve(o.hap),
+      "--bundle-id", o.bundle_id, "--project", path.resolve(o.project)],
+      { encoding: "utf8", env });
+    if (prep.error || prep.status !== 0) {
+      const detail = `${prep.stderr || ""}${prep.stdout || ""}`.trim().split("\n").slice(-3).join(" | ");
+      fail("ERR_VENDOR_AUTH_REQUIRED", `vendor material generation failed (status=${prep.status}): ${detail}`);
+    }
+    const buildProfile = (prep.stdout || "").trim().split("\n").pop();
+    if (!buildProfile || !fs.existsSync(buildProfile)) fail("ERR_VENDOR_AUTH_REQUIRED", "no build-profile produced");
+
+    // Parse build-profile.json5 (may contain comments/trailing commas) via the
+    // vendor CLI's json5, then extract the signing material.
+    let json5;
+    try { json5 = createRequire(cli)("json5"); }
+    catch (e) { fail("ERR_VENDOR_AUTH_REQUIRED", `cannot load json5 from vendor CLI: ${e.message}`); }
+    let doc;
+    try { doc = json5.parse(fs.readFileSync(buildProfile, "utf8")); }
+    catch (e) { fail("ERR_INVALID_REQUEST", `cannot parse build-profile: ${e.message}`); }
+    const material = doc.app?.signingConfigs?.[0]?.material;
+    if (!material) fail("ERR_VENDOR_AUTH_REQUIRED", "build-profile has no signing material");
+
+    const cfgDir = process.env.XDG_CONFIG_HOME || path.join(process.env.HOME || "", ".config");
+    const vendorStateRoot = path.join(process.env.HOME || "", ".ohos/config");
+    const decoded = devecoDecoder.decodePasswords(cli, vendorStateRoot, material.storePassword, material.keyPassword);
+
+    // Persist decoded passwords only in a 0600 secret file; profiles.json holds
+    // a file: reference, never the value.
+    const secretDir = path.join(cfgDir, "ohos-hap", "secrets");
+    fs.mkdirSync(secretDir, { recursive: true, mode: 0o700 });
+    const secretFile = path.join(secretDir, `${name}.pwd`);
+    fs.writeFileSync(secretFile, `${decoded.storePassword}\n${decoded.keyPassword || decoded.storePassword}\n`, { mode: 0o600 });
+    fs.chmodSync(secretFile, 0o600); // writeFileSync mode applies only on create; re-apply on refresh
+
+    const profile = {
+      kind: "vendor-debug", build_profile: buildProfile,
+      vendor_cli: cli, vendor_state_root: vendorStateRoot,
+      bundle_id: o.bundle_id,
+      store_password_ref: `file:${secretFile}`,
+      key_password_ref: `file:${secretFile}`,
+    };
+    const profiles = readProfiles();
+    profiles.profiles = profiles.profiles || {};
+    profiles.profiles[name] = profile;
+    writeProfiles(profiles);
+    out({ protocol_version: 1, refreshed: name, profile,
+      note: "password written to a 0600 file; profiles.json holds only a file: reference" });
+    return;
   }
   fail("ERR_INVALID_REQUEST", `unsupported profile subcommand: ${sub}`);
 }
