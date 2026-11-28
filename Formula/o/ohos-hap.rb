@@ -1,16 +1,15 @@
 class OhosHap < Formula
   desc "Sign, verify and inspect OpenHarmony HAP packages (L0 contract v1)"
   homepage "https://github.com/social4hyq/homebrew-core"
-  # This is a Resources-delivered contract driver (like the tap's claude-code
-  # runtime-fetch stub): install() copies scripts from the checked-out tap, not
-  # from the downloaded tarball. The fork's brew mandates a REAL sha256 (it
-  # rejects :no_check), so pin a fixed, already-merged commit archive rather
-  # than the moving `main.tar.gz`. The archive content is irrelevant to install.
-  url "https://github.com/social4hyq/homebrew-core/archive/4edfd66476daa65e07f751d57ec623d486faaf07.tar.gz"
+  # The tarball is the pinned DevEco CLI runtime; install() uses its package.json
+  # to npm-ci the runtime into libexec (self-contained — no public devecocli
+  # command). The L0 contract driver itself is delivered from Resources/ in the
+  # tap checkout. Version tracks the contract (1.0.0), not the npm package.
+  url "https://registry.npmjs.org/@deveco/deveco-cli-openharmony-arm64/-/deveco-cli-openharmony-arm64-1.3.10.tgz"
   version "1.0.0"
-  sha256 "bd48e6006801d1a4211837bb38b729d3ccf868acdca2831d27a5cab6cfefac53"
+  sha256 "7fdee1bfb7393c151fa09b3714ecc4796e53d9876557e9933c5890319ffb4daa"
   license "MIT"
-  revision 2
+  revision 3
 
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-hap-v1.0.0-r6"
@@ -29,6 +28,7 @@ class OhosHap < Formula
     Resources/ohos-hap/lib/prepare-profile.cjs
     Resources/ohos-hap/lib/vendor-auth.sh
     Resources/ohos-hap/lib/profile-refresh.sh
+    Resources/ohos-hap/package-lock.json
     Resources/ohos-hap/test-ohos-hap.cjs
     Resources/ohos-hap/test-profile-refresh.cjs
     Resources/ohos-hap/schemas/v1/request.schema.json
@@ -46,8 +46,51 @@ class OhosHap < Formula
       dst.dirname.mkpath
       cp tap_root/file, dst
     end
+
+    # Self-contained DevEco CLI runtime (no public devecocli command). The
+    # downloaded tarball is the npm package itself; its package.json supplies
+    # dependencies and the checked-in lockfile pins the exact tree.
+    cli_source = buildpath.parent/"deveco-runtime"
+    cli_source.mkpath
+    package_name = "ohos-hap-deveco-runtime"
+    package_info = JSON.parse((buildpath/"package.json").read)
+    runtime_package = {
+      "name"                 => package_name,
+      "private"              => true,
+      "dependencies"         => package_info.fetch("dependencies"),
+      "optionalDependencies" => package_info.fetch("optionalDependencies", {}),
+    }
+    (cli_source/"package.json").write JSON.pretty_generate(runtime_package)
+    lock = JSON.parse((tap_root/"Resources/ohos-hap/package-lock.json").read)
+    lock["name"] = package_name
+    lock_root = lock.fetch("packages").fetch("")
+    lock_root["name"] = package_name
+    lock_root.delete("version")
+    lock_root["dependencies"] = package_info.fetch("dependencies")
+    lock_root["optionalDependencies"] = package_info.fetch("optionalDependencies", {})
+    lock.fetch("packages").delete("node_modules/@deveco/deveco-cli-openharmony-arm64")
+    (cli_source/"package-lock.json").write JSON.pretty_generate(lock) + "\n"
+    system "npm", "ci", "--prefix", cli_source,
+           "--omit=dev", "--ignore-scripts", "--no-audit", "--no-fund"
+
+    # The CLI's axios proxy adapter mishandles proxy auth; patch it the same way
+    # the legacy app-installer did (fail-closed proxy handling).
+    axios = cli_source/"node_modules/axios/lib/adapters/http.js"
+    inreplace axios,
+              "throw new AxiosError('Invalid proxy authorization', AxiosError.ERR_BAD_OPTION, { proxy });",
+              "proxyAuth = false;"
+
+    cli_module = cli_source/"node_modules/@deveco/deveco-cli-openharmony-arm64"
+    cli_module.dirname.mkpath
+    cp_r buildpath, cli_module
+    (libexec/"deveco-runtime").mkpath # install() renames into this parent
+    libexec.install cli_source/"node_modules" => "deveco-runtime/node_modules"
+    cli_js = libexec/"deveco-runtime/node_modules/@deveco/deveco-cli-openharmony-arm64/dist/cli.js"
+    odie "DevEco CLI runtime missing" unless cli_js.file?
+
     (bin/"ohos-hap").write_env_script libexec/"ohos-hap/ohos-hap.cjs",
-      PATH: "#{formula_opt_bin("node")}:$PATH"
+      PATH: "#{formula_opt_bin("node")}:$PATH",
+      OHOS_HAP_VENDOR_CLI: cli_js, DEVECO_CLI_JS: cli_js
   end
 
   def caveats
