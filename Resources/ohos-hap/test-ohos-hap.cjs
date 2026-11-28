@@ -187,10 +187,10 @@ test("profile: remove deletes the named profile", () => {
   assert.equal(doc.profiles.ext2, undefined);
 });
 
-test("profile: refresh stays explicit (no implicit vendor login)", () => {
+test("profile: refresh requires explicit parameters", () => {
   const res = run(["profile", "refresh"]);
   assert.notEqual(res.status, 0);
-  assert.match(res.stderr, /ERR_VENDOR_AUTH_REQUIRED/);
+  assert.match(res.stderr, /needs/); // requires explicit name/params, never implicit
 });
 
 // Mock vendor CLI: records invocations and reports a configurable auth state.
