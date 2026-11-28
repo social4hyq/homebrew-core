@@ -6,7 +6,7 @@ class OpencodeDesktop < Formula
   # Tap-authored shell sources (MIT) on the CPF-Electron runtime (mixed
   # MIT/BSD/LGPL).
   license :cannot_represent
-  revision 3
+  revision 4
 
   livecheck do
     url :stable
@@ -15,8 +15,8 @@ class OpencodeDesktop < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-desktop-v2.4.2-r11"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c3f53d72dca259c64f5d564ed99e841674257e658b7724603bc931159f0a1abc"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-desktop-v2.4.2-r12"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "5774da5a265dada0376a8da0f151511a1e3ab646fefce592da3579fbc2eaf646"
   end
 
   depends_on "ohos-hap-clt" => :build
@@ -32,7 +32,9 @@ class OpencodeDesktop < Formula
     Resources/_shared/waiting-page/render-waiting.cjs
     Resources/_shared/waiting-page/waiting.html.in
     Resources/opencode-desktop/app/config.json
+    Resources/opencode-desktop/app/assemble.cjs
     Resources/opencode-desktop/app/main.cjs
+    Resources/opencode-desktop/app/personalize.cjs
     Resources/opencode-desktop/app/package.json
     Resources/opencode-desktop/app/tray.cjs
     Resources/opencode-desktop/app/waiting.json
@@ -110,7 +112,11 @@ class OpencodeDesktop < Formula
                 "requestPermissions": [
                       { "name": "ohos.permission.INTERNET" },
                       { "name": "ohos.permission.GET_NETWORK_INFO" },
-                      { "name": "ohos.permission.MICROPHONE", "reason": "$string:microphone", "usedScene": { "abilities": ["EntryAbility"], "when": "inuse" } }
+                      {
+                        "name": "ohos.permission.MICROPHONE",
+                        "reason": "$string:microphone",
+                        "usedScene": { "abilities": ["EntryAbility"], "when": "inuse" },
+                      }
                     ],
               JSON5
 
@@ -195,9 +201,9 @@ class OpencodeDesktop < Formula
     hap = libexec/"opencode-desktop-unsigned.hap"
     hap_sha = Digest::SHA256.file(hap).hexdigest
     descriptor = {
-      "schema_version" => 1,
-      "id"             => "social4hyq/core/opencode-desktop",
-      "artifact"       => {
+      "schema_version"  => 1,
+      "id"              => "social4hyq/core/opencode-desktop",
+      "artifact"        => {
         "format"       => "hap",
         "path"         => "../../../libexec/opencode-desktop-unsigned.hap",
         "sha256"       => hap_sha,
@@ -207,8 +213,19 @@ class OpencodeDesktop < Formula
         "version_name" => version.to_s,
         "version_code" => 1,
       },
-      "launch"         => { "module" => "electron", "ability" => "EntryAbility" },
-      "variants"       => {
+      "launch"          => { "module" => "electron", "ability" => "EntryAbility" },
+      "signing_profile" => "opencode-desktop-acl",
+      "personalization" => {
+        "protocol"    => 1,
+        "plugin"      => "personalize.cjs",
+        "config_root" => "$XDG_STATE_HOME/ohos-app/integrations/opencode-desktop",
+      },
+      "assembly"        => {
+        "protocol" => 1,
+        "plugin"   => "assemble.cjs",
+        "config"   => {},
+      },
+      "variants"        => {
         "default"     => "acl",
         "definitions" => {
           "basic" => {},
@@ -218,12 +235,15 @@ class OpencodeDesktop < Formula
       },
     }
     (pkgshare/"ohos/app.json").write JSON.pretty_generate(descriptor) + "\n"
+    cp res/"app/personalize.cjs", pkgshare/"ohos/personalize.cjs"
+    cp res/"app/assemble.cjs", pkgshare/"ohos/assemble.cjs"
   end
 
   test do
     # Only the HAP and descriptor are delivered; no app-level install command.
     refute_path_exists bin/"opencode-app"
 
+    tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
     descriptor = JSON.parse((pkgshare/"ohos/app.json").read)
     assert_equal 1, descriptor["schema_version"]
     assert_equal "social4hyq/core/opencode-desktop", descriptor["id"]
@@ -231,13 +251,21 @@ class OpencodeDesktop < Formula
     assert_equal Digest::SHA256.file(hap).hexdigest, descriptor.dig("artifact", "sha256")
     assert_equal "com.social4hyq.opencodedesktop", descriptor.dig("artifact", "bundle_id")
     assert_equal "acl", descriptor.dig("variants", "default")
+    assert_equal "opencode-desktop-acl", descriptor["signing_profile"]
+    assert_equal "personalize.cjs", descriptor.dig("personalization", "plugin")
+    assert_equal "assemble.cjs", descriptor.dig("assembly", "plugin")
+    assert_path_exists pkgshare/"ohos/personalize.cjs"
+    assert_path_exists pkgshare/"ohos/assemble.cjs"
+    assert_equal "ohos-app install opencode-desktop --start",
+                 JSON.parse((tap_root/"Resources/opencode-desktop/app/waiting.json").read).fetch("command")
     assert_equal Digest::SHA256.file(pkgshare/"module-acl.json").hexdigest,
                  descriptor.dig("variants", "definitions", "acl", "sha256")
 
     assert_match "libs/arm64-v8a/libelectron.so", shell_output("unzip -Z1 #{hap}")
     assert_match "onQuitRequest", shell_output("unzip -p #{hap} resources/resfile/resources/app/tray.cjs")
-    tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
     system "node", "--check", tap_root/"Resources/opencode-desktop/app/main.cjs"
+    system "node", "--check", tap_root/"Resources/opencode-desktop/app/personalize.cjs"
+    system "node", "--check", tap_root/"Resources/opencode-desktop/app/assemble.cjs"
     system "node", "--test", tap_root/"Resources/opencode-desktop/tests/tray.test.cjs"
     system "node", "--test", tap_root/"Resources/opencode-desktop/tests/close-handler.test.cjs"
     package = JSON.parse(shell_output("unzip -p #{hap} resources/resfile/resources/app/package.json"))
