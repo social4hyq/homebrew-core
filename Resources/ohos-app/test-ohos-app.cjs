@@ -27,7 +27,15 @@ function makeApp(formula, over = {}) {
   const dir = path.join(prefix, "opt", formula, "share", formula, "ohos");
   fs.mkdirSync(dir, { recursive: true });
   const hap = path.join(dir, "unsigned.hap");
-  fs.writeFileSync(hap, Buffer.concat([Buffer.from([0x50, 0x4b, 3, 4]), Buffer.alloc(200, 3)]));
+  const fixture = path.join(dir, "hap-fixture");
+  fs.mkdirSync(fixture, { recursive: true });
+  fs.writeFileSync(path.join(fixture, "module.json"), JSON.stringify({
+    app: { bundleName: "com.example.app", versionName: "1.0", versionCode: 1 },
+    module: { name: "entry", requestPermissions: [] },
+  }));
+  const zipped = spawnSync("zip", ["-q", "-r", hap, "module.json"], { cwd: fixture });
+  if (zipped.status !== 0) throw new Error(zipped.stderr?.toString() || "could not create HAP fixture");
+  fs.rmSync(fixture, { recursive: true, force: true });
   const doc = {
     schema_version: 1, id: `social4hyq/core/${formula}`,
     artifact: { format: "hap", path: "unsigned.hap", sha256: sha(fs.readFileSync(hap)),
@@ -55,6 +63,8 @@ if(process.argv[2]==="profile" && process.argv[3]==="show") {
 }
 const req=JSON.parse(fs.readFileSync(process.argv[process.argv.indexOf("--request")+1],"utf8"));
 if(process.env.FAKE_HAP_LOG) fs.writeFileSync(process.env.FAKE_HAP_LOG, process.env.HAP_SIGN_TOOL||"");
+if(process.env.FAKE_SIGN_PROFILE_LOG) fs.writeFileSync(process.env.FAKE_SIGN_PROFILE_LOG, req.signing_profile_name||"");
+if(process.env.FAKE_SIGN_INPUT_COPY) fs.copyFileSync(req.input_hap,process.env.FAKE_SIGN_INPUT_COPY);
 fs.writeFileSync(req.output_path, Buffer.concat([Buffer.from([0x50,0x4b,3,4]),Buffer.alloc(200,9)]));
 if(process.argv.includes("--result")) fs.writeFileSync(process.argv[process.argv.indexOf("--result")+1], JSON.stringify({protocol_version:1,ok:true}));
 `);
@@ -67,6 +77,7 @@ const cmd=process.argv[2];
 if(cmd==="list") { console.log(JSON.stringify({protocol_version:1,devices:["device-1"]})); process.exit(0); }
 if(cmd==="install"){
   const req=JSON.parse(fs.readFileSync(process.argv[process.argv.indexOf("--request")+1],"utf8"));
+  if(process.env.FAKE_INSTALL_EXPECTED_LOG) fs.writeFileSync(process.env.FAKE_INSTALL_EXPECTED_LOG,JSON.stringify(req.expected));
   console.log(JSON.stringify({protocol_version:1,type:"install_state",operation_id:"op",backend:req.method||"auto",state:"installing",observed_at:"2026-11-27T00:00:00Z"}));
   console.log(JSON.stringify({protocol_version:1,type:"install_result",operation_id:"op",backend:req.method||"auto",state:"installed",bundle:{bundle_id:req.expected.bundle_id},verification:{bundle_matched:true,version_matched:true},error:null}));
   process.exit(0);
@@ -87,7 +98,10 @@ test("list: enumerates descriptors from opt tree (no central registry)", () => {
 test("info: returns descriptor identity", () => {
   const res = run(["info", "demo-desktop"]);
   assert.equal(res.status, 0, res.stderr);
-  assert.equal(JSON.parse(res.stdout).id, "social4hyq/core/demo-desktop");
+  const info = JSON.parse(res.stdout);
+  assert.equal(info.id, "social4hyq/core/demo-desktop");
+  assert.deepEqual(info.hap_identity, { bundle_id: "com.example.app", version_name: "1.0", version_code: 1 });
+  assert.equal(info.signing_profile, "demo-desktop");
 });
 
 test("install: drives sign then device, streams events, no loopback", () => {
@@ -133,6 +147,78 @@ test("install: preserves the signer declared by the selected profile", () => {
   });
   assert.equal(res.status, 0, res.stderr + res.stdout);
   assert.equal(fs.readFileSync(signerLog, "utf8"), "");
+});
+
+test("install: defaults to a formula-specific signing profile", () => {
+  const profileLog = path.join(tmp, "hap-profile-name.log");
+  const res = run(["install", "demo-desktop", "--method", "hdc"], {
+    ...env, FAKE_SIGN_PROFILE_LOG: profileLog,
+  });
+  assert.equal(res.status, 0, res.stderr + res.stdout);
+  assert.equal(fs.readFileSync(profileLog, "utf8"), "demo-desktop");
+});
+
+test("install: uses version metadata from the HAP manifest", () => {
+  const staleDescriptor = makeApp("stale-version-desktop");
+  staleDescriptor.doc.artifact.version_name = "4.0.0";
+  staleDescriptor.doc.artifact.version_code = 1;
+  fs.writeFileSync(path.join(staleDescriptor.dir, "app.json"), JSON.stringify(staleDescriptor.doc));
+  const expectedLog = path.join(tmp, "hap-install-expected.json");
+  const res = run(["install", "stale-version-desktop", "--method", "hdc"], {
+    ...env, FAKE_INSTALL_EXPECTED_LOG: expectedLog,
+  });
+  assert.equal(res.status, 0, res.stderr + res.stdout);
+  assert.deepEqual(JSON.parse(fs.readFileSync(expectedLog, "utf8")), {
+    bundle_id: "com.example.app", version_name: "1.0", version_code: 1,
+  });
+});
+
+test("install: applies a typed module overlay without an app assembler", () => {
+  const fixture = path.join(tmp, "module-overlay-fixture");
+  fs.mkdirSync(fixture, { recursive: true });
+  const baseModule = {
+    app: { bundleName: "com.example.app", versionName: "1.0", versionCode: 1 },
+    module: { name: "entry", requestPermissions: [{ name: "ohos.permission.INTERNET" }] },
+  };
+  fs.writeFileSync(path.join(fixture, "module.json"), JSON.stringify(baseModule));
+  const unsignedHap = path.join(fixture, "unsigned.hap");
+  const archive = spawnSync("zip", ["-q", "-r", unsignedHap, "module.json"], { cwd: fixture });
+  assert.equal(archive.status, 0, archive.stderr?.toString());
+
+  const overlay = {
+    app: { bundleName: "com.example.app" },
+    module: { name: "entry", requestPermissions: [
+      { name: "ohos.permission.INTERNET" },
+      { name: "ohos.permission.CUSTOM_SANDBOX" },
+    ] },
+  };
+  const appWithOverlay = makeApp("overlay-desktop", {
+    artifact: { ...app.doc.artifact, path: "../../../libexec/overlay-unsigned.hap", sha256: "" },
+    variants: { default: "acl", definitions: { basic: {}, acl: { module_overlay: "module-acl.json", sha256: "" } } },
+  });
+  const packagedHap = path.join(prefix, "opt", "overlay-desktop", "libexec", "overlay-unsigned.hap");
+  fs.mkdirSync(path.dirname(packagedHap), { recursive: true });
+  fs.copyFileSync(unsignedHap, packagedHap);
+  appWithOverlay.doc.artifact.sha256 = sha(fs.readFileSync(packagedHap));
+  const overlayPath = path.join(appWithOverlay.dir, "module-acl.json");
+  fs.writeFileSync(overlayPath, JSON.stringify(overlay));
+  appWithOverlay.doc.variants.definitions.acl.sha256 = sha(fs.readFileSync(overlayPath));
+  fs.writeFileSync(path.join(appWithOverlay.dir, "app.json"), JSON.stringify(appWithOverlay.doc));
+
+  const signedInput = path.join(tmp, "assembled-module-overlay.hap");
+  const res = run(["install", "overlay-desktop", "--variant", "acl", "--method", "hdc"], {
+    ...env, FAKE_SIGN_INPUT_COPY: signedInput,
+  });
+  assert.equal(res.status, 0, res.stderr + res.stdout);
+  const inspected = spawnSync("unzip", ["-p", signedInput, "module.json"], { encoding: "utf8" });
+  assert.equal(inspected.status, 0, inspected.stderr);
+  const assembled = JSON.parse(inspected.stdout);
+  assert.deepEqual(assembled.module.requestPermissions.map((item) => item.name), [
+    "ohos.permission.INTERNET", "ohos.permission.CUSTOM_SANDBOX",
+  ]);
+  const entries = spawnSync("unzip", ["-Z1", signedInput], { encoding: "utf8" });
+  assert.equal(entries.status, 0, entries.stderr);
+  assert.equal(entries.stdout.split("\n").filter((entry) => entry.endsWith("/")).length, 0);
 });
 
 test("install: personalizes and assembles the selected variant before signing", () => {
