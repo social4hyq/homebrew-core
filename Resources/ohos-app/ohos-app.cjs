@@ -3,8 +3,9 @@
 
 // ohos-app: orchestration layer. It reads a desktop formula's app.json
 // descriptor and drives ohos-hap (sign) + ohos-device (install) via their L0
-// process contracts. It NEVER implements signing, device I/O, assembly, or
-// host-service management, and it never calls <app> install (no loopback).
+// process contracts. It never implements signing, device I/O, arbitrary app
+// assembly, or host-service management; only typed module overlays are handled
+// by the bundled assembler. It never calls <app> install (no loopback).
 // Commands are explicit and synchronous; failures are non-zero with no pending
 // queue and no background retry.
 
@@ -91,6 +92,28 @@ function sha256File(p) {
   return crypto.createHash("sha256").update(fs.readFileSync(p)).digest("hex");
 }
 
+function hapIdentity(hapPath, expectedBundleId) {
+  const result = spawnSync("unzip", ["-p", hapPath, "module.json"], {
+    encoding: "utf8", timeout: 30000, maxBuffer: 16 * 1024 * 1024,
+  });
+  if (result.error || result.status !== 0) {
+    fail("ERR_INVALID_REQUEST", `cannot read module.json from HAP (${result.status})`);
+  }
+  let manifest;
+  try { manifest = JSON.parse(result.stdout); }
+  catch { fail("ERR_INVALID_REQUEST", "HAP module.json is not valid JSON"); }
+  const app = manifest.app || {};
+  if (typeof app.bundleName !== "string" || !app.bundleName ||
+      typeof app.versionName !== "string" || !app.versionName ||
+      !Number.isInteger(app.versionCode) || app.versionCode < 1) {
+    fail("ERR_INVALID_REQUEST", "HAP module.json is missing bundleName, versionName, or versionCode");
+  }
+  if (expectedBundleId && app.bundleName !== expectedBundleId) {
+    fail("ERR_INVALID_REQUEST", "HAP bundleName does not match app.json");
+  }
+  return { bundle_id: app.bundleName, version_name: app.versionName, version_code: app.versionCode };
+}
+
 function runPlugin(dir, relativePath, requestPath, role) {
   const plugin = resolvePath(dir, relativePath);
   if (!fs.existsSync(plugin) || !fs.statSync(plugin).isFile()) {
@@ -102,6 +125,17 @@ function runPlugin(dir, relativePath, requestPath, role) {
   });
   if (result.error || result.status !== 0) {
     fail("ERR_INVALID_REQUEST", `${role} plugin failed (${result.status})`);
+  }
+}
+
+function runModuleOverlayAssembler(requestPath) {
+  const assembler = path.join(__dirname, "module-overlay.cjs");
+  const result = spawnSync(process.execPath, [assembler, "--protocol", "1", "--request", requestPath], {
+    stdio: "inherit", timeout: 300000,
+    env: { PATH: process.env.PATH || "", HOME: process.env.HOME || "" },
+  });
+  if (result.error || result.status !== 0) {
+    fail("ERR_INVALID_REQUEST", `module overlay assembly failed (${result.status})`);
   }
 }
 
@@ -158,8 +192,12 @@ function cmdList() {
 }
 function cmdInfo(o) {
   const id = o._[1]; if (!id) fail("ERR_INVALID_REQUEST", "info needs <id>");
-  const { doc } = loadDescriptor(shortToId(id));
-  out({ protocol_version: 1, id: doc.id, artifact: doc.artifact, variants: doc.variants, requires: doc.requires });
+  const { doc, dir } = loadDescriptor(shortToId(id));
+  const identity = hapIdentity(resolvePath(dir, doc.artifact.path), doc.artifact.bundle_id);
+  out({ protocol_version: 1, id: doc.id, artifact: doc.artifact,
+    hap_identity: identity,
+    signing_profile: doc.signing_profile || doc.id.split("/").pop(),
+    variants: doc.variants, requires: doc.requires });
 }
 function cmdConfigure(o) {
   const id = o._[1]; if (!id) fail("ERR_INVALID_REQUEST", "configure needs <id>");
@@ -182,6 +220,7 @@ function cmdInstall(o) {
   const unsigned = resolvePath(dir, doc.artifact.path);
   const unsignedSha = sha256File(unsigned);
   if (unsignedSha !== doc.artifact.sha256) fail("ERR_INVALID_REQUEST", "unsigned HAP sha256 mismatch (bottle altered?)");
+  const identity = hapIdentity(unsigned, doc.artifact.bundle_id);
 
   const hapBin = process.env.OHOS_APP_HAP_BIN || path.join(prefix(), "bin/ohos-hap");
   const devBin = process.env.OHOS_APP_DEVICE_BIN || path.join(prefix(), "bin/ohos-device");
@@ -191,7 +230,7 @@ function cmdInstall(o) {
 
   const variantDef = doc.variants.definitions[variant];
   let moduleOverlay = null;
-  if (variantDef.module_overlay && doc.assembly?.plugin) {
+  if (variantDef.module_overlay) {
     moduleOverlay = resolvePath(dir, variantDef.module_overlay);
     // Older desktop formulas placed module-acl.json beside ohos/app.json while
     // storing a bare filename in the descriptor. Accept that layout during the
@@ -228,11 +267,11 @@ function cmdInstall(o) {
     runPlugin(dir, doc.personalization.plugin, requestPath, "personalizer");
   }
 
-  // L2 assembly is delegated to the app's assembler plugin. The engine owns
-  // artifact/overlay verification and passes only verified paths plus the
-  // selected variant and private personalized tree.
+  // L2 assembly uses the app's plugin when declared; otherwise a module overlay
+  // uses the bundled typed assembler. Only verified paths and selected variant
+  // data cross the process boundary.
   let toSign = unsigned;
-  if (doc.assembly?.plugin) {
+  if (doc.assembly?.plugin || moduleOverlay) {
     const req = {
       protocol_version: 1,
       unsigned_hap: unsigned,
@@ -243,23 +282,24 @@ function cmdInstall(o) {
       api: doc.artifact?.api || null,
       tree: path.join(stage, "tree"),
       personalized_tree: personalizedTree,
-      config: doc.assembly.config || {},
+      config: doc.assembly?.config || {},
     };
     fs.mkdirSync(req.tree, { mode: 0o700 });
     const rf = path.join(stage, "assembly-request.json");
     fs.writeFileSync(rf, JSON.stringify(req), { mode: 0o600 });
-    runPlugin(dir, doc.assembly.plugin, rf, "assembler");
+    if (doc.assembly?.plugin) runPlugin(dir, doc.assembly.plugin, rf, "assembler");
+    else runModuleOverlayAssembler(rf);
     toSign = req.out_hap;
     if (!fs.existsSync(toSign)) fail("ERR_INVALID_REQUEST", "assembler produced no output");
   }
 
   // L3 sign: build SigningRequest, call ohos-hap.
   const signedOut = path.join(dir, `.ohos-app-signed-${process.pid}.hap`);
-  const signingProfileName = o.signing_profile || doc.signing_profile || "default";
+  const signingProfileName = o.signing_profile || doc.signing_profile || doc.id.split("/").pop();
   const signReq = { protocol_version: 1, input_hap: toSign,
     input_sha256: sha256File(toSign), output_path: signedOut,
     signing_profile_name: signingProfileName,
-    expected: { bundle_id: doc.artifact.bundle_id, version_code: doc.artifact.version_code } };
+    expected: { bundle_id: identity.bundle_id, version_code: identity.version_code } };
   const signReqFile = path.join(dir, `.ohos-app-signreq-${process.pid}.json`);
   const signResFile = path.join(dir, `.ohos-app-signres-${process.pid}.json`);
   const instReqFile = path.join(dir, `.ohos-app-instreq-${process.pid}.json`);
@@ -277,8 +317,7 @@ function cmdInstall(o) {
   // L4 install: build InstallRequest, call ohos-device, stream its NDJSON.
   const instReq = { protocol_version: 1, method: o.method || "auto", device: selectedDevice,
     hap_path: signedOut, hap_sha256: sha256File(signedOut),
-    expected: { bundle_id: doc.artifact.bundle_id, version_name: doc.artifact.version_name,
-      version_code: doc.artifact.version_code }, wait: true };
+    expected: identity, wait: true };
   fs.writeFileSync(instReqFile, JSON.stringify(instReq), { mode: 0o600 });
   const ir = spawnSync(devBin, ["install", "--request", instReqFile], { encoding: "utf8", timeout: 600000 });
   if (ir.stdout) process.stdout.write(ir.stdout);

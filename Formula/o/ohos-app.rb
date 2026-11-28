@@ -7,7 +7,7 @@ class OhosApp < Formula
   version "1.0.0"
   sha256 "0f37124f93b2431ebba47ba7f8f91ceb8ec2324c02ae6689399aa5359e9b3a7e"
   license "MIT"
-  revision 3
+  revision 4
 
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-app-v1.0.0-r3"
@@ -17,12 +17,14 @@ class OhosApp < Formula
   depends_on "node"
   depends_on "ohos-device"
   depends_on "ohos-hap"
+  depends_on "zip"
 
   # 20 L0 schemas projected from the single authoritative contract root,
-  # plus the driver, test, and contract fingerprint. Literal paths are required
-  # by the tap's check-hap-formulae.py (orphan-resource audit).
+  # plus the driver, helper, tests, and contract fingerprint. Literal paths are
+  # required by the tap's check-hap-formulae.py (orphan-resource audit).
   RESOURCE_FILES = %w[
     Resources/ohos-app/ohos-app.cjs
+    Resources/ohos-app/module-overlay.cjs
     Resources/ohos-app/test-ohos-app.cjs
     Resources/ohos-app/schemas/v1/CONTRACT.sha256
     Resources/ohos-app/schemas/v1/app.schema.json
@@ -77,6 +79,10 @@ class OhosApp < Formula
       Descriptors are discovered from $HOMEBREW_PREFIX/opt/*/share/*/ohos/app.json
       (no central registry). Uninstall keeps device data by default; --purge
       clears only device sandbox data.
+
+      Each desktop needs its own local signing profile. `ohos-app install` uses
+      the descriptor's signing_profile, or the formula name when omitted; it
+      never creates or refreshes signing credentials automatically.
     EOS
   end
 
