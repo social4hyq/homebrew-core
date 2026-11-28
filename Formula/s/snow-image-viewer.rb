@@ -4,7 +4,7 @@ class SnowImageViewer < Formula
   url "https://github.com/mg-chao/snow-shot/archive/refs/tags/v1.6.5_snow-shot.tar.gz"
   sha256 "125059b53d029b9fba8307868595c2eed478b4bf129b88c22d4a4dbb0f30c0d6"
   license "GPL-3.0-or-later"
-  revision 1
+  revision 2
 
   livecheck do
     url "https://github.com/mg-chao/snow-shot.git"
@@ -27,7 +27,8 @@ class SnowImageViewer < Formula
   depends_on "gettext" => :build
   depends_on "libpng" => :build
   depends_on "ninja" => :build
-  depends_on "node" => :build # hvigorw.js is a node script
+  depends_on "node" => :build # Hvigor invokes npm, which finds Node through PATH.
+  depends_on "ohos-hap-clt" => :build
   depends_on "ohos-sdk" => :build
   depends_on "openjdk" => :build
   depends_on "qt-ohos-sdk" => :build
@@ -64,73 +65,19 @@ class SnowImageViewer < Formula
     qt = formula_opt_prefix("qt-ohos-sdk")/"libexec/qt-6.13.0-dev"
     odie "Qt OHOS SDK missing" unless (qt/"lib/cmake/Qt6/Qt6Config.cmake").exist?
     clt = buildpath/"command-line-tools"
-    resource("command-line-tools").stage clt
-    odie "HAP CLT missing" unless (clt/"hvigor/bin/hvigorw.js").exist?
-    # The CI container uses an OHOS Node runtime with a Linux kernel.
-    %w[hvigor hvigor-ohos-plugin].each do |package|
-      inreplace clt/"hvigor/#{package}/node_modules/@ohos/hvigor-common/src/util/system-util.js",
-                'return"HarmonyOS"===os_1.default.type()',
-                'return process.platform==="openharmony"||"HarmonyOS"===os_1.default.type()'
-    end
+    hap_clt = formula_opt_bin("ohos-hap-clt")/"ohos-hap-clt"
+    archive = resource("command-line-tools")
+    archive.fetch
+    system hap_clt.to_s, "stage", clt.to_s, archive.cached_download.to_s
 
     resource("jthread").stage do
       cp_r "source", buildpath/"jthread-source"
     end
     ohos_sdk = formula_opt_prefix("ohos-sdk")
 
-    # es2abc expects the device HiLog API even when running in the build container.
-    hilog_source = buildpath/"hilog-stderr.c"
-    hilog_source.write <<~C
-      #include <stdarg.h>
-      #include <stdio.h>
-
-      int HiLogPrint(int type, int level, unsigned int domain, const char *tag, const char *format, ...) {
-        (void)type;
-        (void)level;
-        (void)domain;
-        char clean[4096];
-        size_t length = 0;
-        for (size_t i = 0; format && format[i] && length + 1 < sizeof(clean); ++i) {
-          if (format[i] == '%' && format[i + 1] == '{') {
-            clean[length++] = '%';
-            i += 2;
-            while (format[i] && format[i] != '}') ++i;
-            if (!format[i]) break;
-          } else {
-            clean[length++] = format[i];
-          }
-        }
-        clean[length] = '\\0';
-        fprintf(stderr, "[%s] ", tag ? tag : "");
-        va_list args;
-        va_start(args, format);
-        int count = vfprintf(stderr, clean, args);
-        va_end(args);
-        fputc('\\n', stderr);
-        return count;
-      }
-    C
-    (clt/"lib").mkpath
-    system ohos_sdk/"bin/clang", "-shared", "-fPIC", "-Wl,-soname,libhilog.so",
-           hilog_source, "-o", clt/"lib/libhilog.so"
-
-    # Build-time Qt tools (moc/rcc/lrelease) are OHOS ELFs running natively
-    # in the aarch64 container; hvigor additionally needs the CLT clang
-    # runtimes and the libhilog stderr adapter.
-    clang_lib = (clt/"sdk/default/openharmony/native/llvm/lib").glob("clang/*/lib/aarch64-linux-ohos").first
-    odie "CLT clang runtime missing" unless clang_lib
-    ENV["LD_LIBRARY_PATH"] = [
-      qt/"lib",
-      clt/"lib",
-      clt/"sdk/default/hms/toolchains/lib",
-      clt/"sdk/default/openharmony/toolchains/lib",
-      clang_lib,
-      formula_opt_lib("zstd"),
-    ].join(":")
-    ENV["DEVECO_SDK_HOME"] = (clt/"sdk").to_s
-    ENV["HOS_SDK_HOME"] = (clt/"sdk").to_s
-    ENV["JAVA_HOME"] = formula_opt_prefix("openjdk").to_s
-    ENV.prepend_path "PATH", formula_opt_bin("openjdk")
+    # The Qt host tools load Qt and zstd while running in the build container.
+    ENV.prepend_path "LD_LIBRARY_PATH", formula_opt_lib("zstd")
+    ENV.prepend_path "LD_LIBRARY_PATH", qt/"lib"
     # A container inheriting RLIMIT_NOFILE near 1e9 drives the musl FD-table
     # sizing into a refused mapping; cap it (only ever lowering).
     soft_cap, hard_cap = Process.getrlimit(Process::RLIMIT_NOFILE)
@@ -202,7 +149,10 @@ class SnowImageViewer < Formula
       # slim CLT; drop the native build option together with its buildOption
       # wrapper (the closing brace belongs to that wrapper).
       inreplace "entry/build-profile.json5", /^  "buildOption": \{.*?^  \},\n/m, ""
-      system "node", (clt/"hvigor/bin/hvigorw.js").to_s, "assembleHap",
+      ENV["JAVA_HOME"] = formula_opt_prefix("openjdk").to_s
+      ENV.prepend_path "PATH", formula_opt_bin("openjdk")
+      ENV.prepend_path "PATH", formula_opt_bin("node")
+      system hap_clt.to_s, "hvigor", clt.to_s, "assembleHap",
              "--mode", "module", "-p", "product=default", "--no-daemon"
     end
 
