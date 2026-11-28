@@ -4,7 +4,7 @@ class SnowImageViewer < Formula
   url "https://github.com/mg-chao/snow-shot/archive/refs/tags/v1.6.5_snow-shot.tar.gz"
   sha256 "125059b53d029b9fba8307868595c2eed478b4bf129b88c22d4a4dbb0f30c0d6"
   license "GPL-3.0-or-later"
-  revision 2
+  revision 3
 
   livecheck do
     url "https://github.com/mg-chao/snow-shot.git"
@@ -26,6 +26,7 @@ class SnowImageViewer < Formula
   depends_on "freetype" => :build
   depends_on "gettext" => :build
   depends_on "libpng" => :build
+  depends_on "muslext" => :build
   depends_on "ninja" => :build
   depends_on "node" => :build # Hvigor invokes npm, which finds Node through PATH.
   depends_on "ohos-hap-clt" => :build
@@ -110,7 +111,7 @@ class SnowImageViewer < Formula
     # directories are required: without them the tool silently deploys only
     # the app library. extra-libs-dirs also lets its llvm-readobj walk include
     # the non-Qt runtime dependencies (fontconfig, freetype, zstd, ...).
-    runtime_lib_dirs = %w[zstd fontconfig freetype expat gettext libpng bzip2 zlib].map do |name|
+    runtime_lib_dirs = %w[zstd muslext fontconfig freetype expat gettext libpng bzip2 zlib].map do |name|
       (formula_opt_prefix(name)/"lib").to_s
     end
     (buildpath/"hd.json").write <<~JSON
@@ -179,6 +180,7 @@ class SnowImageViewer < Formula
     %w[
       libsnow_image_viewer.so
       libqohos.so
+      libmuslext.so.1
       libQt6Core.so.6
       libQt6Gui.so.6
       libQt6Widgets.so.6
