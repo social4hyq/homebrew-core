@@ -193,12 +193,80 @@ test("profile: refresh stays explicit (no implicit vendor login)", () => {
   assert.match(res.stderr, /ERR_VENDOR_AUTH_REQUIRED/);
 });
 
-test("auth: status is explicit and holds no token", () => {
-  const res = run(["auth", "status"]);
-  assert.equal(res.status, 0);
+// Mock vendor CLI: records invocations and reports a configurable auth state.
+function mockVendorCli(label, state) {
+  const p = path.join(tmp, `mock-cli-${label}.sh`);
+  const log = path.join(tmp, `mock-cli-${label}.log`);
+  fs.writeFileSync(p, `#!/bin/sh
+printf '%s\n' "$*" >> "${log}"
+case "$1 $2" in
+  "auth status")
+    case "${state}" in
+      logged-in) echo "Logged in as dev@example.com" ;;
+      not-logged-in) echo "Not logged in" ;;
+      unavailable) echo "cli error" >&2; exit 7 ;;
+    esac ;;
+  "auth login") echo "Please open https://developer.huawei.com/login?code=abc to sign in" ;;
+  "auth logout") echo "logged out" ;;
+esac
+exit 0
+`);
+  fs.chmodSync(p, 0o755);
+  return { cli: p, log };
+}
+
+test("auth: status reports logged-in via vendor CLI", () => {
+  const m = mockVendorCli("in", "logged-in");
+  const res = run(["auth", "status"], { OHOS_HAP_VENDOR_CLI: m.cli, OHOS_HAP_AUTH_NO_BROWSER: "1" });
+  assert.equal(res.status, 0, res.stderr);
   const doc = JSON.parse(res.stdout.trim().split("\n").pop());
   assert.equal(doc.subcommand, "status");
-  assert.match(doc.note, /explicit/);
+  assert.equal(doc.state, "logged-in");
+  assert.match(fs.readFileSync(m.log, "utf8"), /auth status/);
+});
+
+test("auth: status reports not-logged-in", () => {
+  const m = mockVendorCli("out", "not-logged-in");
+  const res = run(["auth", "status"], { OHOS_HAP_VENDOR_CLI: m.cli, OHOS_HAP_AUTH_NO_BROWSER: "1" });
+  assert.equal(res.status, 0, res.stderr);
+  const doc = JSON.parse(res.stdout.trim().split("\n").pop());
+  assert.equal(doc.state, "not-logged-in");
+});
+
+test("auth: status fails closed when vendor CLI errors", () => {
+  const m = mockVendorCli("err", "unavailable");
+  const res = run(["auth", "status"], { OHOS_HAP_VENDOR_CLI: m.cli, OHOS_HAP_AUTH_NO_BROWSER: "1" });
+  assert.notEqual(res.status, 0);
+  assert.match(res.stderr, /ERR_VENDOR_AUTH_REQUIRED/);
+});
+
+test("auth: login delegates to vendor CLI with no browser", () => {
+  const m = mockVendorCli("login", "logged-in");
+  const res = run(["auth", "login"], { OHOS_HAP_VENDOR_CLI: m.cli, OHOS_HAP_AUTH_NO_BROWSER: "1" });
+  assert.equal(res.status, 0, res.stderr);
+  assert.match(fs.readFileSync(m.log, "utf8"), /auth login/);
+  assert.match(res.stderr, /developer\.huawei\.com/); // URL passed through
+});
+
+test("auth: logout delegates to vendor CLI", () => {
+  const m = mockVendorCli("logout", "logged-in");
+  const res = run(["auth", "logout"], { OHOS_HAP_VENDOR_CLI: m.cli, OHOS_HAP_AUTH_NO_BROWSER: "1" });
+  assert.equal(res.status, 0, res.stderr);
+  assert.match(fs.readFileSync(m.log, "utf8"), /auth logout/);
+});
+
+test("auth: fails closed when no vendor CLI is available", () => {
+  const res = run(["auth", "status"], {
+    OHOS_HAP_VENDOR_CLI: path.join(tmp, "no-such-cli"), OHOS_HAP_AUTH_NO_BROWSER: "1",
+  });
+  assert.notEqual(res.status, 0);
+  assert.match(res.stderr, /ERR_VENDOR_AUTH_REQUIRED/);
+});
+
+test("auth: rejects unsupported subcommand", () => {
+  const res = run(["auth", "bogus"]);
+  assert.notEqual(res.status, 0);
+  assert.match(res.stderr, /ERR_INVALID_REQUEST/);
 });
 
 console.log(`\n${passed} passed, ${failed} failed`);

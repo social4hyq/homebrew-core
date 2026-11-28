@@ -10,11 +10,11 @@ class OhosHap < Formula
   version "1.0.0"
   sha256 "bd48e6006801d1a4211837bb38b729d3ccf868acdca2831d27a5cab6cfefac53"
   license "MIT"
+  revision 1
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-hap-v1.0.0-r4"
-    rebuild 3
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "0cd43c081a89d1cd51499e242234d7d75173f8a40018db5443da569812167ad0"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-hap-v1.0.0-r5"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "4177c41f6965d4ef59d1e68c46b575ccc4fc2b8e4cb76e1a5f26c18515b31380"
   end
 
   depends_on "node"
@@ -27,6 +27,7 @@ class OhosHap < Formula
     Resources/ohos-hap/ohos-hap.cjs
     Resources/ohos-hap/lib/deveco-decoder.cjs
     Resources/ohos-hap/lib/prepare-profile.cjs
+    Resources/ohos-hap/lib/vendor-auth.sh
     Resources/ohos-hap/test-ohos-hap.cjs
     Resources/ohos-hap/schemas/v1/request.schema.json
     Resources/ohos-hap/schemas/v1/result.schema.json

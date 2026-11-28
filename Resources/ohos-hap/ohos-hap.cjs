@@ -312,10 +312,24 @@ function cmdProfile(o) {
 
 function cmdAuth(o) {
   const sub = o._[1] || "status";
+  if (!["login", "logout", "status"].includes(sub)) {
+    fail("ERR_INVALID_REQUEST", `unsupported auth subcommand: ${sub}`);
+  }
   // Vendor auth is explicit and delegated to the vendor CLI. This layer holds
   // no tokens and starts no interactive flow from sign/install.
-  out({ protocol_version: 1, subcommand: sub,
-    note: "vendor auth is explicit; delegated to the vendor CLI, never implicit from sign/install" });
+  const script = path.join(__dirname, "lib", "vendor-auth.sh");
+  const result = spawnSync("bash", [script, sub], {
+    encoding: "utf8", stdio: ["inherit", "pipe", "pipe"],
+  });
+  const stream = `${result.stdout || ""}${result.stderr || ""}`;
+  process.stderr.write(stream);
+  if (result.error || result.status !== 0) {
+    fail("ERR_VENDOR_AUTH_REQUIRED", `${sub} failed (status=${result.status}); see output above`);
+  }
+  const state = stream.trim().split("\n").pop() || "";
+  out({ protocol_version: 1, subcommand: sub, ok: true,
+    state: sub === "status" ? state : null,
+    note: "credentials stay in the vendor CLI; ohos-hap holds no token" });
 }
 
 function main() {
