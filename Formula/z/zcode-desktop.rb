@@ -9,7 +9,7 @@ class ZcodeDesktop < Formula
   # Tap-authored shell scripts (MIT) on the CPF-Electron runtime (mixed
   # MIT/BSD/LGPL).
   license :cannot_represent
-  revision 2
+  revision 3
 
   livecheck do
     url "https://raw.githubusercontent.com/zai-org/ZCode/main/package.json"
@@ -19,10 +19,11 @@ class ZcodeDesktop < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-desktop-v4.0.0-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "328930981eb6f1d6ba2b2c13f6a93786149c15f68e8c249d47e6a752d060b659"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/zcode-desktop-v4.0.0-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "9c5a9b84b29a4732699ba956f526b8170058e9b55c9645a474f003fffcdd9599"
   end
 
+  depends_on "ohos-hap-clt" => :build
   depends_on "bun"
   depends_on "curl"
   depends_on "node"
@@ -52,6 +53,12 @@ class ZcodeDesktop < Formula
   resource "electron-ohos" do
     url "https://gitcode.com/CPF-Electron/Electron/releases/download/v40.0.1/v40.0.1.20261028.2-release.zip"
     sha256 "5268fe3c994ec2ce48a999fd6b5029d9cb0e409b07c0395e2a6072e50cb3e1ac"
+  end
+
+  # Publicly mirrored official CLT replaces the private electron-ohos-ci image.
+  resource "command-line-tools" do
+    url "https://s3.oheco.org/command-line-tools/26.0.0.201/commandline-tools-harmonyos-26.0.0.201.tar.gz"
+    sha256 "60929c00ae486cc038ea48145497ad34dbd4ac6a25c3f2fa895ce74afb4607f5"
   end
 
   def install
@@ -146,24 +153,33 @@ class ZcodeDesktop < Formula
               "    super.onWindowStageCreate(windowStage);\n", close_handler
 
     # The proprietary CLT is supplied by the CI image, not distributed by the tap.
-    clt = Pathname.new("/opt/electron-ohos-clt")
-    unless (clt/"hvigor/bin/hvigorw.js").exist?
-      odie "#{name} builds only in electron-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES['#{name}']"
-    end
+    # Stage the publicly mirrored CLI into the build tree: no private image.
+    clt = buildpath/"command-line-tools"
+    hap_clt = formula_opt_bin("ohos-hap-clt")/"ohos-hap-clt"
+    archive = resource("command-line-tools")
+    archive.fetch
+    system hap_clt.to_s, "stage", clt.to_s, archive.cached_download.to_s
 
-    # ohos_packing_tool needs SDK libraries outside brew's sanitized search path.
+    # The source root is an ES module; pin the CLT subtree back to CommonJS so
+    # Node does not treat hvigorw.js as ESM.
+    (clt/"package.json").write JSON.generate("type" => "commonjs")
+
+    # ohpm and ohos_packing_tool need the staged SDK libraries on the search
+    # path; the hvigor wrapper extends this same value for the assemble step.
+    clang_lib = (clt/"sdk/default/openharmony/native/llvm/lib").glob("clang/*/lib/aarch64-linux-ohos").first
+    odie "staged CLT missing clang runtime" if clang_lib.nil?
     ENV["DEVECO_SDK_HOME"] = (clt/"sdk").to_s
     ENV["HOS_SDK_HOME"] = (clt/"sdk").to_s
-    ENV["LD_LIBRARY_PATH"] =
-      "#{clt}/lib:#{clt}/sdk/default/openharmony/native/llvm/lib/clang/15.0.4/lib/aarch64-linux-ohos"
+    ENV["LD_LIBRARY_PATH"] = "#{clt}/lib:#{clang_lib}"
     ENV.delete("NODE_OPTIONS")
-    # An oversized RLIMIT_NOFILE breaks the musl FD table in hvigor.
+    # The hvigor wrapper patches OHOS Node detection and HiLog logging that
+    # were previously baked into the private image.
     soft_cap, hard_cap = Process.getrlimit(Process::RLIMIT_NOFILE)
     Process.setrlimit(Process::RLIMIT_NOFILE, [soft_cap, 65_536].min, 65_536) if hard_cap > 65_536
 
     cd shell do
       system "node", clt/"ohpm/bin/pm-cli.js", "install"
-      system "node", clt/"hvigor/bin/hvigorw.js", "assembleHap",
+      system hap_clt.to_s, "hvigor", clt.to_s, "assembleHap",
              "--mode", "module", "-p", "product=default", "--no-daemon"
     end
 
