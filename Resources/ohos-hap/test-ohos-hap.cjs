@@ -245,7 +245,7 @@ test("auth: login delegates to vendor CLI with no browser", () => {
   const res = run(["auth", "login"], { OHOS_HAP_VENDOR_CLI: m.cli, OHOS_HAP_AUTH_NO_BROWSER: "1" });
   assert.equal(res.status, 0, res.stderr);
   assert.match(fs.readFileSync(m.log, "utf8"), /auth login/);
-  assert.match(res.stderr, /developer\.huawei\.com/); // URL passed through
+  assert.match(`${res.stdout}${res.stderr}`, /developer\.huawei\.com/); // URL passed through (inherit → stdout)
 });
 
 test("auth: logout delegates to vendor CLI", () => {
