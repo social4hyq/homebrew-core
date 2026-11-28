@@ -5,7 +5,7 @@
 // same sessions) and injects HTTP basic auth for its origin. The service's
 // address and password come from its state file, not from this package. The
 // host `opencode` binary and the host environment it needs are baked into
-// config.json by `opencode-app install` before HAP signing. On launch the shell
+// config.json by the `ohos-app` personalizer before HAP signing. On launch the shell
 // starts the service when it is not running (requires the CUSTOM_SANDBOX /
 // READ_WRITE_USER_FILE ACLs) and never stops it itself. A service started by
 // this shell still ends when the app process ends (`aa force-stop`, tray quit):
