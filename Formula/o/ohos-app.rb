@@ -7,7 +7,7 @@ class OhosApp < Formula
   version "1.0.0"
   sha256 "0f37124f93b2431ebba47ba7f8f91ceb8ec2324c02ae6689399aa5359e9b3a7e"
   license "MIT"
-  revision 2
+  revision 3
 
   bottle do
     root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-app-v1.0.0-r2"

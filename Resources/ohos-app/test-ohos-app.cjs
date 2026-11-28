@@ -49,7 +49,12 @@ function fakeBin(name, body) {
 // fake ohos-hap: writes signed HAP to output_path in SigningRequest
 const fakeHap = fakeBin("fake-ohos-hap.cjs", `
 const fs=require("fs");
+if(process.argv[2]==="profile" && process.argv[3]==="show") {
+  console.log(JSON.stringify(process.env.FAKE_PROFILE_SIGNER ? {signer_path:process.env.FAKE_PROFILE_SIGNER} : {}));
+  process.exit(0);
+}
 const req=JSON.parse(fs.readFileSync(process.argv[process.argv.indexOf("--request")+1],"utf8"));
+if(process.env.FAKE_HAP_LOG) fs.writeFileSync(process.env.FAKE_HAP_LOG, process.env.HAP_SIGN_TOOL||"");
 fs.writeFileSync(req.output_path, Buffer.concat([Buffer.from([0x50,0x4b,3,4]),Buffer.alloc(200,9)]));
 if(process.argv.includes("--result")) fs.writeFileSync(process.argv[process.argv.indexOf("--result")+1], JSON.stringify({protocol_version:1,ok:true}));
 `);
@@ -98,6 +103,36 @@ test("install: drives sign then device, streams events, no loopback", () => {
   const devlog = fs.readFileSync(env.FAKE_DEV_LOG, "utf8");
   assert.ok(devlog.includes("install"), "device install called");
   assert.ok(!devlog.includes("demo-desktop install"), "no <app> install loopback");
+});
+
+test("install: discovers the SDK HAP signer when HAP_SIGN_TOOL is unset", () => {
+  const signer = path.join(prefix, "opt", "ohos-sdk-toolchains", "lib", "hap-sign-tool");
+  fs.mkdirSync(path.dirname(signer), { recursive: true });
+  fs.writeFileSync(signer, "test signer placeholder");
+  const signerLog = path.join(tmp, "hap-signer.log");
+  const res = run(["install", "demo-desktop", "--method", "hdc"], {
+    ...env, HAP_SIGN_TOOL: "", FAKE_HAP_LOG: signerLog,
+  });
+  assert.equal(res.status, 0, res.stderr + res.stdout);
+  assert.equal(fs.readFileSync(signerLog, "utf8"), signer);
+});
+
+test("install: preserves an explicit HAP_SIGN_TOOL override", () => {
+  const signerLog = path.join(tmp, "hap-signer-override.log");
+  const res = run(["install", "demo-desktop", "--method", "hdc"], {
+    ...env, HAP_SIGN_TOOL: "/custom/hap-sign-tool", FAKE_HAP_LOG: signerLog,
+  });
+  assert.equal(res.status, 0, res.stderr + res.stdout);
+  assert.equal(fs.readFileSync(signerLog, "utf8"), "/custom/hap-sign-tool");
+});
+
+test("install: preserves the signer declared by the selected profile", () => {
+  const signerLog = path.join(tmp, "hap-profile-signer.log");
+  const res = run(["install", "demo-desktop", "--method", "hdc", "--signing-profile", "custom"], {
+    ...env, HAP_SIGN_TOOL: "", FAKE_PROFILE_SIGNER: "/profile/hap-sign-tool", FAKE_HAP_LOG: signerLog,
+  });
+  assert.equal(res.status, 0, res.stderr + res.stdout);
+  assert.equal(fs.readFileSync(signerLog, "utf8"), "");
 });
 
 test("install: personalizes and assembles the selected variant before signing", () => {
