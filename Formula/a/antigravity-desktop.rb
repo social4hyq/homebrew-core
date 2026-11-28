@@ -5,7 +5,7 @@ class AntigravityDesktop < Formula
       "2.34.0-5887025308631040/linux-arm/Antigravity.tar.gz"
   sha256 "91f31ce50c795e0571e7922511119ff3e7afc2ee4f640a97d69dbad2063c1866"
   license :cannot_represent # Google Terms of Service; closed-source prebuilt desktop app
-  revision 12
+  revision 13
 
   livecheck do
     url :homepage
@@ -13,10 +13,11 @@ class AntigravityDesktop < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/antigravity-desktop-v2.34.0-r3"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "eb0040250630dfcbb94e87d209d4ebec7494133672a311471a37241aa11b03f8"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/antigravity-desktop-v2.34.0-r4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "a2dd89279d1f266b9ab1efc05b930a5a2dad6f168027536ff507ae5c3bfa2a11"
   end
 
+  depends_on "ohos-hap-clt" => :build
   depends_on "glibc"
   depends_on "node"
   depends_on "ohos-sdk-toolchains"
@@ -29,6 +30,12 @@ class AntigravityDesktop < Formula
   resource "electron-ohos" do
     url "https://gitcode.com/CPF-Electron/Electron/releases/download/v40.0.1/v40.0.1.20261028.2-release.zip"
     sha256 "5268fe3c994ec2ce48a999fd6b5029d9cb0e409b07c0395e2a6072e50cb3e1ac"
+  end
+
+  # Publicly mirrored official CLT replaces the private electron-ohos-ci image.
+  resource "command-line-tools" do
+    url "https://s3.oheco.org/command-line-tools/26.0.0.201/commandline-tools-harmonyos-26.0.0.201.tar.gz"
+    sha256 "60929c00ae486cc038ea48145497ad34dbd4ac6a25c3f2fa895ce74afb4607f5"
   end
 
   RESOURCE_FILES = %w[
@@ -56,23 +63,29 @@ class AntigravityDesktop < Formula
            shell, project, version.to_s
 
     # The proprietary CLT is supplied by the CI image, not distributed by the tap.
-    clt = Pathname.new("/opt/electron-ohos-clt")
-    unless (clt/"hvigor/bin/hvigorw.js").exist?
-      odie "#{name} builds only in electron-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES['#{name}']"
-    end
+    # Stage the publicly mirrored CLI into the build tree: no private image.
+    clt = buildpath/"command-line-tools"
+    hap_clt = formula_opt_bin("ohos-hap-clt")/"ohos-hap-clt"
+    archive = resource("command-line-tools")
+    archive.fetch
+    system hap_clt.to_s, "stage", clt.to_s, archive.cached_download.to_s
 
+    # ohpm and ohos_packing_tool need the staged SDK libraries on the search
+    # path; the hvigor wrapper extends this same value for the assemble step.
+    clang_lib = (clt/"sdk/default/openharmony/native/llvm/lib").glob("clang/*/lib/aarch64-linux-ohos").first
+    odie "staged CLT missing clang runtime" if clang_lib.nil?
     ENV["DEVECO_SDK_HOME"] = (clt/"sdk").to_s
     ENV["HOS_SDK_HOME"] = (clt/"sdk").to_s
-    ENV["LD_LIBRARY_PATH"] =
-      "#{clt}/lib:#{clt}/sdk/default/openharmony/native/llvm/lib/clang/15.0.4/lib/aarch64-linux-ohos"
+    ENV["LD_LIBRARY_PATH"] = "#{clt}/lib:#{clang_lib}"
     ENV.delete("NODE_OPTIONS")
-    # An oversized RLIMIT_NOFILE breaks the musl FD table in hvigor.
+    # The hvigor wrapper patches OHOS Node detection and HiLog logging that
+    # were previously baked into the private image.
     soft_cap, hard_cap = Process.getrlimit(Process::RLIMIT_NOFILE)
     Process.setrlimit(Process::RLIMIT_NOFILE, [soft_cap, 65_536].min, 65_536) if hard_cap > 65_536
 
     cd project do
       system "node", clt/"ohpm/bin/pm-cli.js", "install"
-      system "node", clt/"hvigor/bin/hvigorw.js", "assembleHap",
+      system hap_clt.to_s, "hvigor", clt.to_s, "assembleHap",
              "--mode", "module", "-p", "product=default", "--no-daemon"
     end
 
