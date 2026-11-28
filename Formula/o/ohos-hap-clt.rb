@@ -7,8 +7,8 @@ class OhosHapClt < Formula
   revision 2
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-hap-clt-v26.0.0.201-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "d65cb0095be5712211ba3ef3bc87326dee1f929ac8ec5b44fb3bdbe94646b03a"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-hap-clt-v26.0.0.201-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "748b2bd5d2f4db07ad7382f8a30c8ea033b975063d6aab5286150b218de0eca3"
   end
 
   depends_on "ohos-sdk" => :build if OS.ohos?
