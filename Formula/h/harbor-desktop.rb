@@ -12,8 +12,8 @@ class HarborDesktop < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/harbor-desktop-v0.4.1-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "91e0071e4c21b7108a19c1fad12650da9502a9474dbcb38688056de8f38998de"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/harbor-desktop-v0.4.1-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "952b23771468b88bf68e2159956cd282732dcb3ce5bbe57d370bbd1edf763374"
   end
 
   depends_on "node" => :build
