@@ -4,7 +4,7 @@ class HerdrDesktop < Formula
   url "https://github.com/herdrdev/herdr-app/archive/refs/tags/v0.1.18.tar.gz"
   sha256 "0c442fd54231dee2aca661661b50f4177ca04b55966c572f26cf06c629e9e59d"
   license "Apache-2.0"
-  revision 7
+  revision 8
 
   livecheck do
     url "https://github.com/herdrdev/herdr-app.git"
@@ -18,6 +18,7 @@ class HerdrDesktop < Formula
   end
 
   depends_on "node" => :build
+  depends_on "ohos-hap-clt" => :build
   depends_on "ohos-sdk" => :build
   depends_on "rust" => :build
   depends_on "zig@0.16" => :build
@@ -121,18 +122,23 @@ class HerdrDesktop < Formula
     end
   end
 
+  # Publicly mirrored official CLT replaces the private electron-ohos-ci image.
+  resource "command-line-tools" do
+    url "https://s3.oheco.org/command-line-tools/26.0.0.201/commandline-tools-harmonyos-26.0.0.201.tar.gz"
+    sha256 "60929c00ae486cc038ea48145497ad34dbd4ac6a25c3f2fa895ce74afb4607f5"
+  end
+
   def install
     tap_root = Pathname(__FILE__).expand_path.dirname.parent.parent
     res = tap_root/"Resources/herdr-desktop"
     RESOURCE_FILES.each { |file| odie "missing tap resource: #{file}" unless (tap_root/file).exist? }
 
-    # HAP packaging uses the private electron-ohos-ci image
-    # (OHOS_CI_IMAGE_OVERRIDES) with the proprietary CLT at
-    # /opt/electron-ohos-clt.
-    clt = Pathname.new("/opt/electron-ohos-clt")
-    unless (clt/"hvigor/bin/hvigorw.js").exist?
-      odie "#{name} builds only in electron-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES['#{name}']"
-    end
+    # Stage the publicly mirrored CLI into the build tree: no private image.
+    clt = buildpath/"command-line-tools"
+    hap_clt = formula_opt_bin("ohos-hap-clt")/"ohos-hap-clt"
+    archive = resource("command-line-tools")
+    archive.fetch
+    system hap_clt.to_s, "stage", clt.to_s, archive.cached_download.to_s
 
     resource("ghostty").stage(buildpath/"vendor/ghostty")
     resource("openharmony-ability").stage(buildpath/"vendor/openharmony-ability")
@@ -166,19 +172,22 @@ class HerdrDesktop < Formula
     system ndk/"llvm/bin/llvm-strip", "--strip-unneeded", libs/"libopenharmony_ability.so"
     cp ndk/"llvm/lib/aarch64-linux-ohos/libc++_shared.so", libs
 
-    # ohos_packing_tool needs SDK libraries outside brew's sanitized search path.
+    # ohpm and ohos_packing_tool need the staged SDK libraries on the search
+    # path; the hvigor wrapper extends this same value for the assemble step.
+    clang_lib = (clt/"sdk/default/openharmony/native/llvm/lib").glob("clang/*/lib/aarch64-linux-ohos").first
+    odie "staged CLT missing clang runtime" if clang_lib.nil?
     ENV["DEVECO_SDK_HOME"] = (clt/"sdk").to_s
     ENV["HOS_SDK_HOME"] = (clt/"sdk").to_s
-    ENV["LD_LIBRARY_PATH"] =
-      "#{clt}/lib:#{clt}/sdk/default/openharmony/native/llvm/lib/clang/15.0.4/lib/aarch64-linux-ohos"
+    ENV["LD_LIBRARY_PATH"] = "#{clt}/lib:#{clang_lib}"
     ENV.delete("NODE_OPTIONS")
-    # An oversized RLIMIT_NOFILE breaks the musl FD table in hvigor.
+    # The hvigor wrapper patches OHOS Node detection and HiLog logging that
+    # were previously baked into the private image.
     soft_cap, hard_cap = Process.getrlimit(Process::RLIMIT_NOFILE)
     Process.setrlimit(Process::RLIMIT_NOFILE, [soft_cap, 65_536].min, 65_536) if hard_cap > 65_536
 
     cd hap do
       retrying { system "node", clt/"ohpm/bin/pm-cli.js", "install" }
-      system "node", clt/"hvigor/bin/hvigorw.js", "assembleHap",
+      system hap_clt.to_s, "hvigor", clt.to_s, "assembleHap",
              "--mode", "module", "-p", "product=default", "--no-daemon"
     end
 
