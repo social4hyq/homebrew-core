@@ -87,6 +87,7 @@ class OhosHap < Formula
     libexec.install cli_source/"node_modules" => "deveco-runtime/node_modules"
     cli_js = libexec/"deveco-runtime/node_modules/@deveco/deveco-cli-openharmony-arm64/dist/cli.js"
     odie "DevEco CLI runtime missing" unless cli_js.file?
+    chmod 0755, cli_js # invoked directly via its shebang by vendor-auth/profile-refresh
 
     (bin/"ohos-hap").write_env_script libexec/"ohos-hap/ohos-hap.cjs",
       PATH: "#{formula_opt_bin("node")}:$PATH",
