@@ -27,9 +27,8 @@
      必须重触发 pr-validate 门禁重新裁决；bot 名下 bump-* 分支被 pr-validate
      拦进 action_required 时，automerge-autobump.yml 的小时扫描只自动 approve
      allowlist 内的分支；HAP/app 类分支留人工审批（真机验收门禁）。
-     容器镜像由 workflow 起容器前用 --resolve-image 解析：取该 formula 在
-     OHOS_CI_IMAGE_OVERRIDES 里的私有镜像（缺私有 CLT/SDK 时 brew test 无法
-     验证，AI 会误判失败），无 override 则回落默认镜像。
+     容器用共享公开 CI 镜像（OHOS_CI_IMAGE），与 pr-validate 出 bottle 的
+     环境一致（私有镜像依赖已从所有 HAP formula 移除）。
   5. 报告发 PR 评论，标签按结果换成 ai-success / ai-failed
 
 安全边界（与官方一致）：容器内跑的是 AI 自主生成的命令 + PR 自带代码，只向
@@ -498,35 +497,12 @@ def host_main():
             pass
 
 
-def resolve_image():
-    """Runner host 上、起容器前运行：查该 PR formula 的 CI 镜像并写 GITHUB_OUTPUT。
-
-    HAP/Electron formula 的 `brew test` 要私有 CLT/SDK（例如 /opt/electron-ohos-clt），
-    默认 OHOS_CI_IMAGE 没有，AI 会因此声明失败——即使修复本身是对的。复用
-    bottle-build 的 OHOS_CI_IMAGE_OVERRIDES 映射选中对应镜像，让 AI 的验证环境和
-    真正出 bottle 的 pr-validate 构建环境一致。无 override 时回落默认镜像。
-    """
-    require_env("PR_NUMBER", "OVERRIDES", "DEFAULT_IMAGE")
-    formula, _, _, _ = resolve_formula(os.environ["PR_NUMBER"])
-    try:
-        overrides = json.loads(os.environ["OVERRIDES"] or "{}")
-    except json.JSONDecodeError as e:
-        raise RuntimeError(f"OHOS_CI_IMAGE_OVERRIDES 无法解析（{e}）")
-    image = overrides.get(formula) or os.environ["DEFAULT_IMAGE"]
-    with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as fh:
-        fh.write(f"image={image}\n")
-    print(f"resolved image for {formula}: {image}", flush=True)
-
-
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--agent", action="store_true", help="OHOS 容器内运行：准备 tap 环境并执行 AI 修复")
     parser.add_argument("--host", action="store_true", help="runner host 上运行（默认）：编排 agent 阶段并推送结果/评论")
-    parser.add_argument("--resolve-image", action="store_true", help="runner host 上起容器前运行：解析该 PR formula 的 CI 镜像")
     args = parser.parse_args()
-    if args.resolve_image:
-        resolve_image()
-    elif args.agent:
+    if args.agent:
         run_agent()
     else:
         host_main()
