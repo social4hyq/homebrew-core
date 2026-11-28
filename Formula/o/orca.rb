@@ -1,8 +1,8 @@
 class Orca < Formula
   desc "Run coding-agent fleets, each agent in its own git worktree"
   homepage "https://github.com/stablyai/orca"
-  url "https://github.com/stablyai/orca/archive/refs/tags/v1.4.277.tar.gz"
-  sha256 "9585018402f8ccf175127a23e37db81ad82d4af120fb063d94da5636bcc559a7"
+  url "https://github.com/stablyai/orca/archive/refs/tags/v1.4.280.tar.gz"
+  sha256 "6f07952092cc93e384c0fde6882cd422c1d24814e285dd9d1f63f6512f11a452"
   license "MIT"
 
   livecheck do
