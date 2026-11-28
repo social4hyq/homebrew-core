@@ -12,9 +12,8 @@ class OhosHap < Formula
   revision 4
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-hap-v1.0.0-r9"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3a5a77ec0f47046e83bb3a747d77d7434275721c2739aabed4e0c1a246ec3b82"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-hap-v1.0.0-r10"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0d04d97eef56841fa0d277fd4234ca1a7207becdeeb1031d626a45c492a6571d"
   end
 
   depends_on "node"
