@@ -1,10 +1,9 @@
 class SnowImageViewer < Formula
   desc "Color-managed image viewer from Snow Apps, unsigned HAP (sign at install)"
   homepage "https://github.com/mg-chao/snow-shot"
-  url "https://github.com/mg-chao/snow-shot/archive/refs/tags/v1.6.5_snow-shot.tar.gz"
-  sha256 "125059b53d029b9fba8307868595c2eed478b4bf129b88c22d4a4dbb0f30c0d6"
+  url "https://github.com/mg-chao/snow-shot/archive/refs/tags/v1.6.6_snow-shot.tar.gz"
+  sha256 "78a939e86a5fcff842f96a21d5be2b145f66452221f42eb679eb696396b49843"
   license "GPL-3.0-or-later"
-  revision 3
 
   livecheck do
     url "https://github.com/mg-chao/snow-shot.git"
