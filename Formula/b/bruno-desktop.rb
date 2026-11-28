@@ -8,7 +8,7 @@ class BrunoDesktop < Formula
       using: :nounzip
   sha256 "0264f6bd80deec178e89bdbe229e41747fa59e6fce1ef9bf9f3764924f362d7c"
   license "MIT"
-  revision 4
+  revision 5
 
   livecheck do
     url :stable
@@ -20,6 +20,7 @@ class BrunoDesktop < Formula
     sha256 cellar: :any_skip_relocation, arm64_ohos: "cdc4f0d449b4f2c6d6758ed1f72b1a0babcf6542a8f601f3d6635ba71f70d141"
   end
 
+  depends_on "ohos-hap-clt" => :build
   depends_on "node"
   depends_on "ohos-sdk-toolchains"
   depends_on "python@3.15"
@@ -29,6 +30,12 @@ class BrunoDesktop < Formula
   resource "electron-ohos" do
     url "https://gitcode.com/CPF-Electron/Electron/releases/download/v40.0.1/v40.0.1.20261028.2-release.zip"
     sha256 "5268fe3c994ec2ce48a999fd6b5029d9cb0e409b07c0395e2a6072e50cb3e1ac"
+  end
+
+  # Publicly mirrored official CLT replaces the private electron-ohos-ci image.
+  resource "command-line-tools" do
+    url "https://s3.oheco.org/command-line-tools/26.0.0.201/commandline-tools-harmonyos-26.0.0.201.tar.gz"
+    sha256 "60929c00ae486cc038ea48145497ad34dbd4ac6a25c3f2fa895ce74afb4607f5"
   end
 
   # The unused-resource audit requires literal tap paths.
@@ -65,22 +72,29 @@ class BrunoDesktop < Formula
     ENV["BRUNO_APP_VERSION"] = version.to_s
     system "bash", res/"scripts/stage-ohos-shell.sh", shell, project
 
-    clt = Pathname.new("/opt/electron-ohos-clt")
-    unless (clt/"hvigor/bin/hvigorw.js").exist?
-      odie "#{name} builds only in electron-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES['#{name}']"
-    end
+    # Stage the publicly mirrored CLI into the build tree: no private image.
+    clt = buildpath/"command-line-tools"
+    hap_clt = formula_opt_bin("ohos-hap-clt")/"ohos-hap-clt"
+    archive = resource("command-line-tools")
+    archive.fetch
+    system hap_clt.to_s, "stage", clt.to_s, archive.cached_download.to_s
 
+    # ohpm and ohos_packing_tool need the staged SDK libraries on the search
+    # path; the hvigor wrapper extends this same value for the assemble step.
+    clang_lib = (clt/"sdk/default/openharmony/native/llvm/lib").glob("clang/*/lib/aarch64-linux-ohos").first
+    odie "staged CLT missing clang runtime" if clang_lib.nil?
     ENV["DEVECO_SDK_HOME"] = (clt/"sdk").to_s
     ENV["HOS_SDK_HOME"] = (clt/"sdk").to_s
-    ENV["LD_LIBRARY_PATH"] =
-      "#{clt}/lib:#{clt}/sdk/default/openharmony/native/llvm/lib/clang/15.0.4/lib/aarch64-linux-ohos"
+    ENV["LD_LIBRARY_PATH"] = "#{clt}/lib:#{clang_lib}"
     ENV.delete("NODE_OPTIONS")
+    # The hvigor wrapper patches OHOS Node detection and HiLog logging that
+    # were previously baked into the private image.
     soft_cap, hard_cap = Process.getrlimit(Process::RLIMIT_NOFILE)
     Process.setrlimit(Process::RLIMIT_NOFILE, [soft_cap, 65_536].min, 65_536) if hard_cap > 65_536
 
     cd project do
       system "node", clt/"ohpm/bin/pm-cli.js", "install"
-      system "node", clt/"hvigor/bin/hvigorw.js", "assembleHap",
+      system hap_clt.to_s, "hvigor", clt.to_s, "assembleHap",
              "--mode", "module", "-p", "product=default", "--no-daemon"
     end
 
