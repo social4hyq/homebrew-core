@@ -12,8 +12,8 @@ class BrewoDesktop < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/brewo-desktop-v0.3.2-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "84f907a52770dd9365fb89588c0cd010b365d2b769b09668158c2ab12ffad7bd"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/brewo-desktop-v0.3.2-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bd1fd8f8ebb79d31b274618b902614c796e966679b454e2a412620e917e25711"
   end
 
   depends_on "node" => :build
