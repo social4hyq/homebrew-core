@@ -4,7 +4,7 @@ class HarborDesktop < Formula
   url "https://github.com/social4hyq/harbor-app/archive/refs/tags/v0.4.1.tar.gz"
   sha256 "74b6d19cc0af97b1b88972248eb67d6a0cbed8b989ff82bf1d15170761b2b7ee"
   license "MIT"
-  revision 2
+  revision 3
 
   livecheck do
     url :stable
@@ -17,28 +17,40 @@ class HarborDesktop < Formula
   end
 
   depends_on "node" => :build
+  depends_on "ohos-hap-clt" => :build
   depends_on "ohos-sdk" => :build
   depends_on "zip" => :build
   depends_on "python@3.15"
 
-  def install
-    clt = Pathname("/opt/electron-ohos-clt")
-    unless (clt/"hvigor/bin/hvigorw.js").exist?
-      odie "#{name} builds only in electron-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES['#{name}']"
-    end
+  # Publicly mirrored official CLT replaces the private electron-ohos-ci image.
+  resource "command-line-tools" do
+    url "https://s3.oheco.org/command-line-tools/26.0.0.201/commandline-tools-harmonyos-26.0.0.201.tar.gz"
+    sha256 "60929c00ae486cc038ea48145497ad34dbd4ac6a25c3f2fa895ce74afb4607f5"
+  end
 
+  def install
+    # Stage the publicly mirrored CLI into the build tree: no private image.
+    clt = buildpath/"command-line-tools"
+    hap_clt = formula_opt_bin("ohos-hap-clt")/"ohos-hap-clt"
+    archive = resource("command-line-tools")
+    archive.fetch
+    system hap_clt.to_s, "stage", clt.to_s, archive.cached_download.to_s
+
+    # ohpm and ohos_packing_tool need the staged SDK libraries on the search
+    # path; the hvigor wrapper extends this same value for the assemble step.
+    clang_lib = (clt/"sdk/default/openharmony/native/llvm/lib").glob("clang/*/lib/aarch64-linux-ohos").first
+    odie "staged CLT missing clang runtime" if clang_lib.nil?
     ENV["DEVECO_SDK_HOME"] = (clt/"sdk").to_s
     ENV["HOS_SDK_HOME"] = (clt/"sdk").to_s
-    ENV["LD_LIBRARY_PATH"] = "#{clt}/lib:" \
-                             "#{clt}/sdk/default/openharmony/native/llvm/lib/" \
-                             "clang/15.0.4/lib/aarch64-linux-ohos"
-
-    # Limit RLIMIT_NOFILE (oversized values break the musl FD table in hvigor).
+    ENV["LD_LIBRARY_PATH"] = "#{clt}/lib:#{clang_lib}"
+    ENV.delete("NODE_OPTIONS")
+    # The hvigor wrapper patches OHOS Node detection and HiLog logging that
+    # were previously baked into the private image.
     soft_cap, hard_cap = Process.getrlimit(Process::RLIMIT_NOFILE)
     Process.setrlimit(Process::RLIMIT_NOFILE, [soft_cap, 65_536].min, 65_536) if hard_cap > 65_536
 
     system "node", clt/"ohpm/bin/pm-cli.js", "install"
-    system "node", clt/"hvigor/bin/hvigorw.js", "assembleHap",
+    system hap_clt.to_s, "hvigor", clt.to_s, "assembleHap",
            "--mode", "module", "-p", "product=default", "--no-daemon"
 
     # Compile the native NAPI bridge with the OHOS clang and inject into the HAP.
