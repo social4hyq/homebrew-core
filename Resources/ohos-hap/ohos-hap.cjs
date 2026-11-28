@@ -343,20 +343,23 @@ function cmdProfile(o) {
     const vendorStateRoot = path.join(process.env.HOME || "", ".ohos/config");
     const decoded = devecoDecoder.decodePasswords(cli, vendorStateRoot, material.storePassword, material.keyPassword);
 
-    // Persist decoded passwords only in a 0600 secret file; profiles.json holds
-    // a file: reference, never the value.
+    // Persist decoded passwords in separate 0600 secret files — resolveEnvRef
+    // reads the whole file as one value, so store and key must not share a file.
     const secretDir = path.join(cfgDir, "ohos-hap", "secrets");
     fs.mkdirSync(secretDir, { recursive: true, mode: 0o700 });
-    const secretFile = path.join(secretDir, `${name}.pwd`);
-    fs.writeFileSync(secretFile, `${decoded.storePassword}\n${decoded.keyPassword || decoded.storePassword}\n`, { mode: 0o600 });
-    fs.chmodSync(secretFile, 0o600); // writeFileSync mode applies only on create; re-apply on refresh
+    const storeFile = path.join(secretDir, `${name}.store.pwd`);
+    const keyFile = path.join(secretDir, `${name}.key.pwd`);
+    for (const [file, value] of [[storeFile, decoded.storePassword], [keyFile, decoded.keyPassword || decoded.storePassword]]) {
+      fs.writeFileSync(file, `${value}\n`, { mode: 0o600 });
+      fs.chmodSync(file, 0o600); // writeFileSync mode applies only on create; re-apply on refresh
+    }
 
     const profile = {
       kind: "vendor-debug", build_profile: buildProfile,
       vendor_cli: cli, vendor_state_root: vendorStateRoot,
       bundle_id: o.bundle_id,
-      store_password_ref: `file:${secretFile}`,
-      key_password_ref: `file:${secretFile}`,
+      store_password_ref: `file:${storeFile}`,
+      key_password_ref: `file:${keyFile}`,
     };
     const profiles = readProfiles();
     profiles.profiles = profiles.profiles || {};

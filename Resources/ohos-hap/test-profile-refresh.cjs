@@ -106,9 +106,14 @@ test("refresh: generates vendor-debug profile with secret file ref", () => {
   const p = profiles.profiles.mydebug;
   assert.equal(p.kind, "vendor-debug");
   assert.match(p.store_password_ref, /^file:/);
-  const secret = p.store_password_ref.slice(5);
-  assert.equal(fs.statSync(secret).mode & 0o777, 0o600);
-  assert.match(fs.readFileSync(secret, "utf8"), /storePASS/); // decoded, not ENC-
+  const storeSecret = p.store_password_ref.slice(5);
+  const keySecret = p.key_password_ref.slice(5);
+  assert.notEqual(storeSecret, keySecret); // separate files: resolveEnvRef reads the whole file as one value
+  for (const f of [storeSecret, keySecret]) {
+    assert.equal(fs.statSync(f).mode & 0o777, 0o600);
+    assert.equal(fs.readFileSync(f, "utf8").trim().split("\n").length, 1); // one password per file
+  }
+  assert.match(fs.readFileSync(storeSecret, "utf8"), /storePASS/); // decoded, not ENC-
   assert.equal(JSON.stringify(profiles).includes("ENC-storePASS"), false);
 });
 
