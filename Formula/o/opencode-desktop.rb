@@ -6,7 +6,7 @@ class OpencodeDesktop < Formula
   # Tap-authored shell sources (MIT) on the CPF-Electron runtime (mixed
   # MIT/BSD/LGPL).
   license :cannot_represent
-  revision 4
+  revision 5
 
   livecheck do
     url :stable
@@ -256,7 +256,11 @@ class OpencodeDesktop < Formula
     assert_equal "assemble.cjs", descriptor.dig("assembly", "plugin")
     assert_path_exists pkgshare/"ohos/personalize.cjs"
     assert_path_exists pkgshare/"ohos/assemble.cjs"
-    assert_equal "ohos-app install opencode-desktop --start",
+    expected_install_command = [
+      "HAP_SIGN_TOOL=$(brew --prefix ohos-sdk-toolchains)/lib/hap-sign-tool",
+      "ohos-app install opencode-desktop --start",
+    ].join(" ")
+    assert_equal expected_install_command,
                  JSON.parse((tap_root/"Resources/opencode-desktop/app/waiting.json").read).fetch("command")
     assert_equal Digest::SHA256.file(pkgshare/"module-acl.json").hexdigest,
                  descriptor.dig("variants", "definitions", "acl", "sha256")
