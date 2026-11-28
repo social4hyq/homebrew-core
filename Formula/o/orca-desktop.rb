@@ -8,7 +8,7 @@ class OrcaDesktop < Formula
   # Tap-authored shell scripts (MIT) on the CPF-Electron runtime (mixed
   # MIT/BSD/LGPL).
   license :cannot_represent
-  revision 2
+  revision 3
 
   livecheck do
     url :stable
@@ -16,10 +16,11 @@ class OrcaDesktop < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/orca-desktop-v1.4.277-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "261d3eeac62d29d1dbc99ebd03bbf8d7a2f2c876f438db61c6d91a30c3bd1d63"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/orca-desktop-v1.4.277-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "b93d1cc20680ee32bc909902ed16e23dc946ec684dfc7a0ce876137294d8f8a8"
   end
 
+  depends_on "ohos-hap-clt" => :build
   depends_on "openjdk" => :build
   depends_on "node"
   depends_on "ohos-sdk-toolchains"
@@ -46,6 +47,12 @@ class OrcaDesktop < Formula
     Resources/orca-desktop/tests/shell-flow.test.cjs
     Resources/orca-desktop/tests/shell-harness.cjs
   ].freeze
+
+  # Publicly mirrored official CLT replaces the private electron-ohos-ci image.
+  resource "command-line-tools" do
+    url "https://s3.oheco.org/command-line-tools/26.0.0.201/commandline-tools-harmonyos-26.0.0.201.tar.gz"
+    sha256 "60929c00ae486cc038ea48145497ad34dbd4ac6a25c3f2fa895ce74afb4607f5"
+  end
 
   resource "electron-ohos" do
     url "https://gitcode.com/CPF-Electron/Electron/releases/download/v40.0.1/v40.0.1.20261028.2-release.zip"
@@ -140,32 +147,32 @@ class OrcaDesktop < Formula
     inreplace shell/"web_engine/src/main/ets/ability/WebAbility.ets",
               "    super.onWindowStageCreate(windowStage);\n", close_handler
 
-    # The proprietary CLT is supplied by the CI image, not distributed by the tap.
-    clt = Pathname.new("/opt/electron-ohos-clt")
-    unless (clt/"hvigor/bin/hvigorw.js").exist?
-      odie "#{name} builds only in electron-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES['#{name}']"
-    end
+    # Stage the publicly mirrored CLI into the build tree: no private image.
+    clt = buildpath/"command-line-tools"
+    hap_clt = formula_opt_bin("ohos-hap-clt")/"ohos-hap-clt"
+    archive = resource("command-line-tools")
+    archive.fetch
+    system hap_clt.to_s, "stage", clt.to_s, archive.cached_download.to_s
 
-    # ohos_packing_tool needs SDK libraries outside brew's sanitized search path.
-    ENV["DEVECO_SDK_HOME"] = (clt/"sdk").to_s
-    ENV["HOS_SDK_HOME"] = (clt/"sdk").to_s
     # hvigor's PackageHap runs the SDK's hap-sign-tool through `java`.
     ENV["JAVA_HOME"] = formula_opt_prefix("openjdk").to_s
     ENV.prepend_path "PATH", formula_opt_bin("openjdk")
-    ENV["LD_LIBRARY_PATH"] = [
-      "#{clt}/lib",
-      "#{clt}/sdk/default/hms/toolchains/lib",
-      "#{clt}/sdk/default/openharmony/toolchains/lib",
-      "#{clt}/sdk/default/openharmony/native/llvm/lib/clang/15.0.4/lib/aarch64-linux-ohos",
-    ].join(":")
+    # ohpm and ohos_packing_tool need the staged SDK libraries on the search
+    # path; the hvigor wrapper extends this same value for the assemble step.
+    clang_lib = (clt/"sdk/default/openharmony/native/llvm/lib").glob("clang/*/lib/aarch64-linux-ohos").first
+    odie "staged CLT missing clang runtime" if clang_lib.nil?
+    ENV["DEVECO_SDK_HOME"] = (clt/"sdk").to_s
+    ENV["HOS_SDK_HOME"] = (clt/"sdk").to_s
+    ENV["LD_LIBRARY_PATH"] = "#{clt}/lib:#{clang_lib}"
     ENV.delete("NODE_OPTIONS")
-    # An oversized RLIMIT_NOFILE breaks the musl FD table in hvigor.
+    # The hvigor wrapper patches OHOS Node detection and HiLog logging that
+    # were previously baked into the private image.
     soft_cap, hard_cap = Process.getrlimit(Process::RLIMIT_NOFILE)
     Process.setrlimit(Process::RLIMIT_NOFILE, [soft_cap, 65_536].min, 65_536) if hard_cap > 65_536
 
     cd shell do
       system "node", clt/"ohpm/bin/pm-cli.js", "install"
-      system "node", clt/"hvigor/bin/hvigorw.js", "assembleHap",
+      system hap_clt.to_s, "hvigor", clt.to_s, "assembleHap",
              "--mode", "module", "-p", "product=default", "--no-daemon"
     end
 
