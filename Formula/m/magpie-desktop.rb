@@ -12,8 +12,8 @@ class MagpieDesktop < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/magpie-desktop-v0.1.4828-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c35c298ed3bdebe2012c9242ed462bb338a247c572468c942e3bbb2d84068787"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/magpie-desktop-v0.1.4828-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "fd5ada8d765eea51cdf24c9aad690bd70b1d543b9f2c68e07000600bf377ce63"
   end
 
   depends_on "ohos-hap-clt" => :build
