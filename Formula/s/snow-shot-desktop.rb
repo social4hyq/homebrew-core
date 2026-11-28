@@ -4,7 +4,7 @@ class SnowShotDesktop < Formula
   url "https://github.com/mg-chao/snow-shot/archive/refs/tags/v1.6.5_snow-shot.tar.gz"
   sha256 "125059b53d029b9fba8307868595c2eed478b4bf129b88c22d4a4dbb0f30c0d6"
   license "GPL-3.0-or-later"
-  revision 2
+  revision 3
 
   livecheck do
     url "https://github.com/mg-chao/snow-shot.git"
@@ -38,12 +38,14 @@ class SnowShotDesktop < Formula
   depends_on "minizip-ng" => :build
   depends_on "ninja" => :build
   depends_on "node" => :build
+  depends_on "ohos-hap-clt" => :build
   depends_on "ohos-sdk" => :build
   depends_on "openexr" => :build
   depends_on "openssl@4" => :build
   depends_on "patchelf" => :build
   depends_on "pkgconf" => :build
   depends_on "plutovg" => :build
+  depends_on "qt-ohos-sdk" => :build
   depends_on "rust" => :build
   depends_on "snow-shot-opencv" => :build
   depends_on "tinyxml2" => :build
@@ -51,6 +53,12 @@ class SnowShotDesktop < Formula
   depends_on "zlib-ng-compat" => :build
   depends_on "zstd" => :build
   depends_on "ohos-sdk-toolchains"
+
+  # Publicly mirrored official CLT replaces the private qt-ohos-ci/electron-ohos-ci images.
+  resource "command-line-tools" do
+    url "https://s3.oheco.org/command-line-tools/26.0.0.201/commandline-tools-harmonyos-26.0.0.201.tar.gz"
+    sha256 "60929c00ae486cc038ea48145497ad34dbd4ac6a25c3f2fa895ce74afb4607f5"
+  end
 
   resource "ocr-detection-model" do
     url "https://www.modelscope.cn/models/mgchao/SnowShotOCR/resolve/master/PP-OCRv6/small/PP-OCRv6_det_small.onnx"
@@ -155,11 +163,14 @@ class SnowShotDesktop < Formula
   ].freeze
 
   def install
-    qt = Pathname.new("/opt/qt-ohos/qt-6.13.0-dev")
-    clt = Pathname.new("/opt/electron-ohos-clt")
-    unless (qt/"lib/cmake/Qt6/Qt6Config.cmake").exist?
-      odie "#{name} builds only in qt-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES['#{name}']"
-    end
+    qt = formula_opt_prefix("qt-ohos-sdk")/"libexec/qt-6.13.0-dev"
+    odie "Qt OHOS SDK missing" unless (qt/"lib/cmake/Qt6/Qt6Config.cmake").exist?
+    # Stage the publicly mirrored CLI into the build tree: no private image.
+    clt = buildpath/"command-line-tools"
+    hap_clt = formula_opt_bin("ohos-hap-clt")/"ohos-hap-clt"
+    archive = resource("command-line-tools")
+    archive.fetch
+    system hap_clt.to_s, "stage", clt.to_s, archive.cached_download.to_s
 
     ohos_sdk = formula_opt_prefix("ohos-sdk")
     opencv = formula_opt_prefix("snow-shot-opencv")
@@ -167,9 +178,10 @@ class SnowShotDesktop < Formula
     ENV["DEVECO_SDK_HOME"] = (clt/"sdk").to_s
     ENV["HOS_SDK_HOME"] = (clt/"sdk").to_s
     ENV["OPENSSL_DIR"] = formula_opt_prefix("openssl@4").to_s
+    clang_lib = (clt/"sdk/default/openharmony/native/llvm/lib").glob("clang/*/lib/aarch64-linux-ohos").first
+    odie "staged CLT missing clang runtime" if clang_lib.nil?
     ENV["LD_LIBRARY_PATH"] = [
-      "#{qt}/lib", "#{clt}/lib",
-      "#{clt}/sdk/default/openharmony/native/llvm/lib/clang/15.0.4/lib/aarch64-linux-ohos",
+      "#{qt}/lib", "#{clt}/lib", clang_lib.to_s,
       "#{opencv}/lib", "#{formula_opt_prefix("zstd")}/lib"
     ].join(":")
     soft_cap, hard_cap = Process.getrlimit(Process::RLIMIT_NOFILE)
@@ -324,7 +336,7 @@ class SnowShotDesktop < Formula
            "-DQT_CHAINLOAD_TOOLCHAIN_FILE=#{ohos_sdk}/native/build/cmake/ohos.toolchain.cmake",
            "-DOHOS_ARCH=arm64-v8a",
            "-DSNOW_FFMPEG_ROOT=#{formula_opt_prefix("ffmpeg")}",
-           "-DVulkanHeaders_DIR=/opt/qt-ohos/vk-shim/lib/cmake/VulkanHeaders",
+           "-DVulkanHeaders_DIR=#{qt}/share/vk-shim/lib/cmake/VulkanHeaders",
            "-DVulkan_INCLUDE_DIR=#{vulkan_include}",
            "-DOpenCV_DIR=#{opencv}/lib/cmake/opencv4",
            "-Dlcms2_DIR=#{lcms2_cmake}",
@@ -474,7 +486,7 @@ class SnowShotDesktop < Formula
     [payload/"libQt6Network.so", payload/"libqopensslbackend.so"]
   end
 
-  def package_qt_tls(qt_tls, stage, command_line_tools, native_sdk)
+  def package_qt_tls(qt_tls, stage, native_sdk)
     library, plugin = qt_tls
     patchelf = formula_opt_prefix("patchelf")/"bin/patchelf"
     network = buildpath/"libQt6Network.so.6"
@@ -488,8 +500,8 @@ class SnowShotDesktop < Formula
     system patchelf, "--replace-needed", "libQt6Network.so", "libQt6Network.so.6",
            "--replace-needed", "libQt6Core.so", "libQt6Core.so.6",
            "--force-rpath", "--set-rpath", "$ORIGIN:$ORIGIN/..", tls_plugin
-    sign_tool = command_line_tools/"sdk/default/openharmony/toolchains/lib/binary-sign-tool"
-    odie "binary-sign-tool is missing from the Qt/CLT CI image" unless sign_tool.executable?
+    sign_tool = native_sdk/"bin/binary-sign-tool"
+    odie "binary-sign-tool is missing from the OHOS SDK" unless sign_tool.executable?
     # The OHOS compiler already writes a .codesign section; it makes
     # binary-sign-tool reject the file, so drop it before signing.
     objcopy = native_sdk/"native/llvm/bin/llvm-objcopy"
@@ -600,7 +612,7 @@ class SnowShotDesktop < Formula
     cp buildpath/"build/snow_shot/libsnow_shot_image_codec_backend.so", libs
     cp formula_opt_prefix("zlib-ng-compat")/"lib/libz.so.1", libs/"libz.so.1"
     cp buildpath/"build/cargo/aarch64-unknown-linux-ohos/release/libsnow_ocr_inprocess.so", libs
-    package_qt_tls(qt_tls, stage, command_line_tools, native_sdk)
+    package_qt_tls(qt_tls, stage, native_sdk)
     ocr_output = stage/"entry/src/main/resources/rawfile/ocr"
     system "python3", res/"support/scripts/stage-ohos-ocr-assets.py",
            "--source-manifest", buildpath/"snow_shot/packaging/snow-shot-ocr-asset-manifest-arm64.json",
@@ -619,8 +631,8 @@ class SnowShotDesktop < Formula
     cd stage do
       inreplace "oh-package.json5", /"devDependencies": \{[^}]*\},?/, ""
       inreplace "entry/build-profile.json5", /^  "buildOption": \{.*?^  \},\n/m, ""
-      system "node", (command_line_tools/"hvigor/bin/hvigorw.js").to_s, "assembleHap",
-             "--mode", "module", "-p", "product=default", "--no-daemon"
+      system formula_opt_bin("ohos-hap-clt")/"ohos-hap-clt", "hvigor", command_line_tools.to_s,
+             "assembleHap", "--mode", "module", "-p", "product=default", "--no-daemon"
     end
     hap = stage/"entry/build/default/outputs/default/entry-default-unsigned.hap"
     system "python3", (res/"support/scripts/finalize-ohos-ocr-manifest.py").to_s, hap.to_s
