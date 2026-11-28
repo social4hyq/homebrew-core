@@ -13,8 +13,8 @@ class SnowShotDesktop < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-desktop-v1.6.5-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "c4c16b6581bab2395ca91e50ea6120605d609ff618c5279737f87b962c73c3e5"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/snow-shot-desktop-v1.6.5-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "434c41a64fd7152c8b422970c9af0a160195af960fcb2db76ca09fded3d8edee"
   end
 
   depends_on "brotli" => :build
