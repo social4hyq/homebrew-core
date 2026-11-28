@@ -380,15 +380,24 @@ function cmdAuth(o) {
   // Vendor auth is explicit and delegated to the vendor CLI. This layer holds
   // no tokens and starts no interactive flow from sign/install.
   const script = path.join(__dirname, "lib", "vendor-auth.sh");
+  // login/logout are interactive: the vendor CLI prompts ("Press Enter...",
+  // the login URL) and waits for the browser callback. Stream output straight
+  // to the terminal so the user sees the prompt in real time; buffering it
+  // (pipe) makes an interactive `auth login` look like it hangs with no output.
+  // status is non-interactive and quick, so capture it to parse the state.
+  const interactive = sub === "login" || sub === "logout";
   const result = spawnSync("bash", [script, sub], {
-    encoding: "utf8", stdio: ["inherit", "pipe", "pipe"],
+    encoding: "utf8", stdio: interactive ? "inherit" : ["inherit", "pipe", "pipe"],
   });
-  const stream = `${result.stdout || ""}${result.stderr || ""}`;
-  process.stderr.write(stream);
+  let state = null;
+  if (!interactive) {
+    const stream = `${result.stdout || ""}${result.stderr || ""}`;
+    process.stderr.write(stream);
+    state = stream.trim().split("\n").pop() || "";
+  }
   if (result.error || result.status !== 0) {
     fail("ERR_VENDOR_AUTH_REQUIRED", `${sub} failed (status=${result.status}); see output above`);
   }
-  const state = stream.trim().split("\n").pop() || "";
   out({ protocol_version: 1, subcommand: sub, ok: true,
     state: sub === "status" ? state : null,
     note: "credentials stay in the vendor CLI; ohos-hap holds no token" });
