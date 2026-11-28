@@ -9,15 +9,15 @@ class OhosHap < Formula
   version "1.0.0"
   sha256 "7fdee1bfb7393c151fa09b3714ecc4796e53d9876557e9933c5890319ffb4daa"
   license "MIT"
-  revision 3
+  revision 4
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-hap-v1.0.0-r9"
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "3a5a77ec0f47046e83bb3a747d77d7434275721c2739aabed4e0c1a246ec3b82"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/ohos-hap-v1.0.0-r10"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "0d04d97eef56841fa0d277fd4234ca1a7207becdeeb1031d626a45c492a6571d"
   end
 
   depends_on "node"
+  depends_on "ohos-sdk-toolchains" # hdc / hap-sign-tool / PermissionDefinitions for the vendor toolchain adapter
   depends_on "unzip" # inspect reads module.json from the final signed HAP
 
   # The DevEco signing runtime (npm) and hap-sign-tool are supplied by
@@ -90,9 +90,41 @@ class OhosHap < Formula
     odie "DevEco CLI runtime missing" unless cli_js.file?
     chmod 0755, cli_js # invoked directly via its shebang by vendor-auth/profile-refresh
 
+    # devecocli's signature generate needs a toolchain laid out the way its
+    # ToolProvider expects. Build a signing-only adapter from ohos-sdk-toolchains:
+    # node/ohpm/hvigor are stubbed (no build here), while hdc / hap-sign-tool /
+    # PermissionDefinitions and the SDK metadata are real.
+    toolchain = libexec/"deveco-toolchain"
+    node_stub = toolchain/"node/bin/node"
+    node_stub.dirname.mkpath
+    node_stub.write_env_script formula_opt_bin("node")/"node", {}
+    %w[ohpm/bin/pm-cli.js hvigor/bin/hvigorw.js].each do |entry|
+      stub = toolchain/entry
+      stub.dirname.mkpath
+      stub.write <<~JS
+        console.error("This toolchain adapter supports HAP signing only.");
+        process.exit(1);
+      JS
+    end
+    sdk = toolchain/"sdk/default/openharmony"
+    sdk_tools = formula_opt_prefix("ohos-sdk-toolchains")
+    metadata = sdk/"toolchains/oh-uni-package.json"
+    metadata.dirname.mkpath
+    cp sdk_tools/"oh-uni-package.json", metadata
+    sdk_info = JSON.parse(metadata.read)
+    (toolchain/"sdk/default/sdk-pkg.json").write JSON.generate("data" => sdk_info)
+    (sdk/"toolchains/hdc").write_env_script sdk_tools/"hdc", {}
+    signer = sdk/"toolchains/lib/hap-sign-tool"
+    signer.dirname.mkpath
+    signer.write_env_script sdk_tools/"lib/hap-sign-tool", {}
+    # signature generate reads the lowercase spelling on case-sensitive systems.
+    cp sdk_tools/"lib/PermissionDefinitions.json", sdk/"toolchains/lib/PermissionDefinitions.json"
+    cp sdk_tools/"lib/PermissionDefinitions.json", sdk/"toolchains/lib/permissionDefinitions.json"
+
     (bin/"ohos-hap").write_env_script libexec/"ohos-hap/ohos-hap.cjs",
       PATH: "#{formula_opt_bin("node")}:$PATH",
-      OHOS_HAP_VENDOR_CLI: cli_js, DEVECO_CLI_JS: cli_js
+      OHOS_HAP_VENDOR_CLI: cli_js, DEVECO_CLI_JS: cli_js,
+      COMMAND_LINE_TOOL_PATH: toolchain
   end
 
   def caveats
