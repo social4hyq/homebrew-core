@@ -12,7 +12,8 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 DIR="$ROOT/Resources/_shared/waiting-page"
 RENDER="$DIR/render-waiting.cjs"
 TEMPLATE="$DIR/waiting.html.in"
-for f in "$RENDER" "$TEMPLATE"; do
+CHECK="$DIR/check-waiting-commands.cjs"
+for f in "$RENDER" "$TEMPLATE" "$CHECK"; do
   [ -f "$f" ] || { echo "missing: $f" >&2; exit 2; }
 done
 
@@ -39,6 +40,15 @@ for app in ${apps[@]+"${apps[@]}"}; do
   out="$T/$app.html"
   if render "$TEMPLATE" "$ROOT/Resources/$app/app/waiting.json" "$out" 2> "$T/err"; then
     ok "$app renders ($(wc -c < "$out" | tr -d ' ') bytes)"
+    # Each app's {{command}} is the complete `ohos-app install <id>` command.
+    # The template must not append another "install"/"status"/"serve" to it:
+    # a second "install" is a broken command, and the status command must be
+    # `ohos-app status <id>` rather than `... install <id> status`.
+    if node "$DIR/check-waiting-commands.cjs" "$ROOT/Resources/$app/app/waiting.json" "$out" > "$T/cmdout" 2> "$T/cmderr"; then
+      ok "$app waiting-page commands are well-formed"
+    else
+      bad "$app waiting-page commands are well-formed" "$(head -1 "$T/cmderr")"
+    fi
   else
     bad "$app renders" "$(head -1 "$T/err")"
   fi

@@ -6,7 +6,7 @@ class OpencodeDesktop < Formula
   # Tap-authored shell sources (MIT) on the CPF-Electron runtime (mixed
   # MIT/BSD/LGPL).
   license :cannot_represent
-  revision 2
+  revision 3
 
   livecheck do
     url :stable
@@ -15,8 +15,8 @@ class OpencodeDesktop < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-desktop-v2.4.2-r10"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "2950cef5de28a47bf9e6f4b8bb8d1069491cf951983c56e28c613ed1d075f2c5"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/opencode-desktop-v2.4.2-r11"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c3f53d72dca259c64f5d564ed99e841674257e658b7724603bc931159f0a1abc"
   end
 
   depends_on "ohos-hap-clt" => :build

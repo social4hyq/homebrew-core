@@ -29,7 +29,7 @@ body[data-state="spawn-failed"] .track::after,body[data-state="not-configured"] 
 <h1 id="heading">{{name}}</h1>
 <p class="subtitle" id="description">{{subtitle}}</p>
 <div class="connection"><div class="track" aria-hidden="true"></div><p class="status" role="status" aria-live="polite"><span class="indicator" aria-hidden="true"></span><span id="status-text">正在连接本地服务</span></p></div>
-<details class="help" id="help" hidden><summary>启动遇到问题？<span aria-hidden="true"></span></summary><p id="help-text">服务就绪后会自动进入。也可以在终端检查状态：</p><div class="command"><code id="command">{{command}} status</code><button id="copy" type="button" aria-label="复制诊断命令">复制</button></div><p id="extra">若服务尚未启动，运行 <code>{{command}} serve</code>。</p></details>
+<details class="help" id="help" hidden><summary>启动遇到问题？<span aria-hidden="true"></span></summary><p id="help-text">服务就绪后会自动进入。也可以在终端检查状态：</p><div class="command"><code id="command">{{command}}</code><button id="copy" type="button" aria-label="复制诊断命令">复制</button></div><p id="extra">若服务尚未启动，运行 <code id="extra-command">ohos-app status</code>。</p></details>
 <p class="error-note" id="note" hidden></p>
 </section></main>
 <footer class="footer"><span>{{name}}</span><span>本机连接</span></footer>
@@ -48,7 +48,12 @@ function renderState() {
   $('heading').textContent = missing ? '还差一步，就能开始' : failed ? '暂时无法启动' : '{{name}}';
   $('description').textContent = missing ? '请完成本机应用配置，再重新打开。' : failed ? '本地服务启动失败，已有数据不会被更改。' : '{{subtitle}}';
   $('status-text').textContent = missing ? '等待完成配置' : failed ? '需要检查启动环境' : '正在连接本地服务';
-  $('command').textContent = missing ? '{{command}} install' : '{{command}} status';
+  // {{command}} is the complete `ohos-app install <id>` command; derive the
+  // app id for the status/start variants instead of appending verbs to it.
+  const installCmd = '{{command}}';
+  const appId = installCmd.split(' ').pop();
+  $('command').textContent = missing ? installCmd : 'ohos-app status ' + appId;
+  $('extra-command').textContent = 'ohos-app start ' + appId;
   $('help-text').textContent = missing ? '在终端执行以下命令，完成配置和安装：' : '服务就绪后会自动进入。也可以在终端检查状态：';
   $('extra').hidden = missing;
   $('help').hidden = state === 'waiting';
