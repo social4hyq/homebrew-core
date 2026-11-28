@@ -4,7 +4,7 @@ class BrewoDesktop < Formula
   url "https://github.com/social4hyq/brewo-app/archive/refs/tags/v0.3.2.tar.gz"
   sha256 "49d33aebf153347db7a2d8d80195f8b549d7696974304466ddebbaa1312aa16b"
   license "AGPL-3.0-only"
-  revision 2
+  revision 3
 
   livecheck do
     url :stable
@@ -12,33 +12,46 @@ class BrewoDesktop < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/brewo-desktop-v0.3.2-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "84f907a52770dd9365fb89588c0cd010b365d2b769b09668158c2ab12ffad7bd"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/brewo-desktop-v0.3.2-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "bd1fd8f8ebb79d31b274618b902614c796e966679b454e2a412620e917e25711"
   end
 
   depends_on "node" => :build
+  depends_on "ohos-hap-clt" => :build
   depends_on "ohos-sdk" => :build
   depends_on "zip" => :build
   depends_on "harbor-desktop"
   depends_on "python@3.15"
 
-  def install
-    clt = Pathname("/opt/electron-ohos-clt")
-    unless (clt/"hvigor/bin/hvigorw.js").exist?
-      odie "#{name} builds only in electron-ohos-ci; check OHOS_CI_IMAGE_OVERRIDES['#{name}']"
-    end
+  # Publicly mirrored official CLT replaces the private electron-ohos-ci image.
+  resource "command-line-tools" do
+    url "https://s3.oheco.org/command-line-tools/26.0.0.201/commandline-tools-harmonyos-26.0.0.201.tar.gz"
+    sha256 "60929c00ae486cc038ea48145497ad34dbd4ac6a25c3f2fa895ce74afb4607f5"
+  end
 
+  def install
+    # Stage the publicly mirrored CLI into the build tree: no private image.
+    clt = buildpath/"command-line-tools"
+    hap_clt = formula_opt_bin("ohos-hap-clt")/"ohos-hap-clt"
+    archive = resource("command-line-tools")
+    archive.fetch
+    system hap_clt.to_s, "stage", clt.to_s, archive.cached_download.to_s
+
+    # ohpm and ohos_packing_tool need the staged SDK libraries on the search
+    # path; the hvigor wrapper extends this same value for the assemble step.
+    clang_lib = (clt/"sdk/default/openharmony/native/llvm/lib").glob("clang/*/lib/aarch64-linux-ohos").first
+    odie "staged CLT missing clang runtime" if clang_lib.nil?
     ENV["DEVECO_SDK_HOME"] = (clt/"sdk").to_s
     ENV["HOS_SDK_HOME"] = (clt/"sdk").to_s
-    ENV["LD_LIBRARY_PATH"] = "#{clt}/lib:" \
-                             "#{clt}/sdk/default/openharmony/native/llvm/lib/" \
-                             "clang/15.0.4/lib/aarch64-linux-ohos"
-
+    ENV["LD_LIBRARY_PATH"] = "#{clt}/lib:#{clang_lib}"
+    ENV.delete("NODE_OPTIONS")
+    # The hvigor wrapper patches OHOS Node detection and HiLog logging that
+    # were previously baked into the private image.
     soft_cap, hard_cap = Process.getrlimit(Process::RLIMIT_NOFILE)
     Process.setrlimit(Process::RLIMIT_NOFILE, [soft_cap, 65_536].min, 65_536) if hard_cap > 65_536
 
     system "node", clt/"ohpm/bin/pm-cli.js", "install"
-    system "node", clt/"hvigor/bin/hvigorw.js", "assembleHap",
+    system hap_clt.to_s, "hvigor", clt.to_s, "assembleHap",
            "--mode", "module", "-p", "product=default", "--no-daemon"
 
     # Compile the native NAPI bridge with the OHOS clang and inject into the HAP.
