@@ -16,8 +16,8 @@ class BrunoDesktop < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bruno-desktop-v4.4.0-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "cdc4f0d449b4f2c6d6758ed1f72b1a0babcf6542a8f601f3d6635ba71f70d141"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/bruno-desktop-v4.4.0-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "7b2fdb3e99ec45e69e8232ea3b1e5d8bcc444f91d8b46d362594aa51d2d44383"
   end
 
   depends_on "ohos-hap-clt" => :build
