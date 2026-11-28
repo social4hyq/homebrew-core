@@ -54,11 +54,6 @@ on:
         required: false
         type: string
         default: ''
-      image:
-        description: 'CI container image override (default: the OHOS_CI_IMAGE repo variable). For private ghcr images the workflow logs in with GITHUB_TOKEN.'
-        required: false
-        type: string
-        default: ''
       private_root_url:
         description: 'PR 0b: private bottle root URL, only honored when upload=false. Never set for public publishes.'
         required: false
@@ -81,10 +76,6 @@ on:
         required: false
         type: string
         default: ''
-      image:
-        required: false
-        type: string
-        default: ''
       private_root_url:
         required: false
         type: string
@@ -96,9 +87,6 @@ defaults:
 
 permissions:
   contents: write
-  # Private per-formula images (bottle-build's `image` input) live on ghcr
-  # and are pulled with GITHUB_TOKEN.
-  packages: read
 
 concurrency:
   # event_name in the group keeps auto (push) runs from evicting a queued
@@ -107,8 +95,8 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  # Empty `image` input (the default) falls back to the shared runner image.
-  IMAGE: ${{ inputs.image != '' && inputs.image || vars.OHOS_CI_IMAGE }}
+  # Shared public runner image (ci-runner) for all formula builds.
+  IMAGE: ${{ vars.OHOS_CI_IMAGE }}
   CONTAINER: ohos
   TAP_IN_CONTAINER: /storage/Users/currentUser/.harmonybrew/Homebrew/Library/Taps/social4hyq/homebrew-core
   # Inputs pass through env (never interpolated into shell) and a whitelist check
@@ -140,13 +128,6 @@ jobs:
             || { echo "::error::invalid formula name: $FORMULA (allowed: [A-Za-z0-9@+._-])"; exit 1; }
 
       - name: Start OHOS container
-        env:
-          # setup-container.sh logs in to ghcr.io when IMAGE points there.
-          # GHCR_PULL_TOKEN (a PAT with read:packages) is used when set:
-          # GITHUB_TOKEN alone cannot pull a user-scoped private package
-          # that isn't linked to a repo, and the packages API refuses to
-          # link it for classic PATs — so the token is the supported path.
-          GHCR_TOKEN: ${{ secrets.GHCR_PULL_TOKEN != '' && secrets.GHCR_PULL_TOKEN || secrets.GITHUB_TOKEN }}
         run: .github/scripts/setup-container.sh
 
       - name: Build from source
