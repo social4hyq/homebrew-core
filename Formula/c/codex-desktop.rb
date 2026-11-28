@@ -14,8 +14,8 @@ class CodexDesktop < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codex-desktop-v26.1120.50957-r3"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "76e45f3116c7fa12ef604291dc4e1fcfca83b5fecaaba1eae3e6549445dd7ca1"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/codex-desktop-v26.1120.50957-r4"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "daedad12903341f5a3d2a15977bd74ef69996769325e7e3032f87edfdbe96384"
   end
 
   depends_on "ohos-hap-clt" => :build
