@@ -14,8 +14,8 @@ class ClaudeCodeDesktop < Formula
   end
 
   bottle do
-    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-desktop-v6.28899.6-r2"
-    sha256 cellar: :any_skip_relocation, arm64_ohos: "6a27116a0070ab0033c102973f89a45071cc60ddceed9e7ca5eb69d25aee1b8b"
+    root_url "https://atomgit.com/social4hyq/homebrew-core/releases/download/claude-code-desktop-v6.28899.6-r3"
+    sha256 cellar: :any_skip_relocation, arm64_ohos: "c8cf71b268858abb049125472c4e7333466764cf53dbfd1ac4c37c58181e7da3"
   end
 
   depends_on "ohos-hap-clt" => :build
